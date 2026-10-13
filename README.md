@@ -26,6 +26,10 @@ The precise field boundary and label semantics are documented in `benchmarks/REA
 the data includes an inapplicable target that violates its own contract, proving that applicability
 cannot be inferred from target correctness.
 
+The project follows frozen data contracts from evidence capture through evaluation.
+It freezes the Evidence, Guard, feature, scope, replay, baseline, and evaluation contracts before
+the implementation consumes the holdout set.
+
 All scope features are manually confirmed metadata at this stage. Contract family acts as a
 trusted prefilter; the future learner will be evaluated on version and interface boundaries within
 each family.
