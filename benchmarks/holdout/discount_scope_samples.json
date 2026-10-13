@@ -1,25 +1,30 @@
 [
   {
-    "sample_id": "holdout-v1-alternate-correct",
-    "contract_ref": "examples/discount/contracts/membership_discount_final_price_v1.json",
+    "sample_id": "holdout-v1-discount-amount-alternate",
+    "contract_ref": "examples/discount/contracts/membership_discount_amount_v1.json",
     "target": {
-      "module": "examples.discount.implementations.final_price_v1_alternate_correct",
-      "symbol": "calculate_price"
+      "module": "examples.discount.implementations.discount_amount_v1_alternate_correct",
+      "symbol": "calculate_discount"
     },
     "features": {
       "contract_family": "membership_discount",
       "contract_version": "v1",
-      "interface_kind": "final_price",
+      "interface_kind": "discount_amount",
       "symbol_signature": "decimal_bool_to_decimal",
       "module_group": "retail",
-      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+      "ast_features": [
+        "branch:is_member",
+        "decimal:multiply",
+        "decimal:subtract",
+        "round:half_up"
+      ]
     },
     "labels": {
       "guard_id": "membership-discount-final-price-v1",
-      "guard_applicable": true,
-      "guard_violation": false,
+      "guard_applicable": false,
+      "guard_violation": null,
       "contract_compliant": true,
-      "basis": "The v1 guard applies to a different code shape and passes."
+      "basis": "This holdout returns a discount amount, so the v1 final-price guard is inapplicable."
     }
   },
   {
@@ -35,7 +40,12 @@
       "interface_kind": "final_price",
       "symbol_signature": "decimal_bool_to_decimal",
       "module_group": "retail",
-      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+      "ast_features": [
+        "branch:is_member",
+        "decimal:multiply",
+        "decimal:subtract",
+        "round:half_up"
+      ]
     },
     "labels": {
       "guard_id": "membership-discount-final-price-v1",
@@ -58,7 +68,12 @@
       "interface_kind": "final_price",
       "symbol_signature": "decimal_bool_to_decimal",
       "module_group": "retail",
-      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+      "ast_features": [
+        "branch:is_member",
+        "decimal:multiply",
+        "decimal:subtract",
+        "round:half_up"
+      ]
     },
     "labels": {
       "guard_id": "membership-discount-final-price-v1",

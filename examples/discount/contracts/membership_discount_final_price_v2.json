@@ -5,6 +5,8 @@
   "interface_kind": "final_price",
   "target_symbol": "calculate_price",
   "symbol_signature": "decimal_bool_to_decimal",
+  "argument_types": {"amount": "decimal", "is_member": "boolean"},
+  "return_type": "decimal",
   "rounding": "ROUND_HALF_UP",
   "cases": [
     {

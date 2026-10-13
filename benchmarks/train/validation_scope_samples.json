@@ -1,0 +1,147 @@
+[
+  {
+    "sample_id": "train-query-v1-source-bug",
+    "contract_ref": "examples/validation/contracts/input_limit_query_v1.json",
+    "target": {
+      "module": "examples.validation.implementations.query_limit_v1_buggy",
+      "symbol": "parse_limit"
+    },
+    "features": {
+      "contract_family": "input_limit",
+      "contract_version": "v1",
+      "interface_kind": "query_parameter",
+      "symbol_signature": "optional_string_to_integer",
+      "module_group": "shared_validation",
+      "ast_features": [
+        "branch:none",
+        "int:parse",
+        "str:isascii",
+        "str:isdecimal",
+        "range:check"
+      ]
+    },
+    "labels": {
+      "guard_id": "input-limit-query-v1",
+      "guard_applicable": true,
+      "guard_violation": true,
+      "contract_compliant": false,
+      "basis": "The v1 query guard applies and detects that zero is accepted."
+    }
+  },
+  {
+    "sample_id": "train-query-v1-fixed",
+    "contract_ref": "examples/validation/contracts/input_limit_query_v1.json",
+    "target": {
+      "module": "examples.validation.implementations.query_limit_v1_fixed",
+      "symbol": "parse_limit"
+    },
+    "features": {
+      "contract_family": "input_limit",
+      "contract_version": "v1",
+      "interface_kind": "query_parameter",
+      "symbol_signature": "optional_string_to_integer",
+      "module_group": "shared_validation",
+      "ast_features": [
+        "branch:none",
+        "int:parse",
+        "str:isascii",
+        "str:isdecimal",
+        "range:check"
+      ]
+    },
+    "labels": {
+      "guard_id": "input-limit-query-v1",
+      "guard_applicable": true,
+      "guard_violation": false,
+      "contract_compliant": true,
+      "basis": "The guard applies, runs, and the parser satisfies every v1 query example."
+    }
+  },
+  {
+    "sample_id": "train-query-v2-legal",
+    "contract_ref": "examples/validation/contracts/input_limit_query_v2.json",
+    "target": {
+      "module": "examples.validation.implementations.query_limit_v2_correct",
+      "symbol": "parse_limit"
+    },
+    "features": {
+      "contract_family": "input_limit",
+      "contract_version": "v2",
+      "interface_kind": "query_parameter",
+      "symbol_signature": "optional_string_to_integer",
+      "module_group": "shared_validation",
+      "ast_features": [
+        "branch:none",
+        "int:parse",
+        "str:isascii",
+        "str:isdecimal",
+        "range:check"
+      ]
+    },
+    "labels": {
+      "guard_id": "input-limit-query-v1",
+      "guard_applicable": false,
+      "guard_violation": null,
+      "contract_compliant": true,
+      "basis": "The parser follows v2, so its 1 to 200 range must not be judged by the v1 guard."
+    }
+  },
+  {
+    "sample_id": "train-query-v2-own-contract-bug",
+    "contract_ref": "examples/validation/contracts/input_limit_query_v2.json",
+    "target": {
+      "module": "examples.validation.implementations.query_limit_v2_buggy",
+      "symbol": "parse_limit"
+    },
+    "features": {
+      "contract_family": "input_limit",
+      "contract_version": "v2",
+      "interface_kind": "query_parameter",
+      "symbol_signature": "optional_string_to_integer",
+      "module_group": "shared_validation",
+      "ast_features": [
+        "branch:none",
+        "int:parse",
+        "str:isascii",
+        "str:isdecimal",
+        "range:check"
+      ]
+    },
+    "labels": {
+      "guard_id": "input-limit-query-v1",
+      "guard_applicable": false,
+      "guard_violation": null,
+      "contract_compliant": false,
+      "basis": "The v1 guard is inapplicable even though this parser violates its own v2 default."
+    }
+  },
+  {
+    "sample_id": "train-batch-v1-legal",
+    "contract_ref": "examples/validation/contracts/input_limit_batch_v1.json",
+    "target": {
+      "module": "examples.validation.implementations.batch_limit_v1_correct",
+      "symbol": "parse_limit"
+    },
+    "features": {
+      "contract_family": "input_limit",
+      "contract_version": "v1",
+      "interface_kind": "worker_batch",
+      "symbol_signature": "optional_string_to_integer",
+      "module_group": "shared_validation",
+      "ast_features": [
+        "branch:none",
+        "int:parse",
+        "str:isascii",
+        "str:isdecimal",
+        "range:check"
+      ]
+    },
+    "labels": {
+      "guard_id": "input-limit-query-v1",
+      "guard_applicable": false,
+      "guard_violation": null,
+      "contract_compliant": true,
+      "basis": "This parser uses worker-batch semantics despite sharing the v1 version and signature."
+    }
+  }
+]

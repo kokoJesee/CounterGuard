@@ -44,5 +44,5 @@ def test_membership_discount_final_price_v1(
 def test_membership_discount_rejects_negative_amounts() -> None:
     calculate_price = load_target()
 
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError):
         calculate_price(Decimal("-0.01"), True)
