@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evidenceguard"
+version = "0.1.0"
+description = "Turn verified bug evidence into reusable, scope-aware regression guards."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.11,<3",
+  "typer>=0.16,<1",
+]
+
+[project.scripts]
+evidenceguard = "evidenceguard.cli:app"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+  "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evidenceguard"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

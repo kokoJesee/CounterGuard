@@ -1,0 +1,71 @@
+[
+  {
+    "sample_id": "holdout-v1-alternate-correct",
+    "contract_ref": "examples/discount/contracts/membership_discount_final_price_v1.json",
+    "target": {
+      "module": "examples.discount.implementations.final_price_v1_alternate_correct",
+      "symbol": "calculate_price"
+    },
+    "features": {
+      "contract_family": "membership_discount",
+      "contract_version": "v1",
+      "interface_kind": "final_price",
+      "symbol_signature": "decimal_bool_to_decimal",
+      "module_group": "retail",
+      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+    },
+    "labels": {
+      "guard_id": "membership-discount-final-price-v1",
+      "guard_applicable": true,
+      "guard_violation": false,
+      "contract_compliant": true,
+      "basis": "The v1 guard applies to a different code shape and passes."
+    }
+  },
+  {
+    "sample_id": "holdout-v1-alternate-bug",
+    "contract_ref": "examples/discount/contracts/membership_discount_final_price_v1.json",
+    "target": {
+      "module": "examples.discount.implementations.final_price_v1_alternate_buggy",
+      "symbol": "calculate_price"
+    },
+    "features": {
+      "contract_family": "membership_discount",
+      "contract_version": "v1",
+      "interface_kind": "final_price",
+      "symbol_signature": "decimal_bool_to_decimal",
+      "module_group": "retail",
+      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+    },
+    "labels": {
+      "guard_id": "membership-discount-final-price-v1",
+      "guard_applicable": true,
+      "guard_violation": true,
+      "contract_compliant": false,
+      "basis": "The guard applies and detects a 15% discount where v1 requires 20%."
+    }
+  },
+  {
+    "sample_id": "holdout-v2-alternate-legal",
+    "contract_ref": "examples/discount/contracts/membership_discount_final_price_v2.json",
+    "target": {
+      "module": "examples.discount.implementations.final_price_v2_alternate_correct",
+      "symbol": "calculate_price"
+    },
+    "features": {
+      "contract_family": "membership_discount",
+      "contract_version": "v2",
+      "interface_kind": "final_price",
+      "symbol_signature": "decimal_bool_to_decimal",
+      "module_group": "retail",
+      "ast_features": ["branch:is_member", "decimal:subtract", "round:half_up"]
+    },
+    "labels": {
+      "guard_id": "membership-discount-final-price-v1",
+      "guard_applicable": false,
+      "guard_violation": null,
+      "contract_compliant": true,
+      "basis": "This holdout obeys v2; structural similarity cannot make the v1 guard applicable."
+    }
+  }
+]

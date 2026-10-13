@@ -1,0 +1,27 @@
+{
+  "contract_id": "membership-discount-final-price-v1",
+  "contract_family": "membership_discount",
+  "contract_version": "v1",
+  "interface_kind": "final_price",
+  "target_symbol": "calculate_price",
+  "symbol_signature": "decimal_bool_to_decimal",
+  "rounding": "ROUND_HALF_UP",
+  "cases": [
+    {
+      "args": {"amount": "100.00", "is_member": true},
+      "expected": "80.00"
+    },
+    {
+      "args": {"amount": "100.00", "is_member": false},
+      "expected": "100.00"
+    },
+    {
+      "args": {"amount": "12.55", "is_member": true},
+      "expected": "10.04"
+    },
+    {
+      "args": {"amount": "-0.01", "is_member": true},
+      "raises": "ValueError"
+    }
+  ]
+}

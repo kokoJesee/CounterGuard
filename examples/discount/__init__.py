@@ -1,0 +1,1 @@
+"""Membership discount scenarios."""
