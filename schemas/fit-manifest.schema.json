@@ -1,0 +1,173 @@
+{
+  "$defs": {
+    "FitGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Guard Digest",
+          "type": "string"
+        },
+        "training_sample_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Training Sample Ids",
+          "type": "array"
+        },
+        "source_bug_sample_id": {
+          "minLength": 1,
+          "title": "Source Bug Sample Id",
+          "type": "string"
+        },
+        "fixed_sample_id": {
+          "minLength": 1,
+          "title": "Fixed Sample Id",
+          "type": "string"
+        },
+        "training_dataset_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Training Dataset Digest",
+          "type": "string"
+        },
+        "learning_ref": {
+          "minLength": 1,
+          "title": "Learning Ref",
+          "type": "string"
+        },
+        "learning_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Learning Digest",
+          "type": "string"
+        },
+        "scope_ref": {
+          "minLength": 1,
+          "title": "Scope Ref",
+          "type": "string"
+        },
+        "scope_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Scope Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_digest",
+        "training_sample_ids",
+        "source_bug_sample_id",
+        "fixed_sample_id",
+        "training_dataset_digest",
+        "learning_ref",
+        "learning_digest",
+        "scope_ref",
+        "scope_digest"
+      ],
+      "title": "FitGroup",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "fit-manifest.v1",
+      "default": "fit-manifest.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "protocol_id": {
+      "const": "scope_v1",
+      "default": "scope_v1",
+      "title": "Protocol Id",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "phase": {
+      "enum": [
+        "initial",
+        "refined"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "module_context_ref": {
+      "minLength": 1,
+      "title": "Module Context Ref",
+      "type": "string"
+    },
+    "module_context_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Module Context Digest",
+      "type": "string"
+    },
+    "feature_audit_ref": {
+      "minLength": 1,
+      "title": "Feature Audit Ref",
+      "type": "string"
+    },
+    "feature_audit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Feature Audit Digest",
+      "type": "string"
+    },
+    "train_file_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "propertyNames": {
+        "minLength": 1
+      },
+      "title": "Train File Digests",
+      "type": "object"
+    },
+    "groups": {
+      "items": {
+        "$ref": "#/$defs/FitGroup"
+      },
+      "title": "Groups",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol_digest",
+    "split_digest",
+    "phase",
+    "module_context_ref",
+    "module_context_digest",
+    "feature_audit_ref",
+    "feature_audit_digest",
+    "train_file_digests",
+    "groups",
+    "created_at",
+    "artifact_digest"
+  ],
+  "title": "FitManifest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

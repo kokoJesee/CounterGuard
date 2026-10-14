@@ -24,6 +24,14 @@ class FeatureExtractionError(EvidenceGuardError):
     """Source syntax or target structure cannot be extracted reliably."""
 
 
+class InsufficientScopeEvidence(EvidenceGuardError):
+    """Refuse a scope when verified training evidence cannot support it."""
+
+    def __init__(self, reason_code: str, detail: str) -> None:
+        super().__init__(detail)
+        self.reason_code = reason_code
+
+
 class GuardSelfCheckError(EvidenceGuardError):
     """A generated test failed its fixed-target validation; no Guard was published."""
 

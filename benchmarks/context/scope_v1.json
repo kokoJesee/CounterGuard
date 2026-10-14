@@ -1,0 +1,19 @@
+{
+  "schema_version": "module-context.v1",
+  "context_id": "scope_v1_module_context",
+  "owner": "EvidenceGuard benchmark maintainers",
+  "provenance": "D2 fixture architecture: package responsibilities established before scope learning; no applicability or compliance labels used.",
+  "rules": [
+    {
+      "module_prefix": "examples.discount",
+      "module_group": "retail",
+      "basis": "This package contains retail membership pricing and discount interfaces across contract versions."
+    },
+    {
+      "module_prefix": "examples.validation",
+      "module_group": "shared_validation",
+      "basis": "This package contains shared query and worker input validation across contract versions."
+    }
+  ],
+  "artifact_digest": "sha256:08f548c920924dac44f2058014b64c79e6d18f348b820a6535be7b1795f1ad6a"
+}

@@ -54,7 +54,7 @@ def test_all_fifteen_samples_match_and_repeated_artifacts_are_identical(workspac
     )
     assert digest_json_artifact(report) == report["artifact_digest"]
     assert all(entry["missing"] == entry["unexpected"] == [] for entry in report["entries"])
-    assert len(list((workspace / "artifacts/features/ast-features.v1").glob("*.json"))) == 15
+    assert len(list((workspace / "artifacts/features/ast-features.v1").glob("*/*.json"))) == 15
     first = (workspace / OUTPUT).read_bytes()
     repeated, _ = audit(workspace)
     assert repeated.exit_code == 0, repeated.output
@@ -116,7 +116,9 @@ def test_bad_target_retains_error_report_without_publishing_empty_features(works
     row = next(entry for entry in report["entries"] if entry["status"] == "error")
     assert row["error"]
     assert "actual" not in row
-    assert not (workspace / "artifacts/features/ast-features.v1/train-v1-source-bug.json").exists()
+    assert not list(
+        (workspace / "artifacts/features/ast-features.v1").glob("*/train-v1-source-bug.json")
+    )
 
 
 def test_unknown_annotation_vocabulary_is_rejected(workspace):
@@ -140,3 +142,66 @@ def test_source_drift_cannot_silently_overwrite_extracted_record(workspace):
     assert "Immutable artifact conflict" in next(
         row["error"] for row in report["entries"] if row["status"] == "error"
     )
+
+
+def test_module_group_annotation_is_checked_against_independent_manifest(workspace):
+    path = workspace / "benchmarks/train/discount_scope_samples.json"
+    data = json.loads(path.read_bytes())
+    data[0]["features"]["module_group"] = "inferred_from_bug_label"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    result, report = audit(workspace)
+    assert result.exit_code == 1
+    row = next(row for row in report["entries"] if row["status"] == "mismatched")
+    assert row["metadata_diff"]["module_group"] == {
+        "expected": "inferred_from_bug_label",
+        "actual": "retail",
+    }
+    assert report["module_context_digest"]
+    snapshot = workspace / row["source_snapshots"]["target"]
+    assert snapshot.exists()
+    history = (
+        workspace / "artifacts/audits/history" / f"{report['artifact_digest'].split(':')[1]}.json"
+    )
+    assert history.read_bytes() == (workspace / OUTPUT).read_bytes()
+    # Re-running after an annotation change preserves the original dispute.
+    data[0]["features"]["module_group"] = "retail"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    repeated, _ = audit(workspace)
+    assert repeated.exit_code == 0
+    assert history.exists()
+
+
+def test_context_corruption_retains_error_report(workspace):
+    path = workspace / "benchmarks/context/scope_v1.json"
+    data = json.loads(path.read_bytes())
+    data["owner"] = "changed"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    result, report = audit(workspace)
+    assert result.exit_code == 5
+    assert report["errors"] == 1
+
+
+def test_historical_feature_record_keeps_original_digest_shape():
+    path = PROJECT_ROOT / "docs/results/scope-v1/day6-feature-parity.json"
+    historic = json.loads(path.read_bytes())
+    row = historic["entries"][0]
+    # Build the v1 shape from recorded sources without adding context fields.
+    payload = {
+        "schema_version": "feature-extraction.v1",
+        "extractor_version": historic["extractor_version"],
+        "vocabulary_digest": historic["vocabulary_digest"],
+        "target": {
+            "module": "examples.discount.implementations.discount_amount_v1_alternate_correct",
+            "symbol": "calculate_discount",
+            "source_ref": "examples/discount/implementations/"
+            "discount_amount_v1_alternate_correct.py",
+        },
+        "target_digest": "sha256:" + "a" * 64,
+        "contract_ref": "examples/discount/contracts/membership_discount_amount_v1.json",
+        "contract_digest": "sha256:" + "b" * 64,
+        "features": row["actual"],
+    }
+    payload["artifact_digest"] = digest_json_artifact(payload)
+    record = FeatureRecord.model_validate_json(json.dumps(payload))
+    assert record.model_dump(mode="json") == payload
+    assert digest_json_artifact(record) == payload["artifact_digest"]

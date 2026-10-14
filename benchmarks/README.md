@@ -56,3 +56,9 @@ parameter with Python `None` using `is` or `is not`. No qualifying condition mea
 it is never a fallback for the absence of branches. Full boundaries are in `docs/data-contracts.md`.
 The nine-row manual baseline derivation is in
 `docs/results/scope-v1/expected-train-derivation.md`.
+
+`module_group` is independently derived from the reviewed architectural package mapping in
+`context/scope_v1.json`; the frozen group pin is verified before D7 fit. Expected group annotations
+are compared with this source rather than copied. Changes require a new context/protocol version.
+`docs/module-context-policy.md` records the D6 correction, and `docs/feature-adjudication.md`
+defines how annotation errors are independently reviewed without rewriting frozen results.

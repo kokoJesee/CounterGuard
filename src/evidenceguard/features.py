@@ -9,11 +9,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+from pydantic import model_serializer, model_validator
+
 from evidenceguard.artifacts import write_immutable
 from evidenceguard.digests import canonical_json_bytes, digest_bytes, digest_json_artifact
 from evidenceguard.errors import ArtifactIntegrityError, FeatureExtractionError
 from evidenceguard.evidence import parse_target_ref
 from evidenceguard.models import ArtifactRef, Digest, FrozenModel, TargetRef
+from evidenceguard.module_context import load_module_context
 from evidenceguard.predicates import (
     EXTRACTOR_VERSION,
     METADATA_FIELDS,
@@ -26,12 +29,14 @@ from evidenceguard.predicates import (
 class FeatureContext:
     target: str
     contract_path: Path
-    module_group: str
     cwd: Path
+    module_context_path: Path = Path("benchmarks/context/scope_v1.json")
 
 
 class FeatureRecord(FrozenModel):
-    schema_version: Literal["feature-extraction.v1"] = "feature-extraction.v1"
+    schema_version: Literal["feature-extraction.v1", "feature-extraction.v2"] = (
+        "feature-extraction.v2"
+    )
     extractor_version: Literal["ast-features.v1"] = EXTRACTOR_VERSION
     vocabulary_digest: Digest
     target: TargetRef
@@ -40,6 +45,29 @@ class FeatureRecord(FrozenModel):
     contract_digest: Digest
     features: FeatureVector
     artifact_digest: Digest
+    module_context_ref: ArtifactRef | None = None
+    module_context_digest: Digest | None = None
+
+    @model_serializer(mode="wrap")
+    def legacy_shape(self, handler):
+        payload = handler(self)
+        if self.schema_version == "feature-extraction.v1":
+            payload.pop("module_context_ref", None)
+            payload.pop("module_context_digest", None)
+        return payload
+
+    @model_validator(mode="after")
+    def audited_context(self):
+        if self.schema_version == "feature-extraction.v2" and (
+            self.module_context_ref is None or self.module_context_digest is None
+        ):
+            raise ValueError("Feature v2 requires independently audited module metadata")
+        if (
+            self.schema_version == "feature-extraction.v1"
+            and {"module_context_ref", "module_context_digest"} & self.model_fields_set
+        ):
+            raise ValueError("Legacy feature records cannot declare v2 context fields")
+        return self
 
 
 def extract_features(context: FeatureContext) -> FeatureVector:
@@ -51,6 +79,9 @@ def extract_feature_record(context: FeatureContext) -> FeatureRecord:
     try:
         workspace = context.cwd.resolve(strict=True)
         target, target_digest = parse_target_ref(context.target, cwd=workspace)
+        module_context_path = _path(context.module_context_path, workspace)
+        module_context = load_module_context(module_context_path)
+        module_group = module_context.resolve_group(target.module)
         contract_path = _path(context.contract_path, workspace)
         contract_bytes = contract_path.read_bytes()
         contract = json.loads(contract_bytes)
@@ -61,7 +92,7 @@ def extract_feature_record(context: FeatureContext) -> FeatureRecord:
         if digest_bytes(source) != target_digest:
             raise ValueError("Target source changed during extraction")
         tokens = extract_ast_features(source, target.symbol)
-        features = FeatureVector(**metadata, module_group=context.module_group, ast_features=tokens)
+        features = FeatureVector(**metadata, module_group=module_group, ast_features=tokens)
         draft = FeatureRecord(
             vocabulary_digest=VOCABULARY_DIGEST,
             target=target,
@@ -70,6 +101,8 @@ def extract_feature_record(context: FeatureContext) -> FeatureRecord:
             contract_digest=digest_bytes(contract_bytes),
             features=features,
             artifact_digest="sha256:" + "0" * 64,
+            module_context_ref=module_context_path.relative_to(workspace).as_posix(),
+            module_context_digest=module_context.artifact_digest,
         )
         return FeatureRecord.model_validate_json(
             canonical_json_bytes(
@@ -268,17 +301,49 @@ def audit_features(
     output: str | Path,
     cwd: str | Path,
     artifact_root: str | Path = "artifacts",
+    module_context_path: str | Path | None = None,
 ) -> dict:
     workspace = Path(cwd).resolve(strict=True)
     root = _path(Path(benchmark_root), workspace)
     destination = _path(Path(output), workspace)
-    artifact_path = _path(Path(artifact_root), workspace) / "features" / EXTRACTOR_VERSION
+    artifact_base = _path(Path(artifact_root), workspace)
+    context_path = (
+        _path(Path(module_context_path), workspace)
+        if module_context_path
+        else root / "context/scope_v1.json"
+    )
+    try:
+        context = load_module_context(context_path)
+    except ArtifactIntegrityError as error:
+        return _save_report(
+            {
+                "schema_version": "feature-audit.v2",
+                "extractor_version": EXTRACTOR_VERSION,
+                "vocabulary_digest": VOCABULARY_DIGEST,
+                "dataset_digests": {},
+                "dataset_snapshots": {},
+                "sample_count": 0,
+                "matched": 0,
+                "mismatched": 0,
+                "errors": 1,
+                "module_context_ref": context_path.relative_to(workspace).as_posix(),
+                "module_context_digest": None,
+                "entries": [
+                    {"sample_id": None, "status": "error", "exit_code": 5, "error": str(error)}
+                ],
+            },
+            destination,
+            artifact_base,
+        )
+    artifact_path = (
+        artifact_base / "features" / EXTRACTOR_VERSION / context.artifact_digest.split(":")[1][:16]
+    )
     files = sorted(
         path
         for split in ("train", "holdout")
         for path in (root / split).glob("*_scope_samples.json")
     )
-    entries, inputs, seen = [], {}, set()
+    entries, inputs, seen, dataset_snapshots = [], {}, set(), {}
     if not files:
         entries.append(
             {
@@ -295,6 +360,15 @@ def audit_features(
                 raise ValueError("Benchmark file must contain a nonempty list")
             inputs[path.relative_to(workspace).as_posix()] = digest_bytes(
                 canonical_json_bytes(data)
+            )
+            dataset_snapshot = (
+                artifact_base
+                / "audits/snapshots"
+                / (inputs[path.relative_to(workspace).as_posix()].split(":")[1] + ".json")
+            )
+            write_immutable(dataset_snapshot, canonical_json_bytes(data))
+            dataset_snapshots[path.relative_to(workspace).as_posix()] = (
+                dataset_snapshot.relative_to(workspace).as_posix()
             )
         except (OSError, ValueError) as error:
             entries.append(
@@ -319,21 +393,36 @@ def audit_features(
                     raise ValueError("Sample IDs must be unique, safe, nonempty strings")
                 seen.add(sample_id)
                 expected = FeatureVector.model_validate_json(json.dumps(sample["features"]))
-                # Only the explicit module group comes from annotation metadata. The
-                # extractor never receives manual AST tokens or applicability labels.
-                context = FeatureContext(
+                # Architecture metadata comes from a separate reviewed manifest,
+                # never from the expected annotation or applicability labels.
+                feature_context = FeatureContext(
                     target=f"{sample['target']['module']}:{sample['target']['symbol']}",
                     contract_path=Path(sample["contract_ref"]),
-                    module_group=expected.module_group,
                     cwd=workspace,
+                    module_context_path=context_path,
                 )
-                record = extract_feature_record(context)
+                record = extract_feature_record(feature_context)
+                source_snapshots = {}
+                for name, source_ref, expected_digest in (
+                    ("target", record.target.source_ref, record.target_digest),
+                    ("contract", record.contract_ref, record.contract_digest),
+                ):
+                    raw = _path(Path(source_ref), workspace).read_bytes()
+                    if digest_bytes(raw) != expected_digest:
+                        raise ArtifactIntegrityError("Feature source changed during audit snapshot")
+                    snapshot = (
+                        artifact_base
+                        / "audits/snapshots"
+                        / (expected_digest.split(":")[1] + ".bin")
+                    )
+                    write_immutable(snapshot, raw)
+                    source_snapshots[name] = snapshot.relative_to(workspace).as_posix()
                 actual = record.features
                 missing = sorted(expected.ast_features - actual.ast_features)
                 unexpected = sorted(actual.ast_features - expected.ast_features)
                 metadata_diff = {
                     field: {"expected": getattr(expected, field), "actual": getattr(actual, field)}
-                    for field in METADATA_FIELDS
+                    for field in (*METADATA_FIELDS, "module_group")
                     if getattr(expected, field) != getattr(actual, field)
                 }
                 matched = not missing and not unexpected and not metadata_diff
@@ -349,6 +438,7 @@ def audit_features(
                     actual=actual.model_dump(mode="json"),
                     feature_ref=ref.relative_to(workspace).as_posix(),
                     feature_digest=record.artifact_digest,
+                    source_snapshots=source_snapshots,
                 )
             except FeatureExtractionError as error:
                 row.update(exit_code=3, error=str(error))
@@ -358,7 +448,7 @@ def audit_features(
                 row.update(exit_code=2, error=str(error))
             entries.append(row)
     report = {
-        "schema_version": "feature-audit.v1",
+        "schema_version": "feature-audit.v2",
         "extractor_version": EXTRACTOR_VERSION,
         "vocabulary_digest": VOCABULARY_DIGEST,
         "dataset_digests": inputs,
@@ -367,8 +457,17 @@ def audit_features(
         "mismatched": sum(row["status"] == "mismatched" for row in entries),
         "errors": sum(row["status"] == "error" for row in entries),
         "entries": entries,
+        "module_context_ref": context_path.relative_to(workspace).as_posix(),
+        "module_context_digest": context.artifact_digest,
+        "dataset_snapshots": dataset_snapshots,
     }
+    return _save_report(report, destination, artifact_base)
+
+
+def _save_report(report: dict, destination: Path, artifact_base: Path) -> dict:
     report["artifact_digest"] = digest_json_artifact(report)
+    history = artifact_base / "audits/history" / f"{report['artifact_digest'].split(':')[1]}.json"
+    write_immutable(history, canonical_json_bytes(report))
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(canonical_json_bytes(report))
     return report

@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "FeatureVector": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "ast_features": {
+          "items": {
+            "enum": [
+              "branch:is_member",
+              "branch:none",
+              "decimal:multiply",
+              "decimal:subtract",
+              "int:parse",
+              "regex:ascii_digits",
+              "range:check",
+              "round:half_up",
+              "str:isascii",
+              "str:isdecimal"
+            ],
+            "type": "string"
+          },
+          "title": "Ast Features",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature",
+        "module_group",
+        "ast_features"
+      ],
+      "title": "FeatureVector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "features": {
+      "$ref": "#/$defs/FeatureVector"
+    },
+    "guard_applicable": {
+      "title": "Guard Applicable",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "features",
+    "guard_applicable"
+  ],
+  "title": "TrainingExample",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

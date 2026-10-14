@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "ModuleRule": {
+      "additionalProperties": false,
+      "properties": {
+        "module_prefix": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)+$",
+          "title": "Module Prefix",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "basis": {
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module_prefix",
+        "module_group",
+        "basis"
+      ],
+      "title": "ModuleRule",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "module-context.v1",
+      "default": "module-context.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "context_id": {
+      "minLength": 1,
+      "title": "Context Id",
+      "type": "string"
+    },
+    "owner": {
+      "minLength": 1,
+      "title": "Owner",
+      "type": "string"
+    },
+    "provenance": {
+      "minLength": 1,
+      "title": "Provenance",
+      "type": "string"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/ModuleRule"
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "context_id",
+    "owner",
+    "provenance",
+    "rules",
+    "artifact_digest"
+  ],
+  "title": "ModuleContext",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

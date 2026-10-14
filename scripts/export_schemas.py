@@ -6,7 +6,9 @@ from pathlib import Path
 from evidenceguard.baselines import FeatureVector, ScopePredicate
 from evidenceguard.features import FeatureRecord
 from evidenceguard.models import Evidence, Guard, RunRecord
+from evidenceguard.module_context import ModuleContext
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
+from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 
 MODELS = {
     "evidence": Evidence,
@@ -17,6 +19,10 @@ MODELS = {
     "scope-predicate": ScopePredicate,
     "experiment-protocol": ExperimentProtocol,
     "split-manifest": SplitManifest,
+    "module-context": ModuleContext,
+    "training-example": TrainingExample,
+    "scope-learning": ScopeLearningResult,
+    "fit-manifest": FitManifest,
 }
 
 if __name__ == "__main__":

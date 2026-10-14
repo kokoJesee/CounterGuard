@@ -92,8 +92,11 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "feature-extraction.v1",
-      "default": "feature-extraction.v1",
+      "default": "feature-extraction.v2",
+      "enum": [
+        "feature-extraction.v1",
+        "feature-extraction.v2"
+      ],
       "title": "Schema Version",
       "type": "string"
     },
@@ -133,6 +136,32 @@
       "pattern": "^sha256:[0-9a-f]{64}$",
       "title": "Artifact Digest",
       "type": "string"
+    },
+    "module_context_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Module Context Ref"
+    },
+    "module_context_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Module Context Digest"
     }
   },
   "required": [

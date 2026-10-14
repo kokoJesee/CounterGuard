@@ -8,7 +8,12 @@ import typer
 
 from evidenceguard import __version__
 from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
-from evidenceguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
+from evidenceguard.errors import (
+    ArtifactIntegrityError,
+    GuardSelfCheckError,
+    InsufficientScopeEvidence,
+    InvalidEvidenceError,
+)
 from evidenceguard.evidence import (
     CaptureRequest,
     capture_evidence,
@@ -19,6 +24,7 @@ from evidenceguard.evidence import (
 from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
 from evidenceguard.protocol import run_train_baselines, verify_protocol
+from evidenceguard.scope import fit_scopes
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
@@ -31,6 +37,10 @@ benchmark_app = typer.Typer(no_args_is_help=True, help="Execute frozen benchmark
 app.add_typer(benchmark_app, name="benchmark")
 features_app = typer.Typer(no_args_is_help=True, help="Extract and audit static target features.")
 app.add_typer(features_app, name="features")
+scope_app = typer.Typer(
+    no_args_is_help=True, help="Fit scopes from verified training features only."
+)
+app.add_typer(scope_app, name="scope")
 
 
 @app.callback()
@@ -44,6 +54,31 @@ def version() -> None:
     typer.echo(__version__)
 
 
+@scope_app.command("learn")
+def scope_learn(
+    protocol: Annotated[Path, typer.Option(help="Frozen protocol JSON.")],
+    phase: Annotated[str, typer.Option(help="initial or refined; never holdout.")],
+    output: Annotated[Path, typer.Option(help="Immutable fitted scope directory below cwd.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+) -> None:
+    try:
+        manifest = fit_scopes(protocol, phase=phase, output=output, cwd=cwd)
+    except InsufficientScopeEvidence as error:
+        typer.echo(
+            json.dumps(
+                {"status": "refused", "reason_code": error.reason_code, "detail": str(error)}
+            )
+        )
+        raise typer.Exit(4) from error
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (ValueError, TypeError) as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Scope fitting error: {error}", 3)
+    typer.echo(manifest.model_dump_json(indent=2))
+
+
 @features_app.command("audit")
 def features_audit(
     benchmark_root: Annotated[Path, typer.Option(help="Separate train/holdout sample files.")],
@@ -52,12 +87,19 @@ def features_audit(
     artifact_root: Annotated[
         Path, typer.Option(help="Extracted feature records below cwd.")
     ] = Path("artifacts"),
+    context: Annotated[Path | None, typer.Option(help="Reviewed module context manifest.")] = None,
 ) -> None:
     """Compare every feature with manual annotations and retain mismatches/errors."""
     try:
         report = audit_features(
-            benchmark_root=benchmark_root, output=output, cwd=cwd, artifact_root=artifact_root
+            benchmark_root=benchmark_root,
+            output=output,
+            cwd=cwd,
+            artifact_root=artifact_root,
+            module_context_path=context,
         )
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
     except ValueError as error:
         _error(str(error), 2)
     except OSError as error:

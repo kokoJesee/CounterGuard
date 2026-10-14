@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "ScopeClause": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "anyOf": [
+            {
+              "enum": [
+                "contract_family",
+                "contract_version",
+                "interface_kind",
+                "symbol_signature",
+                "module_group"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "ast_features",
+              "type": "string"
+            }
+          ],
+          "title": "Field"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "contains"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "title": "ScopeClause",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "scope-learning.v1",
+      "default": "scope-learning.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "learner_version": {
+      "const": "conjunction.v1",
+      "default": "conjunction.v1",
+      "title": "Learner Version",
+      "type": "string"
+    },
+    "clauses": {
+      "items": {
+        "$ref": "#/$defs/ScopeClause"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Clauses",
+      "type": "array"
+    },
+    "training_dataset_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Training Dataset Digest",
+      "type": "string"
+    },
+    "training_confusion": {
+      "$ref": "#/$defs/ConfusionCounts"
+    },
+    "candidate_count": {
+      "exclusiveMinimum": 0,
+      "title": "Candidate Count",
+      "type": "integer"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "clauses",
+    "training_dataset_digest",
+    "training_confusion",
+    "candidate_count",
+    "artifact_digest"
+  ],
+  "title": "ScopeLearningResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

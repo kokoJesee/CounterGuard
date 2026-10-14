@@ -9,7 +9,8 @@ semantics. The capture service accepts only a real buggy test failure followed b
 reproduced Evidence. Day 4 compiles the failed cases into independent Guard assets and self-checks
 them on the fixed target before publication. Day 5 freezes the experiment protocol, generates
 baseline scopes, and executes both baselines on the nine training rows. Day 6 extracts AST features
-without executing targets and audits all 15 frozen annotations. Scope learning is the next milestone.
+without executing targets and audits all 15 frozen annotations. Day 7 fits initial and refined
+scopes using the frozen training phases and independently audited module context.
 
 The MVP keeps two questions separate:
 
@@ -183,7 +184,7 @@ Four immutable Scope artifacts and the report, predictions, and raw replay recor
 under `artifacts/scopes/scope-v1/` and `artifacts/experiments/scope-v1/train-baselines/`.
 Definitions, sample membership, source text, and executable Guard meaning are pinned by digest;
 fresh capture timestamps do not change the semantic pin, while full provenance is still audited.
-The D5 command rejects holdout execution. Learned methods are frozen specifications for Day 7.
+The D5 command rejects holdout execution. Day 7 now implements the two frozen learned methods.
 See the [Day 5 acceptance record](docs/progress/day5.md).
 
 The [independent training derivation](docs/results/scope-v1/expected-train-derivation.md) lists
@@ -209,3 +210,31 @@ Same-input feature records and reports are deterministic. Changed source cannot 
 same version/sample record. A mismatch exits 1; invalid annotation input exits 2; extraction
 errors exit 3; immutable artifact conflicts exit 5. All errors retain a JSON report.
 See the [feature contract](docs/data-contracts.md) and [Day 6 record](docs/progress/day6.md).
+
+Module groups now come from `benchmarks/context/scope_v1.json`, not the expected annotations.
+The [context policy](docs/module-context-policy.md) corrects the historical D6 interpretation:
+duplicating a group in expected/actual did not independently audit it. FeatureRecord v2 records
+the context pin. Audits preserve immutable historical reports and input snapshots; disputes follow
+the [adjudication process](docs/feature-adjudication.md).
+
+## Fit initial and refined scopes
+
+```powershell
+uv run python scripts/prepare_scope_v1.py
+uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/experiments/scope-v1/fitted/initial
+uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/experiments/scope-v1/fitted/refined
+```
+
+Both initial rules use `contract_version == v1`. Adding the two frozen legal counterexamples and
+fully refitting produces version AND interface rules: `final_price` for discount and
+`query_parameter` for input-limit. On all nine training rows, initial yields TP=4/FP=2/TN=3/FN=0;
+refined yields TP=4/FP=0/TN=5/FN=0. These are scope classifications; actual Scope-aware replay is D8.
+
+The pure solver receives only exact `TrainingExample` values containing a `FeatureVector` and
+strict applicability bool. FeatureRecord, provenance dictionaries, identity fields, and leaking
+subclasses are rejected. The fit wrapper separately verifies source-bug/fixed identities, a legal
+counterexample, the frozen protocol/context, and fresh feature parity. Holdout never enters fit.
+
+Twenty permutations preserve each pure learning result and digest. Persisted scopes and fit
+manifests retain actual creation times and reuse the same bytes on repeat. Refused learning exits
+4; schema/type input errors exit 2; artifact errors exit 5. See the [Day 7 record](docs/progress/day7.md).

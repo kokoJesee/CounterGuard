@@ -37,7 +37,7 @@ Registry / CI 的使用顺序：
 
 ## FeatureVector 与 AST token
 
-FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得；`module_group` 来自显式上下文；只有 AST 集合从源码生成。目标名称、路径、case、Oracle 和标签均在模型之外。
+FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得；`module_group` 从独立、固定摘要的 `benchmarks/context/scope_v1.json` 架构包清单取得；只有 AST 集合从源码生成。目标名称、路径、case、Oracle 和标签均在模型之外。上下文来源及 D6 更正见 `module-context-policy.md`。
 
 `branch:none` 的历史名称表示 **Python None 身份检查**：`ast.If` 或 `ast.IfExp` 的 test 内，一个正式参数与 `None` 通过 `is` / `is not` 比较，允许左右交换。它不表示缺少分支。
 
@@ -68,8 +68,20 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 ## FeatureRecord 与对账报告
 
-`feature-extraction.v1` 外层记录 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、FeatureVector 和自身摘要。外层身份/来源不传入学习器。没有生成时间字段，相同输入可得到相同字节；同提取器版本和 sample ID 的不同输入不能原地覆盖。
+新记录为 `feature-extraction.v2`，外层保存 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、module_context_ref/digest、FeatureVector 和自身摘要。旧 v1 形状与摘要兼容读取，但不能用于 D7 fit。外层身份/来源不传入学习器。没有生成时间字段，相同输入可得到相同字节；同提取器/context/sample ID 的不同输入不能原地覆盖。
 
-`feature-audit.v1` 报告记录数据文件摘要、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于 D6 对账，不进入 D7 拟合。
+`feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于对账，不进入 D7 拟合。历史报告与快照追加保留，分歧仲裁见 `feature-adjudication.md`。
 
 退出 0 要求所有行 matched；差异返回 1，配置或词汇错误返回 2，提取失败返回 3，不可变资产冲突返回 5。混合失败时优先级为 5、3、2、1。错误和差异都会先写出报告。
+
+## Learner 类型边界与确定性
+
+`learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult` 是纯规则搜索入口；它不接收 Guard、FeatureRecord、样本 ID 或路径。TrainingExample 只有精确的 FeatureVector 和严格 bool 适用性标签。严格模型拒绝额外字段，运行时入口拒绝其他模型、dict、FeatureRecord 和带额外属性的 FeatureVector 子类，并重新校验输入。正例角色、标签来源、合法反例、协议、来源和成员资格由外层 `fit_scopes` 审核后再投影。
+
+这是类型注解、严格模型和运行时校验共同执行的输入边界；不把 Python 动态运行时描述成任意代码无法绕过的安全沙箱。测试覆盖整份 FeatureRecord、外层 JSON、混入身份/Oracle 字段、子类和伪造模型输入；正常 API 都会拒绝。
+
+搜索只从正例生成标量 eq / AST contains 候选，枚举 1–3 条 AND，保留 FP=FN=0 且每条条件有独立负例支持的规则。并列顺序为：条件数更少、AST 条件更少、固定字段顺序、规范 JSON 字典序。字段顺序固定为 family、version、interface、signature、module_group、AST；候选输出按规范字段/操作/值排序。
+
+`scope-learning.v1` 保存纯训练特征与标签的无序规范摘要、规则、混淆计数和 candidate_count；没有时间和样本 ID，其 artifact_digest 是 D7 乱序验收所比较的确定性摘要。
+
+外层 ScopePredicate 与 `fit-manifest.v1` 另外记录实际创建时间、sample ID、Guard artifact digest、protocol/split/context/audit 摘要。首次创建时间真实记录，重复相同输入验证后复用；不伪造时间来制造确定性。不同干净工作区的物化 Scope 摘要可能不同，纯 learning digest 保持一致。
