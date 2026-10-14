@@ -3,6 +3,11 @@
 EvidenceGuard turns verified bug evidence into reusable regression guards with explicit
 applicability boundaries.
 
+Day 3 now captures and verifies bidirectional bug Evidence. Each artifact records the selected
+contract and test digests, target digests, structured case results, raw logs, and pytest exit
+semantics. The capture service accepts only a real buggy test failure followed by a fixed pass as
+reproduced Evidence. Guard compilation and scope learning are the next milestones.
+
 The MVP keeps two questions separate:
 
 1. Does a guard apply to this code context?
@@ -89,3 +94,25 @@ uv sync
 uv run pytest
 uv run ruff check .
 ```
+
+## Capture verified Evidence
+
+Run from the repository root with the trusted example fixtures:
+
+```powershell
+uv run evidenceguard capture --evidence-id evd_discount_v1_member_rate_fix --contract examples/discount/contracts/membership_discount_final_price_v1.json --test tests/contract_tests/test_membership_discount_v1.py --buggy-target examples.discount.implementations.final_price_v1_buggy:calculate_price --fixed-target examples.discount.implementations.final_price_v1_fixed:calculate_price --artifact-root artifacts
+uv run evidenceguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix/evidence.json
+```
+
+The JSON has `reproduced=true`, buggy exit code `1`, fixed exit code `0`, and the failed cases
+`member-price` and `member-rounding`. Both commands print machine-readable JSON. Repeating the same
+capture verifies and reuses the existing artifact; changed inputs with the same identity are
+rejected. Input and log references are relative to the selected workspace (`--cwd`).
+
+CLI exit codes are `0` for reproduced Evidence, `1` for a completed but unreproduced attempt, `2`
+for invalid inputs, `3` for execution failures, and `5` for artifact integrity failures. Pytest
+exit codes `2` through `5`, missing or ambiguous case results, and timeouts cannot count as a
+reproduced bug. Diagnostic Evidence is retained when a run fails to reproduce.
+
+The Day 3 acceptance record is in [docs/progress/day3.md](docs/progress/day3.md). Generated runtime
+artifacts under `artifacts/` are excluded from Git.

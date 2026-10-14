@@ -1,0 +1,398 @@
+{
+  "$defs": {
+    "CaseOutcome": {
+      "description": "Normalized result for one stable contract case.",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "error"
+      ],
+      "title": "CaseOutcome",
+      "type": "string"
+    },
+    "CaseResult": {
+      "additionalProperties": false,
+      "description": "The result of one case, linked by its stable contract case ID.",
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/CaseOutcome"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        }
+      },
+      "required": [
+        "case_id",
+        "node_id",
+        "outcome"
+      ],
+      "title": "CaseResult",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "RunRecord": {
+      "additionalProperties": false,
+      "description": "Immutable, reproducible record of one pytest invocation.",
+      "properties": {
+        "schema_version": {
+          "const": "run-record.v1",
+          "default": "run-record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/RunRole"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Argv",
+          "type": "array"
+        },
+        "cwd": {
+          "minLength": 1,
+          "title": "Cwd",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 30.0,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        },
+        "pytest_exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pytest Exit Code"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        "case_results": {
+          "items": {
+            "$ref": "#/$defs/CaseResult"
+          },
+          "title": "Case Results",
+          "type": "array"
+        },
+        "stdout_ref": {
+          "minLength": 1,
+          "title": "Stdout Ref",
+          "type": "string"
+        },
+        "stdout_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stdout Digest",
+          "type": "string"
+        },
+        "stderr_ref": {
+          "minLength": 1,
+          "title": "Stderr Ref",
+          "type": "string"
+        },
+        "stderr_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stderr Digest",
+          "type": "string"
+        },
+        "junit_ref": {
+          "minLength": 1,
+          "title": "Junit Ref",
+          "type": "string"
+        },
+        "junit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Junit Digest",
+          "type": "string"
+        },
+        "python_version": {
+          "minLength": 1,
+          "title": "Python Version",
+          "type": "string"
+        },
+        "pytest_version": {
+          "minLength": 1,
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "error_detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Detail"
+        }
+      },
+      "required": [
+        "run_id",
+        "role",
+        "contract_id",
+        "contract_digest",
+        "target",
+        "target_digest",
+        "argv",
+        "cwd",
+        "started_at",
+        "duration_ms",
+        "pytest_exit_code",
+        "outcome",
+        "case_results",
+        "stdout_ref",
+        "stdout_digest",
+        "stderr_ref",
+        "stderr_digest",
+        "junit_ref",
+        "junit_digest",
+        "python_version",
+        "pytest_version"
+      ],
+      "title": "RunRecord",
+      "type": "object"
+    },
+    "RunRole": {
+      "description": "The purpose of a captured pytest execution.",
+      "enum": [
+        "buggy",
+        "fixed",
+        "replay"
+      ],
+      "title": "RunRole",
+      "type": "string"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A bidirectionally verified bug reproduction artifact.",
+  "properties": {
+    "schema_version": {
+      "const": "evidence.v1",
+      "default": "evidence.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evidence_id": {
+      "pattern": "^evd_[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "contract_id": {
+      "minLength": 1,
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "test_ref": {
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "buggy_target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "fixed_target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "buggy_target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Buggy Target Digest",
+      "type": "string"
+    },
+    "fixed_target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Fixed Target Digest",
+      "type": "string"
+    },
+    "buggy_run": {
+      "$ref": "#/$defs/RunRecord"
+    },
+    "fixed_run": {
+      "$ref": "#/$defs/RunRecord"
+    },
+    "failing_case_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Failing Case Ids",
+      "type": "array"
+    },
+    "reproduced": {
+      "title": "Reproduced",
+      "type": "boolean"
+    },
+    "rejection_reasons": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Rejection Reasons",
+      "type": "array"
+    },
+    "tool_version": {
+      "minLength": 1,
+      "title": "Tool Version",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "created_at",
+    "contract_id",
+    "contract_ref",
+    "contract_digest",
+    "test_ref",
+    "test_digest",
+    "buggy_target",
+    "fixed_target",
+    "buggy_target_digest",
+    "fixed_target_digest",
+    "buggy_run",
+    "fixed_run",
+    "failing_case_ids",
+    "reproduced",
+    "tool_version",
+    "artifact_digest"
+  ],
+  "title": "Evidence",
+  "type": "object"
+}

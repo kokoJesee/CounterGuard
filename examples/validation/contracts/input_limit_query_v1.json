@@ -9,18 +9,18 @@
   "return_type": "integer",
   "lexical_policy": "ascii_decimal_digits_with_leading_zeroes",
   "cases": [
-    {"args": {"raw": null}, "expected": 20},
-    {"args": {"raw": "1"}, "expected": 1},
-    {"args": {"raw": "01"}, "expected": 1},
-    {"args": {"raw": "100"}, "expected": 100},
-    {"args": {"raw": "0"}, "raises": "ValueError"},
-    {"args": {"raw": "101"}, "raises": "ValueError"},
-    {"args": {"raw": "ten"}, "raises": "ValueError"},
-    {"args": {"raw": ""}, "raises": "ValueError"},
-    {"args": {"raw": "+1"}, "raises": "ValueError"},
-    {"args": {"raw": " 1 "}, "raises": "ValueError"},
-    {"args": {"raw": "1_0"}, "raises": "ValueError"},
-    {"args": {"raw": "１２"}, "raises": "ValueError"},
-    {"args": {"raw": "-1"}, "raises": "ValueError"}
+    {"case_id": "omitted-default", "args": {"raw": null}, "expected": 20},
+    {"case_id": "minimum-value", "args": {"raw": "1"}, "expected": 1},
+    {"case_id": "leading-zeroes", "args": {"raw": "01"}, "expected": 1},
+    {"case_id": "maximum-value", "args": {"raw": "100"}, "expected": 100},
+    {"case_id": "below-minimum", "args": {"raw": "0"}, "raises": "ValueError"},
+    {"case_id": "above-maximum", "args": {"raw": "101"}, "raises": "ValueError"},
+    {"case_id": "alphabetic-text", "args": {"raw": "ten"}, "raises": "ValueError"},
+    {"case_id": "empty-value", "args": {"raw": ""}, "raises": "ValueError"},
+    {"case_id": "explicit-plus", "args": {"raw": "+1"}, "raises": "ValueError"},
+    {"case_id": "surrounding-whitespace", "args": {"raw": " 1 "}, "raises": "ValueError"},
+    {"case_id": "underscore-separator", "args": {"raw": "1_0"}, "raises": "ValueError"},
+    {"case_id": "unicode-digits", "args": {"raw": "１２"}, "raises": "ValueError"},
+    {"case_id": "negative-value", "args": {"raw": "-1"}, "raises": "ValueError"}
   ]
 }

@@ -13,3 +13,32 @@ def test_version_command() -> None:
 
     assert result.exit_code == 0
     assert result.stdout.strip() == __version__
+
+
+def test_capture_help_documents_required_inputs() -> None:
+    result = runner.invoke(app, ["capture", "--help"])
+    assert result.exit_code == 0
+    assert "--buggy-target" in result.stdout
+    assert "--fixed-target" in result.stdout
+
+
+def test_capture_rejects_invalid_id_without_traceback() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "capture",
+            "--evidence-id",
+            "invalid",
+            "--contract",
+            "unused.json",
+            "--test",
+            "unused.py",
+            "--buggy-target",
+            "unused:target",
+            "--fixed-target",
+            "unused:target",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "evidence_id" in result.stderr
+    assert "Traceback" not in result.output

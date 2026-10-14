@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://evidenceguard.dev/schemas/contract.v1.json",
+  "title": "EvidenceGuard contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "contract_family",
+    "contract_version",
+    "interface_kind",
+    "target_symbol",
+    "symbol_signature",
+    "argument_types",
+    "return_type",
+    "cases"
+  ],
+  "properties": {
+    "contract_id": {"type": "string", "minLength": 1},
+    "contract_family": {"type": "string", "minLength": 1},
+    "contract_version": {"type": "string", "minLength": 1},
+    "interface_kind": {"type": "string", "minLength": 1},
+    "target_symbol": {"type": "string", "minLength": 1},
+    "symbol_signature": {"type": "string", "minLength": 1},
+    "argument_types": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "enum": ["boolean", "decimal", "integer", "optional_string"]
+      }
+    },
+    "return_type": {
+      "enum": ["boolean", "decimal", "integer", "optional_string"]
+    },
+    "rounding": {"type": "string", "minLength": 1},
+    "lexical_policy": {"type": "string", "minLength": 1},
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/case"}
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "args"],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)+$"
+        },
+        "args": {"type": "object"},
+        "expected": {},
+        "raises": {"type": "string", "minLength": 1}
+      },
+      "oneOf": [
+        {"required": ["expected"], "not": {"required": ["raises"]}},
+        {"required": ["raises"], "not": {"required": ["expected"]}}
+      ]
+    }
+  }
+}

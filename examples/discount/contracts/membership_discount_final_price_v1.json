@@ -10,18 +10,22 @@
   "rounding": "ROUND_HALF_UP",
   "cases": [
     {
+      "case_id": "member-price",
       "args": {"amount": "100.00", "is_member": true},
       "expected": "80.00"
     },
     {
+      "case_id": "non-member-price",
       "args": {"amount": "100.00", "is_member": false},
       "expected": "100.00"
     },
     {
+      "case_id": "member-rounding",
       "args": {"amount": "12.55", "is_member": true},
       "expected": "10.04"
     },
     {
+      "case_id": "negative-amount",
       "args": {"amount": "-0.01", "is_member": true},
       "raises": "ValueError"
     }
