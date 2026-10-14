@@ -104,25 +104,6 @@ def _matches(clauses: tuple[ScopeClause, ...], features: FeatureVector) -> bool:
     )
 
 
-def _confusion(
-    clauses: tuple[ScopeClause, ...], examples: tuple[TrainingExample, ...]
-) -> ConfusionCounts:
-    counts = {"tp": 0, "fp": 0, "tn": 0, "fn": 0}
-    for example in examples:
-        predicted = _matches(clauses, example.features)
-        key = (
-            "tp"
-            if example.guard_applicable and predicted
-            else "fn"
-            if example.guard_applicable
-            else "fp"
-            if predicted
-            else "tn"
-        )
-        counts[key] += 1
-    return ConfusionCounts(**counts)
-
-
 def learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult:
     """Search receives neither Guard/FeatureRecord nor sample identity or provenance."""
     if type(examples) is not tuple or any(type(row) is not TrainingExample for row in examples):
@@ -159,22 +140,38 @@ def learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult:
     candidates = tuple(
         ScopeClause(field=field, op=op, value=value) for field, op, value in sorted(candidate_keys)
     )
+    # Cache each predicate's coverage once. Still enumerate every v1 combination:
+    # this changes scoring cost, not the hypothesis space, counts, or tie-break.
+    coverage_masks = tuple(
+        sum(1 << index for index, row in enumerate(examples) if _matches((clause,), row.features))
+        for clause in candidates
+    )
+    all_mask = (1 << len(examples)) - 1
+    positive_mask = sum(1 << index for index, row in enumerate(examples) if row.guard_applicable)
+    negative_mask = all_mask ^ positive_mask
+    counts = ConfusionCounts(tp=len(positive), fp=0, tn=len(negative), fn=0)
     rules = []
     tested = 0
     for size in range(1, 4):
-        for clauses in itertools.combinations(candidates, size):
+        for indexes in itertools.combinations(range(len(candidates)), size):
             tested += 1
-            counts = _confusion(clauses, examples)
-            if counts.fp or counts.fn:
+            coverage = all_mask
+            for index in indexes:
+                coverage &= coverage_masks[index]
+            if coverage & positive_mask != positive_mask or coverage & negative_mask:
                 continue
-            if not all(
-                any(
-                    _matches(clauses[:index] + clauses[index + 1 :], row.features)
-                    for row in negative
-                )
-                for index in range(len(clauses))
-            ):
+            supported = True
+            for removed in indexes:
+                reduced_coverage = all_mask
+                for index in indexes:
+                    if index != removed:
+                        reduced_coverage &= coverage_masks[index]
+                if not reduced_coverage & negative_mask:
+                    supported = False
+                    break
+            if not supported:
                 continue
+            clauses = tuple(candidates[index] for index in indexes)
             rules.append((clauses, counts))
     if not rules:
         raise InsufficientScopeEvidence(

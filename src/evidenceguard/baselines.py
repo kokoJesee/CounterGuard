@@ -166,8 +166,17 @@ def decide_scope(scope: ScopePredicate, features: Mapping[str, object]) -> Scope
 
 
 def count_predictions(rows: list[tuple[bool, str]]) -> ConfusionCounts:
+    """Count binary decisions; unknown needs a separate coverage report."""
     counts = {"tp": 0, "fp": 0, "tn": 0, "fn": 0}
     for label, decision in rows:
+        if (
+            type(label) is not bool
+            or type(decision) is not str
+            or decision not in {"applicable", "inapplicable"}
+        ):
+            raise ValueError(
+                "Binary confusion counts require bool labels and known scope decisions"
+            )
         predicted = decision == "applicable"
         counts["tp" if label and predicted else "fn" if label else "fp" if predicted else "tn"] += 1
     return ConfusionCounts(**counts)

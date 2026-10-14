@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-10-14T10:34:07.200928+00:00",
+  "tests": {
+    "passed": 342,
+    "added": 67,
+    "duration_seconds": 150.92
+  },
+  "ruff": "passed",
+  "git_diff_check": "passed",
+  "published_learning_records": [
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/initial/grd_discount_member_rate_regression_v2.learning.json",
+      "digest": "sha256:52adaceb4fdf0a6ddee6203211c0ca52babf48c42733617ca095fb5426e477aa",
+      "byte_equal_to_reference": true
+    },
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/initial/grd_query_limit_zero_regression_v2.learning.json",
+      "digest": "sha256:076d71142027772d77c1e30ddbd323bbb5d7d927aa8c99bbfe4090db4aa65c98",
+      "byte_equal_to_reference": true
+    },
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/refined/grd_discount_member_rate_regression_v2.learning.json",
+      "digest": "sha256:76c4b21fea5335d6b5ed589c96f17ee150dc62a99079d10c96f702c08a282f66",
+      "byte_equal_to_reference": true
+    },
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/refined/grd_query_limit_zero_regression_v2.learning.json",
+      "digest": "sha256:09bf7ba72aeb5bedeacc7d66dea67736b7b5c90ab1a0deff807ef76cfe3d3fbe",
+      "byte_equal_to_reference": true
+    },
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/learning-v2/refined/grd_discount_member_rate_regression_v2.learning.json",
+      "digest": "sha256:ce351b08f3ba13405362fdb50e257dfc0cf7ccb9facf28338b0b0764d3196f10",
+      "byte_equal_to_reference": true
+    },
+    {
+      "learning_ref": "artifacts/experiments/scope-v1/fitted/learning-v2/refined/grd_query_limit_zero_regression_v2.learning.json",
+      "digest": "sha256:7fd96fa93b2560363e58e2b55b0a3bcd6873b58391ef5c33204211778fcc2f74",
+      "byte_equal_to_reference": true
+    }
+  ],
+  "new_certificates_verified": 4,
+  "existing_artifact_file_count": 644,
+  "existing_json_self_digests_checked": 84,
+  "existing_json_self_digest_failures": [],
+  "existing_artifacts_written_since_first_source_edit": [],
+  "current_existing_artifact_inventory_digest": "sha256:5cda587d10f21e4806fffe82c20c196cbf43129354abf4a6ac8e42dca55ca47f",
+  "frozen_git_tracked_inputs_and_dependencies_diff": "unchanged",
+  "full_before_after_artifact_snapshot": "unavailable: initial sandbox temp directory was removed after that tool invocation; no full per-file byte comparison is claimed"
+}

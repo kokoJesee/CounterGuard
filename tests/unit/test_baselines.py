@@ -134,3 +134,16 @@ def test_frozen_training_confusion_counts():
             result = decide_scope(scope, sample["features"])
             decisions.append((sample["labels"]["guard_applicable"], result.decision))
         assert count_predictions(decisions).model_dump() == EXPECTED_TRAIN[method]
+
+
+@pytest.mark.parametrize("label", [True, False])
+@pytest.mark.parametrize("decision", ["unknown", "skipped_unknown", "pass", "", None])
+def test_binary_counts_refuse_unknown_and_execution_verdicts(label, decision):
+    with pytest.raises(ValueError, match="known scope decisions"):
+        count_predictions([(label, decision)])
+
+
+@pytest.mark.parametrize("label", [0, 1, "false", None])
+def test_confusion_counts_require_explicit_bool_labels(label):
+    with pytest.raises(ValueError, match="bool labels"):
+        count_predictions([(label, "applicable")])

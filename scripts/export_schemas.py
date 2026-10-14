@@ -10,6 +10,7 @@ from evidenceguard.module_context import ModuleContext
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 from evidenceguard.replay import ReplayResult
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
+from evidenceguard.scope_explanations import ScopeExplanation
 
 MODELS = {
     "evidence": Evidence,
@@ -25,6 +26,7 @@ MODELS = {
     "scope-learning": ScopeLearningResult,
     "fit-manifest": FitManifest,
     "replay-result": ReplayResult,
+    "scope-explanation": ScopeExplanation,
 }
 
 if __name__ == "__main__":

@@ -1,0 +1,196 @@
+{
+  "$defs": {
+    "ClauseWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "clause": {
+          "$ref": "#/$defs/ScopeClause"
+        },
+        "counterexample_features": {
+          "items": {
+            "$ref": "#/$defs/FeatureVector"
+          },
+          "minItems": 1,
+          "title": "Counterexample Features",
+          "type": "array"
+        }
+      },
+      "required": [
+        "clause",
+        "counterexample_features"
+      ],
+      "title": "ClauseWitness",
+      "type": "object"
+    },
+    "FeatureVector": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "ast_features": {
+          "items": {
+            "enum": [
+              "branch:is_member",
+              "branch:none",
+              "decimal:multiply",
+              "decimal:subtract",
+              "int:parse",
+              "regex:ascii_digits",
+              "range:check",
+              "round:half_up",
+              "str:isascii",
+              "str:isdecimal"
+            ],
+            "type": "string"
+          },
+          "title": "Ast Features",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature",
+        "module_group",
+        "ast_features"
+      ],
+      "title": "FeatureVector",
+      "type": "object"
+    },
+    "ScopeClause": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "anyOf": [
+            {
+              "enum": [
+                "contract_family",
+                "contract_version",
+                "interface_kind",
+                "symbol_signature",
+                "module_group"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "ast_features",
+              "type": "string"
+            }
+          ],
+          "title": "Field"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "contains"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "title": "ScopeClause",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "scope-explanation.v1",
+      "default": "scope-explanation.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "learner_version": {
+      "const": "conjunction.v1",
+      "default": "conjunction.v1",
+      "title": "Learner Version",
+      "type": "string"
+    },
+    "label_basis": {
+      "const": "supplied_training_labels",
+      "default": "supplied_training_labels",
+      "title": "Label Basis",
+      "type": "string"
+    },
+    "learning_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Learning Digest",
+      "type": "string"
+    },
+    "training_dataset_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Training Dataset Digest",
+      "type": "string"
+    },
+    "positive_count": {
+      "minimum": 2,
+      "title": "Positive Count",
+      "type": "integer"
+    },
+    "negative_count": {
+      "minimum": 1,
+      "title": "Negative Count",
+      "type": "integer"
+    },
+    "clause_witnesses": {
+      "items": {
+        "$ref": "#/$defs/ClauseWitness"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Clause Witnesses",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "learning_digest",
+    "training_dataset_digest",
+    "positive_count",
+    "negative_count",
+    "clause_witnesses",
+    "artifact_digest"
+  ],
+  "title": "ScopeExplanation",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

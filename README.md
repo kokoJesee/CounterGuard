@@ -247,6 +247,21 @@ Learning v2 exposes `predicate_count` and `combination_count`: discount is 8/92 
 is 10/175. Old v1 counts and digests remain readable. The new bundle directory prevents overwriting
 historical D7 provenance. Dependency and recomputation rules are in [data contracts](docs/data-contracts.md).
 
+The eager learner caches predicate coverage without changing candidate enumeration, ranking, or
+learning bytes/digests. Optional clause-removal witnesses can be exported from an existing audited
+fit without launching pytest or rewriting upstream artifacts:
+
+```powershell
+uv run python scripts/explain_fitted_scopes.py --fit artifacts/experiments/scope-v1/fitted/learning-v2/refined/fit-manifest.json --output artifacts/analyses/scope-explanations-v1/refined
+```
+
+Each certificate binds the original learning digest and training multiset, and lists the negative
+feature vectors admitted if each clause is removed. It proves necessity relative to supplied labels;
+it does not certify label correctness or generalization. Changed content needs a new output version.
+Binary confusion counts reject unknown rather than counting it as inapplicable. See the
+[methodology assessment](docs/research/methodology-transfer-2026-10-14.md) for lazy refinement,
+mutation testing, and shrinking designs and limits.
+
 ## Run Scope-aware training replay
 
 ```powershell

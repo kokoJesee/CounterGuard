@@ -1,6 +1,6 @@
 # 数据契约与摘要边界
 
-本文说明当前持久化接口，字段校验以 `src/evidenceguard/models.py`、`predicates.py`、`features.py`、`baselines.py` 和 `protocol.py` 为准。JSON Schema 位于 `schemas/`，业务跨字段不变量另由严格模型与 verify 检查。
+本文说明当前持久化接口，字段校验以 `src/evidenceguard/models.py`、`predicates.py`、`features.py`、`baselines.py`、`protocol.py`、`scope.py` 和 `scope_explanations.py` 为准。JSON Schema 位于 `schemas/`，业务跨字段不变量另由严格模型与 verify 检查。
 
 ## 依赖与重算规则
 
@@ -13,6 +13,7 @@
 | Guard | artifact：Evidence 关联、完整 Guard 字段、自检与日志；semantic：固定 9 字段执行投影 | Evidence 换修订必须发布新 Guard 身份/版本，不能覆盖原资产。即使 semantic_digest 相同，guard artifact 绑定变化也要求重新物化 Scope/fit manifest；规则本身可复核后复用 |
 | Feature / audit | 目标源码、声明契约、module context、自身特征；audit 还依赖样本文件、手工标注、词汇/提取器与快照 | 重提受影响目标并重新审计；context 来源或记录格式变化生成新记录版本。audit 不能靠改标注变绿。相关训练特征/标签变化须重新学习；其他目标变化无需重训无关规则 |
 | Learning / Scope / fit | 纯 learning：规范排序的训练 FeatureVector+标签、算法/结果格式；Scope/fit：另绑定训练身份、Guard artifact、protocol/split/context/audit 和创建记录 | 特征、标签、成员或算法变化要重学对应 Guard/phase；仅来源绑定或结果记录格式变化可保留验证后的相同规则，但必须重新物化相关结果/manifest。旧引用不可静默换成新 digest |
+| 可选 ScopeExplanation | learning artifact_digest、训练多重集 digest、正负例计数、逐条件删除见证、证书格式 | learning 或训练变化时在新目录重生成证书；该证书是旁路审计产物，不改变已有 Scope/fit/Replay 绑定，也不触发它们重物化 |
 | ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
 | EvaluationReport（D9 待实现） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
 
@@ -108,6 +109,20 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 | input-limit | 10（5 个标量 + 5 个 AST） | 175 = C(10,1)+C(10,2)+C(10,3) |
 
 组合数记录实际枚举的全部 1–3 条组合，包含后来因 FN/FP 或冗余被丢弃的组合。它不是成功规则数。v2 模型核对组合公式，测试对两个真实场景分别固定数字；不把 discount 的 8/92 当成所有 Guard 的常数。
+
+当前计算实现缓存各谓词的训练覆盖位集，再做组合交集；完整枚举、固定排名、删除见证与记录形状保持 `conjunction.v1`。独立逐行枚举器逐字节对照，因此不需要重新签名或重新物化现有学习资产。它不是 lazy 算法，组合空间并未缩小。
+
+`count_predictions` 只接受严格 bool 标签与 applicable/inapplicable 两种预测；unknown、执行 verdict 和隐式整数标签被拒绝，不能混入二元混淆矩阵。覆盖率与 unknown 数量另行报告，不暗改冻结实验的分母。
+
+## 可选作用域反例证书
+
+`scope-explanation.v1` 由 `scope_explanations.py` 定义，包含 learner_version、label_basis=`supplied_training_labels`、原 learning_digest、training_dataset_digest、positive_count/negative_count、clause_witnesses 和自摘要。每个 witness 保存对应 ScopeClause 及删除该条件后被纳入的全部去重负例 FeatureVector；按规范 JSON 排序。重复训练行仍计入训练摘要/正负计数，证书只去重展示特征。
+
+单条件规则删除后成为空合取，接受全部负例。多条件见证必须匹配所有其他条件，并被本条件排除；同时被其他条件排除的样本不是本条件的删除见证。严格模型检查这些逻辑不变量，`verify_scope_explanation` 再核对自摘要，并针对原学习和完整训练多重集重建证书，拒绝重新签名的虚假计数/见证。只校验自摘要不足以证明见证属于训练负例。
+
+证书证明条件不可单独删除，不独立证明标签正确、规则泛化或任意语法上的全局最小。纯函数 `explain_scope` 保留 learner 的 feature-only 输入边界；`explain_fitted_scopes` 外层只读审核既有来源/协议/成员/自动特征，再投影训练输入。它不捕获 Evidence、不重训/更新 fit、不调用 pytest；所有组审核通过后才写独立文件。
+
+证书没有执行/创建时间字段，因为它是确定性的派生说明，没有声称发生新执行。其 digest 覆盖全部上述字段（排除自身 artifact_digest），旧 learning/Scope/fit digest 不改变。Schema 为 `schemas/scope-explanation.schema.json`，新物化目录为 `artifacts/analyses/scope-explanations-v1/{initial,refined}/`。
 
 外层 ScopePredicate 与 `fit-manifest.v1` 另外记录实际创建时间、sample ID、Guard artifact digest、protocol/split/context/audit 摘要。首次创建时间真实记录，重复相同输入验证后复用；不伪造时间来制造确定性。不同干净工作区的物化 Scope 摘要可能不同，纯 learning digest 保持一致。
 
