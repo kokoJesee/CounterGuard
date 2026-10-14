@@ -94,6 +94,7 @@ def _artifact_path(workspace: Path, artifact_ref: str) -> Path:
     return workspace / Path(artifact_ref)
 
 
+@pytest.mark.slow
 def test_runs_real_pytest_with_fixed_cwd_and_sanitized_environment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

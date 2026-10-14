@@ -26,9 +26,13 @@ dev = [
 packages = ["src/evidenceguard"]
 
 [tool.pytest.ini_options]
-addopts = "-ra"
+addopts = "-ra --strict-markers"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
+markers = [
+  "slow: real subprocesses, integration/e2e flows, or expensive prepared fixtures",
+  "fast: in-process checks without a slow fixture or a real child process",
+]
 
 [tool.ruff]
 line-length = 100

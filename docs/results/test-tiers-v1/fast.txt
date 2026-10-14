@@ -1,0 +1,17 @@
+........................................................................ [ 24%]
+........................................................................ [ 48%]
+........................................................................ [ 73%]
+........................................................................ [ 97%]
+.......                                                                  [100%]
+============================ slowest 10 durations =============================
+0.29s call     tests/test_cli.py::test_capture_help_documents_required_inputs
+0.26s call     tests/unit/test_execution.py::test_exit_one_requires_exact_known_case_mapping
+0.23s call     tests/unit/test_evaluation.py::test_paired_refinement_and_twenty_input_permutations_are_identical
+0.09s call     tests/unit/test_scope.py::test_actual_frozen_training_rows_have_stable_results_for_both_phases
+0.08s call     tests/unit/test_scope_optimization.py::test_coverage_masks_preserve_full_payload_or_refusal_on_varied_datasets[37]
+0.06s call     tests/unit/test_execution.py::test_setup_error_cannot_become_test_failure
+0.06s call     tests/unit/test_execution.py::test_unknown_junit_node_cannot_become_test_failure
+0.05s setup    tests/unit/test_execution.py::test_exit_one_requires_exact_known_case_mapping
+0.05s call     tests/unit/test_execution.py::test_preserves_non_domain_pytest_exit_semantics[4-pytest_usage_error]
+0.05s call     tests/unit/test_scope_explanations.py::test_twenty_shuffles_produce_identical_certificate_bytes_and_digest
+295 passed, 146 deselected in 3.72s

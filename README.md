@@ -135,9 +135,20 @@ and parsing structure are similar to the source guard.
 
 ```powershell
 uv sync
-uv run pytest
+uv run pytest -m "not slow" -q
 uv run ruff check .
 ```
+
+Daily checks use the fast tier. Before delivery, run the complete suite once:
+
+```powershell
+uv run pytest -q --durations=20
+```
+
+The unfiltered command still runs every test. Integration/e2e, heavy prepared fixtures and real
+child processes are marked `slow`; run them directly by file when changing their behavior, or
+use `uv run pytest -m slow -q`. Fast tests reject real process launches during fixture setup,
+execution and teardown. Tier definitions and timing evidence are in [testing.md](docs/testing.md).
 
 ## Capture verified Evidence
 

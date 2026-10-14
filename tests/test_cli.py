@@ -3,6 +3,7 @@
 import subprocess
 import sys
 
+import pytest
 from typer.testing import CliRunner
 
 from evidenceguard import __version__
@@ -47,6 +48,7 @@ def test_capture_rejects_invalid_id_without_traceback() -> None:
     assert "Traceback" not in result.output
 
 
+@pytest.mark.slow
 def test_python_module_entrypoint_matches_console_command() -> None:
     result = subprocess.run(
         [sys.executable, "-m", "evidenceguard", "version"], capture_output=True, text=True
