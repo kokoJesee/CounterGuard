@@ -288,3 +288,24 @@ This returns 4 and preserves the missing-information reason. Supply `--contract`
 target contract to evaluate it normally. Input integrity is checked before execution and again
 afterward; changes during a run produce stale with the actual run preserved. See the
 [Day 8 acceptance record](docs/progress/day8.md).
+
+## Evaluate all four methods on the frozen holdout
+
+```powershell
+uv run evidenceguard experiment evaluate --protocol experiments/scope_v1.json --split holdout --fitted artifacts/experiments/scope-v1/fitted --output artifacts/experiments/scope-v1/final
+uv run evidenceguard experiment verify --run artifacts/experiments/scope-v1/final
+```
+
+Evaluation consumes existing fits, executes the same six rows for all methods, and separately probes
+both source bugs in both learned phases. Holdout metrics exclude these four source probes. Scope
+and end-to-end metrics report per-Guard, micro and macro results, with explicit numerators,
+denominators and null reasons. The query Guard has no held-out bug, so its Bug recall is null.
+
+The frozen confusion policy counts unknown as a negative prediction and also reports its rate and
+decision coverage. Raw results retain unknown; skipped cases never become passed tests.
+
+Reports and raw replays are immutable. Reusing an output performs a read-only audit; a real repeat
+needs a new output directory and retains fresh execution IDs/times. Only stable prediction/metric
+projections are expected to have identical bytes. `evaluate` exits 0 when the experiment meets its
+frozen acceptance, not when every Guard passes. `verify` checks evidence integrity without execution.
+The six labels are already public, so this is engineering validation rather than a blind benchmark.

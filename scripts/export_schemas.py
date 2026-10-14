@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 from evidenceguard.baselines import FeatureVector, ScopePredicate
+from evidenceguard.evaluation import EvaluationReport
+from evidenceguard.evaluation_metrics import EvaluationMetrics, Prediction
 from evidenceguard.features import FeatureRecord
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.module_context import ModuleContext
@@ -27,6 +29,9 @@ MODELS = {
     "fit-manifest": FitManifest,
     "replay-result": ReplayResult,
     "scope-explanation": ScopeExplanation,
+    "evaluation-report": EvaluationReport,
+    "evaluation-metrics": EvaluationMetrics,
+    "evaluation-prediction": Prediction,
 }
 
 if __name__ == "__main__":

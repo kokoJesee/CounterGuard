@@ -1,0 +1,246 @@
+{
+  "$defs": {
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "MethodMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "micro": {
+          "$ref": "#/$defs/SliceMetrics"
+        },
+        "per_guard": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SliceMetrics"
+          },
+          "title": "Per Guard",
+          "type": "object"
+        },
+        "macro_scope": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Macro Scope",
+          "type": "object"
+        },
+        "macro_end_to_end": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Macro End To End",
+          "type": "object"
+        }
+      },
+      "required": [
+        "micro",
+        "per_guard",
+        "macro_scope",
+        "macro_end_to_end"
+      ],
+      "title": "MethodMetrics",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "numerator": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Numerator"
+        },
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "number"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "included_guards": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Included Guards",
+          "type": "array"
+        },
+        "components": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "default": {},
+          "title": "Components",
+          "type": "object"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "SliceMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_count": {
+          "minimum": 0,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "confusion": {
+          "$ref": "#/$defs/ConfusionCounts"
+        },
+        "unknown_count": {
+          "minimum": 0,
+          "title": "Unknown Count",
+          "type": "integer"
+        },
+        "execution_count": {
+          "minimum": 0,
+          "title": "Execution Count",
+          "type": "integer"
+        },
+        "verdict_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Verdict Counts",
+          "type": "object"
+        },
+        "scope": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Scope",
+          "type": "object"
+        },
+        "end_to_end": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "End To End",
+          "type": "object"
+        }
+      },
+      "required": [
+        "sample_count",
+        "confusion",
+        "unknown_count",
+        "execution_count",
+        "verdict_counts",
+        "scope",
+        "end_to_end"
+      ],
+      "title": "SliceMetrics",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "evaluation-metrics.v1",
+      "default": "evaluation-metrics.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "metric_version": {
+      "const": "scope-v1-metrics.v1",
+      "default": "scope-v1-metrics.v1",
+      "title": "Metric Version",
+      "type": "string"
+    },
+    "unknown_policy": {
+      "const": "negative_prediction_with_separate_coverage",
+      "default": "negative_prediction_with_separate_coverage",
+      "title": "Unknown Policy",
+      "type": "string"
+    },
+    "methods": {
+      "additionalProperties": {
+        "$ref": "#/$defs/MethodMetrics"
+      },
+      "propertyNames": {
+        "enum": [
+          "b1_always",
+          "b2_interface",
+          "learned_initial",
+          "learned_refined"
+        ]
+      },
+      "title": "Methods",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "methods",
+    "artifact_digest"
+  ],
+  "title": "EvaluationMetrics",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "ClauseTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "op": {
+          "title": "Op",
+          "type": "string"
+        },
+        "expected": {
+          "title": "Expected",
+          "type": "string"
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actual"
+        },
+        "matched": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Matched"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "expected",
+        "actual",
+        "matched"
+      ],
+      "title": "ClauseTrace",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "SampleLabels": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_applicable": {
+          "title": "Guard Applicable",
+          "type": "boolean"
+        },
+        "guard_violation": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Guard Violation"
+        },
+        "contract_compliant": {
+          "title": "Contract Compliant",
+          "type": "boolean"
+        },
+        "basis": {
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_applicable",
+        "guard_violation",
+        "contract_compliant",
+        "basis"
+      ],
+      "title": "SampleLabels",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "method": {
+      "enum": [
+        "b1_always",
+        "b2_interface",
+        "learned_initial",
+        "learned_refined"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "guard_id": {
+      "minLength": 1,
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "sample_id": {
+      "minLength": 1,
+      "title": "Sample Id",
+      "type": "string"
+    },
+    "labels": {
+      "$ref": "#/$defs/SampleLabels"
+    },
+    "scope_decision": {
+      "enum": [
+        "applicable",
+        "inapplicable",
+        "unknown"
+      ],
+      "title": "Scope Decision",
+      "type": "string"
+    },
+    "decision_trace": {
+      "items": {
+        "$ref": "#/$defs/ClauseTrace"
+      },
+      "title": "Decision Trace",
+      "type": "array"
+    },
+    "verdict": {
+      "minLength": 1,
+      "title": "Verdict",
+      "type": "string"
+    },
+    "violated_case_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Violated Case Ids",
+      "type": "array"
+    },
+    "run_outcome": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "method",
+    "guard_id",
+    "sample_id",
+    "labels",
+    "scope_decision",
+    "decision_trace",
+    "verdict",
+    "violated_case_ids",
+    "run_outcome"
+  ],
+  "title": "Prediction",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

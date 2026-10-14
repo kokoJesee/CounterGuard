@@ -15,7 +15,7 @@
 | Learning / Scope / fit | 纯 learning：规范排序的训练 FeatureVector+标签、算法/结果格式；Scope/fit：另绑定训练身份、Guard artifact、protocol/split/context/audit 和创建记录 | 特征、标签、成员或算法变化要重学对应 Guard/phase；仅来源绑定或结果记录格式变化可保留验证后的相同规则，但必须重新物化相关结果/manifest。旧引用不可静默换成新 digest |
 | 可选 ScopeExplanation | learning artifact_digest、训练多重集 digest、正负例计数、逐条件删除见证、证书格式 | learning 或训练变化时在新目录重生成证书；该证书是旁路审计产物，不改变已有 Scope/fit/Replay 绑定，也不触发它们重物化 |
 | ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
-| EvaluationReport（D9 待实现） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
+| EvaluationReport（D9） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
 
@@ -114,6 +114,8 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 `count_predictions` 只接受严格 bool 标签与 applicable/inapplicable 两种预测；unknown、执行 verdict 和隐式整数标签被拒绝，不能混入二元混淆矩阵。覆盖率与 unknown 数量另行报告，不暗改冻结实验的分母。
 
+D9 评测层另按冻结计划 §5.3 显式计算：unknown 在主混淆矩阵中属于负预测，同时独立记录 unknown_count、unknown rate 与 decision coverage。原始 Prediction/Replay 仍保留 unknown/skipped_unknown，且 run=null；不把它重命名为 inapplicable，也不调用只接受二元输入的 count_predictions。这个规则是原冻结口径，不是本轮调整标准。
+
 ## 可选作用域反例证书
 
 `scope-explanation.v1` 由 `scope_explanations.py` 定义，包含 learner_version、label_basis=`supplied_training_labels`、原 learning_digest、training_dataset_digest、positive_count/negative_count、clause_witnesses 和自摘要。每个 witness 保存对应 ScopeClause 及删除该条件后被纳入的全部去重负例 FeatureVector；按规范 JSON 排序。重复训练行仍计入训练摘要/正负计数，证书只去重展示特征。
@@ -148,3 +150,19 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 新目标语法错误、未支持结构或缺少声明契约产生 skipped_unknown；无法解析目标标识/源文件的配置错误返回 2。pytest exit 1 只有实际失败断言才是 violation；exit 2 的 interrupted 未细分原因时按 execution_error 记录，不能自称已确认 collection error。
 
 `replay verify` 的退出 0 表示记录及当前输入/日志完整性审核通过，不表示 verdict=pass，也不重新执行 pytest。历史 violation/unknown 可完整审核通过；来源已变化的旧记录会拒绝供当前工作使用。
+
+## EvaluationReport 与指标投影（D9）
+
+`evaluation-report.v1` 的 manifest 保存 eval_ 身份、真实开始/完成时间和耗时、protocol/split 引用与摘要、两阶段 fit、四方法 Scope 的实际绑定、运行实现的逐文件及集合摘要、Python/pytest/Pydantic/Typer/平台/超时环境、样本/预测/执行计数、文件摘要、验收结果及失败原因。代码摘要来自当前导入的实现，不对临时目标工作区中的空 src 目录签名。
+
+四方法在相同六个 `(guard_id, sample_id)` 留出行上产生 24 个 Prediction 和 Replay。Prediction 是没有随机 ID/时间/耗时的确定性投影，包含方法、身份、冻结标签、原始作用域决策/trace、verdict、失败 case 和实际 RunOutcome。`replays.jsonl` 保留完整 ReplayResult、引用和真实身份/时间。新增源码缺陷复检保存在 `source-checks.jsonl`，两个学习阶段各两个来源 buggy，共四行，明确不进入留出指标分母。
+
+`evaluation-metrics.v1` 保存 scope-v1-metrics.v1 的公式版本、显式 unknown 政策、每方法的 micro、per_guard、macro_scope 和 macro_end_to_end、自摘要。Ratio 保存 numerator、denominator、value 和 reason；零分母为 null/zero_denominator。Balanced accuracy 的任一项未定义则整体 null，保留两项的 components。macro 对有定义的逐 Guard 指标等权，显式保存 included_guards 和全部 components，不能用 micro 值冒充 macro。input-limit 的留出 Bug recall 分母为 0，macro Bug recall 只纳入 discount。
+
+纯 metrics 与 paired-refinement 只依赖确定性的标签/决策/执行分类，重放时间和随机 ID 不参与；实际 Replay 与 manifest 另有新时间、身份和摘要。两者的确定性不能通过伪造运行时间获得。`report.md` 从同一 metrics/paired JSON 渲染，不能独立改变事实。
+
+`experiment evaluate` 只消费已发布 fit，不重新 capture、compile、audit、fit，不读取 holdout 标签给 learner。来源绑定审核可以纯重算训练规则，但不修改上游产物。新输出目录内保留 Baseline Scope、运行日志、六份报告文件和最后发布的 manifest。发现冻结期望不满足仍发布 accepted=false 和失败原因；中途异常另存 failure.json 与已完成的原始 Replay，不制造缺失行的结果。
+
+重复同一输出目录只做 verify；参数或绑定不同拒绝。目录已有部分产物或失败记录时要求新目录，不覆盖。真正确定性复跑使用新目录并产生新执行，比较 predictions.jsonl、metrics.json、paired-refinement.json 和 report.md 字节；replays/manifest 必须保留各次真实时间。
+
+`experiment verify --run` 逐层审核文件摘要、冻结成员/标签、scope/fit、每份真实 Replay、运行时实现及环境、原始预测和指标重建、配对及验收摘要、Markdown 重建；不执行 pytest。返回 0 表示记录完整，不表示 accepted=true，也不表示每个 Guard 通过。`experiment evaluate` 返回 0 表示冻结实验验收通过，原始报告仍可有真实违规和错误应用；验收未通过返回 1，完整性错误返回 5。

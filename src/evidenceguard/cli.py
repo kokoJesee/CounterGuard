@@ -14,6 +14,7 @@ from evidenceguard.errors import (
     InsufficientScopeEvidence,
     InvalidEvidenceError,
 )
+from evidenceguard.evaluation import evaluate_methods, verify_evaluation
 from evidenceguard.evidence import (
     CaptureRequest,
     capture_evidence,
@@ -270,11 +271,18 @@ def evidence_inventory(
 
 @experiment_app.command("verify")
 def experiment_verify(
-    protocol: Annotated[Path, typer.Option(help="Frozen experiment protocol JSON.")],
+    protocol: Annotated[Path | None, typer.Option(help="Frozen experiment protocol JSON.")] = None,
+    run: Annotated[Path | None, typer.Option(help="Immutable D9 evaluation directory.")] = None,
     cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
 ) -> None:
     """Audit protocol, split membership, data pins, and complete Guard provenance."""
     try:
+        if (protocol is None) == (run is None):
+            raise ValueError("Specify exactly one of --protocol and --run")
+        if run is not None:
+            report = verify_evaluation(run, cwd=cwd)
+            typer.echo(report.model_dump_json(indent=2))
+            return
         spec, manifest, guards = verify_protocol(protocol, cwd=cwd)
     except ArtifactIntegrityError as error:
         _error(str(error), 5)
@@ -298,6 +306,35 @@ def experiment_verify(
             indent=2,
         )
     )
+
+
+@experiment_app.command("evaluate")
+def experiment_evaluate(
+    protocol: Annotated[Path, typer.Option(help="Frozen scope_v1 protocol JSON.")],
+    fitted: Annotated[Path, typer.Option(help="Directory containing initial/refined fit bundles.")],
+    output: Annotated[Path, typer.Option(help="New immutable evaluation directory.")],
+    split: Annotated[str, typer.Option(help="D9 accepts holdout only.")] = "holdout",
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+    timeout: Annotated[float, typer.Option(help="Per-run timeout in seconds.")] = 30.0,
+) -> None:
+    try:
+        report = evaluate_methods(
+            protocol,
+            fitted=fitted,
+            output=output,
+            cwd=cwd,
+            split=split,
+            timeout_seconds=timeout,
+        )
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Evaluation execution error: {error}", 3)
+    typer.echo(report.model_dump_json(indent=2))
+    if not report.accepted:
+        raise typer.Exit(1)
 
 
 @benchmark_app.command("baselines")

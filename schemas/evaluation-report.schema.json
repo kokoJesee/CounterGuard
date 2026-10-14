@@ -1,0 +1,215 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "evaluation-report.v1",
+      "default": "evaluation-report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evaluation_id": {
+      "minLength": 1,
+      "title": "Evaluation Id",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "completed_at": {
+      "format": "date-time",
+      "title": "Completed At",
+      "type": "string"
+    },
+    "duration_ms": {
+      "minimum": 0,
+      "title": "Duration Ms",
+      "type": "integer"
+    },
+    "protocol_ref": {
+      "minLength": 1,
+      "title": "Protocol Ref",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "split_ref": {
+      "minLength": 1,
+      "title": "Split Ref",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "split": {
+      "const": "holdout",
+      "default": "holdout",
+      "title": "Split",
+      "type": "string"
+    },
+    "metric_version": {
+      "const": "scope-v1-metrics.v1",
+      "default": "scope-v1-metrics.v1",
+      "title": "Metric Version",
+      "type": "string"
+    },
+    "fit_refs": {
+      "additionalProperties": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Fit Refs",
+      "type": "object"
+    },
+    "fit_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Fit Digests",
+      "type": "object"
+    },
+    "scope_refs": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "b1_always",
+          "b2_interface",
+          "learned_initial",
+          "learned_refined"
+        ]
+      },
+      "title": "Scope Refs",
+      "type": "object"
+    },
+    "scope_digests": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "b1_always",
+          "b2_interface",
+          "learned_initial",
+          "learned_refined"
+        ]
+      },
+      "title": "Scope Digests",
+      "type": "object"
+    },
+    "code_file_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "propertyNames": {
+        "minLength": 1
+      },
+      "title": "Code File Digests",
+      "type": "object"
+    },
+    "code_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Code Digest",
+      "type": "string"
+    },
+    "environment": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Environment",
+      "type": "object"
+    },
+    "sample_count": {
+      "minimum": 1,
+      "title": "Sample Count",
+      "type": "integer"
+    },
+    "prediction_count": {
+      "minimum": 1,
+      "title": "Prediction Count",
+      "type": "integer"
+    },
+    "execution_count": {
+      "minimum": 0,
+      "title": "Execution Count",
+      "type": "integer"
+    },
+    "source_check_execution_count": {
+      "minimum": 0,
+      "title": "Source Check Execution Count",
+      "type": "integer"
+    },
+    "files": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "propertyNames": {
+        "minLength": 1
+      },
+      "title": "Files",
+      "type": "object"
+    },
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "acceptance_failures": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Acceptance Failures",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "started_at",
+    "completed_at",
+    "duration_ms",
+    "protocol_ref",
+    "protocol_digest",
+    "split_ref",
+    "split_digest",
+    "fit_refs",
+    "fit_digests",
+    "scope_refs",
+    "scope_digests",
+    "code_file_digests",
+    "code_digest",
+    "environment",
+    "sample_count",
+    "prediction_count",
+    "execution_count",
+    "source_check_execution_count",
+    "files",
+    "accepted",
+    "acceptance_failures",
+    "artifact_digest"
+  ],
+  "title": "EvaluationReport",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
