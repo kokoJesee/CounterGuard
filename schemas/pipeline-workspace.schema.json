@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "InputPin": {
+      "additionalProperties": false,
+      "description": "The same relative path is used in the source and mirrored workspaces.",
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "content_digest"
+      ],
+      "title": "InputPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "pipeline-workspace.v1",
+      "default": "pipeline-workspace.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "runtime_ref": {
+      "minLength": 1,
+      "title": "Runtime Ref",
+      "type": "string"
+    },
+    "scenario_ref": {
+      "minLength": 1,
+      "title": "Scenario Ref",
+      "type": "string"
+    },
+    "scenario_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Scenario Digest",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/InputPin"
+      },
+      "minItems": 1,
+      "title": "Files",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "runtime_ref",
+    "scenario_ref",
+    "scenario_digest",
+    "files",
+    "artifact_digest"
+  ],
+  "title": "WorkspaceManifest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "ScenarioGuard": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "request_ref": {
+          "minLength": 1,
+          "title": "Request Ref",
+          "type": "string"
+        },
+        "replay_sample_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Replay Sample Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "guard_id",
+        "request_ref",
+        "replay_sample_ids"
+      ],
+      "title": "ScenarioGuard",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "pipeline-scenario.v1",
+      "default": "pipeline-scenario.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scenario_id": {
+      "maxLength": 48,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "protocol_ref": {
+      "minLength": 1,
+      "title": "Protocol Ref",
+      "type": "string"
+    },
+    "guards": {
+      "items": {
+        "$ref": "#/$defs/ScenarioGuard"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "title": "Guards",
+      "type": "array"
+    }
+  },
+  "required": [
+    "scenario_id",
+    "protocol_ref",
+    "guards"
+  ],
+  "title": "PipelineScenario",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

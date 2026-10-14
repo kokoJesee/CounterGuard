@@ -17,8 +17,27 @@
 | ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
 | EvaluationReport（D9） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
 | Candidate / VerificationGate（D10） | 请求原始字节、白名单 AgentContext、recorded 响应指纹、可信模板测试、fixed 来源以及 D3 双向 Evidence | 请求、响应、契约、目标或模板改变，必须使用新的 request ID/修订和新 candidate/Evidence；历史完成标记只读审核。Gate 是 Evidence 的生成分支，不依赖 Scope，也不自动触发既有 Scope/评测重算 |
+| Workspace / Pipeline（D11） | 场景与来源/输入镜像原字节、冻结 protocol/split、各阶段正式模型摘要、实际 Replay/JUnit、执行代码与依赖版本 | 任一来源或运行代码变化，历史结果不能在新版本下冒充当前运行。重新运行使用新的 workspace 版本目录；不得重签旧 manifest、复制旧 artifacts 充当新 capture/fit，或修改冻结配置迁就新路径 |
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
+
+## 独立 Workspace 与 Pipeline（D11）
+
+`pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/day11` 在新目录依次执行 D10 recorded capture → D4 最小 compile → D7 initial/refined fit → D8 refined replay。示例 `.yaml` 内容采用 JSON 形式，当前读取器只接受此子集，使用标准库与现有 Pydantic，不引入通用 YAML 依赖。`pipeline-scenario.v1` 不允许指定新的期待指标或标签；只选择原冻结协议的两份 Guard、两份验证请求和各三个 train sample IDs。
+
+冻结 scope_v1 的 Guard ID、引用路径和 semantic_digest 全部保留。输出目录内的 `w/` 是独立运行 cwd，仅复制显式列举的 protocol/split/context、标注文件、源码/契约、请求/录制响应、场景及必要 package initializer。每个文件保持原始字节并记录 SHA-256；不复制源码仓库中的 artifacts、Git、凭据、缓存、依赖目录或其他文件。新 Gate/Guard/Scope 的同名业务 ID 只存在于新 namespace，与历史产物物理隔离；Guard 执行语义必须再次满足冻结 pin。
+
+`workspace_manifest.json` 的 `InputPin.ref` 相对于来源 cwd，也相对于 `w/`，两侧必须与同一 content_digest 一致。`runtime_ref` 相对于来源 cwd，指向 `<workspace>/w`。workspace 文件集合必须完整且无额外输入，场景本身也被原字节固定。准备前校验冻结来源和完整最长路径预算；不要求原仓库预先具备可用 Guard。原仓库中的过期/损坏 artifact 不作为输入。
+
+`run_manifest.json` 是最后发布的完成标记。其所有 `ArtifactLink.ref` 相对于**来源 cwd**，以 runtime_ref 重定位到独立运行文件；被引用的 Gate/Evidence/Guard/fit/Replay 模型内部引用继续相对于 **w/**。这是两层命名空间，不可把内部 ref 直接当作源仓库路径。所有阶段链接必须留在该运行 namespace 内，并与正式模型的 artifact_digest、身份与来源链一致。
+
+manifest 绑定 workspace、场景、两份 Gate/Evidence/Guard、initial/refined fit/Scope/learning、六份实际 Replay、冻结 protocol/split、实际加载的 runtime 源码及 Python/pytest/Pydantic/Typer 版本。initial 为 7 行训练、refined 为 9 行训练，learner 仍只接收 TrainingExample；静态 feature audit 仍核对冻结 15 行，但 holdout 不进入学习或本次真实重放。
+
+演示三类目标由冻结 train 标签独立决定：源 buggy 正例必须得到 applicable+violation，fixed 正例必须得到 applicable+pass，已确认合法的不适用反例必须得到 inapplicable+not_run。两份 Guard 共六行；标准成功记录包含两次 violation、两次 pass、两次 skipped_inapplicable，真实 Replay 执行四次。CLI 的 0 表示演示验收通过，不能解释为所有被测实现都通过 Guard。skip 保留自身 verdict 和 run=null。
+
+每个执行边界都先审核已完成来源、Gate、Guard、fit/learning 与先前 Replay/JUnit。缺失引用、输入/摘要不一致不继续启动后续阶段。失败保留 `failure.json`、已完成正式 artifact 链接和原始运行日志，且不发布成功完成标记；无效输入/路径在 mkdir/运行前拒绝。失败与未完成目录拒绝自动覆盖/恢复，后续尝试用新版本目录。异常文本不序列化进 failure，保留固定原因/错误类型及真实阶段，避免自由文本或密钥回显。
+
+`pipeline verify <run_manifest.json>` 只读复验所有输入和正式阶段模型，重新解析原始 JUnit 核对执行结果与最小 case 集，重建 manifest 的逐行摘要/验收。调用 Scope 的已有来源审核可以在内存纯重算训练规则，不能发布新 fit、调用 provider 或执行目标。相同 scenario/输出目录的重复 run 走这一路径，保留原 ID、时间、摘要和文件字节。修改 JSON 后重新计算自摘要仍无法伪造接受结论。
 
 ## 路径预算
 

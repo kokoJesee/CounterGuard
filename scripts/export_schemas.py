@@ -15,11 +15,13 @@ from evidenceguard.independent_verifier import (
 )
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.module_context import ModuleContext
+from evidenceguard.pipeline import PipelineFailure, PipelineManifest
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 from evidenceguard.replay import ReplayResult
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from evidenceguard.scope_explanations import ScopeExplanation
 from evidenceguard.verification_gate import GateResult
+from evidenceguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
     "evidence": Evidence,
@@ -44,6 +46,10 @@ MODELS = {
     "agent-context": AgentContext,
     "candidate-record": CandidateRecord,
     "verification-gate": GateResult,
+    "pipeline-scenario": PipelineScenario,
+    "pipeline-workspace": WorkspaceManifest,
+    "pipeline-run": PipelineManifest,
+    "pipeline-failure": PipelineFailure,
 }
 
 if __name__ == "__main__":

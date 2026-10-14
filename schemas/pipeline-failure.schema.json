@@ -1,0 +1,88 @@
+{
+  "$defs": {
+    "ArtifactLink": {
+      "additionalProperties": false,
+      "description": "References are relative to the caller's source cwd, not the mirrored cwd.",
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "artifact_digest"
+      ],
+      "title": "ArtifactLink",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "pipeline-failure.v1",
+      "default": "pipeline-failure.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "workspace": {
+      "$ref": "#/$defs/ArtifactLink"
+    },
+    "failed_stage": {
+      "enum": [
+        "capture",
+        "compile",
+        "learn",
+        "replay",
+        "verify"
+      ],
+      "title": "Failed Stage",
+      "type": "string"
+    },
+    "reason_code": {
+      "minLength": 1,
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "exit_code": {
+      "minimum": 1,
+      "title": "Exit Code",
+      "type": "integer"
+    },
+    "completed_artifacts": {
+      "items": {
+        "$ref": "#/$defs/ArtifactLink"
+      },
+      "title": "Completed Artifacts",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "workspace",
+    "failed_stage",
+    "reason_code",
+    "exit_code",
+    "completed_artifacts",
+    "artifact_digest"
+  ],
+  "title": "PipelineFailure",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

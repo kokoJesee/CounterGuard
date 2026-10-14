@@ -24,6 +24,7 @@ from evidenceguard.evidence import (
 )
 from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
+from evidenceguard.pipeline import PipelineExecutionError, run_pipeline, verify_pipeline
 from evidenceguard.protocol import run_train_baselines, verify_protocol
 from evidenceguard.replay import (
     ReplayRequest,
@@ -54,6 +55,43 @@ replay_app = typer.Typer(no_args_is_help=True, help="Run or audit a scoped repla
 app.add_typer(replay_app, name="replay")
 verification_app = typer.Typer(no_args_is_help=True, help="Audit independent candidate Gates.")
 app.add_typer(verification_app, name="verification")
+pipeline_app = typer.Typer(no_args_is_help=True, help="Run or audit the offline MVP pipeline.")
+app.add_typer(pipeline_app, name="pipeline")
+
+
+@pipeline_app.command("run")
+def pipeline_run(
+    scenario: Annotated[Path, typer.Option(help="JSON-compatible YAML scenario.")],
+    workspace: Annotated[Path, typer.Option(help="New immutable output directory below cwd.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+) -> None:
+    try:
+        manifest = run_pipeline(scenario, cwd=cwd, workspace=workspace)
+    except PipelineExecutionError as error:
+        _error(str(error), error.exit_code)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError:
+        _error("Pipeline input or output is unavailable", 3)
+    typer.echo(manifest.model_dump_json(indent=2))
+    if not manifest.accepted:
+        raise typer.Exit(1)
+
+
+@pipeline_app.command("verify")
+def pipeline_verify(
+    path: Annotated[Path, typer.Argument(help="Completed run_manifest.json.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+) -> None:
+    try:
+        manifest = verify_pipeline(path, cwd=cwd)
+    except (ArtifactIntegrityError, OSError, ValueError) as error:
+        _error(str(error), 5)
+    typer.echo(manifest.model_dump_json(indent=2))
+    if not manifest.accepted:
+        raise typer.Exit(1)
 
 
 @verification_app.command("verify")

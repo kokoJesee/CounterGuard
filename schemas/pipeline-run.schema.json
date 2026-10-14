@@ -1,0 +1,284 @@
+{
+  "$defs": {
+    "ArtifactLink": {
+      "additionalProperties": false,
+      "description": "References are relative to the caller's source cwd, not the mirrored cwd.",
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "artifact_digest"
+      ],
+      "title": "ArtifactLink",
+      "type": "object"
+    },
+    "PipelineGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "gate": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "evidence": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "guard": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "initial_scope": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "initial_learning": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "refined_scope": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "refined_learning": {
+          "$ref": "#/$defs/ArtifactLink"
+        }
+      },
+      "required": [
+        "guard_id",
+        "gate",
+        "evidence",
+        "guard",
+        "initial_scope",
+        "initial_learning",
+        "refined_scope",
+        "refined_learning"
+      ],
+      "title": "PipelineGroup",
+      "type": "object"
+    },
+    "PipelineReplay": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "sample_id": {
+          "minLength": 1,
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "replay": {
+          "$ref": "#/$defs/ArtifactLink"
+        },
+        "scope_decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Scope Decision",
+          "type": "string"
+        },
+        "execution_outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunOutcome"
+            },
+            {
+              "const": "not_run",
+              "type": "string"
+            }
+          ],
+          "title": "Execution Outcome"
+        },
+        "verdict": {
+          "minLength": 1,
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "sample_id",
+        "replay",
+        "scope_decision",
+        "execution_outcome",
+        "verdict"
+      ],
+      "title": "PipelineReplay",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "pipeline-run.v1",
+      "default": "pipeline-run.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "scenario_id": {
+      "minLength": 1,
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "scenario_ref": {
+      "minLength": 1,
+      "title": "Scenario Ref",
+      "type": "string"
+    },
+    "scenario_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Scenario Digest",
+      "type": "string"
+    },
+    "workspace": {
+      "$ref": "#/$defs/ArtifactLink"
+    },
+    "runtime_ref": {
+      "minLength": 1,
+      "title": "Runtime Ref",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "code_file_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "propertyNames": {
+        "minLength": 1
+      },
+      "title": "Code File Digests",
+      "type": "object"
+    },
+    "code_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Code Digest",
+      "type": "string"
+    },
+    "environment": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Environment",
+      "type": "object"
+    },
+    "initial_fit": {
+      "$ref": "#/$defs/ArtifactLink"
+    },
+    "refined_fit": {
+      "$ref": "#/$defs/ArtifactLink"
+    },
+    "groups": {
+      "items": {
+        "$ref": "#/$defs/PipelineGroup"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "title": "Groups",
+      "type": "array"
+    },
+    "replays": {
+      "items": {
+        "$ref": "#/$defs/PipelineReplay"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "title": "Replays",
+      "type": "array"
+    },
+    "verdict_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Verdict Counts",
+      "type": "object"
+    },
+    "execution_count": {
+      "minimum": 0,
+      "title": "Execution Count",
+      "type": "integer"
+    },
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "created_at",
+    "scenario_id",
+    "scenario_ref",
+    "scenario_digest",
+    "workspace",
+    "runtime_ref",
+    "protocol_digest",
+    "split_digest",
+    "code_file_digests",
+    "code_digest",
+    "environment",
+    "initial_fit",
+    "refined_fit",
+    "groups",
+    "replays",
+    "verdict_counts",
+    "execution_count",
+    "accepted",
+    "artifact_digest"
+  ],
+  "title": "PipelineManifest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

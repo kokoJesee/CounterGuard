@@ -31,6 +31,21 @@ Untrusted Python and empty candidates are rejected before execution. Infrastruct
 retain diagnostic runs under the candidate directory and never publish a verified Evidence.
 New artifact paths, atomic temporary files and pytest caches must fit a 240 UTF-16-unit budget.
 
+Day 11 runs that flow from clean inputs in an independent pinned workspace:
+
+```powershell
+uv run evidenceguard pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/day11
+uv run evidenceguard pipeline verify artifacts/day11/run_manifest.json
+```
+
+The scenario uses JSON-compatible YAML and the frozen training members only. It builds both
+Guards, fits initial and refined scopes, then demonstrates a real violation, a pass, and an
+inapplicable target for each Guard. A successful Pipeline exits 0 while retaining those distinct
+results; skipped targets never become passes. It does not execute holdout targets or copy old
+artifacts. Completed workspaces are read-only; failures and changed inputs require a new output
+version. Runtime artifacts use paths relative to the workspace's `w/`, while top-level manifest
+links use the source project root.
+
 The MVP keeps two questions separate:
 
 1. Does a guard apply to this code context?

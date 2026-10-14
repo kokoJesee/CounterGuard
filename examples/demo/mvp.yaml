@@ -1,0 +1,17 @@
+{
+  "schema_version": "pipeline-scenario.v1",
+  "scenario_id": "scope_v1_offline_v1",
+  "protocol_ref": "experiments/scope_v1.json",
+  "guards": [
+    {
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "request_ref": "examples/demo/requests/discount_agent.json",
+      "replay_sample_ids": ["train-v1-source-bug", "train-v1-fixed", "train-v1-discount-amount"]
+    },
+    {
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "request_ref": "examples/demo/requests/query_agent.json",
+      "replay_sample_ids": ["train-query-v1-source-bug", "train-query-v1-fixed", "train-batch-v1-legal"]
+    }
+  ]
+}
