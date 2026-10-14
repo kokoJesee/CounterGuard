@@ -32,6 +32,14 @@ class InsufficientScopeEvidence(EvidenceGuardError):
         self.reason_code = reason_code
 
 
+class GuardReplayIntegrityError(ArtifactIntegrityError):
+    """Keep the actual run when post-execution checks detect changed input bytes."""
+
+    def __init__(self, detail: str, run: RunRecord) -> None:
+        super().__init__(detail)
+        self.run = run
+
+
 class GuardSelfCheckError(EvidenceGuardError):
     """A generated test failed its fixed-target validation; no Guard was published."""
 

@@ -81,8 +81,11 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "scope-learning.v1",
-      "default": "scope-learning.v1",
+      "default": "scope-learning.v2",
+      "enum": [
+        "scope-learning.v1",
+        "scope-learning.v2"
+      ],
       "title": "Schema Version",
       "type": "string"
     },
@@ -110,9 +113,43 @@
       "$ref": "#/$defs/ConfusionCounts"
     },
     "candidate_count": {
-      "exclusiveMinimum": 0,
-      "title": "Candidate Count",
-      "type": "integer"
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Candidate Count"
+    },
+    "predicate_count": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Predicate Count"
+    },
+    "combination_count": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Combination Count"
     },
     "artifact_digest": {
       "pattern": "^sha256:[0-9a-f]{64}$",
@@ -124,7 +161,6 @@
     "clauses",
     "training_dataset_digest",
     "training_confusion",
-    "candidate_count",
     "artifact_digest"
   ],
   "title": "ScopeLearningResult",

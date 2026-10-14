@@ -8,6 +8,7 @@ from evidenceguard.features import FeatureRecord
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.module_context import ModuleContext
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
+from evidenceguard.replay import ReplayResult
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 
 MODELS = {
@@ -23,6 +24,7 @@ MODELS = {
     "training-example": TrainingExample,
     "scope-learning": ScopeLearningResult,
     "fit-manifest": FitManifest,
+    "replay-result": ReplayResult,
 }
 
 if __name__ == "__main__":

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import itertools
 from datetime import UTC, datetime
+from math import comb
 from pathlib import Path
 from typing import Literal, Self
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
 from evidenceguard.artifacts import write_immutable
 from evidenceguard.baselines import ConfusionCounts, ScopeClause, ScopePredicate
@@ -45,16 +46,44 @@ class TrainingExample(FrozenModel):
 
 
 class ScopeLearningResult(FrozenModel):
-    schema_version: Literal["scope-learning.v1"] = "scope-learning.v1"
+    schema_version: Literal["scope-learning.v1", "scope-learning.v2"] = "scope-learning.v2"
     learner_version: Literal["conjunction.v1"] = LEARNER_VERSION
     clauses: tuple[ScopeClause, ...] = Field(min_length=1, max_length=3)
     training_dataset_digest: Digest
     training_confusion: ConfusionCounts
-    candidate_count: int = Field(gt=0)
+    candidate_count: int | None = Field(default=None, gt=0)
+    predicate_count: int | None = Field(default=None, gt=0)
+    combination_count: int | None = Field(default=None, gt=0)
     artifact_digest: Digest
+
+    @model_serializer(mode="wrap")
+    def versioned_counts(self, handler):
+        payload = handler(self)
+        if self.schema_version == "scope-learning.v1":
+            payload.pop("predicate_count", None)
+            payload.pop("combination_count", None)
+        else:
+            payload.pop("candidate_count", None)
+        return payload
 
     @model_validator(mode="after")
     def supported_result(self) -> Self:
+        if self.schema_version == "scope-learning.v1":
+            if (
+                self.candidate_count is None
+                or {"predicate_count", "combination_count"} & self.model_fields_set
+            ):
+                raise ValueError("Legacy learning requires its original combination count only")
+        elif (
+            self.candidate_count is not None
+            or self.predicate_count is None
+            or self.combination_count
+            != sum(
+                comb(self.predicate_count, size)
+                for size in range(1, min(3, self.predicate_count) + 1)
+            )
+        ):
+            raise ValueError("Learning v2 requires predicate_count and exact combination_count")
         counts = self.training_confusion
         if counts.tp < 2 or counts.tn < 1 or counts.fp or counts.fn:
             raise ValueError(
@@ -171,7 +200,8 @@ def learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult:
         clauses=clauses,
         training_dataset_digest=input_digest,
         training_confusion=counts,
-        candidate_count=tested,
+        predicate_count=len(candidates),
+        combination_count=tested,
         artifact_digest="sha256:" + "0" * 64,
     )
     return ScopeLearningResult.model_validate(
@@ -381,7 +411,11 @@ def fit_scopes(
         phase=phase,
         module_context_ref=context_ref,
         module_context_digest=SCOPE_V1_CONTEXT_DIGEST,
-        feature_audit_ref=audit_ref,
+        feature_audit_ref=(
+            root / "audits/history" / f"{report['artifact_digest'].split(':')[1]}.json"
+        )
+        .relative_to(workspace)
+        .as_posix(),
         feature_audit_digest=report["artifact_digest"],
         train_file_digests={
             item.path: item.content_digest for item in split.files if item.split == "train"

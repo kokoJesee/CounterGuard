@@ -8,10 +8,11 @@ import pytest
 from pydantic import ValidationError
 
 from evidenceguard.baselines import ScopeClause
+from evidenceguard.digests import digest_json_artifact
 from evidenceguard.errors import InsufficientScopeEvidence
 from evidenceguard.features import FeatureRecord
 from evidenceguard.predicates import FeatureVector
-from evidenceguard.scope import TrainingExample, learn_scope
+from evidenceguard.scope import ScopeLearningResult, TrainingExample, learn_scope
 
 
 def vector(**changes):
@@ -156,7 +157,7 @@ def test_actual_frozen_training_rows_have_stable_results_for_both_phases():
         for path in (root / "benchmarks/train").glob("*_scope_samples.json")
         for sample in json.loads(path.read_bytes())
     }
-    for phases in split["phases"].values():
+    for guard_id, phases in split["phases"].items():
         for ids in (phases["initial"], phases["initial"] + phases["refinement_additions"]):
             examples = [
                 TrainingExample(
@@ -168,6 +169,22 @@ def test_actual_frozen_training_rows_have_stable_results_for_both_phases():
                 for sid in ids
             ]
             expected = learn_scope(tuple(examples)).model_dump_json()
+            result = learn_scope(tuple(examples))
+            counts = (8, 92) if "discount" in guard_id else (10, 175)
+            assert (result.predicate_count, result.combination_count) == counts
+            assert "candidate_count" not in result.model_dump(mode="json")
             for seed in range(20):
                 random.Random(seed).shuffle(examples)
                 assert learn_scope(tuple(examples)).model_dump_json() == expected
+
+
+def test_legacy_combination_count_retains_its_original_digest_shape():
+    result = learn_scope((row(True), row(True), row(False, contract_version="v2")))
+    payload = result.model_dump(mode="json")
+    payload["schema_version"] = "scope-learning.v1"
+    payload["candidate_count"] = payload.pop("combination_count")
+    payload.pop("predicate_count")
+    payload["artifact_digest"] = digest_json_artifact(payload)
+    loaded = ScopeLearningResult.model_validate_json(json.dumps(payload))
+    assert loaded.model_dump(mode="json") == payload
+    assert digest_json_artifact(loaded) == payload["artifact_digest"]

@@ -12,6 +12,9 @@ baseline scopes, and executes both baselines on the nine training rows. Day 6 ex
 without executing targets and audits all 15 frozen annotations. Day 7 fits initial and refined
 scopes using the frozen training phases and independently audited module context.
 
+Day 8 verifies that bundle and automatically decides applicability before starting pytest.
+Pass, violation, inapplicable, unknown, and infrastructure failures are reported separately.
+
 The MVP keeps two questions separate:
 
 1. Does a guard apply to this code context?
@@ -221,14 +224,15 @@ the [adjudication process](docs/feature-adjudication.md).
 
 ```powershell
 uv run python scripts/prepare_scope_v1.py
-uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/experiments/scope-v1/fitted/initial
-uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/experiments/scope-v1/fitted/refined
+uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/experiments/scope-v1/fitted/learning-v2/initial
+uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/experiments/scope-v1/fitted/learning-v2/refined
 ```
 
 Both initial rules use `contract_version == v1`. Adding the two frozen legal counterexamples and
 fully refitting produces version AND interface rules: `final_price` for discount and
 `query_parameter` for input-limit. On all nine training rows, initial yields TP=4/FP=2/TN=3/FN=0;
-refined yields TP=4/FP=0/TN=5/FN=0. These are scope classifications; actual Scope-aware replay is D8.
+refined yields TP=4/FP=0/TN=5/FN=0. These are scope classifications; D8 separately executes the
+applicable Guards.
 
 The pure solver receives only exact `TrainingExample` values containing a `FeatureVector` and
 strict applicability bool. FeatureRecord, provenance dictionaries, identity fields, and leaking
@@ -238,3 +242,34 @@ counterexample, the frozen protocol/context, and fresh feature parity. Holdout n
 Twenty permutations preserve each pure learning result and digest. Persisted scopes and fit
 manifests retain actual creation times and reuse the same bytes on repeat. Refused learning exits
 4; schema/type input errors exit 2; artifact errors exit 5. See the [Day 7 record](docs/progress/day7.md).
+
+Learning v2 exposes `predicate_count` and `combination_count`: discount is 8/92 and input-limit
+is 10/175. Old v1 counts and digests remain readable. The new bundle directory prevents overwriting
+historical D7 provenance. Dependency and recomputation rules are in [data contracts](docs/data-contracts.md).
+
+## Run Scope-aware training replay
+
+```powershell
+uv run evidenceguard benchmark replay --protocol experiments/scope_v1.json --phase refined --split train
+```
+
+The expected exit code is **1**, because two applicable targets really violate their Guards.
+The report is written first: 2 pass, 2 violation, 5 skipped_inapplicable, with exactly 4 pytest
+processes. Every skipped row has `run=null`; unknown uses `skipped_unknown`, never inapplicable
+or pass. D8 rejects holdout execution.
+
+JSON and Markdown reports are under `artifacts/experiments/scope-v1/train-replays/refined/`.
+Each immutable `artifacts/replays/<replay_id>/result.json` binds actual inputs and raw logs.
+`replay verify <result.json>` audits current inputs without executing pytest; a successful audit
+does not mean the recorded verdict was pass.
+
+Individual replay can explicitly omit contract metadata to produce unknown without starting pytest:
+
+```powershell
+uv run evidenceguard replay run --guard artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --scope artifacts/experiments/scope-v1/fitted/learning-v2/refined/grd_discount_member_rate_regression_v2.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
+```
+
+This returns 4 and preserves the missing-information reason. Supply `--contract` for the declared
+target contract to evaluate it normally. Input integrity is checked before execution and again
+afterward; changes during a run produce stale with the actual run preserved. See the
+[Day 8 acceptance record](docs/progress/day8.md).

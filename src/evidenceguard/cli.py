@@ -24,6 +24,13 @@ from evidenceguard.evidence import (
 from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
 from evidenceguard.protocol import run_train_baselines, verify_protocol
+from evidenceguard.replay import (
+    ReplayRequest,
+    replay_exit_code,
+    replay_guard,
+    replay_train_benchmark,
+    verify_replay,
+)
 from evidenceguard.scope import fit_scopes
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
@@ -41,6 +48,8 @@ scope_app = typer.Typer(
     no_args_is_help=True, help="Fit scopes from verified training features only."
 )
 app.add_typer(scope_app, name="scope")
+replay_app = typer.Typer(no_args_is_help=True, help="Run or audit a scoped replay.")
+app.add_typer(replay_app, name="replay")
 
 
 @app.callback()
@@ -52,6 +61,94 @@ def main() -> None:
 def version() -> None:
     """Print the installed EvidenceGuard version."""
     typer.echo(__version__)
+
+
+@replay_app.command("run")
+def replay_run(
+    guard: Annotated[Path, typer.Option(help="Guard JSON.")],
+    scope: Annotated[Path, typer.Option(help="Bound Scope JSON.")],
+    target: Annotated[str, typer.Option(help="New target module:symbol.")],
+    contract: Annotated[
+        Path | None, typer.Option(help="Declared target contract; missing yields unknown.")
+    ] = None,
+    cwd: Annotated[Path, typer.Option(help="Trusted workspace.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Replay output below cwd.")] = Path(
+        "artifacts"
+    ),
+    timeout: Annotated[float, typer.Option(help="Execution timeout in seconds.")] = 30.0,
+) -> None:
+    try:
+        result = replay_guard(
+            ReplayRequest(
+                guard, scope, target, contract, cwd, artifact_root, timeout_seconds=timeout
+            )
+        )
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Replay error: {error}", 3)
+    typer.echo(result.model_dump_json(indent=2))
+    code = replay_exit_code(result)
+    if code:
+        raise typer.Exit(code)
+
+
+@replay_app.command("verify")
+def replay_verify(
+    path: Annotated[Path, typer.Argument(help="Replay result.json.")],
+    cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
+) -> None:
+    try:
+        result = verify_replay(path, cwd=cwd)
+    except (ArtifactIntegrityError, OSError) as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    typer.echo(result.model_dump_json(indent=2))
+
+
+@benchmark_app.command("replay")
+def benchmark_replay(
+    protocol: Annotated[Path, typer.Option(help="Frozen protocol JSON.")],
+    phase: Annotated[str, typer.Option(help="initial or refined.")],
+    split: Annotated[str, typer.Option(help="D8 accepts train only.")] = "train",
+    fitted: Annotated[Path | None, typer.Option(help="Fitted bundle directory.")] = None,
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Run reports below cwd.")] = Path("artifacts"),
+) -> None:
+    try:
+        directory = fitted or artifact_root / f"experiments/scope-v1/fitted/learning-v2/{phase}"
+        report = replay_train_benchmark(
+            protocol,
+            phase=phase,
+            fitted=directory,
+            cwd=cwd,
+            artifact_root=artifact_root,
+            split=split,
+        )
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Benchmark replay error: {error}", 3)
+    typer.echo(json.dumps(report, indent=2))
+    counts = report["counts"]
+    code = (
+        5
+        if counts["stale"]
+        else 3
+        if any(counts[key] for key in ("collection_error", "execution_error", "timeout"))
+        else 4
+        if counts["skipped_unknown"]
+        else 1
+        if counts["violation"]
+        else 0
+    )
+    if code:
+        raise typer.Exit(code)
 
 
 @scope_app.command("learn")

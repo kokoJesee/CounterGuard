@@ -17,7 +17,12 @@ from evidenceguard.digests import (
     digest_file,
     digest_json_artifact,
 )
-from evidenceguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
+from evidenceguard.errors import (
+    ArtifactIntegrityError,
+    GuardReplayIntegrityError,
+    GuardSelfCheckError,
+    InvalidEvidenceError,
+)
 from evidenceguard.evidence import parse_target_ref, verify_evidence
 from evidenceguard.execution import PytestRunRequest, run_pytest
 from evidenceguard.models import (
@@ -302,9 +307,12 @@ def run_guard(
             timeout_seconds=timeout_seconds,
         )
     )
-    load_guard(path, cwd=workspace)
-    if digest_file(workspace / target_ref.source_ref) != target_digest:
-        raise ArtifactIntegrityError("Guard replay target changed during execution")
+    try:
+        load_guard(path, cwd=workspace)
+        if digest_file(workspace / target_ref.source_ref) != target_digest:
+            raise ArtifactIntegrityError("Guard replay target changed during execution")
+    except (ArtifactIntegrityError, OSError) as error:
+        raise GuardReplayIntegrityError(str(error), run) from error
     return run
 
 

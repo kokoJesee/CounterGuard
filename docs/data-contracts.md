@@ -2,6 +2,24 @@
 
 本文说明当前持久化接口，字段校验以 `src/evidenceguard/models.py`、`predicates.py`、`features.py`、`baselines.py` 和 `protocol.py` 为准。JSON Schema 位于 `schemas/`，业务跨字段不变量另由严格模型与 verify 检查。
 
+## 依赖与重算规则
+
+当前 Evidence 只有 `artifact_digest`，没有 semantic_digest；Guard 才提供语义投影摘要。Feature 也不由 Guard 派生，而是由目标源码、声明契约和独立 module context 派生。纯 learning 依赖训练特征与适用性标签；物化 Scope/fit manifest 再绑定 Guard 和协议来源。这些分支在 Replay 汇合。
+
+| 本层 | 摘要的直接依赖 | 上游变化时必须做什么 |
+|---|---|---|
+| Contract / source | 原始文件字节；实验 source pin 单独只规范 CRLF | 来源 Evidence 引用改变的文件必须重新 capture；相关目标/声明契约的 Feature 与 audit 重算。冻结实验 source pin 改变不能原地重签，需新协议 |
+| Evidence | 契约、测试、buggy/fixed 目标、双向 RunRecord、日志引用摘要、版本/替代链和自身字段 | 任一引用或日志变化则旧 Evidence 验证失败；新 capture 使用新修订，重编译相关 Guard 并审核来源。时间变化或重新捕获也会改变 artifact_digest |
+| Guard | artifact：Evidence 关联、完整 Guard 字段、自检与日志；semantic：固定 9 字段执行投影 | Evidence 换修订必须发布新 Guard 身份/版本，不能覆盖原资产。即使 semantic_digest 相同，guard artifact 绑定变化也要求重新物化 Scope/fit manifest；规则本身可复核后复用 |
+| Feature / audit | 目标源码、声明契约、module context、自身特征；audit 还依赖样本文件、手工标注、词汇/提取器与快照 | 重提受影响目标并重新审计；context 来源或记录格式变化生成新记录版本。audit 不能靠改标注变绿。相关训练特征/标签变化须重新学习；其他目标变化无需重训无关规则 |
+| Learning / Scope / fit | 纯 learning：规范排序的训练 FeatureVector+标签、算法/结果格式；Scope/fit：另绑定训练身份、Guard artifact、protocol/split/context/audit 和创建记录 | 特征、标签、成员或算法变化要重学对应 Guard/phase；仅来源绑定或结果记录格式变化可保留验证后的相同规则，但必须重新物化相关结果/manifest。旧引用不可静默换成新 digest |
+| ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
+| EvaluationReport（D9 待实现） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
+
+操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
+
+例：D6 的 AST 词汇与 15 个特征值没有改变，但 module_group 来源证明增加，导致 FeatureRecord v2 和独立 audit 必须重建，D7 fit provenance 必须更新。纯规则在相同训练值下可以一致。D8 候选计数字段升级同理：改 learning 记录格式与下游引用，不改变已冻结规则或样本真值。
+
 ## Guard 的 semantic_digest
 
 `semantic_digest` 使用当前固定的 `guard-semantic.v1` 投影规则，由 `protocol.guard_semantic_digest` 计算。它绑定**指定身份和版本的 Guard 执行内容**；不同 Guard ID 即使断言相同，也不共享此摘要。
@@ -82,6 +100,36 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 搜索只从正例生成标量 eq / AST contains 候选，枚举 1–3 条 AND，保留 FP=FN=0 且每条条件有独立负例支持的规则。并列顺序为：条件数更少、AST 条件更少、固定字段顺序、规范 JSON 字典序。字段顺序固定为 family、version、interface、signature、module_group、AST；候选输出按规范字段/操作/值排序。
 
-`scope-learning.v1` 保存纯训练特征与标签的无序规范摘要、规则、混淆计数和 candidate_count；没有时间和样本 ID，其 artifact_digest 是 D7 乱序验收所比较的确定性摘要。
+新 `scope-learning.v2` 保存纯训练特征与标签的无序规范摘要、规则、混淆计数，以及 predicate_count / combination_count；没有时间和样本 ID，其 artifact_digest 是乱序验收所比较的确定性摘要。旧 v1 的 candidate_count 实际代表组合数，保持原形状和摘要兼容读取。
+
+| 场景（initial/refined 均相同） | predicate_count | combination_count |
+|---|---:|---:|
+| discount | 8（5 个标量 + 3 个 AST） | 92 = C(8,1)+C(8,2)+C(8,3) |
+| input-limit | 10（5 个标量 + 5 个 AST） | 175 = C(10,1)+C(10,2)+C(10,3) |
+
+组合数记录实际枚举的全部 1–3 条组合，包含后来因 FN/FP 或冗余被丢弃的组合。它不是成功规则数。v2 模型核对组合公式，测试对两个真实场景分别固定数字；不把 discount 的 8/92 当成所有 Guard 的常数。
 
 外层 ScopePredicate 与 `fit-manifest.v1` 另外记录实际创建时间、sample ID、Guard artifact digest、protocol/split/context/audit 摘要。首次创建时间真实记录，重复相同输入验证后复用；不伪造时间来制造确定性。不同干净工作区的物化 Scope 摘要可能不同，纯 learning digest 保持一致。
+
+v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 `fitted/learning-v2/{initial,refined}`，旧 D7 资产不覆盖。新 fit manifest 引用不可变 audit history 文件，不再绑定可被后续审计替换的最新报告副本。
+
+## ReplayResult 与执行边界
+
+`replay-result.v1` 显式绑定 Guard/Scope/protocol/fit 的引用与摘要、目标原始字节摘要、声明契约和 module context、自动 FeatureRecord、决策 trace、最终 verdict、失败 case 和 RunRecord。unknown 时 FeatureVector/FeatureRecord 可为空；绝不制造空特征向量代表提取失败。
+
+| scope_decision | verdict | run | 执行返回码 |
+|---|---|---|---:|
+| inapplicable | skipped_inapplicable | null | 0 |
+| unknown | skipped_unknown | null | 4 |
+| applicable | pass | 实际 passed RunRecord | 0 |
+| applicable | violation | 实际 test_failed RunRecord，列稳定 case ID | 1 |
+| applicable | collection_error / execution_error / timeout | 实际错误 RunRecord | 3 |
+| applicable | stale | 若已运行则保留实际 RunRecord，否则 null | 5 |
+
+报告仅统计 verdict=pass 为通过；skipped/unknown 不进入 pass。模型禁止 unknown 变成 inapplicable、skipped 配 run、无真实 run 的 pass、以及错误运行冒充 violation。未知特征以明确 reason、null FeatureVector 和未匹配 trace 保留。
+
+重放前完整核对 Guard 来源、Scope/fit/learning/训练 Feature/audit 及冻结协议；不写回、不自动 capture/refit 上游。规则重算只用于核对固定来源，发现差异就拒绝。完整性失败不能变成普通不适用。适用时再启动 pytest；执行后再次审核输入，变化则 stale 并保留运行证据。
+
+新目标语法错误、未支持结构或缺少声明契约产生 skipped_unknown；无法解析目标标识/源文件的配置错误返回 2。pytest exit 1 只有实际失败断言才是 violation；exit 2 的 interrupted 未细分原因时按 execution_error 记录，不能自称已确认 collection error。
+
+`replay verify` 的退出 0 表示记录及当前输入/日志完整性审核通过，不表示 verdict=pass，也不重新执行 pytest。历史 violation/unknown 可完整审核通过；来源已变化的旧记录会拒绝供当前工作使用。

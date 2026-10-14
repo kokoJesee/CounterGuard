@@ -334,7 +334,9 @@ def _verify_lineage(evidence: Evidence, workspace: Path) -> None:
         current = prior
 
 
-def parse_target_ref(spec: str, *, cwd: str | Path) -> tuple[TargetRef, Digest]:
+def parse_target_ref(
+    spec: str, *, cwd: str | Path, validate_symbol: bool = True
+) -> tuple[TargetRef, Digest]:
     """Resolve ``module:symbol`` to a repository-relative source and digest."""
 
     if spec.count(":") != 1:
@@ -363,7 +365,8 @@ def parse_target_ref(spec: str, *, cwd: str | Path) -> tuple[TargetRef, Digest]:
         raise ValueError(f"target module resolves ambiguously below the workspace: {refs}")
 
     source_path = _verified_workspace_file(candidates[0], workspace, "target source")
-    _require_symbol_in_source(source_path, symbol)
+    if validate_symbol:
+        _require_symbol_in_source(source_path, symbol)
     target = TargetRef(
         module=provisional.module,
         symbol=provisional.symbol,
