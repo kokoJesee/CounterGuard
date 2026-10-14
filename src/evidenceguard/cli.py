@@ -1,5 +1,6 @@
 """Command-line entry point for the EvidenceGuard MVP."""
 
+import json
 from pathlib import Path
 from typing import Annotated, NoReturn
 
@@ -8,14 +9,25 @@ import typer
 from evidenceguard import __version__
 from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
 from evidenceguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
-from evidenceguard.evidence import CaptureRequest, capture_evidence, verify_evidence
+from evidenceguard.evidence import (
+    CaptureRequest,
+    capture_evidence,
+    evidence_exit_code,
+    inventory_evidence,
+    verify_evidence,
+)
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
+from evidenceguard.protocol import run_train_baselines, verify_protocol
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
 guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
 app.add_typer(guard_app, name="guard")
+experiment_app = typer.Typer(no_args_is_help=True, help="Audit frozen experiment protocols.")
+app.add_typer(experiment_app, name="experiment")
+benchmark_app = typer.Typer(no_args_is_help=True, help="Execute frozen benchmark methods.")
+app.add_typer(benchmark_app, name="benchmark")
 
 
 @app.callback()
@@ -41,6 +53,12 @@ def capture(
     ),
     cwd: Annotated[Path, typer.Option(help="Trusted project workspace.")] = Path("."),
     timeout: Annotated[float, typer.Option(help="Per-run timeout in seconds.")] = 30.0,
+    supersedes: Annotated[
+        Path | None, typer.Option(help="Predecessor Evidence; derives the next revision.")
+    ] = None,
+    reason: Annotated[
+        str | None, typer.Option(help="Why this recapture replaces its predecessor.")
+    ] = None,
 ) -> None:
     """Capture a buggy failure and fixed pass as auditable JSON Evidence."""
     try:
@@ -55,6 +73,8 @@ def capture(
                 artifact_root=artifact_root,
                 timeout_seconds=timeout,
                 tool_version=__version__,
+                supersedes_path=supersedes,
+                recapture_reason=reason,
             )
         )
     except ArtifactIntegrityError as error:
@@ -64,6 +84,76 @@ def capture(
     except OSError as error:
         _error(f"capture execution error: {error}", 3)
     _emit_evidence(evidence)
+
+
+@evidence_app.command("inventory")
+def evidence_inventory(
+    cwd: Annotated[Path, typer.Option(help="Workspace used for full verification.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Artifact directory to inspect.")] = Path(
+        "artifacts"
+    ),
+) -> None:
+    """List verification and supersession states; exit 0 means inspection completed."""
+    try:
+        report = inventory_evidence(cwd=cwd, artifact_root=artifact_root)
+    except (ValueError, OSError) as error:
+        _error(str(error), 2)
+    typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
+
+
+@experiment_app.command("verify")
+def experiment_verify(
+    protocol: Annotated[Path, typer.Option(help="Frozen experiment protocol JSON.")],
+    cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
+) -> None:
+    """Audit protocol, split membership, data pins, and complete Guard provenance."""
+    try:
+        spec, manifest, guards = verify_protocol(protocol, cwd=cwd)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Protocol verification error: {error}", 5)
+    typer.echo(
+        json.dumps(
+            {
+                "protocol_id": spec.protocol_id,
+                "protocol_digest": spec.artifact_digest,
+                "split_digest": manifest.artifact_digest,
+                "guard_ids": sorted(guards),
+                "train_count": sum(
+                    len(p.initial + p.refinement_additions) for p in manifest.phases.values()
+                ),
+                "holdout_count": sum(len(p.holdout) for p in manifest.phases.values()),
+                "verified": True,
+            },
+            indent=2,
+        )
+    )
+
+
+@benchmark_app.command("baselines")
+def benchmark_baselines(
+    protocol: Annotated[Path, typer.Option(help="Frozen experiment protocol JSON.")],
+    split: Annotated[str, typer.Option(help="D5 accepts train only.")] = "train",
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Report output below cwd.")] = Path(
+        "artifacts"
+    ),
+) -> None:
+    """Predict applicability and actually run each applicable Guard on training rows."""
+    try:
+        report = run_train_baselines(protocol, cwd=cwd, artifact_root=artifact_root, split=split)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Baseline execution error: {error}", 3)
+    typer.echo(json.dumps(report, indent=2))
+    if report["infrastructure_errors"]:
+        raise typer.Exit(3)
 
 
 @evidence_app.command("verify")
@@ -155,11 +245,9 @@ def _emit_run(run: RunRecord) -> None:
 
 def _emit_evidence(evidence: Evidence) -> None:
     typer.echo(evidence.model_dump_json(indent=2))
-    valid_outcomes = {RunOutcome.PASSED, RunOutcome.TEST_FAILED}
-    if any(run.outcome not in valid_outcomes for run in (evidence.buggy_run, evidence.fixed_run)):
-        raise typer.Exit(3)
-    if not evidence.reproduced:
-        raise typer.Exit(1)
+    code = evidence_exit_code(evidence)
+    if code:
+        raise typer.Exit(code)
 
 
 def _error(message: str, exit_code: int) -> NoReturn:

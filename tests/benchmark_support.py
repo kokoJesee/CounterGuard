@@ -32,11 +32,11 @@ def implementation_satisfies_contract(sample: dict[str, Any]) -> bool:
 
 def implementation_violates_minimal_guard(sample: dict[str, Any]) -> bool:
     guards = {
-        "grd_discount_member_rate_regression": (
+        "grd_discount_member_rate_regression_v2": (
             "examples/discount/contracts/membership_discount_final_price_v1.json",
             {"member-price", "member-rounding"},
         ),
-        "grd_query_limit_zero_regression": (
+        "grd_query_limit_zero_regression_v2": (
             "examples/validation/contracts/input_limit_query_v1.json",
             {"below-minimum"},
         ),

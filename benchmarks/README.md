@@ -39,7 +39,13 @@ counterexamples. Cross-family negatives require per-guard labels on the same sam
 for a later schema revision.
 
 Day 4 compiles only the source Evidence's failed cases: two discount assertions and the zero-limit
-rejection. The independent identities are `grd_discount_member_rate_regression` and
-`grd_query_limit_zero_regression`. An applicable Guard violation is measured by these minimal
+rejection. The current independent identities are `grd_discount_member_rate_regression_v2` and
+`grd_query_limit_zero_regression_v2`. An applicable Guard violation is measured by these minimal
 assertions, separately from full-contract compliance. The existing 15 labels retain their values
 after this migration; the integrity tests check the minimal assertions explicitly.
+
+D5 freezes the four method definitions in `experiments/scope_v1.json`, with two-stage training and
+holdout membership in `benchmarks/splits/scope_v1.json`. B1 always runs; B2 reads only
+`interface_kind` and compares it with the frozen Guard interface. The D5 command executes only
+training rows and rejects `--split holdout`. Protocol verification may audit holdout metadata and
+source pins; these public fixtures are engineering checks, not a blind evaluation.

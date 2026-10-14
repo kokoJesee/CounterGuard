@@ -463,8 +463,11 @@
       "type": "array"
     },
     "generator_version": {
-      "const": "guard-test.v1",
-      "default": "guard-test.v1",
+      "default": "guard-test.v2",
+      "enum": [
+        "guard-test.v1",
+        "guard-test.v2"
+      ],
       "title": "Generator Version",
       "type": "string"
     },
@@ -523,5 +526,6 @@
     "artifact_digest"
   ],
   "title": "Guard",
-  "type": "object"
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
 }

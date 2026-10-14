@@ -1,0 +1,188 @@
+{
+  "$defs": {
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "ScopeClause": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "anyOf": [
+            {
+              "enum": [
+                "contract_family",
+                "contract_version",
+                "interface_kind",
+                "symbol_signature",
+                "module_group"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "ast_features",
+              "type": "string"
+            }
+          ],
+          "title": "Field"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "contains"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "title": "ScopeClause",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "scope-predicate.v1",
+      "default": "scope-predicate.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope_id": {
+      "minLength": 1,
+      "title": "Scope Id",
+      "type": "string"
+    },
+    "guard_id": {
+      "minLength": 1,
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "strategy": {
+      "enum": [
+        "always",
+        "fixed_interface",
+        "learned_conjunction"
+      ],
+      "title": "Strategy",
+      "type": "string"
+    },
+    "clauses": {
+      "items": {
+        "$ref": "#/$defs/ScopeClause"
+      },
+      "maxItems": 3,
+      "title": "Clauses",
+      "type": "array"
+    },
+    "training_dataset_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Training Dataset Digest"
+    },
+    "training_sample_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Training Sample Ids",
+      "type": "array"
+    },
+    "training_confusion": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConfusionCounts"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "learner_version": {
+      "minLength": 1,
+      "title": "Learner Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope_id",
+    "guard_id",
+    "guard_digest",
+    "protocol_digest",
+    "strategy",
+    "clauses",
+    "learner_version",
+    "created_at",
+    "artifact_digest"
+  ],
+  "title": "ScopePredicate",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

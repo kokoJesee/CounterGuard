@@ -55,6 +55,33 @@
       "title": "CaseResult",
       "type": "object"
     },
+    "EvidenceLink": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "minLength": 1,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "evidence_ref",
+        "artifact_digest"
+      ],
+      "title": "EvidenceLink",
+      "type": "object"
+    },
     "RunOutcome": {
       "description": "Normalized outcome of a pytest process.",
       "enum": [
@@ -280,8 +307,11 @@
   "description": "A bidirectionally verified bug reproduction artifact.",
   "properties": {
     "schema_version": {
-      "const": "evidence.v1",
-      "default": "evidence.v1",
+      "default": "evidence.v2",
+      "enum": [
+        "evidence.v1",
+        "evidence.v2"
+      ],
       "title": "Schema Version",
       "type": "string"
     },
@@ -372,6 +402,36 @@
       "pattern": "^sha256:[0-9a-f]{64}$",
       "title": "Artifact Digest",
       "type": "string"
+    },
+    "capture_revision": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Capture Revision",
+      "type": "integer"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EvidenceLink"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "recapture_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Recapture Reason"
     }
   },
   "required": [
@@ -394,5 +454,6 @@
     "artifact_digest"
   ],
   "title": "Evidence",
-  "type": "object"
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
 }

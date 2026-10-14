@@ -1,0 +1,87 @@
+{
+  "schema_version": "split-manifest.v1",
+  "split_id": "scope_v1",
+  "files": [
+    {
+      "path": "benchmarks/train/discount_scope_samples.json",
+      "split": "train",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "content_digest": "sha256:2e13fd36b47624470be7084911089bff1799b8c0528e00a8732b6a84520a38d7"
+    },
+    {
+      "path": "benchmarks/holdout/discount_scope_samples.json",
+      "split": "holdout",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "content_digest": "sha256:386864f794c2b7602e16bad09e0438e82cef93b7fad079b6b111582620e6454b"
+    },
+    {
+      "path": "benchmarks/train/validation_scope_samples.json",
+      "split": "train",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "content_digest": "sha256:9fae69c8cefb19970310c9de2cf76ed37574d9290512b83fbc026ef360c07d78"
+    },
+    {
+      "path": "benchmarks/holdout/validation_scope_samples.json",
+      "split": "holdout",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "content_digest": "sha256:65bc7d6ae94cc2efcd1c2d32ff0f3a4c15ef6f52838cbad36e71cc08db2c9899"
+    }
+  ],
+  "phases": {
+    "grd_discount_member_rate_regression_v2": {
+      "initial": [
+        "train-v1-source-bug",
+        "train-v1-fixed",
+        "train-v2-legal"
+      ],
+      "refinement_additions": [
+        "train-v1-discount-amount"
+      ],
+      "holdout": [
+        "holdout-v1-discount-amount-alternate",
+        "holdout-v1-alternate-bug",
+        "holdout-v2-alternate-legal"
+      ]
+    },
+    "grd_query_limit_zero_regression_v2": {
+      "initial": [
+        "train-query-v1-source-bug",
+        "train-query-v1-fixed",
+        "train-query-v2-legal",
+        "train-query-v2-own-contract-bug"
+      ],
+      "refinement_additions": [
+        "train-batch-v1-legal"
+      ],
+      "holdout": [
+        "holdout-query-v1-alternate-correct",
+        "holdout-batch-v1-alternate-legal",
+        "holdout-query-v2-alternate-legal"
+      ]
+    }
+  },
+  "source_text_digests": {
+    "examples/discount/contracts/membership_discount_amount_v1.json": "sha256:8658ed2e054b557da714117f6d9242132a88a6dbd6765e11a5a2fd6a8328339d",
+    "examples/discount/contracts/membership_discount_final_price_v1.json": "sha256:1ae60b9a63a7270ec34ff20da51cebff91d1fb2b682e70066894a5b4c5a69057",
+    "examples/discount/contracts/membership_discount_final_price_v2.json": "sha256:4327a875c83208f850c2a2004b12d85d91cbf4a47bd928386c289304a5ebd318",
+    "examples/discount/implementations/discount_amount_v1_alternate_correct.py": "sha256:ead26e9312a2266daa4fc5d181fdda118aa513ad500e2815c40660292d96ab93",
+    "examples/discount/implementations/discount_amount_v1_correct.py": "sha256:42d3828eebe257c21e3befe8f1d73451c104eada79e4f35259af36b5e34e67d8",
+    "examples/discount/implementations/final_price_v1_alternate_buggy.py": "sha256:7fa5573c89f7f26780a0e272bc7344eb27839fad151afbdbe7694b3abb679e25",
+    "examples/discount/implementations/final_price_v1_buggy.py": "sha256:df250247cfae0ac0347004b73d6d4e4969bbf9726375d0dd560d753407a60d9c",
+    "examples/discount/implementations/final_price_v1_fixed.py": "sha256:9aba8ce81dca67b85773b8b8ea5317404e9dda12d84a51085ef8db1d9f5fdcf3",
+    "examples/discount/implementations/final_price_v2_alternate_correct.py": "sha256:e2e093a1a9fb6964b8404229e51a273d115271c29ffde015c15b30584f4231db",
+    "examples/discount/implementations/final_price_v2_correct.py": "sha256:09e437c472379d44c87fe79a89e5842881e25f38868a3e12b52207292ebffe50",
+    "examples/validation/contracts/input_limit_batch_v1.json": "sha256:e871ee758abdf6c2d3d619b112751bf3717846642280cfb3a3dcf3bc257978bd",
+    "examples/validation/contracts/input_limit_query_v1.json": "sha256:40901e4f22bc63b240a0f52a0c29871c92d2a969af8403d0c566e3926f521af5",
+    "examples/validation/contracts/input_limit_query_v2.json": "sha256:dd50ec8428b21dd0d9f1120c701d67e341abd55bab8e4854a2a9273cda4157d3",
+    "examples/validation/implementations/batch_limit_v1_alternate_correct.py": "sha256:77299d28d9b01702fb96384b4f5c5a7fd01549c8a70b8f0442efee2e611ffee6",
+    "examples/validation/implementations/batch_limit_v1_correct.py": "sha256:ca976f2b6185f109c2e93068361fe3c4b7b0a980192975c698a9ddb017f01fac",
+    "examples/validation/implementations/query_limit_v1_alternate_correct.py": "sha256:37e502a5f627af8d4975819bd231126e948352a9ec2b321a7ef974f13c69690a",
+    "examples/validation/implementations/query_limit_v1_buggy.py": "sha256:ddddc788b70dad377047429f4eb9bbd3423fbedad447dd036bc641ec62cf878a",
+    "examples/validation/implementations/query_limit_v1_fixed.py": "sha256:1ebcbd76ff9835cd45266801648d2da5be5ac49cbe633b2d51b4cd91909f5243",
+    "examples/validation/implementations/query_limit_v2_alternate_correct.py": "sha256:fd07dfdb5c05e39c3eae1a74d3a2c1cdb50f8493a0869463d17e05f54c017448",
+    "examples/validation/implementations/query_limit_v2_buggy.py": "sha256:eddbb1190146acb7bd27f45944ab32295e76a8b3b531610a08102116c5a439a3",
+    "examples/validation/implementations/query_limit_v2_correct.py": "sha256:a79eb007f17d7724d344929647976ee0582b05f352a71ab840b54063ba422a2a"
+  },
+  "artifact_digest": "sha256:f04170d16cd6e54f09edcc4b1c3cdb39f84ce4dbd2928c5923da7ccc21cd0cef"
+}

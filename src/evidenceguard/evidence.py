@@ -5,9 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import math
-import os
 import re
-import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from importlib.metadata import PackageNotFoundError, version
@@ -15,6 +13,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from evidenceguard.artifacts import write_immutable
 from evidenceguard.contracts import convert_contract_value, resolve_exception
 from evidenceguard.digests import (
     canonical_json_bytes,
@@ -27,6 +26,7 @@ from evidenceguard.models import (
     CaseOutcome,
     Digest,
     Evidence,
+    EvidenceLink,
     RunOutcome,
     RunRecord,
     RunRole,
@@ -67,6 +67,8 @@ class CaptureRequest:
     artifact_root: Path
     timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS
     tool_version: str | None = None
+    supersedes_path: Path | None = None
+    recapture_reason: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,6 +94,9 @@ class _CaptureInputs:
     fixed_target: TargetRef
     fixed_target_digest: Digest
     tool_version: str
+    supersedes: EvidenceLink | None
+    capture_revision: int
+    recapture_reason: str | None
 
 
 def capture_evidence(request: CaptureRequest) -> Evidence:
@@ -148,6 +153,9 @@ def capture_evidence(request: CaptureRequest) -> Evidence:
         rejection_reasons=rejection_reasons,
         tool_version=prepared.tool_version,
         artifact_digest=_PLACEHOLDER_DIGEST,
+        capture_revision=prepared.capture_revision,
+        supersedes=prepared.supersedes,
+        recapture_reason=prepared.recapture_reason,
     )
     evidence = Evidence.model_validate(
         {
@@ -193,6 +201,7 @@ def verify_evidence(path: str | Path, *, cwd: str | Path) -> Evidence:
         raise ArtifactIntegrityError("Evidence workspace must be a directory")
     evidence_path = _verified_workspace_file(Path(path), workspace, "evidence artifact")
     evidence = load_evidence(evidence_path)
+    _verify_lineage(evidence, workspace)
 
     if evidence_path.name != "evidence.json" or evidence_path.parent.name != evidence.evidence_id:
         raise ArtifactIntegrityError(
@@ -232,6 +241,97 @@ def verify_evidence(path: str | Path, *, cwd: str | Path) -> Evidence:
             )
 
     return evidence
+
+
+def evidence_exit_code(evidence: Evidence) -> int:
+    """Use the same admissibility decision for CLI verification and inventory."""
+    domain_outcomes = {RunOutcome.PASSED, RunOutcome.TEST_FAILED}
+    if any(run.outcome not in domain_outcomes for run in (evidence.buggy_run, evidence.fixed_run)):
+        return 3
+    return 0 if evidence.reproduced else 1
+
+
+def inventory_evidence(*, cwd: str | Path, artifact_root: str | Path) -> dict:
+    """Inspect every artifact through full verification; names never imply validity."""
+    workspace = Path(cwd).resolve(strict=True)
+    root = _workspace_path(Path(artifact_root), workspace, "artifact_root") / "evidence"
+    rows = []
+    verified = {}
+    for directory in sorted(root.iterdir()) if root.is_dir() else ():
+        if not directory.is_dir():
+            continue
+        path = directory / "evidence.json"
+        row = {
+            "evidence_id": directory.name,
+            "path": path.relative_to(workspace).as_posix(),
+            "status": "invalid",
+            "verification_exit_code": 5,
+            "usable": False,
+            "eligible": False,
+            "superseded_by": [],
+            "reason": None,
+        }
+        try:
+            evidence = verify_evidence(path, cwd=workspace)
+        except (ArtifactIntegrityError, OSError, ValueError) as error:
+            row["reason"] = str(error)
+        else:
+            code = evidence_exit_code(evidence)
+            row.update(
+                status="verified" if code == 0 else "diagnostic",
+                verification_exit_code=code,
+                usable=code == 0,
+                eligible=code == 0,
+                capture_revision=evidence.capture_revision
+                if evidence.schema_version == "evidence.v2"
+                else None,
+                recapture_reason=evidence.recapture_reason,
+            )
+            if code == 0:
+                verified[evidence.evidence_id] = evidence
+        rows.append(row)
+    successors: dict[str, list[str]] = {}
+    for evidence in verified.values():
+        if evidence.supersedes is not None:
+            successors.setdefault(evidence.supersedes.evidence_id, []).append(evidence.evidence_id)
+    for row in rows:
+        row["superseded_by"] = sorted(successors.get(row["evidence_id"], []))
+        row["eligible"] = row["usable"] and not row["superseded_by"]
+    return {
+        "schema_version": "evidence-inventory.v1",
+        "entries": rows,
+        "counts": {
+            "total": len(rows),
+            "verified": sum(row["usable"] for row in rows),
+            "invalid": sum(row["status"] == "invalid" for row in rows),
+            "diagnostic": sum(row["status"] == "diagnostic" for row in rows),
+            "eligible": sum(row["eligible"] for row in rows),
+        },
+    }
+
+
+def _verify_lineage(evidence: Evidence, workspace: Path) -> None:
+    current = evidence
+    visited = {current.evidence_id}
+    while current.supersedes is not None:
+        link = current.supersedes
+        path = _verified_workspace_file(workspace / link.evidence_ref, workspace, "predecessor")
+        # Historical input files may be stale; the immutable predecessor JSON
+        # must still be intact. It is never admitted for new work by this check.
+        prior = load_evidence(path)
+        if (
+            prior.evidence_id in visited
+            or prior.evidence_id != link.evidence_id
+            or prior.artifact_digest != link.artifact_digest
+        ):
+            raise ArtifactIntegrityError("Evidence predecessor identity/digest mismatch or cycle")
+        if (
+            prior.contract_id != current.contract_id
+            or current.capture_revision != prior.capture_revision + 1
+        ):
+            raise ArtifactIntegrityError("Evidence predecessor contract/revision mismatch")
+        visited.add(prior.evidence_id)
+        current = prior
 
 
 def parse_target_ref(spec: str, *, cwd: str | Path) -> tuple[TargetRef, Digest]:
@@ -275,6 +375,10 @@ def parse_target_ref(spec: str, *, cwd: str | Path) -> tuple[TargetRef, Digest]:
 def _prepare_capture(request: CaptureRequest) -> _CaptureInputs:
     if not _EVIDENCE_ID_PATTERN.fullmatch(request.evidence_id):
         raise ValueError("evidence_id must start with 'evd_' and contain safe characters")
+    if re.search(r"_d\d+$", request.evidence_id):
+        raise ValueError(
+            "Calendar-suffixed Evidence IDs are legacy only; use a semantic _vN revision"
+        )
     cwd = Path(request.cwd).resolve(strict=True)
     if not cwd.is_dir():
         raise ValueError("cwd must be a directory")
@@ -290,6 +394,28 @@ def _prepare_capture(request: CaptureRequest) -> _CaptureInputs:
         raise ValueError("buggy target symbol does not match contract target_symbol")
     if fixed_target.symbol != contract.target_symbol:
         raise ValueError("fixed target symbol does not match contract target_symbol")
+
+    predecessor = None
+    revision = 1
+    if request.supersedes_path is not None:
+        if not request.recapture_reason or not request.recapture_reason.strip():
+            raise ValueError("A recapture requires an explicit reason")
+        predecessor_path = _verified_workspace_file(request.supersedes_path, cwd, "predecessor")
+        prior = load_evidence(predecessor_path)
+        _verify_lineage(prior, cwd)
+        if prior.evidence_id == request.evidence_id or prior.contract_id != contract.contract_id:
+            raise ValueError("Cannot supersede the same Evidence ID or a different contract")
+        revision = prior.capture_revision + 1
+        predecessor = EvidenceLink(
+            evidence_id=prior.evidence_id,
+            evidence_ref=predecessor_path.relative_to(cwd).as_posix(),
+            artifact_digest=prior.artifact_digest,
+        )
+    elif request.recapture_reason is not None:
+        raise ValueError("recapture_reason requires a supersedes path")
+    version_suffix = re.search(r"_v([1-9]\d*)$", request.evidence_id)
+    if version_suffix and int(version_suffix.group(1)) != revision:
+        raise ValueError("Evidence ID version suffix must match its derived capture revision")
 
     artifact_root = _workspace_path(request.artifact_root, cwd, "artifact_root")
     evidence_path = artifact_root / "evidence" / request.evidence_id / "evidence.json"
@@ -312,6 +438,9 @@ def _prepare_capture(request: CaptureRequest) -> _CaptureInputs:
         fixed_target=fixed_target,
         fixed_target_digest=fixed_digest,
         tool_version=tool_version,
+        supersedes=predecessor,
+        capture_revision=revision,
+        recapture_reason=request.recapture_reason,
     )
 
 
@@ -499,6 +628,9 @@ def _require_same_capture_inputs(
         evidence.tool_version,
         evidence.buggy_run.timeout_seconds,
         evidence.fixed_run.timeout_seconds,
+        evidence.supersedes,
+        evidence.capture_revision,
+        evidence.recapture_reason,
     )
     expected = (
         evidence_id,
@@ -514,6 +646,9 @@ def _require_same_capture_inputs(
         prepared.tool_version,
         timeout_seconds,
         timeout_seconds,
+        prepared.supersedes,
+        prepared.capture_revision,
+        prepared.recapture_reason,
     )
     if actual != expected:
         raise ArtifactIntegrityError(
@@ -522,23 +657,7 @@ def _require_same_capture_inputs(
 
 
 def _publish_evidence(path: Path, evidence: Evidence) -> None:
-    data = canonical_json_bytes(evidence)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.parent / f".{path.name}.{uuid.uuid4().hex}.tmp"
-    try:
-        with temporary.open("xb") as stream:
-            stream.write(data)
-            stream.flush()
-            os.fsync(stream.fileno())
-        try:
-            os.link(temporary, path)
-        except FileExistsError:
-            if path.read_bytes() != data:
-                raise ArtifactIntegrityError(
-                    f"Evidence ID {evidence.evidence_id!r} was concurrently written differently"
-                ) from None
-    finally:
-        temporary.unlink(missing_ok=True)
+    write_immutable(path, canonical_json_bytes(evidence))
 
 
 def _workspace_path(path: Path, cwd: Path, label: str) -> Path:

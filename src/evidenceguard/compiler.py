@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import json
-import os
 import re
-import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import ValidationError
 
+from evidenceguard.artifacts import write_immutable
 from evidenceguard.digests import (
     canonical_json_bytes,
     digest_bytes,
@@ -74,6 +73,21 @@ def test_guard_case(target, case):
         assert target(**kwargs) == convert(case["expected"], DATA["return_type"])
 '''
 
+_TEST_TEMPLATE_V2 = _TEST_TEMPLATE.replace("guard-test.v1", "guard-test.v2").replace(
+    '    result = importlib.import_module(os.environ["EVIDENCEGUARD_TARGET"])\n'
+    '    for part in os.environ["EVIDENCEGUARD_SYMBOL"].split("."):',
+    '    module = os.environ.get("EVIDENCEGUARD_TARGET")\n'
+    '    symbol = os.environ.get("EVIDENCEGUARD_SYMBOL")\n'
+    "    if not module or not symbol:\n"
+    "        raise pytest.UsageError(\n"
+    '            "Missing Guard target. Use evidenceguard guard run <guard.json> "\n'
+    '            "--target module:symbol, or set EVIDENCEGUARD_TARGET and "\n'
+    '            "EVIDENCEGUARD_SYMBOL before running pytest."\n'
+    "        )\n"
+    "    result = importlib.import_module(module)\n"
+    '    for part in symbol.split("."):',
+)
+
 
 @dataclass(frozen=True, slots=True)
 class CompileRequest:
@@ -96,6 +110,8 @@ def compile_guard(request: CompileRequest) -> Guard:
         )
     if request.guard_id == evidence.contract_id:
         raise ValueError("Guard and contract must have independent identities")
+    version_suffix = re.search(r"_v([1-9]\d*)$", request.guard_id)
+    guard_version = int(version_suffix.group(1)) if version_suffix else 1
     contract = json.loads((workspace / evidence.contract_ref).read_bytes())
     cases = _minimal_cases(contract, evidence)
     interface = TargetInterface.model_validate(
@@ -115,6 +131,10 @@ def compile_guard(request: CompileRequest) -> Guard:
         guard = verify_guard(guard_path, cwd=workspace)
         if guard.source_evidence_digest != evidence.artifact_digest:
             raise ArtifactIntegrityError("Guard ID already exists with different source Evidence")
+        if guard.generator_version != "guard-test.v2" or guard.guard_version != guard_version:
+            raise ArtifactIntegrityError(
+                "Guard ID already exists with a different generator/version"
+            )
         if guard.source_evidence_ref != evidence_path.relative_to(workspace).as_posix():
             raise ArtifactIntegrityError(
                 "Guard ID already exists with a different source reference"
@@ -123,7 +143,7 @@ def compile_guard(request: CompileRequest) -> Guard:
 
     # The JSON file is the completion marker. A failed self-check leaves the
     # generated candidate test and raw run logs, but no consumable Guard JSON.
-    _write_immutable(test_path, test_bytes)
+    write_immutable(test_path, test_bytes)
     run = run_pytest(
         PytestRunRequest(
             role=RunRole.REPLAY,
@@ -143,6 +163,7 @@ def compile_guard(request: CompileRequest) -> Guard:
     verify_evidence(evidence_path, cwd=workspace)
     draft = Guard(
         guard_id=request.guard_id,
+        guard_version=guard_version,
         created_at=datetime.now(UTC),
         source_evidence_id=evidence.evidence_id,
         source_evidence_ref=evidence_path.relative_to(workspace).as_posix(),
@@ -165,7 +186,7 @@ def compile_guard(request: CompileRequest) -> Guard:
     guard = Guard.model_validate(
         {**draft.model_dump(), "artifact_digest": digest_json_artifact(draft)}
     )
-    _write_immutable(guard_path, canonical_json_bytes(guard))
+    write_immutable(guard_path, canonical_json_bytes(guard))
     return guard
 
 
@@ -195,7 +216,9 @@ def load_guard(path: str | Path, *, cwd: str | Path) -> Guard:
         test_bytes = test_path.read_bytes()
     except OSError as error:
         raise ArtifactIntegrityError("Guard test is missing") from error
-    if digest_bytes(test_bytes) != guard.test_digest or test_bytes != _render_test(payload):
+    if digest_bytes(test_bytes) != guard.test_digest or test_bytes != _render_test(
+        payload, guard.generator_version
+    ):
         raise ArtifactIntegrityError("Guard test digest or generated content mismatch")
     return guard
 
@@ -299,9 +322,10 @@ def _minimal_cases(contract: dict, evidence: Evidence) -> tuple[GuardCase, ...]:
     )
 
 
-def _render_test(payload: dict) -> bytes:
+def _render_test(payload: dict, generator_version: str = "guard-test.v2") -> bytes:
     literal = repr(canonical_json_bytes(payload).decode("utf-8"))
-    return _TEST_TEMPLATE.replace("__PAYLOAD__", literal).encode("utf-8")
+    template = _TEST_TEMPLATE if generator_version == "guard-test.v1" else _TEST_TEMPLATE_V2
+    return template.replace("__PAYLOAD__", literal).encode("utf-8")
 
 
 def _workspace_path(path: Path, workspace: Path) -> Path:
@@ -309,22 +333,3 @@ def _workspace_path(path: Path, workspace: Path) -> Path:
     if not resolved.is_relative_to(workspace):
         raise ValueError("Guard path must resolve below cwd")
     return resolved
-
-
-def _write_immutable(path: Path, data: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.parent / f".{path.name}.{uuid.uuid4().hex}.tmp"
-    try:
-        with temporary.open("xb") as stream:
-            stream.write(data)
-            stream.flush()
-            os.fsync(stream.fileno())
-        try:
-            os.link(temporary, path)
-        except FileExistsError:
-            if path.read_bytes() != data:
-                raise ArtifactIntegrityError(
-                    f"Immutable Guard file conflict: {path.name}"
-                ) from None
-    finally:
-        temporary.unlink(missing_ok=True)

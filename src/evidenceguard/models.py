@@ -15,6 +15,7 @@ from pydantic import (
     Field,
     JsonValue,
     StringConstraints,
+    model_serializer,
     model_validator,
 )
 
@@ -223,10 +224,16 @@ class RunRecord(FrozenModel):
         return self
 
 
+class EvidenceLink(FrozenModel):
+    evidence_id: NonEmptyText
+    evidence_ref: ArtifactRef
+    artifact_digest: Digest
+
+
 class Evidence(FrozenModel):
     """A bidirectionally verified bug reproduction artifact."""
 
-    schema_version: Literal["evidence.v1"] = "evidence.v1"
+    schema_version: Literal["evidence.v1", "evidence.v2"] = "evidence.v2"
     evidence_id: Annotated[str, StringConstraints(pattern=r"^evd_[A-Za-z0-9][A-Za-z0-9_-]*$")]
     created_at: UtcDateTime
     contract_id: NonEmptyText
@@ -245,9 +252,31 @@ class Evidence(FrozenModel):
     rejection_reasons: tuple[NonEmptyText, ...] = ()
     tool_version: NonEmptyText
     artifact_digest: Digest
+    capture_revision: Annotated[int, Field(ge=1)] = 1
+    supersedes: EvidenceLink | None = None
+    recapture_reason: NonEmptyText | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_legacy_shape(self, handler):
+        payload = handler(self)
+        if self.schema_version == "evidence.v1":
+            for key in ("capture_revision", "supersedes", "recapture_reason"):
+                payload.pop(key, None)
+        return payload
 
     @model_validator(mode="after")
     def validate_reproduction(self) -> Self:
+        revision_fields = {"capture_revision", "supersedes", "recapture_reason"}
+        if self.schema_version == "evidence.v1" and revision_fields & self.model_fields_set:
+            raise ValueError("Legacy Evidence cannot declare v2 revision fields")
+        if (self.supersedes is None) != (self.recapture_reason is None):
+            raise ValueError("supersedes and recapture_reason must be provided together")
+        if self.supersedes is None and self.capture_revision != 1:
+            raise ValueError("A recapture revision requires a predecessor")
+        if self.supersedes is not None and (
+            self.supersedes.evidence_id == self.evidence_id or self.capture_revision < 2
+        ):
+            raise ValueError("A recapture must use a distinct ID and advance its revision")
         if self.buggy_run.role is not RunRole.BUGGY:
             raise ValueError("buggy_run must have role=buggy")
         if self.fixed_run.role is not RunRole.FIXED:
@@ -339,7 +368,7 @@ class Guard(FrozenModel):
     argument_types: dict[str, ContractType]
     return_type: ContractType
     cases: Annotated[tuple[GuardCase, ...], Field(min_length=1)]
-    generator_version: Literal["guard-test.v1"] = "guard-test.v1"
+    generator_version: Literal["guard-test.v1", "guard-test.v2"] = "guard-test.v2"
     test_ref: ArtifactRef
     test_digest: Digest
     source_buggy_digest: Digest

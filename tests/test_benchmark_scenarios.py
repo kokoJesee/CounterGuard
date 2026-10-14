@@ -17,12 +17,12 @@ from tests.benchmark_support import (
 )
 
 GUARD_SCOPES = {
-    "grd_discount_member_rate_regression": {
+    "grd_discount_member_rate_regression_v2": {
         "contract_family": "membership_discount",
         "contract_version": "v1",
         "interface_kind": "final_price",
     },
-    "grd_query_limit_zero_regression": {
+    "grd_query_limit_zero_regression_v2": {
         "contract_family": "input_limit",
         "contract_version": "v1",
         "interface_kind": "query_parameter",
@@ -97,9 +97,7 @@ def test_no_single_scope_predicate_perfectly_separates_a_guard(files: tuple[Any,
                 assert predicted != expected
 
         ast_features = {
-            feature
-            for sample in samples
-            for feature in sample["features"]["ast_features"]
+            feature for sample in samples for feature in sample["features"]["ast_features"]
         }
         for feature in ast_features:
             predicted = [feature in sample["features"]["ast_features"] for sample in samples]

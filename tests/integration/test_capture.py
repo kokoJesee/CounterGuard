@@ -11,10 +11,12 @@ import pytest
 from typer.testing import CliRunner
 
 from evidenceguard.cli import app
+from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
 from evidenceguard.errors import ArtifactIntegrityError
 from evidenceguard.evidence import (
     CaptureRequest,
     capture_evidence,
+    inventory_evidence,
     load_evidence,
     verify_evidence,
 )
@@ -320,3 +322,111 @@ def test_timeout_change_cannot_reuse_existing_capture(workspace: Path) -> None:
     capture_evidence(request)
     with pytest.raises(ArtifactIntegrityError, match="different immutable inputs"):
         capture_evidence(replace(request, timeout_seconds=5.0))
+
+
+def test_recapture_links_a_stale_predecessor_without_admitting_it(workspace: Path) -> None:
+    request = _discount_request(workspace, evidence_id="evd_discount_v1")
+    first = capture_evidence(request)
+    first_path = Path("artifacts/evidence") / first.evidence_id / "evidence.json"
+    test_path = workspace / request.test_path
+    test_path.write_bytes(test_path.read_bytes() + b"\n# revised test harness\n")
+    second = capture_evidence(
+        replace(
+            request,
+            evidence_id="evd_discount_v2",
+            supersedes_path=first_path,
+            recapture_reason="Test harness revised; recapture with current source digests.",
+        )
+    )
+    assert second.capture_revision == 2
+    assert second.supersedes.evidence_id == first.evidence_id
+    assert second.supersedes.artifact_digest == first.artifact_digest
+    assert (
+        verify_evidence(Path("artifacts/evidence/evd_discount_v2/evidence.json"), cwd=workspace)
+        == second
+    )
+    report = inventory_evidence(cwd=workspace, artifact_root="artifacts")
+    assert report["counts"] == {
+        "total": 2,
+        "verified": 1,
+        "invalid": 1,
+        "diagnostic": 0,
+        "eligible": 1,
+    }
+    assert report["entries"][0]["usable"] is False
+
+
+def test_verified_supersession_is_separate_from_validity(workspace: Path) -> None:
+    request = _discount_request(workspace, evidence_id="evd_discount_v1")
+    capture_evidence(request)
+    capture_evidence(
+        replace(
+            request,
+            evidence_id="evd_discount_v2",
+            supersedes_path=Path("artifacts/evidence/evd_discount_v1/evidence.json"),
+            recapture_reason="Replace the capture with an explicit revision.",
+        )
+    )
+    report = inventory_evidence(cwd=workspace, artifact_root="artifacts")
+    assert report["counts"]["verified"] == 2
+    assert report["counts"]["eligible"] == 1
+    older = report["entries"][0]
+    assert older["usable"] is True and older["eligible"] is False
+    assert older["superseded_by"] == ["evd_discount_v2"]
+
+
+def test_capture_rejects_calendar_names_and_revision_without_reason(workspace: Path) -> None:
+    request = _discount_request(workspace, evidence_id="evd_discount_d5")
+    with pytest.raises(ValueError, match="Calendar-suffixed"):
+        capture_evidence(request)
+    request = replace(request, evidence_id="evd_discount_v1")
+    capture_evidence(request)
+    with pytest.raises(ValueError, match="explicit reason"):
+        capture_evidence(
+            replace(
+                request,
+                evidence_id="evd_discount_v2",
+                supersedes_path=Path("artifacts/evidence/evd_discount_v1/evidence.json"),
+            )
+        )
+
+
+def test_diagnostic_successor_does_not_retire_verified_predecessor(workspace: Path) -> None:
+    request = _discount_request(workspace, evidence_id="evd_discount_v1")
+    capture_evidence(request)
+    capture_evidence(
+        replace(
+            request,
+            evidence_id="evd_discount_v2",
+            buggy_target=request.fixed_target,
+            supersedes_path=Path("artifacts/evidence/evd_discount_v1/evidence.json"),
+            recapture_reason="Attempted recapture without a reproduced bug.",
+        )
+    )
+    report = inventory_evidence(cwd=workspace, artifact_root="artifacts")
+    assert report["counts"]["diagnostic"] == 1
+    assert report["counts"]["eligible"] == 1
+    assert report["entries"][0]["eligible"] is True
+    assert report["entries"][0]["superseded_by"] == []
+
+
+def test_tampered_predecessor_invalidates_revision_chain(workspace: Path) -> None:
+    request = _discount_request(workspace, evidence_id="evd_discount_v1")
+    capture_evidence(request)
+    predecessor = Path("artifacts/evidence/evd_discount_v1/evidence.json")
+    capture_evidence(
+        replace(
+            request,
+            evidence_id="evd_discount_v2",
+            supersedes_path=predecessor,
+            recapture_reason="Record explicit revision provenance.",
+        )
+    )
+    path = workspace / predecessor
+    payload = json.loads(path.read_bytes())
+    payload["tool_version"] = "altered"
+    payload["artifact_digest"] = digest_json_artifact(payload)
+    path.write_bytes(canonical_json_bytes(payload))
+    report = inventory_evidence(cwd=workspace, artifact_root="artifacts")
+    assert report["entries"][1]["usable"] is False
+    assert "predecessor identity/digest mismatch" in report["entries"][1]["reason"]

@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "GuardBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_ref": {
+          "minLength": 1,
+          "title": "Guard Ref",
+          "type": "string"
+        },
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "frozen_interface_kind": {
+          "enum": [
+            "final_price",
+            "query_parameter"
+          ],
+          "title": "Frozen Interface Kind",
+          "type": "string"
+        },
+        "semantic_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Semantic Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_ref",
+        "contract_family",
+        "frozen_interface_kind",
+        "semantic_digest"
+      ],
+      "title": "GuardBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "experiment-protocol.v1",
+      "default": "experiment-protocol.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "protocol_id": {
+      "const": "scope_v1",
+      "default": "scope_v1",
+      "title": "Protocol Id",
+      "type": "string"
+    },
+    "unit": {
+      "const": "labeled_guard_sample_row",
+      "default": "labeled_guard_sample_row",
+      "title": "Unit",
+      "type": "string"
+    },
+    "split_ref": {
+      "minLength": 1,
+      "title": "Split Ref",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "methods": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Methods",
+      "type": "object"
+    },
+    "guards": {
+      "items": {
+        "$ref": "#/$defs/GuardBinding"
+      },
+      "title": "Guards",
+      "type": "array"
+    },
+    "expected_train": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ConfusionCounts"
+      },
+      "title": "Expected Train",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "split_ref",
+    "split_digest",
+    "methods",
+    "guards",
+    "expected_train",
+    "artifact_digest"
+  ],
+  "title": "ExperimentProtocol",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

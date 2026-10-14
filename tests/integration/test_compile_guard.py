@@ -1,7 +1,10 @@
 """Exercise the real Evidence -> minimal Guard -> direct replay chain."""
 
 import json
+import os
 import shutil
+import subprocess
+import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -261,3 +264,22 @@ def test_cli_compile_audit_and_direct_replay(workspace: Path) -> None:
     )
     assert failed.exit_code == 1, failed.output
     assert json.loads(failed.stdout)["outcome"] == "test_failed"
+
+
+def test_manual_guard_run_without_env_has_actionable_error(workspace: Path) -> None:
+    _, guard, _ = make_guard(workspace)
+    environment = os.environ.copy()
+    environment.pop("EVIDENCEGUARD_TARGET", None)
+    environment.pop("EVIDENCEGUARD_SYMBOL", None)
+    environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", guard.test_ref, "--noconftest", "-q"],
+        cwd=workspace,
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0
+    assert "Missing Guard target" in result.stdout
+    assert "--target module:symbol" in result.stdout
+    assert "KeyError" not in result.stdout

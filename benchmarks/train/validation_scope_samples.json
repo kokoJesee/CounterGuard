@@ -21,7 +21,7 @@
       ]
     },
     "labels": {
-      "guard_id": "grd_query_limit_zero_regression",
+      "guard_id": "grd_query_limit_zero_regression_v2",
       "guard_applicable": true,
       "guard_violation": true,
       "contract_compliant": false,
@@ -50,7 +50,7 @@
       ]
     },
     "labels": {
-      "guard_id": "grd_query_limit_zero_regression",
+      "guard_id": "grd_query_limit_zero_regression_v2",
       "guard_applicable": true,
       "guard_violation": false,
       "contract_compliant": true,
@@ -79,7 +79,7 @@
       ]
     },
     "labels": {
-      "guard_id": "grd_query_limit_zero_regression",
+      "guard_id": "grd_query_limit_zero_regression_v2",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,
@@ -108,7 +108,7 @@
       ]
     },
     "labels": {
-      "guard_id": "grd_query_limit_zero_regression",
+      "guard_id": "grd_query_limit_zero_regression_v2",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": false,
@@ -137,7 +137,7 @@
       ]
     },
     "labels": {
-      "guard_id": "grd_query_limit_zero_regression",
+      "guard_id": "grd_query_limit_zero_regression_v2",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,

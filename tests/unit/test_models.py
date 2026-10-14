@@ -329,3 +329,17 @@ def test_strict_evidence_round_trips_through_json() -> None:
 def test_fixed_pass_cannot_hide_a_skipped_case() -> None:
     with pytest.raises(ValidationError, match="all collected cases to pass"):
         run(RunRole.FIXED, RunOutcome.PASSED, (case("member", CaseOutcome.SKIPPED),))
+
+
+def test_legacy_evidence_keeps_its_original_digest_shape(tmp_path: Path) -> None:
+    from evidenceguard.evidence import load_evidence
+
+    payload = {**evidence_payload(), "schema_version": "evidence.v1"}
+    legacy = Evidence.model_validate(payload)
+    data = legacy.model_dump(mode="json")
+    assert "capture_revision" not in data
+    assert "supersedes" not in data
+    data["artifact_digest"] = digest_json_artifact(data)
+    path = tmp_path / "evidence.json"
+    path.write_bytes(canonical_json_bytes(data))
+    assert load_evidence(path).artifact_digest == data["artifact_digest"]

@@ -7,7 +7,9 @@ Day 3 now captures and verifies bidirectional bug Evidence. Each artifact record
 contract and test digests, target digests, structured case results, raw logs, and pytest exit
 semantics. The capture service accepts only a real buggy test failure followed by a fixed pass as
 reproduced Evidence. Day 4 compiles the failed cases into independent Guard assets and self-checks
-them on the fixed target before publication. Baselines and scope learning are the next milestones.
+them on the fixed target before publication. Day 5 freezes the experiment protocol, generates
+baseline scopes, and executes both baselines on the nine training rows. Automatic feature
+extraction and scope learning are the next milestones.
 
 The MVP keeps two questions separate:
 
@@ -106,14 +108,25 @@ uv run ruff check .
 Run from the repository root with the trusted example fixtures:
 
 ```powershell
-uv run evidenceguard capture --evidence-id evd_discount_v1_member_rate_fix_d4 --contract examples/discount/contracts/membership_discount_final_price_v1.json --test tests/contract_tests/test_membership_discount_v1.py --buggy-target examples.discount.implementations.final_price_v1_buggy:calculate_price --fixed-target examples.discount.implementations.final_price_v1_fixed:calculate_price --artifact-root artifacts
-uv run evidenceguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_d4/evidence.json
+uv run python scripts/prepare_scope_v1.py
+uv run evidenceguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json
+uv run evidenceguard evidence inventory
 ```
 
-The JSON has `reproduced=true`, buggy exit code `1`, fixed exit code `0`, and the failed cases
+The preparation script captures both scenarios and compiles their Guards without modifying the
+frozen protocol. On a clean checkout it first creates semantic v1 predecessors; in the existing
+development workspace it uses the intact historical D4 records. Existing v2 assets are verified
+and reused. The discount JSON has `reproduced=true`, buggy exit code `1`, fixed exit code `0`, and the failed cases
 `member-price` and `member-rounding`. Both commands print machine-readable JSON. Repeating the same
 capture verifies and reuses the existing artifact; changed inputs with the same identity are
 rejected. Input and log references are relative to the selected workspace (`--cwd`).
+
+New Evidence uses `evidence.v2`, with `capture_revision`, an explicit `supersedes` link, and
+`recapture_reason`. New calendar suffixes are rejected. Legacy records retain their bytes and
+digests. **Only `evidence verify` returning 0 makes Evidence usable**; a newer usable successor
+removes the predecessor from default selection without making it invalid. Inventory reports each
+state independently, and its successful exit means the inspection completed. See the
+[lifecycle rules](docs/evidence-lifecycle.md) for recapture commands and historical retention.
 
 CLI exit codes are `0` for reproduced Evidence, `1` for a completed but unreproduced attempt, `2`
 for invalid inputs, `3` for execution failures, and `5` for artifact integrity failures. Pytest
@@ -126,9 +139,9 @@ artifacts under `artifacts/` are excluded from Git.
 ## Compile and directly replay a minimal Guard
 
 ```powershell
-uv run evidenceguard compile --guard-id grd_discount_member_rate_regression --evidence artifacts/evidence/evd_discount_v1_member_rate_fix_d4/evidence.json --artifact-root artifacts
-uv run evidenceguard guard verify artifacts/guards/grd_discount_member_rate_regression/guard.json
-uv run python -m evidenceguard guard run artifacts/guards/grd_discount_member_rate_regression/guard.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
+uv run evidenceguard compile --guard-id grd_discount_member_rate_regression_v2 --evidence artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json --artifact-root artifacts
+uv run evidenceguard guard verify artifacts/guards/grd_discount_member_rate_regression_v2/guard.json
+uv run python -m evidenceguard guard run artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
 ```
 
 The discount Guard contains two assertions; the query-limit Guard contains the one zero-rejection
@@ -142,3 +155,32 @@ do not yet decide Scope applicability.
 [execution policy](docs/pytest-execution-policy.md) explains plugin/conftest loading and the explicit
 exception whitelist. The [Day 4 record](docs/progress/day4.md) includes the completed acceptance
 commands, artifact identities, and six direct replay results.
+
+The current `guard-test.v2` generator gives an actionable configuration error when manually run
+without `EVIDENCEGUARD_TARGET` or `EVIDENCEGUARD_SYMBOL`. Use `guard run --target module:symbol`
+to supply them consistently. Old v1 assets remain auditable.
+
+## Run the frozen training baselines
+
+```powershell
+uv run python scripts/prepare_scope_v1.py
+uv run evidenceguard experiment verify --protocol experiments/scope_v1.json
+uv run evidenceguard benchmark baselines --protocol experiments/scope_v1.json --split train
+```
+
+| Method | TP | FP | TN | FN | Guard executions |
+|---|---:|---:|---:|---:|---:|
+| B1 always | 4 | 5 | 0 | 0 | 9 |
+| B2 interface | 4 | 3 | 2 | 0 | 7 |
+
+Each applicable row actually executes its minimal Guard. The two skipped rows are `not_run`.
+Scope counts are independent of execution outcomes: an inapplicable Guard remains a false
+application even if its assertions pass. The command returns 0 when the frozen scope counts match
+and no infrastructure errors occur; expected assertion failures are benchmark data.
+
+Four immutable Scope artifacts and the report, predictions, and raw replay records are written
+under `artifacts/scopes/scope-v1/` and `artifacts/experiments/scope-v1/train-baselines/`.
+Definitions, sample membership, source text, and executable Guard meaning are pinned by digest;
+fresh capture timestamps do not change the semantic pin, while full provenance is still audited.
+The D5 command rejects holdout execution. Learned methods are frozen specifications for Day 7.
+See the [Day 5 acceptance record](docs/progress/day5.md).

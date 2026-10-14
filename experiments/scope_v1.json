@@ -1,0 +1,44 @@
+{
+  "schema_version": "experiment-protocol.v1",
+  "protocol_id": "scope_v1",
+  "unit": "labeled_guard_sample_row",
+  "split_ref": "benchmarks/splits/scope_v1.json",
+  "split_digest": "sha256:f04170d16cd6e54f09edcc4b1c3cdb39f84ce4dbd2928c5923da7ccc21cd0cef",
+  "methods": {
+    "b1_always": "always",
+    "b2_interface": "interface_kind_eq_frozen_guard_interface",
+    "learned_initial": "fit_initial_train_only",
+    "learned_refined": "refit_initial_plus_counterexamples_train_only"
+  },
+  "guards": [
+    {
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "guard_ref": "artifacts/guards/grd_discount_member_rate_regression_v2/guard.json",
+      "contract_family": "membership_discount",
+      "frozen_interface_kind": "final_price",
+      "semantic_digest": "sha256:88a44dcfd7c1d3fa0c5e3a6f0bce400e4dc3c4f98ff88b1b640ed05903db1d68"
+    },
+    {
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "guard_ref": "artifacts/guards/grd_query_limit_zero_regression_v2/guard.json",
+      "contract_family": "input_limit",
+      "frozen_interface_kind": "query_parameter",
+      "semantic_digest": "sha256:234b4198c0258158e9544ca15af79d4e0448e1b5b08f88f69b76d25b0878fba3"
+    }
+  ],
+  "expected_train": {
+    "b1_always": {
+      "tp": 4,
+      "fp": 5,
+      "tn": 0,
+      "fn": 0
+    },
+    "b2_interface": {
+      "tp": 4,
+      "fp": 3,
+      "tn": 2,
+      "fn": 0
+    }
+  },
+  "artifact_digest": "sha256:1f401186a3f51c17e582dbbdc96f9324e47e128f90fcb91f29594690bc8daa3a"
+}
