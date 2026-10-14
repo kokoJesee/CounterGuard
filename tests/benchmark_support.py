@@ -2,9 +2,10 @@
 
 import importlib
 import json
-from decimal import Decimal
 from pathlib import Path
 from typing import Any
+
+from evidenceguard.contracts import convert_contract_value, resolve_exception
 
 PROJECT_ROOT = Path(__file__).parents[1]
 TRAIN_FILES = tuple(sorted((PROJECT_ROOT / "benchmarks/train").glob("*_scope_samples.json")))
@@ -21,25 +22,33 @@ def load_samples(files: tuple[Path, ...] = SCENARIO_FILES) -> list[dict[str, Any
 
 
 def convert_value(value: Any, declared_type: str) -> Any:
-    if declared_type == "decimal":
-        return Decimal(value)
-    if declared_type == "boolean":
-        if not isinstance(value, bool):
-            raise TypeError("boolean contract value must be a JSON boolean")
-        return value
-    if declared_type == "integer":
-        if not isinstance(value, int) or isinstance(value, bool):
-            raise TypeError("integer contract value must be a JSON integer")
-        return value
-    if declared_type == "optional_string":
-        if value is not None and not isinstance(value, str):
-            raise TypeError("optional_string contract value must be a string or null")
-        return value
-    raise ValueError(f"unsupported contract type: {declared_type}")
+    return convert_contract_value(value, declared_type)
 
 
 def implementation_satisfies_contract(sample: dict[str, Any]) -> bool:
     contract = load_json(PROJECT_ROOT / sample["contract_ref"])
+    return _satisfies_cases(sample, contract)
+
+
+def implementation_violates_minimal_guard(sample: dict[str, Any]) -> bool:
+    guards = {
+        "grd_discount_member_rate_regression": (
+            "examples/discount/contracts/membership_discount_final_price_v1.json",
+            {"member-price", "member-rounding"},
+        ),
+        "grd_query_limit_zero_regression": (
+            "examples/validation/contracts/input_limit_query_v1.json",
+            {"below-minimum"},
+        ),
+    }
+    contract_ref, case_ids = guards[sample["labels"]["guard_id"]]
+    contract = load_json(PROJECT_ROOT / contract_ref)
+    contract["cases"] = [case for case in contract["cases"] if case["case_id"] in case_ids]
+    assert len(contract["cases"]) == len(case_ids)
+    return not _satisfies_cases(sample, contract)
+
+
+def _satisfies_cases(sample: dict[str, Any], contract: dict[str, Any]) -> bool:
     module = importlib.import_module(sample["target"]["module"])
     target = getattr(module, sample["target"]["symbol"])
 
@@ -53,7 +62,7 @@ def implementation_satisfies_contract(sample: dict[str, Any]) -> bool:
         try:
             actual = target(**kwargs)
         except Exception as error:  # noqa: BLE001 - execution outcome is benchmark data
-            if expected_error == type(error).__name__:
+            if expected_error is not None and isinstance(error, resolve_exception(expected_error)):
                 continue
             return False
 

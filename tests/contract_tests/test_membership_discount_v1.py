@@ -1,6 +1,5 @@
 """Execute the selected discount contract without duplicating its oracle."""
 
-import builtins
 import importlib
 import json
 import os
@@ -9,6 +8,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 import pytest
+
+from evidenceguard.contracts import resolve_exception
 
 DEFAULT_TARGET = "examples.discount.implementations.final_price_v1_fixed"
 TARGET_MODULE = os.environ.get("EVIDENCEGUARD_TARGET", DEFAULT_TARGET)
@@ -41,7 +42,7 @@ def test_membership_discount_contract(case: dict[str, Any]) -> None:
         "is_member": case["args"]["is_member"],
     }
     if "raises" in case:
-        with pytest.raises(getattr(builtins, case["raises"])):
+        with pytest.raises(resolve_exception(case["raises"])):
             calculate_price(**kwargs)
     else:
         assert calculate_price(**kwargs) == Decimal(case["expected"])

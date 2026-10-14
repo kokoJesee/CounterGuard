@@ -15,7 +15,7 @@
       "ast_features": ["branch:is_member", "decimal:multiply", "round:half_up"]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": true,
       "guard_violation": true,
       "contract_compliant": false,
@@ -38,7 +38,7 @@
       "ast_features": ["branch:is_member", "decimal:multiply", "round:half_up"]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": true,
       "guard_violation": false,
       "contract_compliant": true,
@@ -61,7 +61,7 @@
       "ast_features": ["branch:is_member", "decimal:multiply", "round:half_up"]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,
@@ -84,7 +84,7 @@
       "ast_features": ["branch:is_member", "decimal:multiply", "round:half_up"]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,

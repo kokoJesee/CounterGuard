@@ -13,9 +13,12 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    JsonValue,
     StringConstraints,
     model_validator,
 )
+
+from evidenceguard.contracts import ContractType, ExceptionName, convert_contract_value
 
 Digest = Annotated[
     str,
@@ -291,4 +294,83 @@ class Evidence(FrozenModel):
             raise ValueError("reproduced Evidence cannot contain rejection reasons")
         if not self.reproduced and not self.rejection_reasons:
             raise ValueError("unreproduced Evidence requires at least one rejection reason")
+        return self
+
+
+class TargetInterface(FrozenModel):
+    """Trusted contract metadata; target source identity is supplied at replay."""
+
+    contract_family: NonEmptyText
+    contract_version: NonEmptyText
+    interface_kind: NonEmptyText
+    symbol_signature: NonEmptyText
+
+
+class ValueGuardCase(FrozenModel):
+    case_id: NonEmptyText
+    args: dict[str, JsonValue]
+    expected: JsonValue
+
+
+class RaisesGuardCase(FrozenModel):
+    case_id: NonEmptyText
+    args: dict[str, JsonValue]
+    raises: ExceptionName
+
+
+GuardCase = ValueGuardCase | RaisesGuardCase
+
+
+class Guard(FrozenModel):
+    """A minimal, self-contained regression test with explicit provenance."""
+
+    schema_version: Literal["guard.v1"] = "guard.v1"
+    guard_id: Annotated[str, StringConstraints(pattern=r"^grd_[A-Za-z0-9][A-Za-z0-9_-]*$")]
+    guard_version: Annotated[int, Field(ge=1)] = 1
+    created_at: UtcDateTime
+    source_evidence_id: Annotated[
+        str, StringConstraints(pattern=r"^evd_[A-Za-z0-9][A-Za-z0-9_-]*$")
+    ]
+    source_evidence_ref: ArtifactRef
+    source_evidence_digest: Digest
+    contract_id: NonEmptyText
+    contract_digest: Digest
+    target_interface: TargetInterface
+    argument_types: dict[str, ContractType]
+    return_type: ContractType
+    cases: Annotated[tuple[GuardCase, ...], Field(min_length=1)]
+    generator_version: Literal["guard-test.v1"] = "guard-test.v1"
+    test_ref: ArtifactRef
+    test_digest: Digest
+    source_buggy_digest: Digest
+    source_fixed_digest: Digest
+    validation_run: RunRecord
+    state: Literal["candidate"] = "candidate"
+    artifact_digest: Digest
+
+    @model_validator(mode="after")
+    def validate_guard(self) -> Self:
+        if self.guard_id == self.contract_id:
+            raise ValueError("Guard and contract must have independent identities")
+        if not self.argument_types:
+            raise ValueError("Guard must declare argument types")
+        case_ids = tuple(case.case_id for case in self.cases)
+        if case_ids != tuple(sorted(set(case_ids))):
+            raise ValueError("Guard case IDs must be unique and sorted")
+        for case in self.cases:
+            if set(case.args) != set(self.argument_types):
+                raise ValueError("Guard case arguments do not match argument_types")
+            for name, value in case.args.items():
+                convert_contract_value(value, self.argument_types[name])
+            if isinstance(case, ValueGuardCase):
+                convert_contract_value(case.expected, self.return_type)
+        run = self.validation_run
+        if run.role is not RunRole.REPLAY or run.outcome is not RunOutcome.PASSED:
+            raise ValueError("Guard requires a successful fixed-target self-check")
+        if run.contract_id != self.contract_id or run.contract_digest != self.contract_digest:
+            raise ValueError("Guard self-check contract mismatch")
+        if run.target_digest != self.source_fixed_digest:
+            raise ValueError("Guard self-check must use the source fixed target")
+        if tuple(case.case_id for case in run.case_results) != case_ids:
+            raise ValueError("Guard self-check must execute exactly its minimal case set")
         return self

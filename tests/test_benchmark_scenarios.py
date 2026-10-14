@@ -11,17 +11,18 @@ from tests.benchmark_support import (
     SCENARIO_FILES,
     TRAIN_FILES,
     implementation_satisfies_contract,
+    implementation_violates_minimal_guard,
     load_json,
     load_samples,
 )
 
 GUARD_SCOPES = {
-    "membership-discount-final-price-v1": {
+    "grd_discount_member_rate_regression": {
         "contract_family": "membership_discount",
         "contract_version": "v1",
         "interface_kind": "final_price",
     },
-    "input-limit-query-v1": {
+    "grd_query_limit_zero_regression": {
         "contract_family": "input_limit",
         "contract_version": "v1",
         "interface_kind": "query_parameter",
@@ -44,7 +45,7 @@ def test_guard_applicability_and_violation_are_separate_labels() -> None:
 
         assert labels["guard_applicable"] is expected_applicability
         if labels["guard_applicable"]:
-            assert labels["guard_violation"] is (not labels["contract_compliant"])
+            assert labels["guard_violation"] is implementation_violates_minimal_guard(sample)
         else:
             assert labels["guard_violation"] is None
 

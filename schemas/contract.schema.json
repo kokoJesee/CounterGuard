@@ -52,7 +52,7 @@
         },
         "args": {"type": "object"},
         "expected": {},
-        "raises": {"type": "string", "minLength": 1}
+        "raises": {"enum": ["ValueError", "TypeError", "OverflowError"]}
       },
       "oneOf": [
         {"required": ["expected"], "not": {"required": ["raises"]}},

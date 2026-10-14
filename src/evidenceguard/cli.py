@@ -6,13 +6,16 @@ from typing import Annotated, NoReturn
 import typer
 
 from evidenceguard import __version__
-from evidenceguard.errors import ArtifactIntegrityError
+from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
+from evidenceguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
 from evidenceguard.evidence import CaptureRequest, capture_evidence, verify_evidence
-from evidenceguard.models import Evidence, RunOutcome
+from evidenceguard.models import Evidence, RunOutcome, RunRecord
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
+guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
+app.add_typer(guard_app, name="guard")
 
 
 @app.callback()
@@ -78,6 +81,76 @@ def evidence_verify(
     except OSError as error:
         _error(f"verification execution error: {error}", 3)
     _emit_evidence(evidence)
+
+
+@app.command("compile")
+def compile_command(
+    guard_id: Annotated[str, typer.Option(help="Independent grd_ identity.")],
+    evidence: Annotated[Path, typer.Option(help="Verified source Evidence JSON.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted project workspace.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Output below cwd.")] = Path("artifacts"),
+) -> None:
+    """Compile minimal regression assertions and validate them on the fixed target."""
+    try:
+        guard = compile_guard(CompileRequest(guard_id, evidence, cwd, artifact_root))
+    except GuardSelfCheckError as error:
+        typer.echo(str(error), err=True)
+        _emit_run(error.run)
+        raise typer.Exit(3) from error
+    except InvalidEvidenceError as error:
+        _error(str(error), 1)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"compile execution error: {error}", 3)
+    typer.echo(guard.model_dump_json(indent=2))
+
+
+@guard_app.command("verify")
+def guard_verify(
+    path: Annotated[Path, typer.Argument(help="Guard JSON to audit.")],
+    cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
+) -> None:
+    """Verify Guard content, source Evidence, and fixed-target self-check logs."""
+    try:
+        guard = verify_guard(path, cwd=cwd)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Guard verification error: {error}", 3)
+    typer.echo(guard.model_dump_json(indent=2))
+
+
+@guard_app.command("run")
+def guard_run(
+    path: Annotated[Path, typer.Argument(help="Guard JSON to execute directly.")],
+    target: Annotated[str, typer.Option(help="New target module:symbol.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted project workspace.")] = Path("."),
+    artifact_root: Annotated[Path, typer.Option(help="Run output below cwd.")] = Path("artifacts"),
+    timeout: Annotated[float, typer.Option(help="Run timeout in seconds.")] = 30.0,
+) -> None:
+    """Direct smoke replay; this command does not decide Scope applicability."""
+    try:
+        run = run_guard(path, target, cwd=cwd, artifact_root=artifact_root, timeout_seconds=timeout)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Guard execution error: {error}", 3)
+    _emit_run(run)
+
+
+def _emit_run(run: RunRecord) -> None:
+    typer.echo(run.model_dump_json(indent=2))
+    if run.outcome is RunOutcome.TEST_FAILED:
+        raise typer.Exit(1)
+    if run.outcome is not RunOutcome.PASSED:
+        raise typer.Exit(3)
 
 
 def _emit_evidence(evidence: Evidence) -> None:

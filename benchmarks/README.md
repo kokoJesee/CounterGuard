@@ -2,7 +2,8 @@
 
 Each sample keeps scope classification separate from contract execution.
 
-- `features` is the complete and only input allowed for scope learning.
+- `features` is the complete and only feature input allowed for scope learning.
+- `guard_applicable` is provided separately as a supervised target; it is never a feature.
 - `contract_ref` and `target` are execution and traceability metadata.
 - `labels.guard_applicable` says whether the named guard may run in the sample context.
 - `labels.guard_violation` is `true` or `false` only when the guard applies; otherwise it is
@@ -12,7 +13,7 @@ Each sample keeps scope classification separate from contract execution.
 - `labels.basis` records the human-readable reason for the confirmed label.
 
 The Scope Learner must not receive sample IDs, paths, module or symbol names, contract IDs,
-contract examples, expected outputs, label fields, or basis text. Several of those fields contain
+contract examples, expected outputs, violation/compliance labels, or basis text. Several of those fields contain
 words such as `buggy`, `fixed`, `v1`, or `legal` and would leak the answer.
 
 `ast_features` is currently a manually confirmed, presence-only summary using the controlled
@@ -37,7 +38,8 @@ within one family. It therefore tests whether version and interface predicates c
 counterexamples. Cross-family negatives require per-guard labels on the same sample and are left
 for a later schema revision.
 
-For these initial fixtures, each Guard replays the full declared contract, so an applicable Guard
-violation currently equals failure of the target's own contract. Future Guards may encode only one
-regression property; at that point Guard execution and full-contract compliance must be measured
-independently.
+Day 4 compiles only the source Evidence's failed cases: two discount assertions and the zero-limit
+rejection. The independent identities are `grd_discount_member_rate_regression` and
+`grd_query_limit_zero_regression`. An applicable Guard violation is measured by these minimal
+assertions, separately from full-contract compliance. The existing 15 labels retain their values
+after this migration; the integrity tests check the minimal assertions explicitly.

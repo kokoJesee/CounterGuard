@@ -120,6 +120,9 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
         "-m",
         "pytest",
         prepared.test_ref,
+        "-c",
+        _workspace_ref(prepared.run_dir / "pytest.ini", prepared.cwd, "pytest config"),
+        "--noconftest",
         "-q",
         "--junitxml",
         prepared.junit_ref,
@@ -244,6 +247,7 @@ def _prepare_run(request: PytestRunRequest) -> _PreparedRun:
         raise ValueError("run_id must start with 'run_' and contain lowercase safe characters")
     run_dir = artifact_root / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
+    (run_dir / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
 
     stdout_path = run_dir / "stdout.txt"
     stderr_path = run_dir / "stderr.txt"

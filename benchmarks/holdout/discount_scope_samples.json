@@ -20,7 +20,7 @@
       ]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,
@@ -48,7 +48,7 @@
       ]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": true,
       "guard_violation": true,
       "contract_compliant": false,
@@ -76,7 +76,7 @@
       ]
     },
     "labels": {
-      "guard_id": "membership-discount-final-price-v1",
+      "guard_id": "grd_discount_member_rate_regression",
       "guard_applicable": false,
       "guard_violation": null,
       "contract_compliant": true,

@@ -1,6 +1,5 @@
 """Execute the selected query-limit contract without duplicating its oracle."""
 
-import builtins
 import importlib
 import json
 import os
@@ -8,6 +7,8 @@ from pathlib import Path
 from typing import Any, Protocol
 
 import pytest
+
+from evidenceguard.contracts import resolve_exception
 
 DEFAULT_TARGET = "examples.validation.implementations.query_limit_v1_fixed"
 TARGET_MODULE = os.environ.get("EVIDENCEGUARD_TARGET", DEFAULT_TARGET)
@@ -35,7 +36,7 @@ def load_target() -> LimitParser:
 def test_query_limit_contract(case: dict[str, Any]) -> None:
     parse_limit = load_target()
     if "raises" in case:
-        with pytest.raises(getattr(builtins, case["raises"])):
+        with pytest.raises(resolve_exception(case["raises"])):
             parse_limit(**case["args"])
     else:
         assert parse_limit(**case["args"]) == case["expected"]

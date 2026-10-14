@@ -118,6 +118,8 @@ def test_controlled_environment(value: int) -> None:
         encoding="utf-8",
     )
     monkeypatch.setenv("EVIDENCEGUARD_SHOULD_NOT_LEAK", "secret")
+    (tmp_path / "conftest.py").write_text("raise RuntimeError('conftest must not load')\n")
+    (tmp_path / "pytest.ini").write_text("[pytest]\naddopts = -p missing_project_plugin\n")
     request = PytestRunRequest(
         role=RunRole.REPLAY,
         contract_id="controlled-environment-v1",

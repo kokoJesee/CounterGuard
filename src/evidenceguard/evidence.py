@@ -3,21 +3,19 @@
 from __future__ import annotations
 
 import ast
-import builtins
 import json
 import math
 import os
 import re
 import uuid
-from contextlib import suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from decimal import Decimal, InvalidOperation
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from pydantic import ValidationError
 
+from evidenceguard.contracts import convert_contract_value, resolve_exception
 from evidenceguard.digests import (
     canonical_json_bytes,
     digest_file,
@@ -387,9 +385,7 @@ def _load_contract(path: Path) -> _ContractManifest:
         if "raises" in case and (not isinstance(case["raises"], str) or not case["raises"]):
             raise ValueError(f"contract case {case_id!r} raises must be a non-empty string")
         if "raises" in case:
-            error_type = getattr(builtins, case["raises"], None)
-            if not isinstance(error_type, type) or not issubclass(error_type, Exception):
-                raise ValueError(f"contract case {case_id!r} must raise a built-in Exception type")
+            resolve_exception(case["raises"])
         for name, value in arguments.items():
             _validate_contract_value(value, argument_types[name], f"{case_id}.{name}")
         if "expected" in case:
@@ -406,18 +402,10 @@ def _load_contract(path: Path) -> _ContractManifest:
 
 
 def _validate_contract_value(value: object, declared_type: str, label: str) -> None:
-    valid = False
-    if declared_type == "boolean":
-        valid = isinstance(value, bool)
-    elif declared_type == "integer":
-        valid = isinstance(value, int) and not isinstance(value, bool)
-    elif declared_type == "optional_string":
-        valid = value is None or isinstance(value, str)
-    elif declared_type == "decimal" and isinstance(value, str):
-        with suppress(InvalidOperation):
-            valid = Decimal(value).is_finite()
-    if not valid:
-        raise ValueError(f"contract value {label} does not match {declared_type}")
+    try:
+        convert_contract_value(value, declared_type)
+    except ValueError as error:
+        raise ValueError(f"contract value {label} does not match {declared_type}") from error
 
 
 def _require_unchanged_inputs(prepared: _CaptureInputs) -> None:
