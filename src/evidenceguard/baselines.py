@@ -4,23 +4,13 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Literal, Self
 
-from pydantic import Field, field_serializer, model_validator
+from pydantic import Field, model_validator
 
 from evidenceguard.digests import digest_json_artifact
 from evidenceguard.models import Digest, FrozenModel, Guard, NonEmptyText, UtcDateTime
+from evidenceguard.predicates import AstFeature as AstFeature
+from evidenceguard.predicates import FeatureVector as FeatureVector
 
-AstFeature = Literal[
-    "branch:is_member",
-    "branch:none",
-    "decimal:multiply",
-    "decimal:subtract",
-    "int:parse",
-    "regex:ascii_digits",
-    "range:check",
-    "round:half_up",
-    "str:isascii",
-    "str:isdecimal",
-]
 ScalarFeature = Literal[
     "contract_family",
     "contract_version",
@@ -28,19 +18,6 @@ ScalarFeature = Literal[
     "symbol_signature",
     "module_group",
 ]
-
-
-class FeatureVector(FrozenModel):
-    contract_family: NonEmptyText
-    contract_version: NonEmptyText
-    interface_kind: NonEmptyText
-    symbol_signature: NonEmptyText
-    module_group: NonEmptyText
-    ast_features: frozenset[AstFeature]
-
-    @field_serializer("ast_features")
-    def sorted_features(self, value: frozenset[str]) -> list[str]:
-        return sorted(value)
 
 
 class ConfusionCounts(FrozenModel):

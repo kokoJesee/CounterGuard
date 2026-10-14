@@ -20,6 +20,10 @@ class InvalidEvidenceError(EvidenceGuardError):
     """Evidence does not satisfy the contract required by a downstream stage."""
 
 
+class FeatureExtractionError(EvidenceGuardError):
+    """Source syntax or target structure cannot be extracted reliably."""
+
+
 class GuardSelfCheckError(EvidenceGuardError):
     """A generated test failed its fixed-target validation; no Guard was published."""
 

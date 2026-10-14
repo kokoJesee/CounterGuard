@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from evidenceguard.baselines import FeatureVector, ScopePredicate
+from evidenceguard.features import FeatureRecord
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 
@@ -12,6 +13,7 @@ MODELS = {
     "guard": Guard,
     "run-record": RunRecord,
     "feature-vector": FeatureVector,
+    "feature-extraction": FeatureRecord,
     "scope-predicate": ScopePredicate,
     "experiment-protocol": ExperimentProtocol,
     "split-manifest": SplitManifest,

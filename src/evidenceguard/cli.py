@@ -16,6 +16,7 @@ from evidenceguard.evidence import (
     inventory_evidence,
     verify_evidence,
 )
+from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
 from evidenceguard.protocol import run_train_baselines, verify_protocol
 
@@ -28,6 +29,8 @@ experiment_app = typer.Typer(no_args_is_help=True, help="Audit frozen experiment
 app.add_typer(experiment_app, name="experiment")
 benchmark_app = typer.Typer(no_args_is_help=True, help="Execute frozen benchmark methods.")
 app.add_typer(benchmark_app, name="benchmark")
+features_app = typer.Typer(no_args_is_help=True, help="Extract and audit static target features.")
+app.add_typer(features_app, name="features")
 
 
 @app.callback()
@@ -39,6 +42,31 @@ def main() -> None:
 def version() -> None:
     """Print the installed EvidenceGuard version."""
     typer.echo(__version__)
+
+
+@features_app.command("audit")
+def features_audit(
+    benchmark_root: Annotated[Path, typer.Option(help="Separate train/holdout sample files.")],
+    output: Annotated[Path, typer.Option(help="JSON audit report below cwd.")],
+    cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
+    artifact_root: Annotated[
+        Path, typer.Option(help="Extracted feature records below cwd.")
+    ] = Path("artifacts"),
+) -> None:
+    """Compare every feature with manual annotations and retain mismatches/errors."""
+    try:
+        report = audit_features(
+            benchmark_root=benchmark_root, output=output, cwd=cwd, artifact_root=artifact_root
+        )
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError as error:
+        _error(f"Feature audit error: {error}", 3)
+    typer.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    codes = {entry["exit_code"] for entry in report["entries"]}
+    for code in (5, 3, 2, 1):
+        if code in codes:
+            raise typer.Exit(code)
 
 
 @app.command()

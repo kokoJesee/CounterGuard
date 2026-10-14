@@ -18,8 +18,9 @@ words such as `buggy`, `fixed`, `v1`, or `legal` and would leak the answer.
 
 `ast_features` is currently a manually confirmed, presence-only summary using the controlled
 vocabulary enforced by the test suite. It is not a serialized AST. Every operation represented by
-the current vocabulary should be listed when it appears in the target. Production AST extraction
-is intentionally deferred to the feature-extraction milestone.
+the current vocabulary should be listed when it appears in the target. Day 6 now extracts the same
+controlled vocabulary automatically and requires exact equality with these frozen annotations.
+It never rewrites them to match the implementation.
 
 The benchmark intentionally includes all four meaningful combinations that can exist:
 
@@ -49,3 +50,9 @@ holdout membership in `benchmarks/splits/scope_v1.json`. B1 always runs; B2 read
 `interface_kind` and compares it with the frozen Guard interface. The D5 command executes only
 training rows and rejects `--split holdout`. Protocol verification may audit holdout metadata and
 source pins; these public fixtures are engineering checks, not a blind evaluation.
+
+`branch:none` is the historical token name for an If/IfExp condition that compares a formal
+parameter with Python `None` using `is` or `is not`. No qualifying condition means no such token;
+it is never a fallback for the absence of branches. Full boundaries are in `docs/data-contracts.md`.
+The nine-row manual baseline derivation is in
+`docs/results/scope-v1/expected-train-derivation.md`.

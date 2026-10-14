@@ -1,0 +1,150 @@
+{
+  "$defs": {
+    "FeatureVector": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "ast_features": {
+          "items": {
+            "enum": [
+              "branch:is_member",
+              "branch:none",
+              "decimal:multiply",
+              "decimal:subtract",
+              "int:parse",
+              "regex:ascii_digits",
+              "range:check",
+              "round:half_up",
+              "str:isascii",
+              "str:isdecimal"
+            ],
+            "type": "string"
+          },
+          "title": "Ast Features",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature",
+        "module_group",
+        "ast_features"
+      ],
+      "title": "FeatureVector",
+      "type": "object"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "feature-extraction.v1",
+      "default": "feature-extraction.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "extractor_version": {
+      "const": "ast-features.v1",
+      "default": "ast-features.v1",
+      "title": "Extractor Version",
+      "type": "string"
+    },
+    "vocabulary_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Vocabulary Digest",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "features": {
+      "$ref": "#/$defs/FeatureVector"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "vocabulary_digest",
+    "target",
+    "target_digest",
+    "contract_ref",
+    "contract_digest",
+    "features",
+    "artifact_digest"
+  ],
+  "title": "FeatureRecord",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -8,8 +8,8 @@ contract and test digests, target digests, structured case results, raw logs, an
 semantics. The capture service accepts only a real buggy test failure followed by a fixed pass as
 reproduced Evidence. Day 4 compiles the failed cases into independent Guard assets and self-checks
 them on the fixed target before publication. Day 5 freezes the experiment protocol, generates
-baseline scopes, and executes both baselines on the nine training rows. Automatic feature
-extraction and scope learning are the next milestones.
+baseline scopes, and executes both baselines on the nine training rows. Day 6 extracts AST features
+without executing targets and audits all 15 frozen annotations. Scope learning is the next milestone.
 
 The MVP keeps two questions separate:
 
@@ -39,7 +39,8 @@ It freezes the Evidence, Guard, feature, scope, replay, baseline, and evaluation
 the learner consumes the holdout set. The current public fixtures provide engineering checks;
 they are not a blind research evaluation.
 
-All scope features are manually confirmed metadata at this stage. Contract family acts as a
+Contract metadata and module groups remain explicitly confirmed; AST features are now extracted
+automatically and compared with the frozen manual annotations. Contract family acts as a
 trusted prefilter; the future learner will be evaluated on version and interface boundaries within
 each family.
 
@@ -184,3 +185,27 @@ Definitions, sample membership, source text, and executable Guard meaning are pi
 fresh capture timestamps do not change the semantic pin, while full provenance is still audited.
 The D5 command rejects holdout execution. Learned methods are frozen specifications for Day 7.
 See the [Day 5 acceptance record](docs/progress/day5.md).
+
+The [independent training derivation](docs/results/scope-v1/expected-train-derivation.md) lists
+all nine rows: four applicable and five inapplicable. B2 rejects two interface mismatches while
+retaining three inapplicable rows sharing the original interface. These counts do not depend on
+whether the Guard assertions pass. The exact semantic digest field set and downstream usage are
+documented in [data contracts](docs/data-contracts.md).
+
+## Audit automatic AST features
+
+```powershell
+uv run evidenceguard features audit --benchmark-root benchmarks --output artifacts/audits/day6-feature-parity.json
+```
+
+The audit compares all 15 samples with the frozen annotations, including both splits, without
+executing targets or passing applicability labels into extraction. Each row records missing and
+unexpected tokens, metadata differences, and the source hashes of its feature record.
+`branch:none` means an If/IfExp condition checks a formal parameter against Python `None` using
+identity comparison. It does not mean no branch exists; plain computation can have no branch
+token and an empty AST set. Unsupported target structures and syntax errors fail explicitly.
+
+Same-input feature records and reports are deterministic. Changed source cannot overwrite the
+same version/sample record. A mismatch exits 1; invalid annotation input exits 2; extraction
+errors exit 3; immutable artifact conflicts exit 5. All errors retain a JSON report.
+See the [feature contract](docs/data-contracts.md) and [Day 6 record](docs/progress/day6.md).

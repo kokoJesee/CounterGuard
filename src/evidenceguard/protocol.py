@@ -32,6 +32,17 @@ EXPECTED_TRAIN = {
     "b1_always": {"tp": 4, "fp": 5, "tn": 0, "fn": 0},
     "b2_interface": {"tp": 4, "fp": 3, "tn": 2, "fn": 0},
 }
+GUARD_SEMANTIC_FIELDS = (
+    "guard_id",
+    "guard_version",
+    "contract_id",
+    "target_interface",
+    "argument_types",
+    "return_type",
+    "cases",
+    "generator_version",
+    "test_digest",
+)
 
 
 class SampleTarget(FrozenModel):
@@ -126,19 +137,7 @@ class ExperimentProtocol(FrozenModel):
 def guard_semantic_digest(guard: Guard) -> Digest:
     """Pin executable meaning while allowing fresh capture timestamps and run IDs."""
     return digest_bytes(
-        canonical_json_bytes(
-            {
-                "guard_id": guard.guard_id,
-                "guard_version": guard.guard_version,
-                "contract_id": guard.contract_id,
-                "target_interface": guard.target_interface,
-                "argument_types": guard.argument_types,
-                "return_type": guard.return_type,
-                "cases": guard.cases,
-                "generator_version": guard.generator_version,
-                "test_digest": guard.test_digest,
-            }
-        )
+        canonical_json_bytes({field: getattr(guard, field) for field in GUARD_SEMANTIC_FIELDS})
     )
 
 
