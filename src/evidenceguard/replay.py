@@ -40,6 +40,7 @@ from evidenceguard.models import (
     UtcDateTime,
 )
 from evidenceguard.module_context import SCOPE_V1_CONTEXT_DIGEST, load_module_context
+from evidenceguard.path_limits import require_replay_directory
 from evidenceguard.predicates import VOCABULARY_DIGEST, FeatureVector
 from evidenceguard.protocol import _load_model, _path, _read_samples, verify_protocol
 from evidenceguard.scope import (
@@ -349,6 +350,7 @@ def replay_guard(request: ReplayRequest) -> ReplayResult:
     target, target_digest = parse_target_ref(request.target, cwd=workspace, validate_symbol=False)
     replay_id = "rpl_" + uuid.uuid4().hex
     directory = root / "replays" / replay_id
+    require_replay_directory(directory)
     feature = None
     feature_ref = None
     error = None

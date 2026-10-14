@@ -5,9 +5,11 @@ import uuid
 from pathlib import Path
 
 from evidenceguard.errors import ArtifactIntegrityError
+from evidenceguard.path_limits import require_publication
 
 
 def write_immutable(path: Path, data: bytes) -> None:
+    require_publication(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.parent / f".{path.name}.{uuid.uuid4().hex}.tmp"
     try:

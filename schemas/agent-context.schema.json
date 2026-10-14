@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Explicit allowlist: no fixed implementation, labels, metrics or environment.",
+  "properties": {
+    "schema_version": {
+      "const": "agent-context.v1",
+      "default": "agent-context.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "contract_json": {
+      "title": "Contract Json",
+      "type": "string"
+    },
+    "buggy_target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "buggy_target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Buggy Target Digest",
+      "type": "string"
+    },
+    "buggy_source_code": {
+      "title": "Buggy Source Code",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_ref",
+    "contract_digest",
+    "contract_json",
+    "buggy_target",
+    "buggy_target_digest",
+    "buggy_source_code"
+  ],
+  "title": "AgentContext",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -26,6 +26,7 @@ from evidenceguard.models import (
     RunRole,
     TargetRef,
 )
+from evidenceguard.path_limits import require_run_directory
 
 DEFAULT_TIMEOUT_SECONDS = 30.0
 
@@ -246,6 +247,7 @@ def _prepare_run(request: PytestRunRequest) -> _PreparedRun:
     if not _RUN_ID_PATTERN.fullmatch(run_id):
         raise ValueError("run_id must start with 'run_' and contain lowercase safe characters")
     run_dir = artifact_root / "runs" / run_id
+    require_run_directory(run_dir)
     run_dir.mkdir(parents=True, exist_ok=False)
     (run_dir / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
 

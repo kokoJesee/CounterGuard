@@ -7,12 +7,19 @@ from evidenceguard.baselines import FeatureVector, ScopePredicate
 from evidenceguard.evaluation import EvaluationReport
 from evidenceguard.evaluation_metrics import EvaluationMetrics, Prediction
 from evidenceguard.features import FeatureRecord
+from evidenceguard.independent_verifier import (
+    AgentContext,
+    CandidateRecord,
+    CandidateTest,
+    VerificationRequest,
+)
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.module_context import ModuleContext
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 from evidenceguard.replay import ReplayResult
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from evidenceguard.scope_explanations import ScopeExplanation
+from evidenceguard.verification_gate import GateResult
 
 MODELS = {
     "evidence": Evidence,
@@ -32,6 +39,11 @@ MODELS = {
     "evaluation-report": EvaluationReport,
     "evaluation-metrics": EvaluationMetrics,
     "evaluation-prediction": Prediction,
+    "verification-request": VerificationRequest,
+    "candidate-test": CandidateTest,
+    "agent-context": AgentContext,
+    "candidate-record": CandidateRecord,
+    "verification-gate": GateResult,
 }
 
 if __name__ == "__main__":
@@ -43,4 +55,5 @@ if __name__ == "__main__":
         (root / f"{name}.schema.json").write_text(
             json.dumps(schema, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
+            newline="\n",
         )

@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "verification-request.v1",
+      "default": "verification-request.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "maxLength": 48,
+      "pattern": "^req_[a-z0-9][a-z0-9_]*_v[1-9][0-9]*$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "buggy_target": {
+      "title": "Buggy Target",
+      "type": "string"
+    },
+    "fixed_target": {
+      "title": "Fixed Target",
+      "type": "string"
+    },
+    "response_ref": {
+      "minLength": 1,
+      "title": "Response Ref",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "default": 30.0,
+      "exclusiveMinimum": 0,
+      "maximum": 300,
+      "title": "Timeout Seconds",
+      "type": "number"
+    }
+  },
+  "required": [
+    "request_id",
+    "contract_ref",
+    "buggy_target",
+    "fixed_target",
+    "response_ref"
+  ],
+  "title": "VerificationRequest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

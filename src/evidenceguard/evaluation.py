@@ -32,6 +32,7 @@ from evidenceguard.evaluation_metrics import (
 )
 from evidenceguard.execution import _classify_completed_run
 from evidenceguard.models import ArtifactRef, Digest, FrozenModel, Guard, NonEmptyText, UtcDateTime
+from evidenceguard.path_limits import require_evaluation_directory, require_publication
 from evidenceguard.protocol import _load_model, _path, _read_samples, verify_protocol
 from evidenceguard.replay import (
     ReplayRequest,
@@ -120,6 +121,7 @@ CODE_MODULES = (
     "features",
     "models",
     "module_context",
+    "path_limits",
     "predicates",
     "protocol",
     "replay",
@@ -213,6 +215,7 @@ def evaluate_methods(
         raise ArtifactIntegrityError(
             "Evaluation directory is not empty; choose a new output version"
         )
+    require_evaluation_directory(destination)
     protocol, manifest, guards = verify_protocol(path, cwd=workspace)
     if protocol.artifact_digest != SCOPE_V1_PROTOCOL_DIGEST:
         raise ArtifactIntegrityError("Evaluation requires the original frozen scope_v1 protocol")
@@ -266,6 +269,8 @@ def evaluate_methods(
                     protocol_digest=protocol.artifact_digest,
                 )
             scope_paths[(method, guard_id)] = scope_path
+            if not method.startswith("learned_"):
+                require_publication(scope_path)
             scopes[method][guard_id] = scope
     code_files = _code_files(workspace)
     started_at, clock = datetime.now(UTC), time.monotonic()

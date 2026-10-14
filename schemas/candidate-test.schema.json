@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "description": "An oracle-free proposal referencing existing, authoritative contract cases.",
+  "properties": {
+    "schema_version": {
+      "const": "candidate-test.v1",
+      "default": "candidate-test.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "case_ids": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Case Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_digest",
+    "case_ids"
+  ],
+  "title": "CandidateTest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

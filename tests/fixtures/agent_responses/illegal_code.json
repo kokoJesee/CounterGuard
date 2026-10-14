@@ -1,0 +1,6 @@
+{
+  "schema_version": "candidate-test.v1",
+  "contract_digest": "sha256:1ae60b9a63a7270ec34ff20da51cebff91d1fb2b682e70066894a5b4c5a69057",
+  "case_ids": ["member-price", "non-member-price", "member-rounding", "negative-amount"],
+  "test_code": "raise RuntimeError('MODEL_PAYLOAD_MUST_NOT_RUN_OR_BE_LOGGED')"
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "candidate-test.v1",
+  "contract_digest": "sha256:40901e4f22bc63b240a0f52a0c29871c92d2a969af8403d0c566e3926f521af5",
+  "case_ids": [
+    "omitted-default", "minimum-value", "leading-zeroes", "maximum-value",
+    "below-minimum", "above-maximum", "alphabetic-text", "empty-value", "explicit-plus",
+    "surrounding-whitespace", "underscore-separator", "unicode-digits", "negative-value"
+  ]
+}

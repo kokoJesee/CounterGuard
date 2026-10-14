@@ -16,8 +16,31 @@
 | 可选 ScopeExplanation | learning artifact_digest、训练多重集 digest、正负例计数、逐条件删除见证、证书格式 | learning 或训练变化时在新目录重生成证书；该证书是旁路审计产物，不改变已有 Scope/fit/Replay 绑定，也不触发它们重物化 |
 | ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
 | EvaluationReport（D9） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
+| Candidate / VerificationGate（D10） | 请求原始字节、白名单 AgentContext、recorded 响应指纹、可信模板测试、fixed 来源以及 D3 双向 Evidence | 请求、响应、契约、目标或模板改变，必须使用新的 request ID/修订和新 candidate/Evidence；历史完成标记只读审核。Gate 是 Evidence 的生成分支，不依赖 Scope，也不自动触发既有 Scope/评测重算 |
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
+
+## 路径预算
+
+所有新产物写入采用 **240 个 UTF-16 单元**的绝对路径预算，包含最终文件、原子发布临时文件 `.<name>.<32hex>.tmp`、运行配置/日志/JUnit 和 `.pytest_cache/v/cache/lastfailed`。非 BMP 字符按两个单元计数。240 是项目的保守兼容策略；Windows 的传统 MAX_PATH 是 260（含终止字符），启用长路径还依赖系统与应用双方支持，见 [Microsoft 路径限制文档](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation)。不改机器注册表，不依赖本机已经放开限制。
+
+`write_immutable` 在 mkdir 前检查最长临时路径，执行器在创建运行目录/启动 pytest 前检查日志和缓存路径。Replay、Evaluation 和 D10 Gate 进一步预检完整计划布局，避免只写到一半才发现深层路径超限。超过预算返回配置错误，提示缩短输出目录/身份，不自动截断 ID、不重命名历史文件。已有长路径产物可以继续只读审核；这不保证任意未来目录布局都能写入，D10–D14 的代表性布局与真正运行前的预检共同防止回归。
+
+路径保护改变了实际执行代码摘要。D9 两份已发布报告仍保留原文件，绑定 `b883ca3` 的运行源码；在当前源码下进行环境绑定审核会拒绝旧运行代码摘要。若要做新评测，必须用新目录和真实运行；本轮没有重跑留出集、重签旧报告或改冻结协议。新 D10 Evidence 的身份、生成测试、实际时间和日志都是新记录；已有 Guard/Feature/Scope 的输入与记录格式没有因此改变，无需为了新 Gate 重物化。
+
+## 独立候选与 Verification Gate（D10）
+
+`verification-request.v1` 由可信调用方提供 `request_id`、契约路径、buggy/fixed 符号、recorded 响应路径和有限正超时。request ID 用语义修订 `_v1` 等，与开发日程无关；同一 ID/输出目录的重复调用只读审核，任何输入改变、同 ID 的其他请求文件或未完成目录都拒绝覆盖。
+
+Provider 接口只接受严格的 `AgentContext`：契约路径/原始摘要/文本，buggy 的 TargetRef/摘要/源码。fixed 实现、benchmark 标签、目标指标和环境变量不在类型白名单里。业务契约的 expected/raises 是授权 oracle，允许进入上下文；fixed 实现和修复答案不能进入。`RecordedModelClient` 只读指定响应文件，不访问网络、不发现凭据；该类型边界不是 Docker 或操作系统沙箱，D10 只支持可信本地目标。
+
+`candidate-test.v1` 只有契约摘要与已有 case ID 集合，禁止代码、额外 oracle、Evidence、标签与任意解释字段。候选必须完整覆盖原契约：D3 审核全部已知 case，不能用少数 case 冒充完整 capture。case IDs 去重检查后排序，20 次乱序生成相同候选与测试摘要。D4 Compiler 仍然只选择实际失败 case；D10 不改它的最小 Guard 规则。新增输入、shrinking 和新 oracle 要走新的契约审核，不由 Agent 直接决定。
+
+候选记录保存真实 UTC 时间、上下文摘要、请求/响应引用与摘要、响应大小、已准入的结构或固定拒绝码。原始未可信响应及 Pydantic 的输入回显不写入产物/日志。recorded 输入限 64 KiB，超限属于输入配置错误；响应无效时固定码为 candidate_schema / contract_digest / case_coverage。响应可能包含敏感内容，源文件由调用方保管，Gate 产物只保留指纹和必要的可信 case IDs。
+
+Gate 从已经严格验证的契约生成 `guard-test.v2` 模板测试，调用原 D3 双向 capture。只有 buggy=`test_failed` 且 fixed=`passed`、来源摘要与输入未变化、失败集非空时，才将真实 Evidence 原字节发布到 `<workspace>/evidence/`。两次运行超时、测试收集/导入错误、buggy 未失败或 fixed 未通过时，Gate=`rejected`、`evidence_ref=null`；仅在候选 runtime 目录保留明确的 diagnostic Evidence 与原始日志，不能当作已验证证据消费。Gate 顶层 `rejection_reasons` 保留具体失败原因。
+
+`verification-gate.v1` 的 `gate.json` 是完成标记，绑定 request、CandidateRecord、fixed pin、可信生成测试、诊断与公开 Evidence。只读 verify 重做候选准入和可信渲染，验证全部引用及双向 Evidence，并从原 JUnit 重建有 exit code 的 outcome/case Results。修改 JSON 后重新算摘要仍不能使其与真实日志矛盾。重复调用不再调用 provider、不启动 pytest、不伪造新的运行时间。退出码：0 verified，2 候选/配置无效，1 未满足双向缺陷条件，3 运行基础设施异常，5 完整性拒绝。
 
 例：D6 的 AST 词汇与 15 个特征值没有改变，但 module_group 来源证明增加，导致 FeatureRecord v2 和独立 audit 必须重建，D7 fit provenance 必须更新。纯规则在相同训练值下可以一致。D8 候选计数字段升级同理：改 learning 记录格式与下游引用，不改变已冻结规则或样本真值。
 

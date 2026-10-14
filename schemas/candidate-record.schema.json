@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "CandidateTest": {
+      "additionalProperties": false,
+      "description": "An oracle-free proposal referencing existing, authoritative contract cases.",
+      "properties": {
+        "schema_version": {
+          "const": "candidate-test.v1",
+          "default": "candidate-test.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "case_ids": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Case Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_digest",
+        "case_ids"
+      ],
+      "title": "CandidateTest",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "candidate-record.v1",
+      "default": "candidate-record.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "request_ref": {
+      "minLength": 1,
+      "title": "Request Ref",
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "context_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Context Digest",
+      "type": "string"
+    },
+    "response_ref": {
+      "minLength": 1,
+      "title": "Response Ref",
+      "type": "string"
+    },
+    "response_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Response Digest",
+      "type": "string"
+    },
+    "response_size": {
+      "minimum": 0,
+      "title": "Response Size",
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "admitted",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CandidateTest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reason_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "candidate_schema",
+            "response_too_large",
+            "contract_digest",
+            "case_coverage"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reason Code"
+    },
+    "generator_version": {
+      "const": "guard-test.v2",
+      "default": "guard-test.v2",
+      "title": "Generator Version",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "created_at",
+    "request_ref",
+    "request_digest",
+    "context_digest",
+    "response_ref",
+    "response_digest",
+    "response_size",
+    "status",
+    "candidate",
+    "reason_code",
+    "artifact_digest"
+  ],
+  "title": "CandidateRecord",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

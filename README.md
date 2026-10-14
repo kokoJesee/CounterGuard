@@ -15,6 +15,22 @@ scopes using the frozen training phases and independently audited module context
 Day 8 verifies that bundle and automatically decides applicability before starting pytest.
 Pass, violation, inapplicable, unknown, and infrastructure failures are reported separately.
 
+Day 9 evaluates all four frozen methods on holdout without refitting. Day 10 adds an offline
+independent candidate boundary: recorded proposals reference authoritative contract cases,
+trusted code renders the tests, and a Verification Gate promotes only real buggy failures
+followed by fixed passes. This does not yet generate new oracle cases or call a live model.
+
+```powershell
+uv run evidenceguard capture --request examples/demo/requests/discount_agent.json --agent-source recorded --workspace artifacts/day10
+uv run evidenceguard capture --request examples/demo/requests/query_agent.json --agent-source recorded --workspace artifacts/day10
+uv run evidenceguard verification verify artifacts/day10/candidates/cnd_discount_agent_v1/gate.json
+```
+
+Completed requests are read-only on repeat; changed inputs require a new semantic request ID.
+Untrusted Python and empty candidates are rejected before execution. Infrastructure errors
+retain diagnostic runs under the candidate directory and never publish a verified Evidence.
+New artifact paths, atomic temporary files and pytest caches must fit a 240 UTF-16-unit budget.
+
 The MVP keeps two questions separate:
 
 1. Does a guard apply to this code context?

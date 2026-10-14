@@ -33,6 +33,7 @@ from evidenceguard.replay import (
     verify_replay,
 )
 from evidenceguard.scope import fit_scopes
+from evidenceguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
@@ -51,6 +52,23 @@ scope_app = typer.Typer(
 app.add_typer(scope_app, name="scope")
 replay_app = typer.Typer(no_args_is_help=True, help="Run or audit a scoped replay.")
 app.add_typer(replay_app, name="replay")
+verification_app = typer.Typer(no_args_is_help=True, help="Audit independent candidate Gates.")
+app.add_typer(verification_app, name="verification")
+
+
+@verification_app.command("verify")
+def verification_verify(
+    path: Annotated[Path, typer.Argument(help="Completed candidate gate.json.")],
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+) -> None:
+    try:
+        result = verify_gate(path, cwd=cwd)
+    except (ArtifactIntegrityError, OSError, ValueError) as error:
+        _error(str(error), 5)
+    typer.echo(result.model_dump_json(indent=2))
+    code = gate_exit_code(result, cwd=cwd)
+    if code:
+        raise typer.Exit(code)
 
 
 @app.callback()
@@ -211,11 +229,15 @@ def features_audit(
 
 @app.command()
 def capture(
-    evidence_id: Annotated[str, typer.Option(help="Stable evd_ identity for this capture.")],
-    contract: Annotated[Path, typer.Option(help="Repository-relative contract JSON.")],
-    test: Annotated[Path, typer.Option(help="Repository-relative pytest contract test.")],
-    buggy_target: Annotated[str, typer.Option(help="Buggy module:symbol.")],
-    fixed_target: Annotated[str, typer.Option(help="Fixed module:symbol.")],
+    evidence_id: Annotated[str | None, typer.Option(help="Stable evd_ identity.")] = None,
+    contract: Annotated[
+        Path | None, typer.Option(help="Repository-relative contract JSON.")
+    ] = None,
+    test: Annotated[
+        Path | None, typer.Option(help="Repository-relative pytest contract test.")
+    ] = None,
+    buggy_target: Annotated[str | None, typer.Option(help="Buggy module:symbol.")] = None,
+    fixed_target: Annotated[str | None, typer.Option(help="Fixed module:symbol.")] = None,
     artifact_root: Annotated[Path, typer.Option(help="Output directory below cwd.")] = Path(
         "artifacts"
     ),
@@ -227,9 +249,48 @@ def capture(
     reason: Annotated[
         str | None, typer.Option(help="Why this recapture replaces its predecessor.")
     ] = None,
+    request: Annotated[
+        Path | None, typer.Option(help="Independent verification request JSON.")
+    ] = None,
+    agent_source: Annotated[str | None, typer.Option(help="D10 provider: recorded.")] = None,
+    workspace: Annotated[Path | None, typer.Option(help="Candidate/Gate output below cwd.")] = None,
 ) -> None:
     """Capture a buggy failure and fixed pass as auditable JSON Evidence."""
     try:
+        if request is not None:
+            if (
+                any(
+                    value is not None
+                    for value in (
+                        evidence_id,
+                        contract,
+                        test,
+                        buggy_target,
+                        fixed_target,
+                        supersedes,
+                        reason,
+                    )
+                )
+                or artifact_root != Path("artifacts")
+                or timeout != 30.0
+            ):
+                raise ValueError("Do not mix request mode with direct capture options")
+            if agent_source != "recorded" or workspace is None:
+                raise ValueError("Request mode requires --agent-source recorded and --workspace")
+            result = capture_candidate(
+                request, cwd=cwd, workspace=workspace, agent_source=agent_source
+            )
+            typer.echo(result.model_dump_json(indent=2))
+            code = gate_exit_code(result, cwd=cwd)
+            if code:
+                raise typer.Exit(code)
+            return
+        if agent_source is not None or workspace is not None:
+            raise ValueError("Agent options require --request")
+        if any(
+            value is None for value in (evidence_id, contract, test, buggy_target, fixed_target)
+        ):
+            raise ValueError("Direct capture requires evidence-id, contract, test and both targets")
         evidence = capture_evidence(
             CaptureRequest(
                 evidence_id=evidence_id,

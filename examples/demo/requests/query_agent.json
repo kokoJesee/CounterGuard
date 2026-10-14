@@ -1,0 +1,9 @@
+{
+  "schema_version": "verification-request.v1",
+  "request_id": "req_query_agent_v1",
+  "contract_ref": "examples/validation/contracts/input_limit_query_v1.json",
+  "buggy_target": "examples.validation.implementations.query_limit_v1_buggy:parse_limit",
+  "fixed_target": "examples.validation.implementations.query_limit_v1_fixed:parse_limit",
+  "response_ref": "tests/fixtures/agent_responses/query_v1.json",
+  "timeout_seconds": 30.0
+}

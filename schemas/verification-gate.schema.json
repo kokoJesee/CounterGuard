@@ -1,0 +1,214 @@
+{
+  "$defs": {
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "verification-gate.v1",
+      "default": "verification-gate.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "agent_source": {
+      "const": "recorded",
+      "default": "recorded",
+      "title": "Agent Source",
+      "type": "string"
+    },
+    "request_ref": {
+      "minLength": 1,
+      "title": "Request Ref",
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "candidate_ref": {
+      "minLength": 1,
+      "title": "Candidate Ref",
+      "type": "string"
+    },
+    "candidate_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Candidate Digest",
+      "type": "string"
+    },
+    "fixed_target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "fixed_target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Fixed Target Digest",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "verified",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "reason_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "candidate_rejected",
+            "not_reproduced"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reason Code"
+    },
+    "rejection_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rejection Reasons",
+      "type": "array"
+    },
+    "test_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Test Ref"
+    },
+    "test_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Test Digest"
+    },
+    "diagnostic_evidence_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Diagnostic Evidence Ref"
+    },
+    "diagnostic_evidence_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Diagnostic Evidence Digest"
+    },
+    "evidence_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Evidence Ref"
+    },
+    "evidence_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Evidence Digest"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "created_at",
+    "request_ref",
+    "request_digest",
+    "candidate_ref",
+    "candidate_digest",
+    "fixed_target",
+    "fixed_target_digest",
+    "status",
+    "reason_code",
+    "rejection_reasons",
+    "test_ref",
+    "test_digest",
+    "diagnostic_evidence_ref",
+    "diagnostic_evidence_digest",
+    "evidence_ref",
+    "evidence_digest",
+    "artifact_digest"
+  ],
+  "title": "GateResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

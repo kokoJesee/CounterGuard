@@ -1,0 +1,9 @@
+{
+  "schema_version": "verification-request.v1",
+  "request_id": "req_discount_empty_v1",
+  "contract_ref": "examples/discount/contracts/membership_discount_final_price_v1.json",
+  "buggy_target": "examples.discount.implementations.final_price_v1_buggy:calculate_price",
+  "fixed_target": "examples.discount.implementations.final_price_v1_fixed:calculate_price",
+  "response_ref": "tests/fixtures/agent_responses/empty_tests.json",
+  "timeout_seconds": 30.0
+}
