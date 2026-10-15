@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.metadata
+import importlib.util
 import math
 import os
 import platform
@@ -17,7 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from evidenceguard.digests import digest_file
-from evidenceguard.errors import ArtifactIntegrityError
+from evidenceguard.errors import ArtifactIntegrityError, RunnerDependencyError
 from evidenceguard.models import (
     CaseOutcome,
     CaseResult,
@@ -146,6 +147,7 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
     runs become ``process_error``.
     """
 
+    pytest_version = require_pytest()
     prepared = _prepare_run(request)
     argv = (
         sys.executable,
@@ -230,7 +232,7 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
         junit_ref=prepared.junit_ref,
         junit_digest=digest_file(prepared.junit_path),
         python_version=platform.python_version(),
-        pytest_version=_pytest_version(),
+        pytest_version=pytest_version,
         error_detail=error_detail,
     )
 
@@ -495,8 +497,15 @@ def _output_bytes(output: bytes | str | None) -> bytes:
     return output.encode("utf-8", errors="replace")
 
 
-def _pytest_version() -> str:
+def require_pytest() -> str:
+    """Check this interpreter before creating output or starting the pytest executor."""
     try:
-        return importlib.metadata.version("pytest")
-    except importlib.metadata.PackageNotFoundError:
-        return "unavailable"
+        version = importlib.metadata.version("pytest")
+        if importlib.util.find_spec("pytest") is not None:
+            return version
+    except (importlib.metadata.PackageNotFoundError, ImportError, ValueError):
+        pass
+    raise RunnerDependencyError(
+        "pytest runner is unavailable. Install evidenceguard[runner] in this Python environment: "
+        'python -m pip install "evidenceguard[runner]"'
+    ) from None

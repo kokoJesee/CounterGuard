@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-15T08:03:54.731977+00:00",
+  "relative_links_checked": 72,
+  "protected_files_unchanged": 2455,
+  "full_passed": 560,
+  "full_seconds": 490.68,
+  "fast_passed": 389,
+  "slow_count": 171,
+  "ruff_passed": true,
+  "distribution_hashes_match": true,
+  "frozen_inputs_schemas_dependencies_changed": false,
+  "capture_representation": "failing pytest transcripts preserved losslessly in JSON strings"
+}

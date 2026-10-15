@@ -47,3 +47,5 @@ W01–W04 是未关闭事项，不因 D14 MVP 验收通过而关闭。W3 开始�
 只有检查点全部通过才允许 W3-D 未知仓库试点；失败时保留诊断并停止该类执行，不用可信本地模式绕过。Registry/CI 接入前再关闭 W04 对应项。此流程不改变 scope_v1 的标签、指标或历史验收。
 
 历史“verify 通过”的解释见 [旧验证结论的边界](known-limitations.md#历史验证结论的边界)。
+
+MVP 冻结补充：A09 的依赖缺失预检由 [test_runner_dependency.py](../tests/unit/test_runner_dependency.py) 和 [真实安装验收](progress/mvp-freeze-v1.md) 覆盖；缺 pytest 元数据或模块时，CLI 给出 runner 安装提示、执行器不启动进程。这不关闭 W01 的未知代码隔离缺口。

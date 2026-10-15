@@ -12,6 +12,10 @@ class EvidenceGuardError(Exception):
     """Base class for errors callers may handle at an EvidenceGuard boundary."""
 
 
+class RunnerDependencyError(EvidenceGuardError, OSError):
+    """The current interpreter cannot provide the optional pytest executor."""
+
+
 class ArtifactIntegrityError(EvidenceGuardError):
     """An artifact digest or reference does not match the stored content."""
 

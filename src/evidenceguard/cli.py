@@ -15,6 +15,7 @@ from evidenceguard.errors import (
     GuardSelfCheckError,
     InsufficientScopeEvidence,
     InvalidEvidenceError,
+    RunnerDependencyError,
 )
 from evidenceguard.evaluation import evaluate_methods, verify_evaluation
 from evidenceguard.evidence import (
@@ -76,6 +77,8 @@ def pipeline_run(
         _error(str(error), 5)
     except ValueError as error:
         _error(str(error), 2)
+    except RunnerDependencyError as error:
+        _error(str(error), 3)
     except OSError:
         _error("Pipeline input or output is unavailable", 3)
     typer.echo(manifest.model_dump_json(indent=2))
@@ -90,6 +93,8 @@ def pipeline_verify(
 ) -> None:
     try:
         manifest = verify_pipeline(path, cwd=cwd)
+    except RunnerDependencyError as error:
+        _error(str(error), 3)
     except (ArtifactIntegrityError, OSError, ValueError) as error:
         _error(str(error), 5)
     typer.echo(manifest.model_dump_json(indent=2))
@@ -152,6 +157,8 @@ def demo(
         _error(str(error), 5)
     except ValueError as error:
         _error(str(error), 2)
+    except RunnerDependencyError as error:
+        _error(str(error), 3)
     except OSError:
         _error("Demo input or output is unavailable", 3)
     typer.echo(render_report(result, format), nl=False)

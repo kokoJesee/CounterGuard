@@ -15,6 +15,11 @@ the pytest dependency already used by the project. The offline Demo also needs t
 distribution's examples, benchmarks, experiments and contract tests; these are not bundled in
 the library wheel. No PyPI or GitHub publication is implied by local acceptance.
 
+The local `v0.1.0` tag anchors the validated MVP, including the missing-runner install hint.
+Its distributions live in `dist/v0.1.0-freeze/`; earlier D14 files retain their original hashes.
+Without pytest, execution fails before output creation with exit 3 and an
+`evidenceguard[runner]` installation hint. Both install choices are in the quickstart.
+
 Start with the [offline quickstart](docs/quickstart.md). Although the scenario is named
 `mvp.yaml`, it currently requires JSON syntax; YAML indentation, comments and anchors are
 unsupported. The quickstart includes valid input and a real missing-contract `unknown` replay.

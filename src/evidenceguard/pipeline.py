@@ -24,7 +24,7 @@ from evidenceguard.errors import (
     EvidenceGuardError,
 )
 from evidenceguard.evaluation import _code_files
-from evidenceguard.execution import _classify_completed_run
+from evidenceguard.execution import _classify_completed_run, require_pytest
 from evidenceguard.models import (
     ArtifactRef,
     Digest,
@@ -164,7 +164,8 @@ def _environment() -> dict[str, str]:
 
     return {
         "python": platform.python_version(),
-        **{name: version(name) for name in ("pytest", "pydantic", "typer")},
+        "pytest": require_pytest(),
+        **{name: version(name) for name in ("pydantic", "typer")},
     }
 
 

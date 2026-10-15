@@ -7,6 +7,7 @@
 - Python-only、pytest-only，仅支持显式目标及当前契约类型/断言模板。
 - mvp.yaml 只接受 JSON 语法这一 YAML 子集；不支持通用 YAML 缩进、注释或锚点。完整内容见 [快速开始](quickstart.md)。
 - 标准 Demo 使用录制候选、固定可信模板和本地 fixture，未接入实时模型或任意新 oracle 生成。
+- pytest 是可选 runner extra；基础安装缺少它时，Demo/Pipeline 和执行器提前拒绝执行并提示安装，退出 3，不把缺依赖当作测试违规。检查元数据/模块存在不保证任意损坏安装的功能正常。
 - 当前执行器面向可信本地代码，尚无 Docker/OS 级隔离、网络封锁、资源配额或针对任意子孙进程的安全终止保证。pytest 插件自动发现和 conftest 被隔离，但这不是通用 Python 沙箱。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
 

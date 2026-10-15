@@ -1,0 +1,36 @@
+{
+  "created_at": "2026-10-15T07:58:17.843535+00:00",
+  "baseline": "ce404ac",
+  "accepted": true,
+  "run_id": "pip_5734999652d74f30ba2aa7a47961576d",
+  "demo_digest": "sha256:171c5811af2f52c03ddf0fd7a4a435d845cd5a15cdb4f431175f62a3a6bb7021",
+  "pipeline_digest": "sha256:09d43238bbfbfc40bcf1ee29e44ab83ed5ee1ed26ce85e3071059b6d62b75377",
+  "code_digest": "sha256:bc4c3496ae46b84e53ea4b25eefb3c9cad387b5604a79adcb98bf66fa0a770ef",
+  "verdict_counts": {
+    "pass": 2,
+    "skipped_inapplicable": 2,
+    "violation": 2
+  },
+  "replay_execution_count": 4,
+  "total_pytest_runs": 10,
+  "changed_runtime_bindings": [
+    "src/evidenceguard/cli.py",
+    "src/evidenceguard/errors.py",
+    "src/evidenceguard/execution.py",
+    "src/evidenceguard/pipeline.py"
+  ],
+  "minimal_guard_case_counts": {
+    "grd_discount_member_rate_regression_v2": 2,
+    "grd_query_limit_zero_regression_v2": 1
+  },
+  "guard_semantics_match_d14": true,
+  "learning_digests_match_d14": {
+    "grd_discount_member_rate_regression_v2/initial": "sha256:0d920803612c06764a81e45d3d25a57460ba8c03373692ec384c7e35e12443ba",
+    "grd_discount_member_rate_regression_v2/refined": "sha256:ce351b08f3ba13405362fdb50e257dfc0cf7ccb9facf28338b0b0764d3196f10",
+    "grd_query_limit_zero_regression_v2/initial": "sha256:9b1b7426914bf0f6bd0e476a04a1a2e40da78ccbe32011b8d73e2f7d4839d402",
+    "grd_query_limit_zero_regression_v2/refined": "sha256:7fd96fa93b2560363e58e2b55b0a3bcd6873b58391ef5c33204211778fcc2f74"
+  },
+  "read_only_files_unchanged": 160,
+  "protected_existing_files": 2455,
+  "changed_existing_files": []
+}

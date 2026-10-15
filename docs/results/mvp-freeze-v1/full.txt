@@ -1,0 +1,30 @@
+........................................................................ [ 12%]
+........................................................................ [ 25%]
+........................................................................ [ 38%]
+........................................................................ [ 51%]
+........................................................................ [ 64%]
+........................................................................ [ 77%]
+........................................................................ [ 90%]
+........................................................                 [100%]
+============================ slowest 20 durations =============================
+31.34s setup    tests/integration/test_evaluation_protocol.py::test_all_methods_have_real_replays_and_source_probes
+29.52s call     tests/integration/test_evaluation_protocol.py::test_fresh_repeat_has_identical_predictions_metrics_and_distinct_real_times
+26.31s setup    tests/e2e/test_demo.py::test_real_demo_has_json_markdown_and_six_honest_rows
+26.04s setup    tests/e2e/test_full_mvp.py::test_standalone_replay_verifier_rejects_resigned_execution_claim
+25.51s setup    tests/e2e/test_mvp_flow.py::test_end_to_end_two_guards_three_outcomes_each
+17.18s call     tests/integration/test_protocol.py::test_baselines_execute_only_applicable_training_rows
+12.12s call     tests/e2e/test_mvp_flow.py::test_missing_completed_replay_stops_before_another_replay
+11.75s setup    tests/e2e/test_scope_aware_replay.py::test_refined_training_replay_runs_four_and_skips_five
+11.45s call     tests/e2e/test_demo.py::test_demo_repeat_and_all_formats_never_execute_or_rewrite
+10.91s setup    tests/integration/test_protocol.py::test_protocol_digest_is_pinned_and_clean_assets_verify
+10.54s setup    tests/integration/test_scope_learning.py::test_initial_refined_fit_is_reproducible_and_has_no_holdout_members
+8.73s call     tests/e2e/test_scope_aware_replay.py::test_refined_training_replay_runs_four_and_skips_five
+8.46s call     tests/integration/test_evaluation_protocol.py::test_all_methods_have_real_replays_and_source_probes
+8.41s call     tests/e2e/test_mvp_flow.py::test_changed_learning_stops_before_refinement_or_replay
+7.48s call     tests/integration/test_evaluation_protocol.py::test_cli_verify_run_and_protocol_remain_distinct
+7.22s call     tests/integration/test_evaluation_protocol.py::test_rehashed_fake_facts_are_rejected[predictions.jsonl]
+7.13s call     tests/integration/test_evaluation_protocol.py::test_all_prior_workspace_artifacts_survive_new_evaluation
+6.48s call     tests/integration/test_compile_guard.py::test_minimal_guard_is_verified_and_replays_on_new_target[discount]
+6.33s call     tests/integration/test_evaluation_protocol.py::test_rehashed_fake_facts_are_rejected[metrics.json]
+6.21s call     tests/integration/test_compile_guard.py::test_minimal_guard_is_verified_and_replays_on_new_target[query]
+560 passed in 490.68s (0:08:10)

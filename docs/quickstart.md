@@ -1,6 +1,26 @@
 # 从离线 Demo 开始
 
-当前版本支持 Python / pytest 和受信本地示例。先在项目根目录安装锁定依赖，再选择一个尚不存在的输出目录：
+当前版本支持 Python / pytest 和受信本地示例。先选择安装方式，再在源码输入根目录使用一个尚不存在的输出目录。
+
+## 两种安装方式
+
+本地 MVP 尚未上传 PyPI，以下使用 [冻结发行物](release.md) 的真实 wheel 路径：
+
+```powershell
+# 基础安装：CLI、数据模型与库；不安装 pytest 执行器。
+python -m pip install './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl'
+
+# 执行安装：需要运行 Demo、Capture 或 Guard 时选择 runner。
+python -m pip install './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl[runner]'
+```
+
+安装源提供同名包后，对应包名写法分别是 `python -m pip install evidenceguard` 和 `python -m pip install "evidenceguard[runner]"`。两者是可选方式，不必先装基础包再装 runner。uv 用户可以使用 `uv pip install` 加相同的 wheel/extra 参数；请安装到实际运行 CLI 的 Python 环境。
+
+基础安装缺少 pytest 时，新 Demo 返回 **3**，给出 `pytest runner is unavailable` 和安装 `evidenceguard[runner]` 的提示，不显示 traceback、不启动 pytest、不创建输出目录。CLI 的 version/help 仍可使用。若缺少 Demo 的源码输入，安装 runner 不能替代输入文件；需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。
+
+## 从源码开始 Demo
+
+源码开发安装会包含 dev 组中的 pytest：
 
 ```powershell
 uv sync
@@ -10,7 +30,7 @@ uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format markdown
 uv run evidenceguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
-源码开发环境的 uv sync 会安装 dev 组中的 pytest。安装构建后的 wheel 时，执行功能必须显式选择 `runner` extra，例如 `uv pip install './dist/evidenceguard-0.1.0-py3-none-any.whl[runner]'`；基础 wheel 不自动安装 pytest，只承诺 CLI/库的基础依赖。离线 Demo 的输入不在 wheel 内，需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。完整干净安装命令见 [安装与发布验收](release.md)。
+完整的独立安装及 checkout 外运行命令见 [安装与发布验收](release.md)。
 
 首次调用会生成 report.json、report.md 和完整来源链。后续调用只读复验；输入、代码或依赖版本改变后使用 quickstart-v2 等新目录。失败/部分目录也保留原样，不通过覆盖旧文件恢复。
 
