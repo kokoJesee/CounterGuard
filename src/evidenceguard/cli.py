@@ -8,6 +8,7 @@ import typer
 
 from evidenceguard import __version__
 from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
+from evidenceguard.demo import run_demo, verify_demo
 from evidenceguard.errors import (
     ArtifactIntegrityError,
     GuardSelfCheckError,
@@ -33,6 +34,7 @@ from evidenceguard.replay import (
     replay_train_benchmark,
     verify_replay,
 )
+from evidenceguard.report import OutputFormat, command_report, render_report
 from evidenceguard.scope import fit_scopes
 from evidenceguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
@@ -120,6 +122,42 @@ def version() -> None:
     typer.echo(__version__)
 
 
+@app.command()
+def demo(
+    workspace: Annotated[Path, typer.Option(help="New immutable offline Demo workspace.")] = Path(
+        "artifacts/demo-run"
+    ),
+    scenario: Annotated[Path, typer.Option(help="JSON-compatible YAML scenario.")] = Path(
+        "examples/demo/mvp.yaml"
+    ),
+    cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+    format: Annotated[OutputFormat, typer.Option(help="Render the same verified JSON facts.")] = (
+        OutputFormat.TEXT
+    ),
+    verify_only: Annotated[
+        bool, typer.Option(help="Read-only audit; never start the Pipeline.")
+    ] = (False),
+) -> None:
+    """Run the recorded offline Demo or audit its completed report."""
+    try:
+        result = (
+            verify_demo(workspace / "report.json", cwd=cwd)
+            if verify_only
+            else run_demo(scenario, cwd=cwd, workspace=workspace)
+        )
+    except PipelineExecutionError as error:
+        _error(str(error), error.exit_code)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError:
+        _error("Demo input or output is unavailable", 3)
+    typer.echo(render_report(result, format), nl=False)
+    if not result.report.payload["accepted"]:
+        raise typer.Exit(1)
+
+
 @replay_app.command("run")
 def replay_run(
     guard: Annotated[Path, typer.Option(help="Guard JSON.")],
@@ -133,6 +171,7 @@ def replay_run(
         "artifacts"
     ),
     timeout: Annotated[float, typer.Option(help="Execution timeout in seconds.")] = 30.0,
+    format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
     try:
         result = replay_guard(
@@ -146,7 +185,7 @@ def replay_run(
         _error(str(error), 2)
     except OSError as error:
         _error(f"Replay error: {error}", 3)
-    typer.echo(result.model_dump_json(indent=2))
+    _emit_report("replay", result, format)
     code = replay_exit_code(result)
     if code:
         raise typer.Exit(code)
@@ -208,20 +247,22 @@ def benchmark_replay(
         raise typer.Exit(code)
 
 
+@app.command("learn")
 @scope_app.command("learn")
 def scope_learn(
     protocol: Annotated[Path, typer.Option(help="Frozen protocol JSON.")],
     phase: Annotated[str, typer.Option(help="initial or refined; never holdout.")],
     output: Annotated[Path, typer.Option(help="Immutable fitted scope directory below cwd.")],
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
+    format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
     try:
         manifest = fit_scopes(protocol, phase=phase, output=output, cwd=cwd)
     except InsufficientScopeEvidence as error:
-        typer.echo(
-            json.dumps(
-                {"status": "refused", "reason_code": error.reason_code, "detail": str(error)}
-            )
+        _emit_report(
+            "learn",
+            {"status": "refused", "reason_code": error.reason_code, "detail": str(error)},
+            format,
         )
         raise typer.Exit(4) from error
     except ArtifactIntegrityError as error:
@@ -230,7 +271,7 @@ def scope_learn(
         _error(str(error), 2)
     except OSError as error:
         _error(f"Scope fitting error: {error}", 3)
-    typer.echo(manifest.model_dump_json(indent=2))
+    _emit_report("learn", manifest, format)
 
 
 @features_app.command("audit")
@@ -292,6 +333,7 @@ def capture(
     ] = None,
     agent_source: Annotated[str | None, typer.Option(help="D10 provider: recorded.")] = None,
     workspace: Annotated[Path | None, typer.Option(help="Candidate/Gate output below cwd.")] = None,
+    format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
     """Capture a buggy failure and fixed pass as auditable JSON Evidence."""
     try:
@@ -318,7 +360,7 @@ def capture(
             result = capture_candidate(
                 request, cwd=cwd, workspace=workspace, agent_source=agent_source
             )
-            typer.echo(result.model_dump_json(indent=2))
+            _emit_report("capture", result, format)
             code = gate_exit_code(result, cwd=cwd)
             if code:
                 raise typer.Exit(code)
@@ -350,7 +392,7 @@ def capture(
         _error(str(error), 2)
     except OSError as error:
         _error(f"capture execution error: {error}", 3)
-    _emit_evidence(evidence)
+    _emit_evidence(evidence, format)
 
 
 @evidence_app.command("inventory")
@@ -407,6 +449,7 @@ def experiment_verify(
     )
 
 
+@app.command("evaluate")
 @experiment_app.command("evaluate")
 def experiment_evaluate(
     protocol: Annotated[Path, typer.Option(help="Frozen scope_v1 protocol JSON.")],
@@ -415,6 +458,7 @@ def experiment_evaluate(
     split: Annotated[str, typer.Option(help="D9 accepts holdout only.")] = "holdout",
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
     timeout: Annotated[float, typer.Option(help="Per-run timeout in seconds.")] = 30.0,
+    format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
     try:
         report = evaluate_methods(
@@ -431,7 +475,7 @@ def experiment_evaluate(
         _error(str(error), 2)
     except OSError as error:
         _error(f"Evaluation execution error: {error}", 3)
-    typer.echo(report.model_dump_json(indent=2))
+    _emit_report("evaluate", report, format)
     if not report.accepted:
         raise typer.Exit(1)
 
@@ -482,13 +526,14 @@ def compile_command(
     evidence: Annotated[Path, typer.Option(help="Verified source Evidence JSON.")],
     cwd: Annotated[Path, typer.Option(help="Trusted project workspace.")] = Path("."),
     artifact_root: Annotated[Path, typer.Option(help="Output below cwd.")] = Path("artifacts"),
+    format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
     """Compile minimal regression assertions and validate them on the fixed target."""
     try:
         guard = compile_guard(CompileRequest(guard_id, evidence, cwd, artifact_root))
     except GuardSelfCheckError as error:
         typer.echo(str(error), err=True)
-        _emit_run(error.run)
+        _emit_report("compile", error.run, format)
         raise typer.Exit(3) from error
     except InvalidEvidenceError as error:
         _error(str(error), 1)
@@ -498,7 +543,7 @@ def compile_command(
         _error(str(error), 2)
     except OSError as error:
         _error(f"compile execution error: {error}", 3)
-    typer.echo(guard.model_dump_json(indent=2))
+    _emit_report("compile", guard, format)
 
 
 @guard_app.command("verify")
@@ -546,11 +591,20 @@ def _emit_run(run: RunRecord) -> None:
         raise typer.Exit(3)
 
 
-def _emit_evidence(evidence: Evidence) -> None:
-    typer.echo(evidence.model_dump_json(indent=2))
+def _emit_evidence(evidence: Evidence, format: OutputFormat | None = None) -> None:
+    _emit_report("capture", evidence, format)
     code = evidence_exit_code(evidence)
     if code:
         raise typer.Exit(code)
+
+
+def _emit_report(operation: str, record, format: OutputFormat | None) -> None:
+    payload = record if isinstance(record, dict) else record.model_dump(mode="json")
+    if format is None:
+        # Pre-D12 clients keep the original artifact shape and its original digest semantics.
+        typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        typer.echo(render_report(command_report(operation, payload), format), nl=False)
 
 
 def _error(message: str, exit_code: int) -> NoReturn:

@@ -46,6 +46,30 @@ artifacts. Completed workspaces are read-only; failures and changed inputs requi
 version. Runtime artifacts use paths relative to the workspace's `w/`, while top-level manifest
 links use the source project root.
 
+Day 12 adds the one-command offline Demo and reports from the same JSON facts:
+
+```powershell
+uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/demo-run
+uv run evidenceguard demo --workspace artifacts/demo-run --format json
+uv run evidenceguard demo --workspace artifacts/demo-run --format markdown
+uv run evidenceguard demo --workspace artifacts/demo-run --verify-only
+```
+
+The first command creates `report.json` and `report.md` alongside the Pipeline. Repeating it
+only verifies and renders existing records. The report keeps `scope_decision`,
+`execution_outcome`, and `final_verdict` separate: inapplicable/unknown produce
+`not_run` + `skipped`, while infrastructure failures produce `inconclusive`. It shows the
+minimal failed cases, initial/refined rules, actual clause checks and source links.
+The default Demo uses recorded proposals and trusted local fixtures, with no network or
+live model requirement. It does not provide a sandbox for arbitrary Python.
+
+`capture`, `compile`, `learn` (alias of `scope learn`), `replay run`, and `evaluate`
+(alias of `experiment evaluate`) accept `--format text|json|markdown`. Explicit formats
+use `command-report.v1`: `payload` retains the original artifact, and `replays` contains
+normalized execution conclusions when applicable. Without `--format`, existing commands
+keep their original JSON shape; Demo defaults to text. Formatting does not change exit codes.
+See [the CLI contract](docs/cli.md) for the schemas, state mapping and audit commands.
+
 The MVP keeps two questions separate:
 
 1. Does a guard apply to this code context?

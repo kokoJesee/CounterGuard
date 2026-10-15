@@ -18,8 +18,23 @@
 | EvaluationReport（D9） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
 | Candidate / VerificationGate（D10） | 请求原始字节、白名单 AgentContext、recorded 响应指纹、可信模板测试、fixed 来源以及 D3 双向 Evidence | 请求、响应、契约、目标或模板改变，必须使用新的 request ID/修订和新 candidate/Evidence；历史完成标记只读审核。Gate 是 Evidence 的生成分支，不依赖 Scope，也不自动触发既有 Scope/评测重算 |
 | Workspace / Pipeline（D11） | 场景与来源/输入镜像原字节、冻结 protocol/split、各阶段正式模型摘要、实际 Replay/JUnit、执行代码与依赖版本 | 任一来源或运行代码变化，历史结果不能在新版本下冒充当前运行。重新运行使用新的 workspace 版本目录；不得重签旧 manifest、复制旧 artifacts 充当新 capture/fit，或修改冻结配置迁就新路径 |
+| Command / Demo 展示（D12） | command-report.v1 投影原 JSON；demo-report.v1 另绑定 Pipeline 引用/摘要、demo.py/report.py 原始代码摘要、真实生成时间、规则/逐行展示与自摘要；Markdown 逐字节由该 JSON 渲染 | 只读切换格式无需任何新执行；已发布 Demo 改动/缺失即拒绝，不重新生成缺失文件。新输入/代码使用新 workspace 和 report，不重签旧记录。当前 D9/D11 包含 cli.py/report.py 代码 pin，因此本轮展示修改也会使它们在新运行时审核失效；历史记录保留，原提交可复验 |
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
+
+## CLI 与 Demo 展示（D12）
+
+`report.py` 定义 `command-report.v1`、`ReplayPresentation`（Schema 文件为 replay-presentation.schema.json，内层行没有独立 schema_version）与三格式纯渲染器。`demo.py` 定义 `demo-report.v1`、`run_demo`、`verify_demo`，复用 D11 管线而不再实现一套执行路径。
+
+显式 `--format text|json|markdown` 都消费同一 CommandReport。payload 保存原完整 JSON，不改变内层 artifact_digest 的覆盖集合；包装层是展示 DTO，不冒充原始 artifact 或新执行证据。capture/compile/learn/evaluate 没有 Replay 时 replays=[]，不虚构适用性结论。既有命令未传 --format 保持原始 JSON 形状，新增 demo 默认 text。命令/别名、退出码和状态表见 `docs/cli.md`。
+
+Replay 行保留 guard_id、可选 sample_id/source_ref、三种 scope_decision、五种 execution_outcome、四种 final_verdict、原始 raw_outcome/raw_verdict、失败 case、错误解释与完整 decision_trace。`RunOutcome.passed/test_failed/timeout` 分别展示 pass/fail/timeout，其余执行异常为 error；没有 RunRecord 是 not_run。原始 pass/violation 分别展示 pass/violation；两类 skipped 展示 skipped，同时保留 unknown 与 inapplicable 区别；异常与 stale 是 inconclusive。stale 可保留实际 pass 执行，但最终仍是 inconclusive，不能读成可信通过。
+
+严格行模型拒绝 skipped 配执行、unknown 无解释、执行错误配 pass/violation；Replay CommandReport 还要与原 payload 的投影完全一致。Demo 的六行、验收、最小失败 case、规则与来源全部从已 verify 的 Pipeline/Guard/Learning/Replay 重建。规则和 trace 是原数据的解释，不新学条件、不重算指标。
+
+Demo 首次在空 workspace 运行；report.md 先发布，report.json 最后作为展示完成标记。中途失败保留已有 Pipeline/文件，重复调用拒绝部分目录，改用新版本目录。report.json 的 digest 覆盖除自身 artifact_digest 外全部字段；Markdown 包含该摘要并要求从同一 JSON 重建逐字节相同，不在 JSON 中再包含 Markdown 摘要造成循环依赖。生成时间使用实际 UTC，重复复验不改时间。命令自身不修改 pre-D12 artifact 或冻结协议。
+
+重复 Demo/`demo --verify-only` 先审核 Pipeline 全来源、代码/环境、原始 JUnit，再重建 JSON 事实和 Markdown；不调用 provider、pytest、compile 或 fit。自摘要正确但事实/代码/Markdown 不匹配仍拒绝。输出 ref 相对于源 cwd，内层原 artifact 引用继续遵守 w/ 命名空间。
 
 ## 独立 Workspace 与 Pipeline（D11）
 

@@ -1,0 +1,183 @@
+{
+  "$defs": {
+    "JsonValue": {},
+    "ReplayPresentation": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "sample_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sample Id"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Ref"
+        },
+        "scope_decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Scope Decision",
+          "type": "string"
+        },
+        "execution_outcome": {
+          "enum": [
+            "not_run",
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ],
+          "title": "Execution Outcome",
+          "type": "string"
+        },
+        "final_verdict": {
+          "enum": [
+            "pass",
+            "violation",
+            "skipped",
+            "inconclusive"
+          ],
+          "title": "Final Verdict",
+          "type": "string"
+        },
+        "raw_outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "raw_verdict": {
+          "title": "Raw Verdict",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "violated_case_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Violated Case Ids",
+          "type": "array"
+        },
+        "decision_trace": {
+          "default": [],
+          "items": {
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
+            "type": "object"
+          },
+          "title": "Decision Trace",
+          "type": "array"
+        }
+      },
+      "required": [
+        "guard_id",
+        "scope_decision",
+        "execution_outcome",
+        "final_verdict",
+        "raw_outcome",
+        "raw_verdict"
+      ],
+      "title": "ReplayPresentation",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "command-report.v1",
+      "default": "command-report.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "capture",
+        "compile",
+        "learn",
+        "replay",
+        "evaluate",
+        "demo"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Payload",
+      "type": "object"
+    },
+    "replays": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ReplayPresentation"
+      },
+      "title": "Replays",
+      "type": "array"
+    }
+  },
+  "required": [
+    "operation",
+    "payload"
+  ],
+  "title": "CommandReport",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
