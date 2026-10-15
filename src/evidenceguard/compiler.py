@@ -24,7 +24,7 @@ from evidenceguard.errors import (
     InvalidEvidenceError,
 )
 from evidenceguard.evidence import parse_target_ref, verify_evidence
-from evidenceguard.execution import PytestRunRequest, run_pytest
+from evidenceguard.execution import PytestRunRequest, run_pytest, verify_run_record
 from evidenceguard.models import (
     Evidence,
     Guard,
@@ -278,6 +278,9 @@ def verify_guard(path: str | Path, *, cwd: str | Path) -> Guard:
             raise ArtifactIntegrityError("Guard self-check log is missing") from error
         if actual_digest != expected_digest:
             raise ArtifactIntegrityError("Guard self-check log digest mismatch")
+    verify_run_record(
+        run, cwd=workspace, known_case_ids=tuple(case.case_id for case in guard.cases)
+    )
     return guard
 
 

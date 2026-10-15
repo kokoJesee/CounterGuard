@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from evidenceguard.digests import digest_file
+from evidenceguard.errors import ArtifactIntegrityError
 from evidenceguard.models import (
     CaseOutcome,
     CaseResult,
@@ -59,6 +60,36 @@ _EXIT_OUTCOMES = {
     4: RunOutcome.PYTEST_USAGE_ERROR,
     5: RunOutcome.NO_TESTS_COLLECTED,
 }
+
+
+def verify_run_record(run: RunRecord, *, cwd: Path, known_case_ids: tuple[str, ...]) -> None:
+    """Audit log bytes and reconstruct execution claims, without starting a process."""
+    workspace = cwd.resolve(strict=True)
+    if any(case.case_id not in known_case_ids for case in run.case_results):
+        raise ArtifactIntegrityError("Recorded execution contains an unknown contract case")
+    for ref, expected in (
+        (run.stdout_ref, run.stdout_digest),
+        (run.stderr_ref, run.stderr_digest),
+        (run.junit_ref, run.junit_digest),
+    ):
+        path = (workspace / ref).resolve()
+        if not path.is_relative_to(workspace):
+            raise ArtifactIntegrityError("Execution log reference escapes its workspace")
+        try:
+            actual = digest_file(path)
+        except OSError as error:
+            raise ArtifactIntegrityError("Execution log is missing or unavailable") from error
+        if actual != expected:
+            raise ArtifactIntegrityError("Execution log digest mismatch")
+    if run.pytest_exit_code is None:
+        if run.case_results:
+            raise ArtifactIntegrityError("Uncompleted execution cannot claim collected cases")
+        return
+    outcome, cases, _ = _classify_completed_run(
+        run.pytest_exit_code, workspace / run.junit_ref, known_case_ids
+    )
+    if (outcome, cases) != (run.outcome, run.case_results):
+        raise ArtifactIntegrityError("Recorded execution contradicts raw JUnit/case results")
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,8 +184,10 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
         error_detail = f"pytest exceeded timeout of {request.timeout_seconds:g} seconds"
     except OSError as error:
         stdout = b""
-        error_detail = f"could not launch pytest: {type(error).__name__}: {error}"
-        stderr = error_detail.encode("utf-8", errors="replace")
+        stderr = f"could not launch pytest: {type(error).__name__}: {error}".encode(
+            "utf-8", errors="replace"
+        )
+        error_detail = f"could not launch pytest: {type(error).__name__}"
         pytest_exit_code = None
         outcome = RunOutcome.LAUNCH_ERROR
     else:

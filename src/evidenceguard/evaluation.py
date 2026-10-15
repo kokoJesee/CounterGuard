@@ -112,6 +112,7 @@ CODE_MODULES = (
     "cli",
     "compiler",
     "contracts",
+    "diagnostics",
     "digests",
     "errors",
     "evaluation",

@@ -21,7 +21,12 @@ from evidenceguard.digests import (
     digest_json_artifact,
 )
 from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.execution import DEFAULT_TIMEOUT_SECONDS, PytestRunRequest, run_pytest
+from evidenceguard.execution import (
+    DEFAULT_TIMEOUT_SECONDS,
+    PytestRunRequest,
+    run_pytest,
+    verify_run_record,
+)
 from evidenceguard.models import (
     CaseOutcome,
     Digest,
@@ -240,6 +245,27 @@ def verify_evidence(path: str | Path, *, cwd: str | Path) -> Evidence:
                 f"expected {expected_digest}, got {actual_digest}"
             )
 
+    contract = _load_contract(workspace / evidence.contract_ref)
+    if contract.contract_id != evidence.contract_id:
+        raise ArtifactIntegrityError("Evidence contract identity contradicts its source")
+    for target, expected in (
+        (evidence.buggy_target, evidence.buggy_target_digest),
+        (evidence.fixed_target, evidence.fixed_target_digest),
+    ):
+        try:
+            actual_target, actual_digest = parse_target_ref(
+                f"{target.module}:{target.symbol}", cwd=workspace, validate_symbol=True
+            )
+        except (OSError, ValueError) as error:
+            raise ArtifactIntegrityError("Evidence target binding is unavailable") from error
+        if (
+            actual_target != target
+            or actual_digest != expected
+            or target.symbol != contract.target_symbol
+        ):
+            raise ArtifactIntegrityError("Evidence target identity contradicts its source")
+    for run in (evidence.buggy_run, evidence.fixed_run):
+        verify_run_record(run, cwd=workspace, known_case_ids=contract.case_ids)
     return evidence
 
 

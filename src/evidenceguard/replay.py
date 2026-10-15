@@ -26,6 +26,7 @@ from evidenceguard.errors import (
     GuardReplayIntegrityError,
 )
 from evidenceguard.evidence import parse_target_ref, verify_evidence
+from evidenceguard.execution import verify_run_record
 from evidenceguard.features import FeatureContext, FeatureRecord, extract_feature_record
 from evidenceguard.models import (
     ArtifactRef,
@@ -549,11 +550,28 @@ def verify_replay(path: str | Path, *, cwd: str | Path) -> ReplayResult:
         fit_manifest_path=Path(result.fit_manifest_ref) if result.fit_manifest_ref else None,
     )
     guard = verify_guard(result.guard_ref, cwd=workspace)
+    try:
+        current_target, target_digest = parse_target_ref(
+            f"{result.target.module}:{result.target.symbol}", cwd=workspace, validate_symbol=False
+        )
+    except (OSError, ValueError) as error:
+        raise ArtifactIntegrityError("Replay target binding is unavailable") from error
     if (
         scope.artifact_digest != result.scope_digest
         or guard.artifact_digest != result.guard_digest
+        or guard.guard_id != result.guard_id
+        or scope.scope_id != result.scope_id
+        or scope.protocol_digest != result.protocol_digest
         or (manifest.artifact_digest if manifest else None) != result.fit_manifest_digest
-        or digest_file(_path(Path(result.target.source_ref), workspace)) != result.target_digest
+        or current_target != result.target
+        or target_digest != result.target_digest
+        or (
+            result.run is not None
+            and (
+                result.run.contract_id != guard.contract_id
+                or result.run.contract_digest != guard.contract_digest
+            )
+        )
     ):
         raise ArtifactIntegrityError("Replay input bindings are stale")
     load_module_context(_path(Path(result.module_context_ref), workspace))
@@ -577,14 +595,30 @@ def verify_replay(path: str | Path, *, cwd: str | Path) -> ReplayResult:
         ):
             raise ArtifactIntegrityError("Replay features changed")
         if result.scope_decision != "unknown":
-            expected_decision = (
-                "inapplicable"
-                if feature.features.contract_family != guard.target_interface.contract_family
-                else decide_scope(scope, feature.features.model_dump(mode="json")).decision
-            )
-            if expected_decision != result.scope_decision:
-                raise ArtifactIntegrityError("Replay decision does not follow its stored scope")
-    elif result.scope_decision == "unknown" and result.declared_contract_ref:
+            if feature.features.contract_family != guard.target_interface.contract_family:
+                expected_decision = ScopeDecision(
+                    decision="inapplicable",
+                    trace=(
+                        ClauseTrace(
+                            field="contract_family",
+                            op="eq",
+                            expected=guard.target_interface.contract_family,
+                            actual=feature.features.contract_family,
+                            matched=False,
+                        ),
+                    ),
+                )
+            else:
+                expected_decision = decide_scope(scope, feature.features.model_dump(mode="json"))
+            if (expected_decision.decision, expected_decision.trace) != (
+                result.scope_decision,
+                result.decision_trace,
+            ):
+                raise ArtifactIntegrityError(
+                    "Replay decision/trace does not follow its stored scope"
+                )
+    unknown_reason = "Target contract metadata was not provided"
+    if result.scope_decision == "unknown" and result.declared_contract_ref:
         try:
             extract_feature_record(
                 FeatureContext(
@@ -594,20 +628,27 @@ def verify_replay(path: str | Path, *, cwd: str | Path) -> ReplayResult:
                     Path(result.module_context_ref),
                 )
             )
-        except FeatureExtractionError:
-            pass
+        except FeatureExtractionError as failure:
+            unknown_reason = str(failure)
         else:
             raise ArtifactIntegrityError(
                 "Previously unknown target information has changed; replay again"
             )
+    if result.scope_decision == "unknown":
+        expected_trace = tuple(
+            ClauseTrace(
+                field=clause.field, op=clause.op, expected=clause.value, actual=None, matched=None
+            )
+            for clause in scope.clauses
+        )
+        if result.decision_trace != expected_trace or result.error_detail != unknown_reason:
+            raise ArtifactIntegrityError(
+                "Unknown Replay reason/trace differs from available inputs"
+            )
     if result.run:
-        for ref, expected in (
-            (result.run.stdout_ref, result.run.stdout_digest),
-            (result.run.stderr_ref, result.run.stderr_digest),
-            (result.run.junit_ref, result.run.junit_digest),
-        ):
-            if digest_file(_path(Path(ref), workspace)) != expected:
-                raise ArtifactIntegrityError("Replay execution log digest mismatch")
+        verify_run_record(
+            result.run, cwd=workspace, known_case_ids=tuple(case.case_id for case in guard.cases)
+        )
     return result
 
 

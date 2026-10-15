@@ -22,6 +22,16 @@
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
 
+## D13 独立验证补强
+
+自摘要和文件摘要只保证被引用的字节一致，不足以保证 JSON 中的执行声明来自这些字节。公开 `verify_evidence`、`verify_guard`、`verify_replay` 现在都调用 `execution.verify_run_record`：检查日志引用留在 workspace 内、三份日志摘要、已知 case 集，再从原始 JUnit 与实际记录的 pytest exit code 重建 outcome/case_results。记录里的未知 case、重签后的假失败集/自检结果均拒绝；timeout/launch error 没有正常返回码时不得伪造 collected cases。此检查不启动进程。
+
+Evidence 同时核对源契约的实际 contract_id，以及 buggy/fixed 的模块、符号、原始源码与声明引用一致。Replay 明确绑定 Guard/Scope 身份、protocol 摘要、执行契约和目标源码身份；已知决策的完整 trace 从真实 FeatureVector 重建，unknown 的 trace/原因从缺失信息或当前提取失败重建。重新签名 trace 或身份字段不能替代这些交叉核对。D9/D11 仍保留原整体来源审核，独立入口不再依赖调用者额外补一层审核才能拒绝这些矛盾声明。
+
+没有改变现有持久化模型/Schema、Guard semantic_digest 的九字段集合、特征词汇、learner 搜索或冻结指标。加强的是 verify 接受条件：内部自洽但违背原始来源的记录应拒绝。新增 diagnostics.py 纳入执行代码摘要；CLI 自产错误诊断脱敏和 launch error 摘要收紧会改变新代码/新执行的 artifact 绑定，正式验收使用 day13-smoke 新目录，不重签旧 manifest 或覆盖历史记录。
+
+脱敏只约束明确的公开错误摘要，不改写原始 stdout/stderr/JUnit，也不将原始 RunRecord 或报告包装为公开导出包。具体范围见 `docs/known-limitations.md`。独立 unknown 样例另外保留原 ReplayResult 与同源 CommandReport 的三种展示，不增加标准 Demo 行数或评测分母。
+
 ## CLI 与 Demo 展示（D12）
 
 `report.py` 定义 `command-report.v1`、`ReplayPresentation`（Schema 文件为 replay-presentation.schema.json，内层行没有独立 schema_version）与三格式纯渲染器。`demo.py` 定义 `demo-report.v1`、`run_demo`、`verify_demo`，复用 D11 管线而不再实现一套执行路径。

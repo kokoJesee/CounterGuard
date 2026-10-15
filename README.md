@@ -3,6 +3,10 @@
 EvidenceGuard turns verified bug evidence into reusable regression guards with explicit
 applicability boundaries.
 
+Start with the [offline quickstart](docs/quickstart.md). Although the scenario is named
+`mvp.yaml`, it currently requires JSON syntax; YAML indentation, comments and anchors are
+unsupported. The quickstart includes valid input and a real missing-contract `unknown` replay.
+
 Day 3 now captures and verifies bidirectional bug Evidence. Each artifact records the selected
 contract and test digests, target digests, structured case results, raw logs, and pytest exit
 semantics. The capture service accepts only a real buggy test failure followed by a fixed pass as
@@ -34,8 +38,8 @@ New artifact paths, atomic temporary files and pytest caches must fit a 240 UTF-
 Day 11 runs that flow from clean inputs in an independent pinned workspace:
 
 ```powershell
-uv run evidenceguard pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/day11
-uv run evidenceguard pipeline verify artifacts/day11/run_manifest.json
+uv run evidenceguard pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/pipeline-example-v1
+uv run evidenceguard pipeline verify artifacts/pipeline-example-v1/run_manifest.json
 ```
 
 The scenario uses JSON-compatible YAML and the frozen training members only. It builds both
@@ -49,10 +53,10 @@ links use the source project root.
 Day 12 adds the one-command offline Demo and reports from the same JSON facts:
 
 ```powershell
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/demo-run
-uv run evidenceguard demo --workspace artifacts/demo-run --format json
-uv run evidenceguard demo --workspace artifacts/demo-run --format markdown
-uv run evidenceguard demo --workspace artifacts/demo-run --verify-only
+uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
+uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format json
+uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format markdown
+uv run evidenceguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
 The first command creates `report.json` and `report.md` alongside the Pipeline. Repeating it

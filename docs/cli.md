@@ -1,6 +1,12 @@
-# D12 CLI 与报告约定
+# CLI 与报告约定
 
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
+
+## 场景文件格式
+
+**mvp.yaml 当前只能写 JSON 语法，不支持通用 YAML。** `.yaml` 后缀不会启用缩进映射、注释、锚点等 YAML 特性。请使用双引号、花括号和方括号，不加尾逗号；解析器使用现有 Pydantic JSON 入口，不引入 YAML 依赖。完整可用内容与会被拒绝的 YAML 反例见 [quickstart.md](quickstart.md)。语法不支持返回 2，在执行前拒绝。
+
+标准 Demo 选择的六个冻结训练样本信息完整，所以原报告没有 unknown。独立的缺少 --contract 的真实 Replay 用法见 [quickstart.md](quickstart.md#怎么读结果以及为什么标准-demo-没有-unknown)：必须保留 unknown/not_run/skipped 和退出 4，不改动标准六行或评测分母。
 
 ## 命令与兼容
 
@@ -20,10 +26,10 @@ capture/compile/learn/evaluate 不是“新目标是否通过”的单行 Replay
 ```powershell
 uv run evidenceguard learn --protocol experiments/scope_v1.json --phase refined --output artifacts/fitted-new/refined --format markdown
 uv run evidenceguard replay run --guard <guard.json> --scope <scope.json> --target <module:symbol> --contract <contract.json> --format json
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/demo-run
-uv run evidenceguard demo --workspace artifacts/demo-run --format json
-uv run evidenceguard demo --workspace artifacts/demo-run --format markdown
-uv run evidenceguard demo --workspace artifacts/demo-run --verify-only
+uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/cli-demo-v1
+uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --format json
+uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --format markdown
+uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --verify-only
 ```
 
 尖括号路径需要替换为同一来源链中的实际资产。不要混用旧 Guard 与新 fit 的摘要。已有失败、部分目录或代码/输入已变更时，选择新的 workspace 版本，不删除/重签原产物来恢复。
@@ -55,6 +61,6 @@ raw_outcome 与 raw_verdict 不丢弃；unknown 保留具体原因，执行违�
 
 既有 audit/verify 命令的 0 仅表示审核成功，不替换原 verdict。`demo --verify-only` 同样只读，并保留原 accepted 的退出语义。格式切换不改变这些规则，不将 stderr 的配置/完整性错误包装为正常结果。
 
-本轮同时修正 compile 自检错误分支：旧实现调用 `_emit_run` 时，test_failed 会提前退出 1，使后面的预期退出 3 不可达。现在所有格式都先输出实际自检 Run，再退出 3；这是编译/固定目标自检失败，不是新目标的确认 violation。原直接 `guard run` 的真实断言失败仍退出 1。该兼容差异明确保留，未修改任何原执行记录。
+D12 修正了 compile 自检错误分支：旧实现调用 `_emit_run` 时，test_failed 会提前退出 1，使后面的预期退出 3 不可达。现在所有格式都先输出实际自检 Run，再退出 3；这是编译/固定目标自检失败，不是新目标的确认 violation。原直接 `guard run` 的真实断言失败仍退出 1。该兼容差异明确保留，未修改任何原执行记录。
 
 标准 Demo 使用已录制请求和显式 pin 的可信本地源码/契约。它不访问网络，不依赖 API key，不使用仓库旧 artifacts、未记录的 pytest 插件或 conftest。pytest/Python/Pydantic/Typer 版本记录在 Pipeline 中；改变环境后使用新 workspace。离线复现不是任意代码的网络/进程沙箱，Docker 留在后续阶段。

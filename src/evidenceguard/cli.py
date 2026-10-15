@@ -9,6 +9,7 @@ import typer
 from evidenceguard import __version__
 from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
 from evidenceguard.demo import run_demo, verify_demo
+from evidenceguard.diagnostics import public_diagnostic
 from evidenceguard.errors import (
     ArtifactIntegrityError,
     GuardSelfCheckError,
@@ -608,7 +609,7 @@ def _emit_report(operation: str, record, format: OutputFormat | None) -> None:
 
 
 def _error(message: str, exit_code: int) -> NoReturn:
-    typer.echo(f"Error: {message}", err=True)
+    typer.echo(f"Error: {public_diagnostic(message)}", err=True)
     raise typer.Exit(exit_code)
 
 
