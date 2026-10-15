@@ -38,6 +38,11 @@ dependencies = [
     { name = "typer" },
 ]
 
+[package.optional-dependencies]
+runner = [
+    { name = "pytest" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
@@ -47,8 +52,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = ">=2.11,<3" },
+    { name = "pytest", marker = "extra == 'runner'", specifier = ">=8.4,<9" },
     { name = "typer", specifier = ">=0.16,<1" },
 ]
+provides-extras = ["runner"]
 
 [package.metadata.requires-dev]
 dev = [

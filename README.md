@@ -3,6 +3,18 @@
 EvidenceGuard turns verified bug evidence into reusable regression guards with explicit
 applicability boundaries.
 
+MVP 0.1.0 covers the trusted local Python/pytest pipeline: bidirectional Evidence, minimal
+Guard compilation, initial/refined Scope learning, Replay, and an offline Demo. See the
+[architecture](docs/architecture.md), [frozen evaluation](docs/evaluation.md), and
+[release/install procedure](docs/release.md). The [attack-surface checklist](docs/attack-surface-checklist.md)
+distinguishes tested behavior from remaining risks and the requirements for untrusted repositories.
+Historical verification has an explicit [version boundary](docs/known-limitations.md#历史验证结论的边界).
+
+The wheel provides the CLI and library. Install the `runner` extra to execute tests; it declares
+the pytest dependency already used by the project. The offline Demo also needs the source
+distribution's examples, benchmarks, experiments and contract tests; these are not bundled in
+the library wheel. No PyPI or GitHub publication is implied by local acceptance.
+
 Start with the [offline quickstart](docs/quickstart.md). Although the scenario is named
 `mvp.yaml`, it currently requires JSON syntax; YAML indentation, comments and anchors are
 unsupported. The quickstart includes valid input and a real missing-contract `unknown` replay.

@@ -10,6 +10,8 @@ uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format markdown
 uv run evidenceguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
+源码开发环境的 uv sync 会安装 dev 组中的 pytest。安装构建后的 wheel 时，执行功能必须显式选择 `runner` extra，例如 `uv pip install './dist/evidenceguard-0.1.0-py3-none-any.whl[runner]'`；基础 wheel 不自动安装 pytest，只承诺 CLI/库的基础依赖。离线 Demo 的输入不在 wheel 内，需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。完整干净安装命令见 [安装与发布验收](release.md)。
+
 首次调用会生成 report.json、report.md 和完整来源链。后续调用只读复验；输入、代码或依赖版本改变后使用 quickstart-v2 等新目录。失败/部分目录也保留原样，不通过覆盖旧文件恢复。
 
 ## mvp.yaml 的内容必须是 JSON
