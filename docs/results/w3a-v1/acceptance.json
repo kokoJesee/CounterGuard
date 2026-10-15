@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-10-15T09:16:56.691995+00:00",
+  "baseline": "54b39d9",
+  "states": {
+    "ready": {
+      "exit_code": 0,
+      "artifact_digest": "sha256:6127fc1d2c24b21bba1f3044ed71a24b4edd22d94b51bf963d5623c5718f61ce",
+      "status": "ready",
+      "reason_codes": [],
+      "base_commit": "afcdb8594fe3a2c5cd756646a719f404a9dac812",
+      "head_commit": "c19ce25e20c46b44ed912359d97841760a779a5e",
+      "execution_outcome": "not_run",
+      "implementation_file_count": 33
+    },
+    "unknown": {
+      "exit_code": 4,
+      "artifact_digest": "sha256:ca89fd0a0a006e6878e4b5b6b78166e378090721fab8592316c5f6196a0d5a12",
+      "status": "unknown",
+      "reason_codes": [
+        "missing_base_commit"
+      ],
+      "base_commit": null,
+      "head_commit": null,
+      "execution_outcome": "not_run",
+      "implementation_file_count": 33
+    },
+    "rejected": {
+      "exit_code": 5,
+      "status": "rejected",
+      "reason_codes": [
+        "external_object_store"
+      ],
+      "artifact_digest": "sha256:7153f554668dc5b0bc874ef8a9543361c0ce8e44b15f38a19528d74b55762ad3",
+      "git_processes": 0,
+      "fixture_kind": "minimal malicious metadata, not a full clone"
+    }
+  },
+  "tool_requested_git_commands": [
+    "--version",
+    "rev-parse",
+    "rev-parse",
+    "fsck",
+    "diff-tree",
+    "ls-tree",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "ls-tree",
+    "cat-file",
+    "cat-file",
+    "--version",
+    "rev-parse",
+    "rev-parse",
+    "fsck",
+    "diff-tree",
+    "ls-tree",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "cat-file",
+    "ls-tree",
+    "cat-file",
+    "cat-file",
+    "--version",
+    "rev-parse",
+    "--version",
+    "rev-parse"
+  ],
+  "tool_requested_non_git_processes": 0,
+  "target_pytest_executions": 0,
+  "fixture_files_unchanged": 41,
+  "repeat_stdout_identical": true,
+  "protected_existing_files": 3284,
+  "changed_existing_files": [],
+  "scope_v1_rerun": false,
+  "limitations": "Does not observe arbitrary native Git descendants or provide an OS sandbox"
+}

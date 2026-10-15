@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "FileChange": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "A",
+            "M",
+            "D",
+            "T"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "old_mode": {
+          "title": "Old Mode",
+          "type": "string"
+        },
+        "new_mode": {
+          "title": "New Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "kind",
+        "old_mode",
+        "new_mode"
+      ],
+      "title": "FileChange",
+      "type": "object"
+    },
+    "FilePin": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "enum": [
+            "base",
+            "head"
+          ],
+          "title": "Revision",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "FilePin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "repository-snapshot.v1",
+      "default": "repository-snapshot.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "unknown",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "base_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base Commit"
+    },
+    "head_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Head Commit"
+    },
+    "shallow": {
+      "default": false,
+      "title": "Shallow",
+      "type": "boolean"
+    },
+    "git_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Git Version"
+    },
+    "changes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FileChange"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "files": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FilePin"
+      },
+      "title": "Files",
+      "type": "array"
+    }
+  },
+  "required": [
+    "status"
+  ],
+  "title": "RepositorySnapshot",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -2,6 +2,12 @@
 
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
 
+## W3-A inspect
+
+源码开发版新增 `inspect --repo ... --base ... --head ... --config ... --format json|text|markdown`，使用独立 `repository-inspection.v1`，不扩展旧 command-report.v1 或把候选影响当作 Replay verdict。完整可运行示例见 [只读仓库检查](repository-inspection.md)，安全准入见 [security-model.md](security-model.md)。
+
+配置是严格 JSON 子集，即使扩展名为 .yaml。ready/unknown/rejected 分别退出 0/4/5；无效配置/修订语法退出 2。三格式同源，unknown 与拒绝保留原因。所有结果 execution_allowed=false / not_run，不能由 ready 推断可执行或测试通过。Frozen v0.1.0 wheel 不包含这个后续源码功能。
+
 ## 场景文件格式
 
 **mvp.yaml 当前只能写 JSON 语法，不支持通用 YAML。** `.yaml` 后缀不会启用缩进映射、注释、锚点等 YAML 特性。请使用双引号、花括号和方括号，不加尾逗号；解析器使用现有 Pydantic JSON 入口，不引入 YAML 依赖。完整可用内容与会被拒绝的 YAML 反例见 [quickstart.md](quickstart.md)。语法不支持返回 2，在执行前拒绝。

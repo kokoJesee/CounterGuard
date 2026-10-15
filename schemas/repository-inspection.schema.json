@@ -1,0 +1,309 @@
+{
+  "$defs": {
+    "FileChange": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "A",
+            "M",
+            "D",
+            "T"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "old_mode": {
+          "title": "Old Mode",
+          "type": "string"
+        },
+        "new_mode": {
+          "title": "New Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "kind",
+        "old_mode",
+        "new_mode"
+      ],
+      "title": "FileChange",
+      "type": "object"
+    },
+    "FilePin": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "enum": [
+            "base",
+            "head"
+          ],
+          "title": "Revision",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "FilePin",
+      "type": "object"
+    },
+    "TargetImpact": {
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        },
+        "guard_id": {
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "source_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        },
+        "impact": {
+          "enum": [
+            "affected",
+            "unaffected",
+            "unknown"
+          ],
+          "title": "Impact",
+          "type": "string"
+        },
+        "changed_inputs": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Changed Inputs",
+          "type": "array"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "execution_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Execution Allowed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "target_id",
+        "guard_id",
+        "source_ref",
+        "symbol",
+        "impact",
+        "changed_inputs"
+      ],
+      "title": "TargetImpact",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "repository-inspection.v1",
+      "default": "repository-inspection.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "unknown",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "requested_base": {
+      "title": "Requested Base",
+      "type": "string"
+    },
+    "requested_head": {
+      "title": "Requested Head",
+      "type": "string"
+    },
+    "base_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Base Commit"
+    },
+    "head_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Head Commit"
+    },
+    "shallow": {
+      "title": "Shallow",
+      "type": "boolean"
+    },
+    "git_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Git Version"
+    },
+    "config_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Config Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/FileChange"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/FilePin"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "unmapped_paths": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Unmapped Paths",
+      "type": "array"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/TargetImpact"
+      },
+      "title": "Targets",
+      "type": "array"
+    },
+    "source_selection": {
+      "const": "committed_objects_only",
+      "default": "committed_objects_only",
+      "title": "Source Selection",
+      "type": "string"
+    },
+    "mapping_trust": {
+      "const": "declared_not_semantically_verified",
+      "default": "declared_not_semantically_verified",
+      "title": "Mapping Trust",
+      "type": "string"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "execution_outcome": {
+      "const": "not_run",
+      "default": "not_run",
+      "title": "Execution Outcome",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "status",
+    "reason_codes",
+    "requested_base",
+    "requested_head",
+    "base_commit",
+    "head_commit",
+    "shallow",
+    "git_version",
+    "config_digest",
+    "implementation_digests",
+    "changes",
+    "files",
+    "unmapped_paths",
+    "targets",
+    "artifact_digest"
+  ],
+  "title": "InspectionReport",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

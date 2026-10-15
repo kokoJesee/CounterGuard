@@ -1,0 +1,15 @@
+{
+  "schema_version": "project-config.v1",
+  "project_id": "sample_project",
+  "targets": [
+    {
+      "target_id": "pricing",
+      "guard_id": "grd_sample_price",
+      "source_ref": "src/sample_project/pricing.py",
+      "symbol": "price",
+      "contract_ref": "contracts/pricing-v1.json",
+      "dependency_refs": ["src/sample_project/__init__.py"]
+    }
+  ],
+  "ignored_paths": ["README.md"]
+}

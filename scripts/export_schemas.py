@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from evidenceguard.baselines import FeatureVector, ScopePredicate
+from evidenceguard.change_analysis import InspectionReport
 from evidenceguard.demo import DemoReport
 from evidenceguard.evaluation import EvaluationReport
 from evidenceguard.evaluation_metrics import EvaluationMetrics, Prediction
@@ -17,9 +18,11 @@ from evidenceguard.independent_verifier import (
 from evidenceguard.models import Evidence, Guard, RunRecord
 from evidenceguard.module_context import ModuleContext
 from evidenceguard.pipeline import PipelineFailure, PipelineManifest
+from evidenceguard.project_config import ProjectConfig
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 from evidenceguard.replay import ReplayResult
 from evidenceguard.report import CommandReport, ReplayPresentation
+from evidenceguard.repository import RepositorySnapshot
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from evidenceguard.scope_explanations import ScopeExplanation
 from evidenceguard.verification_gate import GateResult
@@ -55,6 +58,9 @@ MODELS = {
     "command-report": CommandReport,
     "replay-presentation": ReplayPresentation,
     "demo-report": DemoReport,
+    "project-config": ProjectConfig,
+    "repository-snapshot": RepositorySnapshot,
+    "repository-inspection": InspectionReport,
 }
 
 if __name__ == "__main__":

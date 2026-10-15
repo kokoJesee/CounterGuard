@@ -34,7 +34,7 @@
 | A10 部分 | 声明式候选只引用可信契约 case，非法 Python/空候选拒绝；AgentContext 不含 fixed/标签/环境 | [test_independent_verifier.py](../tests/unit/test_independent_verifier.py)、[test_verification_gate.py](../tests/integration/test_verification_gate.py) | 实时模型、提示注入、任意生成代码、新 oracle 的正确性 |
 | A11 部分 | 严格 Schema、JSON 子集、摘要、三格式同源及既有 Markdown 转义案例 | [test_cli_contract.py](../tests/unit/test_cli_contract.py)、[test_demo.py](../tests/e2e/test_demo.py) | 巨量/深层 JSON、恶意 XML 的拒绝服务预算、终端控制字符及全面输出注入检查 |
 | W01 未实现 | 不可信目标的文件、网络、CPU/内存/PID、子孙进程隔离 | W3-B 待验收 | 当前禁止把未知仓库交给 LocalTrustedExecutor；Docker 不可用不降级执行 |
-| W02 未实现 | Git base/head、浅克隆、diff 路径、子模块、Git 配置和仓库链接边界 | W3-A 待实现 | 影响范围不明必须 unknown；不得隐式执行 hooks、过滤器或仓库安装脚本 |
+| W02 部分实现 | Git base/head、浅克隆、diff 路径、子模块、Git 配置和仓库链接边界 | [W3-A 安全模型与 fixture](security-model.md)；repository / change_analysis / project_config 测试 | 普通受限 profile 只读可用；worktree 等布局、恶意并发原子性、Git 原生解析器资源隔离与全面 fuzz 未关闭；影响不明仍 unknown |
 | W03 未实现 | 真实项目声明配置、插件、conftest、依赖安装/build hooks | W3-A/B 待实现 | 仓库配置与安装过程也是代码；全部进入受限执行边界，不能只隔离测试函数 |
 | W04 未实现 | Registry 权限/状态、CI 凭据/上传、公开报告、供应链和多平台矩阵 | W3-C / W4 待实现 | 本地 hash 不能替代发布签名；本机 wheel 成功不等于跨平台或 CI 安全 |
 

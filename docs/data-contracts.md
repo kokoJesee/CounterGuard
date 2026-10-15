@@ -233,3 +233,26 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 重复同一输出目录只做 verify；参数或绑定不同拒绝。目录已有部分产物或失败记录时要求新目录，不覆盖。真正确定性复跑使用新目录并产生新执行，比较 predictions.jsonl、metrics.json、paired-refinement.json 和 report.md 字节；replays/manifest 必须保留各次真实时间。
 
 `experiment verify --run` 逐层审核文件摘要、冻结成员/标签、scope/fit、每份真实 Replay、运行时实现及环境、原始预测和指标重建、配对及验收摘要、Markdown 重建；不执行 pytest。返回 0 表示记录完整，不表示 accepted=true，也不表示每个 Guard 通过。`experiment evaluate` 返回 0 表示冻结实验验收通过，原始报告仍可有真实违规和错误应用；验收未通过返回 1，完整性错误返回 5。
+
+## W3-A 配置、Git 快照和检查报告
+
+三份新 Schema 为 project-config.v1、repository-snapshot.v1、repository-inspection.v1；旧 Schema/冻结 scope_v1 未改。均继承严格 FrozenModel，配置不得加入命令、插件、环境或任意扩展字段。
+
+| 契约/字段 | 类型与语义 |
+|---|---|
+| ProjectConfig | project_id、唯一 target_id 映射；每项 guard_id/source_ref/symbol/contract_ref，dependency_refs 可空；ignored_paths 仅 .md/.rst |
+| config_digest | Digest；实际读取配置原字节 SHA-256，不等于作者/审核者认证 |
+| Snapshot.base_commit/head_commit | str 或 null；resolver 仅接受 40 位 SHA-1 commit ID，失败保留能解析的部分 |
+| Snapshot.changes | 已验证相对路径、A/M/D/T 和原/新 mode；关闭 rename 猜测，rename 表示 D+A |
+| Snapshot.files | base/head、path、Git blob object_id、实际原始内容 SHA-256；只含显式映射文件，无源码正文 |
+| Inspection.status / reason_codes | ready/unknown/rejected，原因是固定码，不包含原始 Git stderr；配置无效在构造报告前拒绝 |
+| Inspection.targets | target_id/guard_id/source_ref/symbol、affected/unaffected/unknown、changed_inputs、reason_codes；仅文件候选关系 |
+| source_selection / mapping_trust | 固定 committed_objects_only / declared_not_semantically_verified；不把声明当作可信语义或 Scope 标签 |
+| execution_allowed / execution_outcome | 固定 false / not_run；任何候选也不产生执行许可 |
+| implementation_digests / artifact_digest | 实际包全部 .py 源码摘要；报告去自身摘要后的规范化 JSON 摘要 |
+
+读取/影响分析没有时间字段，不虚构时间换确定性。请求修订字符串、选定提交、配置字节、Git/源码版本均相同时，重读逐字节相同；不同 ref 别名即使解析到同一提交，也作为不同请求进入摘要。dirty tree、原 config 或无关新 refs 不作为代码来源。引用在检查期间变化则 unknown；不声称这是 OS 原子快照或防恶意并发恢复。
+
+输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。W3-A 新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 D9/D14/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
+
+JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 W3-B 未关闭项见 [安全模型](security-model.md)。

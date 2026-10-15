@@ -1,0 +1,72 @@
+{
+  "artifact_digest": "sha256:7153f554668dc5b0bc874ef8a9543361c0ce8e44b15f38a19528d74b55762ad3",
+  "base_commit": null,
+  "changes": [],
+  "config_digest": "sha256:35935c648cd90e9333f0609bf4a3ec04a6f356cd5f907a2fb094df2c158c7d8e",
+  "execution_allowed": false,
+  "execution_outcome": "not_run",
+  "files": [],
+  "git_version": null,
+  "head_commit": null,
+  "implementation_digests": {
+    "__init__.py": "sha256:d82060d1760c51f7b59e567b6c9426ade3b9bf34b1fef369f5a23ecb4f7a4978",
+    "__main__.py": "sha256:91950e969f1e09de11d748de1b95e3fb0b0002d8649094fec88a87c0ceb76541",
+    "artifacts.py": "sha256:25e0db68f6024aa8eac8af09bf7a7502c53ce18a9c13ff9ac6610a89128d5c1f",
+    "baselines.py": "sha256:a53cc1adb92cb4c88bab5f7e22f2e5bf221d92ae4cb064250c3163d192308e1a",
+    "change_analysis.py": "sha256:b3e180bcc15f9f333a69ca957042b417f4c9a581f5f63e3a0eecfea450496c8d",
+    "cli.py": "sha256:3cbf40aa5232cfb3622efd30cc324b80c843a059f4fe8b82f4b51f2e1d4915c0",
+    "compiler.py": "sha256:0157190d9f90ca79bba49dff070cd934ae5c5c27342ffa8ca487f2e351c9d84f",
+    "contracts.py": "sha256:37e46fc6f9c68ef13f12784ef7b178f142aea29cb5b01e18db05ea297cbd7b89",
+    "demo.py": "sha256:661ba4f40ccbcc6e0c61e9dfc450cd688ba48e0b15ab42bf67d650d24e47157d",
+    "diagnostics.py": "sha256:4664d57cc47f2f5e116f01a9fa395586ecba64dccb83f251a0d8e50c4268d3ff",
+    "digests.py": "sha256:9357f9e3a763333020e3d29c5058ac64b99a49de1767ec85cff8448460b2c7a4",
+    "errors.py": "sha256:84e8f197c1ebdfbaa2223189a8f44ffaafa2621fdec1fdaac6dc194adbea6afb",
+    "evaluation.py": "sha256:8bf7b5db60c6a39691564417a8f56d94f00b33a827045bed21d4579ed404929f",
+    "evaluation_metrics.py": "sha256:ae34032fc97bbbfd51d74f44fd983cb2a0c66c282de5d4e1299a538ae5afd15b",
+    "evidence.py": "sha256:96b01382e229d8b858c08b1910929418dbe309663248f5e61e1e898f86760bde",
+    "execution.py": "sha256:7f88ed91b290c313c501a84c66e55d1ac599d097d724e3236f03e39a5fb73c89",
+    "features.py": "sha256:52eaad4f909e1f41fd10b00edac17bf01186bee5f66eb3af846e7c6466fd5af9",
+    "independent_verifier.py": "sha256:721ba78465f427bdc262a8a4f7ec41da8a8d09aa27cef5f5ef7a9669c8521fa4",
+    "model_client.py": "sha256:382e54f9add44be2d9057e35f683e43d809412d2243fd17e4cdce9fe9a16faf1",
+    "models.py": "sha256:8a2f92637992546fda137d2c64c77a79abd765e9a175b8f21484c8c5006761f6",
+    "module_context.py": "sha256:9fa31e61e3ab6148487b14a3aa08525d3e3e24626b60fc3cb84c58db64470a15",
+    "path_limits.py": "sha256:3af867c41b49b705fce59e83f911c4a4340291661b0e27277ff14bed46de8a33",
+    "pipeline.py": "sha256:0cb2fc502eb98e1152ae614d1326d8688bee2a1cfd1bf82b0e647f5dfbbeec46",
+    "predicates.py": "sha256:504258958ed5a468f6bf3201f975f7f1d98c3e37bb95cf0fff51da3a9e073bdd",
+    "project_config.py": "sha256:96f76b8a08ffae606920e9726570bddfa7e03583f6d3af8d6bfc23bc9ea80528",
+    "protocol.py": "sha256:a83820421b8b40c4ea8e72f0158778e2c6bf18337f845518abc33aed1a13a428",
+    "replay.py": "sha256:12828509c2c911e78e5474edc1e76a80110b4588fbe5494d251163f64f3f14b8",
+    "report.py": "sha256:927d3f4b7e180afc5f752f146d2afd32dcde86693730b691c9d6bc9d47b82680",
+    "repository.py": "sha256:f0efe79ffd9e8e950f063ba571ef5022fe965b500faf58d4f4c97cb010b5bf06",
+    "scope.py": "sha256:6a76d8679d4aafb623d3373700b811e2057c07136a833e3c9b0bbd8b7de8d298",
+    "scope_explanations.py": "sha256:0e55089498343a3182c5ebd40054945302acffcea3bc7948991a164a4f50bb43",
+    "verification_gate.py": "sha256:84a54ff98c80464c4a29c45268998e151e77909a30542ba3eda9aeed17f6266b",
+    "workspace.py": "sha256:b953b205532dfb22f871ed99873b1e39a5328bdfc7285180313d7324c8362bac"
+  },
+  "mapping_trust": "declared_not_semantically_verified",
+  "project_id": "sample_project",
+  "reason_codes": [
+    "external_object_store"
+  ],
+  "requested_base": "HEAD",
+  "requested_head": "HEAD",
+  "schema_version": "repository-inspection.v1",
+  "shallow": false,
+  "source_selection": "committed_objects_only",
+  "status": "rejected",
+  "targets": [
+    {
+      "changed_inputs": [],
+      "execution_allowed": false,
+      "guard_id": "grd_sample_price",
+      "impact": "unknown",
+      "reason_codes": [
+        "external_object_store"
+      ],
+      "source_ref": "src/sample_project/pricing.py",
+      "symbol": "price",
+      "target_id": "pricing"
+    }
+  ],
+  "unmapped_paths": []
+}

@@ -1,0 +1,112 @@
+"""Strict declarative mappings; configuration never supplies executable code."""
+
+import re
+import unicodedata
+from pathlib import Path, PurePosixPath
+from typing import Annotated, Literal, Self
+
+from pydantic import AfterValidator, Field, StringConstraints, model_validator
+
+from evidenceguard.digests import digest_bytes
+from evidenceguard.models import FrozenModel
+
+CONFIG_LIMIT = 128 * 1024
+_RESERVED = re.compile(r"^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)", re.I)
+
+
+def repository_path(value: str) -> str:
+    path = PurePosixPath(value)
+    if (
+        not value
+        or not path.parts
+        or len(value) > 512
+        or path.is_absolute()
+        or str(path) != value
+        or unicodedata.normalize("NFC", value) != value
+        or any(c in value for c in '\\:\x00*?"<>|')
+        or any(unicodedata.category(c).startswith("C") for c in value)
+        or any(
+            p.casefold() in {".", "..", ".git"} or p.endswith((".", " ")) or _RESERVED.match(p)
+            for p in path.parts
+        )
+    ):
+        raise ValueError("Expected a safe canonical repository-relative POSIX file path")
+    return value
+
+
+RepositoryPath = Annotated[
+    str,
+    StringConstraints(strict=True, min_length=1, max_length=512),
+    AfterValidator(repository_path),
+]
+Identifier = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$")]
+Symbol = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z_][a-zA-Z0-9_]*$", max_length=128)]
+
+
+class TargetMapping(FrozenModel):
+    target_id: Identifier
+    guard_id: Annotated[str, StringConstraints(pattern=r"^grd_[a-zA-Z0-9_-]+$", max_length=96)]
+    source_ref: RepositoryPath
+    symbol: Symbol
+    contract_ref: RepositoryPath
+    dependency_refs: Annotated[tuple[RepositoryPath, ...], Field(max_length=64)] = ()
+
+    @model_validator(mode="after")
+    def file_types(self) -> Self:
+        if not self.source_ref.endswith(".py") or not self.contract_ref.endswith(".json"):
+            raise ValueError(
+                "Targets require a .py source and an explicit .json contract reference"
+            )
+        if len(set(self.dependency_refs)) != len(self.dependency_refs):
+            raise ValueError("Dependency references must be distinct")
+        return self
+
+    def input_refs(self) -> tuple[str, ...]:
+        return tuple(sorted({self.source_ref, self.contract_ref, *self.dependency_refs}))
+
+
+class ProjectConfig(FrozenModel):
+    schema_version: Literal["project-config.v1"] = "project-config.v1"
+    project_id: Identifier
+    targets: Annotated[tuple[TargetMapping, ...], Field(min_length=1, max_length=128)]
+    ignored_paths: Annotated[tuple[RepositoryPath, ...], Field(max_length=128)] = ()
+
+    @model_validator(mode="after")
+    def distinct_bindings(self) -> Self:
+        if len({t.target_id for t in self.targets}) != len(self.targets):
+            raise ValueError("Target identities must be unique")
+        bound = {p for t in self.targets for p in t.input_refs()}
+        if len(set(self.ignored_paths)) != len(self.ignored_paths) or bound.intersection(
+            self.ignored_paths
+        ):
+            raise ValueError("Ignored paths must be unique and cannot hide a mapped input")
+        if any(not p.endswith((".md", ".rst")) for p in self.ignored_paths):
+            raise ValueError("Only explicitly listed .md/.rst documentation may be ignored")
+        return self
+
+
+def load_project_config(path: str | Path) -> tuple[ProjectConfig, str]:
+    path = Path(path).absolute()
+    reject_links(path)
+    with path.open("rb") as stream:
+        raw = stream.read(CONFIG_LIMIT + 1)
+    if len(raw) > CONFIG_LIMIT:
+        raise ValueError("Project configuration exceeds 128 KiB")
+    try:
+        config = ProjectConfig.model_validate_json(raw)
+    except (ValueError, RecursionError) as error:
+        raise ValueError(
+            "Project config must match project-config.v1 using JSON syntax, not general YAML"
+        ) from error
+    return config, digest_bytes(raw)
+
+
+def reject_links(path: Path) -> None:
+    """Check each existing component before resolution, including Windows reparse points."""
+    for component in (*reversed(path.parents), path):
+        try:
+            stat = component.lstat()
+        except FileNotFoundError:
+            continue
+        if component.is_symlink() or getattr(stat, "st_file_attributes", 0) & 0x400:
+            raise ValueError("Linked/reparse repository or configuration paths are unsupported")

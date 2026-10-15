@@ -1,0 +1,99 @@
+{
+  "$defs": {
+    "TargetMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "guard_id": {
+          "maxLength": 96,
+          "pattern": "^grd_[a-zA-Z0-9_-]+$",
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "source_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "symbol": {
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "contract_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Contract Ref",
+          "type": "string"
+        },
+        "dependency_refs": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 64,
+          "title": "Dependency Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_id",
+        "guard_id",
+        "source_ref",
+        "symbol",
+        "contract_ref"
+      ],
+      "title": "TargetMapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "project-config.v1",
+      "default": "project-config.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/TargetMapping"
+      },
+      "maxItems": 128,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    },
+    "ignored_paths": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 128,
+      "title": "Ignored Paths",
+      "type": "array"
+    }
+  },
+  "required": [
+    "project_id",
+    "targets"
+  ],
+  "title": "ProjectConfig",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

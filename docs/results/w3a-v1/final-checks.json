@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-15T09:23:23.177283+00:00",
+  "baseline_commit_and_tag": "54b39d9bf0e4b7783ca365695a5cd26121ef0ec5",
+  "protected_existing_files": 3284,
+  "changed_existing_protected_files": [],
+  "old_test_files_changed": false,
+  "existing_collected_tests": 560,
+  "full_passed": 632,
+  "full_seconds": 684.28,
+  "fast_passed": 444,
+  "fast_seconds": 4.21,
+  "slow_count": 188,
+  "partition_disjoint_and_complete": true,
+  "new_schema_models_matched": [
+    "project-config",
+    "repository-inspection",
+    "repository-snapshot"
+  ],
+  "new_reports_digest_and_current_source_pins_match": true,
+  "relative_doc_links_checked": 77,
+  "ruff_passed": true,
+  "frozen_inputs_old_schemas_dependencies_changed": false,
+  "formal_scope_v1_rerun": false,
+  "red_capture": "lossless UTF-8 text JSON envelope with original SHA-256"
+}

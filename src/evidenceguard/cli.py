@@ -7,6 +7,7 @@ from typing import Annotated, NoReturn
 import typer
 
 from evidenceguard import __version__
+from evidenceguard.change_analysis import inspect_repository, render_inspection
 from evidenceguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
 from evidenceguard.demo import run_demo, verify_demo
 from evidenceguard.diagnostics import public_diagnostic
@@ -61,6 +62,29 @@ verification_app = typer.Typer(no_args_is_help=True, help="Audit independent can
 app.add_typer(verification_app, name="verification")
 pipeline_app = typer.Typer(no_args_is_help=True, help="Run or audit the offline MVP pipeline.")
 app.add_typer(pipeline_app, name="pipeline")
+
+
+@app.command("inspect")
+def inspect_command(
+    repo: Annotated[Path, typer.Option(help="Explicit repository root; committed data only.")],
+    base: Annotated[str, typer.Option(help="Base commit, branch/tag or HEAD ancestry.")],
+    head: Annotated[str, typer.Option(help="Head commit, branch/tag or HEAD ancestry.")],
+    config: Annotated[Path, typer.Option(help="Explicit project-config.v1 JSON-compatible YAML.")],
+    format: Annotated[
+        OutputFormat, typer.Option(help="Presentation of the same inspection facts.")
+    ] = OutputFormat.TEXT,
+) -> None:
+    """Inspect explicit file mappings without executing repository code."""
+    try:
+        report = inspect_repository(repo, base, head, config)
+    except ValueError as error:
+        _error(str(error), 2)
+    except OSError:
+        _error("Project configuration is unavailable", 2)
+    typer.echo(render_inspection(report, format.value), nl=False)
+    code = {"ready": 0, "unknown": 4, "rejected": 5}[report.status]
+    if code:
+        raise typer.Exit(code)
 
 
 @pipeline_app.command("run")

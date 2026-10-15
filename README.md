@@ -24,6 +24,11 @@ Start with the [offline quickstart](docs/quickstart.md). Although the scenario i
 `mvp.yaml`, it currently requires JSON syntax; YAML indentation, comments and anchors are
 unsupported. The quickstart includes valid input and a real missing-contract `unknown` replay.
 
+W3-A development adds [read-only repository inspection](docs/repository-inspection.md) with
+explicit file/contract mappings. It reports affected/unaffected/unknown candidates and never
+permits execution. This source feature is newer than the frozen v0.1.0 wheel; the
+[security model](docs/security-model.md) keeps Docker and untrusted-code execution as W3-B work.
+
 Day 3 now captures and verifies bidirectional bug Evidence. Each artifact records the selected
 contract and test digests, target digests, structured case results, raw logs, and pytest exit
 semantics. The capture service accepts only a real buggy test failure followed by a fixed pass as

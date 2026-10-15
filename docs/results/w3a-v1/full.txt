@@ -1,0 +1,31 @@
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 34%]
+........................................................................ [ 45%]
+........................................................................ [ 56%]
+........................................................................ [ 68%]
+........................................................................ [ 79%]
+........................................................................ [ 91%]
+........................................................                 [100%]
+============================ slowest 20 durations =============================
+61.62s call     tests/integration/test_evaluation_protocol.py::test_fresh_repeat_has_identical_predictions_metrics_and_distinct_real_times
+37.01s setup    tests/integration/test_evaluation_protocol.py::test_all_methods_have_real_replays_and_source_probes
+35.69s setup    tests/e2e/test_demo.py::test_real_demo_has_json_markdown_and_six_honest_rows
+33.31s setup    tests/e2e/test_full_mvp.py::test_standalone_replay_verifier_rejects_resigned_execution_claim
+33.06s setup    tests/e2e/test_mvp_flow.py::test_end_to_end_two_guards_three_outcomes_each
+23.18s call     tests/integration/test_evaluation_protocol.py::test_rehashed_fake_facts_are_rejected[metrics.json]
+21.61s call     tests/integration/test_protocol.py::test_baselines_execute_only_applicable_training_rows
+16.91s call     tests/integration/test_evaluation_protocol.py::test_all_methods_have_real_replays_and_source_probes
+16.03s call     tests/e2e/test_mvp_flow.py::test_missing_completed_replay_stops_before_another_replay
+15.56s setup    tests/integration/test_scope_learning.py::test_initial_refined_fit_is_reproducible_and_has_no_holdout_members
+14.45s setup    tests/e2e/test_scope_aware_replay.py::test_refined_training_replay_runs_four_and_skips_five
+14.07s call     tests/e2e/test_demo.py::test_demo_repeat_and_all_formats_never_execute_or_rewrite
+13.35s setup    tests/integration/test_protocol.py::test_protocol_digest_is_pinned_and_clean_assets_verify
+11.46s call     tests/e2e/test_mvp_flow.py::test_changed_learning_stops_before_refinement_or_replay
+11.27s call     tests/e2e/test_scope_aware_replay.py::test_refined_training_replay_runs_four_and_skips_five
+7.59s call     tests/integration/test_compile_guard.py::test_minimal_guard_is_verified_and_replays_on_new_target[query]
+7.45s call     tests/integration/test_compile_guard.py::test_same_guard_id_cannot_change_source_evidence
+7.42s call     tests/integration/test_compile_guard.py::test_minimal_guard_is_verified_and_replays_on_new_target[discount]
+6.46s call     tests/integration/test_evaluation_protocol.py::test_rehashed_fake_facts_are_rejected[predictions.jsonl]
+5.93s call     tests/integration/test_capture.py::test_verified_supersession_is_separate_from_validity
+632 passed in 684.28s (0:11:24)

@@ -1,0 +1,11 @@
+# EvidenceGuard inspect
+
+status: unknown
+base: unknown
+head: unknown
+execution: not_run; execution_allowed: false
+Impact candidates are declared file mappings, not Scope decisions.
+reasons: missing_base_commit
+
+pricing | grd_sample_price | unknown | missing_base_commit
+artifact_digest: sha256:ca89fd0a0a006e6878e4b5b6b78166e378090721fab8592316c5f6196a0d5a12

@@ -11,6 +11,8 @@
 - 当前执行器面向可信本地代码，尚无 Docker/OS 级隔离、网络封锁、资源配额或针对任意子孙进程的安全终止保证。pytest 插件自动发现和 conftest 被隔离，但这不是通用 Python 沙箱。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
 
+W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run；普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git 原生解析器、资源耗尽、TOCTOU 等剩余风险及准入要求见 [安全模型](security-model.md)；W3-B 的 Docker/OS 隔离尚未完成。
+
 ## 证据能证明什么
 
 Evidence 要求 buggy 实际断言失败且 fixed 通过；Guard 只保留这次已失败且修复后通过的 case。验证器对引用文件校验摘要，并从原始 JUnit 重建 case 集、结果和执行分类。pytest exit 1 只有完整且准确的断言失败映射才是 violation；2/3/4/5、收集错误、缺失/矛盾 JUnit、timeout 和 launch error 不能冒充缺陷证据。

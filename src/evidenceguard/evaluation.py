@@ -109,6 +109,7 @@ CODE_MODULES = (
     "__main__",
     "artifacts",
     "baselines",
+    "change_analysis",
     "cli",
     "compiler",
     "contracts",
@@ -124,8 +125,10 @@ CODE_MODULES = (
     "module_context",
     "path_limits",
     "predicates",
+    "project_config",
     "protocol",
     "replay",
+    "repository",
     "report",
     "scope",
 )
