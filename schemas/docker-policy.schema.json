@@ -1,0 +1,135 @@
+{
+  "additionalProperties": false,
+  "description": "Closed W3-B isolation profile; callers cannot weaken individual controls.",
+  "properties": {
+    "schema_version": {
+      "const": "docker-policy.v1",
+      "default": "docker-policy.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "network_mode": {
+      "const": "none",
+      "default": "none",
+      "title": "Network Mode",
+      "type": "string"
+    },
+    "workspace_mode": {
+      "const": "read_only",
+      "default": "read_only",
+      "title": "Workspace Mode",
+      "type": "string"
+    },
+    "root_filesystem": {
+      "const": "read_only",
+      "default": "read_only",
+      "title": "Root Filesystem",
+      "type": "string"
+    },
+    "run_as": {
+      "const": "65532:65532",
+      "default": "65532:65532",
+      "title": "Run As",
+      "type": "string"
+    },
+    "cap_drop": {
+      "const": "ALL",
+      "default": "ALL",
+      "title": "Cap Drop",
+      "type": "string"
+    },
+    "no_new_privileges": {
+      "const": true,
+      "default": true,
+      "title": "No New Privileges",
+      "type": "boolean"
+    },
+    "ipc_mode": {
+      "const": "none",
+      "default": "none",
+      "title": "Ipc Mode",
+      "type": "string"
+    },
+    "pids_limit": {
+      "const": 64,
+      "default": 64,
+      "title": "Pids Limit",
+      "type": "integer"
+    },
+    "memory_bytes": {
+      "const": 268435456,
+      "default": 268435456,
+      "title": "Memory Bytes",
+      "type": "integer"
+    },
+    "memory_swap_bytes": {
+      "const": 268435456,
+      "default": 268435456,
+      "title": "Memory Swap Bytes",
+      "type": "integer"
+    },
+    "cpus": {
+      "const": 1.0,
+      "default": 1.0,
+      "title": "Cpus",
+      "type": "number"
+    },
+    "tmpfs_size_bytes": {
+      "const": 67108864,
+      "default": 67108864,
+      "title": "Tmpfs Size Bytes",
+      "type": "integer"
+    },
+    "stdout_limit_bytes": {
+      "const": 1048576,
+      "default": 1048576,
+      "title": "Stdout Limit Bytes",
+      "type": "integer"
+    },
+    "stderr_limit_bytes": {
+      "const": 1048576,
+      "default": 1048576,
+      "title": "Stderr Limit Bytes",
+      "type": "integer"
+    },
+    "junit_limit_bytes": {
+      "const": 4194304,
+      "default": 4194304,
+      "title": "Junit Limit Bytes",
+      "type": "integer"
+    },
+    "transport_stdout_limit_bytes": {
+      "const": 8388608,
+      "default": 8388608,
+      "title": "Transport Stdout Limit Bytes",
+      "type": "integer"
+    },
+    "transport_stderr_limit_bytes": {
+      "const": 65536,
+      "default": 65536,
+      "title": "Transport Stderr Limit Bytes",
+      "type": "integer"
+    },
+    "startup_grace_seconds": {
+      "const": 5.0,
+      "default": 5.0,
+      "title": "Startup Grace Seconds",
+      "type": "number"
+    },
+    "cleanup_timeout_seconds": {
+      "const": 5.0,
+      "default": 5.0,
+      "title": "Cleanup Timeout Seconds",
+      "type": "number"
+    },
+    "max_test_timeout_seconds": {
+      "const": 30.0,
+      "default": 30.0,
+      "title": "Max Test Timeout Seconds",
+      "type": "number"
+    }
+  },
+  "title": "DockerPolicyV1",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

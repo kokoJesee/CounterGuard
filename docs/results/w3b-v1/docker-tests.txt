@@ -1,0 +1,19 @@
+date: 2026-10-15
+docker_desktop: 4.71.0
+docker_engine: 29.4.1
+engine: linux/x86_64 via WSL2
+security_options: builtin seccomp; cgroup namespace
+runner_kind: temporary offline mechanism-test image, not release image
+base_image_id: sha256:a47223be4e6fd4992eac199ee2ecfc04f58c948e83ffe8f1f83b96b455854ef7
+runner_image_id: sha256:f1e2b9ab84286b38ce96f3370ea5e8f47b246c2881de3daaf5c024041e282564
+runner_python: 3.12.13
+runner_pytest: 9.0.2
+command: pytest -m docker tests/integration/test_docker_runner.py -q
+result: 4 passed in 17.88s
+release_image_build: blocked
+release_image_reason: auth.docker.io token endpoint connection timeout
+input_mount: only digest-pinned source/contract/dependencies and Guard test; repository config/conftest/pytest.ini absent
+interpretation: isolation mechanism and minimal mount passed; official Python 3.13/pytest 8.4.2 image supply chain not accepted
+full_suite: 659 passed in 1058.27s; includes real Docker tests
+fast_suite: 467 passed, 192 deselected in 11.92s
+ruff: passed

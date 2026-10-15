@@ -82,6 +82,16 @@ def test_json_subset_and_input_digest_are_explicit(tmp_path):
         load_project_config(path)
 
 
+def test_module_is_optional_for_inspection_and_strict_when_declared():
+    without_module = ProjectConfig.model_validate_json(json.dumps(project()))
+    with_module = ProjectConfig.model_validate_json(
+        json.dumps(project(targets=[mapping(module="src.pricing")]))
+    )
+
+    assert without_module.targets[0].module is None
+    assert with_module.targets[0].module == "src.pricing"
+
+
 def test_config_size_limit_is_checked_before_parsing(tmp_path):
     path = tmp_path / "project.json"
     path.write_bytes(b" " * (CONFIG_LIMIT + 1))
@@ -90,14 +100,35 @@ def test_config_size_limit_is_checked_before_parsing(tmp_path):
 
 
 @pytest.mark.parametrize(
+    "path",
+    [
+        "CHANGELOG",
+        "LICENSE.txt",
+        ".gitignore",
+        ".github/workflows/ci.yml",
+        ".github/dependabot.yaml",
+        ".circleci/config.yml",
+        ".gitlab-ci.yml",
+    ],
+)
+def test_explicit_auxiliary_control_plane_paths_can_be_declared(path):
+    config = ProjectConfig.model_validate_json(json.dumps(project(ignored_paths=[path])))
+    assert config.ignored_paths == (path,)
+
+
+@pytest.mark.parametrize(
     "payload",
     [
         project(targets=[mapping(), mapping()]),
         project(ignored_paths=["src/pricing.py"]),
         project(ignored_paths=["requirements.txt"]),
+        project(ignored_paths=["assets/logo.png"]),
+        project(ignored_paths=[".github/actions/build/action.yml"]),
         project(extra_command="do something"),
         project(targets=[mapping(source_ref="src/pricing.txt")]),
         project(targets=[mapping(symbol="price.__globals__")]),
+        project(targets=[mapping(module="src/pricing")]),
+        project(targets=[mapping(module="os.__dict__")]),
         project(targets=[mapping(dependency_refs=["dep.py", "dep.py"])]),
     ],
 )

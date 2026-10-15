@@ -35,11 +35,13 @@ testpaths = ["tests"]
 markers = [
   "slow: real subprocesses, integration/e2e flows, or expensive prepared fixtures",
   "fast: in-process checks without a slow fixture or a real child process",
+  "docker: requires Docker Engine and the pinned EvidenceGuard runner image",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = [".task-audits"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

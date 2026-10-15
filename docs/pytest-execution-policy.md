@@ -1,6 +1,6 @@
 # pytest 执行策略
 
-日期：2026-10-14。当前实现覆盖可信本地样本；真实仓库配置接入归 Week 3。
+日期：2026-10-15。可信本地样本继续使用 LocalTrustedExecutor；W3-B 为未知仓库增加 Docker 受控模式。
 
 ## 三个追问的处理
 
@@ -10,7 +10,7 @@
 
 本轮的受控执行器进一步使用 `--noconftest` 和独立空 `pytest.ini`，不沿用仓库的 addopts、required_plugins 或 conftest。环境中的 PYTEST_ADDOPTS / PYTEST_PLUGINS 不传入子进程。测试已放置会报错的 conftest 和指向不存在插件的仓库配置，确认它们不影响受控运行。
 
-Week 3 的真实仓库接入将新增独立的项目执行模式，仍保留自动加载关闭，但允许显式声明插件和 fixture 引导方式：
+需要第三方插件/fixture 的项目最终需要独立显式模式，仍保留自动加载关闭，并固定以下来源：
 
 | 配置项 | 规则 |
 |---|---|
@@ -19,9 +19,11 @@ Week 3 的真实仓库接入将新增独立的项目执行模式，仍保留自�
 | conftest / fixture 引导模块 | 明确选择允许的目录或模块，记录摘要，并在 Docker 内执行 |
 | 其他隐式依赖 | 不自动补齐；缺失时产生执行错误及说明 |
 
-独立 Guard 位于 artifacts 下，不会天然继承 `tests/conftest.py` 中的 fixtures。需要这些 fixtures 的项目必须声明引导方式并通过接入测试；当前纯 JSON 函数契约不能承诺覆盖所有框架测试。Week 3 验收要求包括：必要插件/fixture 成功加载、未声明依赖明确失败、固定配置可重复执行、配置或插件版本变化改变执行清单。
+独立 Guard 位于 artifacts 下，不会天然继承 `tests/conftest.py` 中的 fixtures。W3-B v1 选择更窄的安全边界：只提供受控模式，仍使用空配置、`--noconftest`、`-p no:cacheprovider` 和禁自动插件；不在宿主或容器中安装项目。会依赖项目 conftest、插件、build hook 或安装步骤的仓库不进入 W3-D 首个试点，而不是自动补齐后继续执行。
 
-这些选项管理加载行为。未知仓库代码的执行隔离由 Week 3 Docker backend 提供。
+显式插件模式尚未实现。以后实现时，配置/插件包/fixture 引导模块必须进入授权摘要与 runner 镜像构建记录，并用新的 policy/配置协议版本；不能扩大 docker-policy.v1 的含义。
+
+这些选项管理加载行为。Docker backend 另提供宿主隔离；它们共同生效，任一失败都不回退到本地 pytest。
 
 ### 2. raises 白名单
 

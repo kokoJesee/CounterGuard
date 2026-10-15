@@ -23,6 +23,7 @@ from evidenceguard.protocol import ExperimentProtocol, SplitManifest
 from evidenceguard.replay import ReplayResult
 from evidenceguard.report import CommandReport, ReplayPresentation
 from evidenceguard.repository import RepositorySnapshot
+from evidenceguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
 from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from evidenceguard.scope_explanations import ScopeExplanation
 from evidenceguard.verification_gate import GateResult
@@ -61,6 +62,8 @@ MODELS = {
     "project-config": ProjectConfig,
     "repository-snapshot": RepositorySnapshot,
     "repository-inspection": InspectionReport,
+    "docker-policy": DockerPolicyV1,
+    "docker-execution-authorization": DockerExecutionAuthorization,
 }
 
 if __name__ == "__main__":

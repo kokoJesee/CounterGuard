@@ -240,7 +240,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 | 契约/字段 | 类型与语义 |
 |---|---|
-| ProjectConfig | project_id、唯一 target_id 映射；每项 guard_id/source_ref/symbol/contract_ref，dependency_refs 可空；ignored_paths 仅 .md/.rst |
+| ProjectConfig | project_id、唯一 target_id 映射；每项 guard_id/source_ref/symbol/contract_ref，dependency_refs 可空；`module` 对 W3-A 兼容可空，声明时必须由 source_ref 唯一推导，W3-B 授权要求非空；ignored_paths 仅接受逐路径文档、根级仓库元数据和少量 CI 控制文件 |
 | config_digest | Digest；实际读取配置原字节 SHA-256，不等于作者/审核者认证 |
 | Snapshot.base_commit/head_commit | str 或 null；resolver 仅接受 40 位 SHA-1 commit ID，失败保留能解析的部分 |
 | Snapshot.changes | 已验证相对路径、A/M/D/T 和原/新 mode；关闭 rename 猜测，rename 表示 D+A |
@@ -256,3 +256,18 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。W3-A 新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 D9/D14/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
 
 JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 W3-B 未关闭项见 [安全模型](security-model.md)。
+
+## W3-B Docker 执行授权
+
+W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有修改 `repository-inspection.v1`、RunRecord v1 或任何冻结 scope_v1 文件。
+
+| 契约/字段 | 类型与语义 |
+|---|---|
+| DockerPolicyV1 | 全字段 Literal 常量；固定网络/IPC、只读、UID/GID、capability、CPU/内存/PID/时间和日志上限，项目配置不能调弱 |
+| inspection_digest / config_digest / head_commit | 绑定已复核 Inspection、自身原始配置字节和精确 head；Inspection 仍为 execution_allowed=false |
+| input_pins | 目标的 source/contract/dependency 精确路径、Git object ID 和内容 SHA-256，排序且不重复 |
+| target / contract / test | 绑定 replay role、contract ID/摘要/路径、TargetRef/摘要、测试路径/摘要、case IDs、timeout 和输出根；target.module 必须与配置和 source_ref 推导值相同 |
+| image_digest / policy_digest | 本机实际 Docker image ID 与固定 policy 的规范化摘要；Docker 运行 `--pull=never` |
+| artifact_digest | 去自身摘要后的规范化 JSON SHA-256；执行前后仍须从 Inspection、配置、请求和工作区重建，不能只验自摘要 |
+
+任一上游变化都要求重新物化授权：Inspection/工具源码、配置字节、head 输入、Guard 测试、请求字段、policy 或 image ID。执行时只把 input_pins 与 test_ref 的已核对字节物化到新目录并只读挂载，未声明仓库文件不进入容器。RunRecord 保留 v1 形状，Docker 约束和 image ID 进入归一化 argv；授权本身由后续调度/Registry 作为独立来源保存。历史 W3-A 报告没有当前递归源码清单，不能被 W3-B 补签成授权，必须在新 ID/目录重跑 inspect。

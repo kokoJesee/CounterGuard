@@ -33,16 +33,16 @@
 | A09 部分 | 受控 argv、无 shell、环境 allowlist、空 pytest 配置、禁 conftest 与插件自动发现 | [test_execution.py](../tests/unit/test_execution.py)、[执行策略](pytest-execution-policy.md) | 目标 Python 本身可读写宿主、访问网络；插件隔离不是沙箱 |
 | A10 部分 | 声明式候选只引用可信契约 case，非法 Python/空候选拒绝；AgentContext 不含 fixed/标签/环境 | [test_independent_verifier.py](../tests/unit/test_independent_verifier.py)、[test_verification_gate.py](../tests/integration/test_verification_gate.py) | 实时模型、提示注入、任意生成代码、新 oracle 的正确性 |
 | A11 部分 | 严格 Schema、JSON 子集、摘要、三格式同源及既有 Markdown 转义案例 | [test_cli_contract.py](../tests/unit/test_cli_contract.py)、[test_demo.py](../tests/e2e/test_demo.py) | 巨量/深层 JSON、恶意 XML 的拒绝服务预算、终端控制字符及全面输出注入检查 |
-| W01 未实现 | 不可信目标的文件、网络、CPU/内存/PID、子孙进程隔离 | W3-B 待验收 | 当前禁止把未知仓库交给 LocalTrustedExecutor；Docker 不可用不降级执行 |
+| W01 部分实测 | 仅挂载摘要绑定的最小输入；不可信目标的文件、网络、CPU/内存/PID、子孙进程隔离 | [W3-B 真实攻击 fixture](progress/w3b.md) | 固定策略机制通过；正式基础镜像因 registry 网络未完成供应链复验，未知试点仍未放行 |
 | W02 部分实现 | Git base/head、浅克隆、diff 路径、子模块、Git 配置和仓库链接边界 | [W3-A 安全模型与 fixture](security-model.md)；repository / change_analysis / project_config 测试 | 普通受限 profile 只读可用；worktree 等布局、恶意并发原子性、Git 原生解析器资源隔离与全面 fuzz 未关闭；影响不明仍 unknown |
-| W03 未实现 | 真实项目声明配置、插件、conftest、依赖安装/build hooks | W3-A/B 待实现 | 仓库配置与安装过程也是代码；全部进入受限执行边界，不能只隔离测试函数 |
+| W03 部分实测 | 真实项目声明配置、插件、conftest、依赖安装/build hooks | W3-B 空配置、禁插件/conftest 的真实容器 fixture | v1 明确拒绝依赖这些机制的项目；显式锁定插件模式未实现，不允许自动安装 |
 | W04 未实现 | Registry 权限/状态、CI 凭据/上传、公开报告、供应链和多平台矩阵 | W3-C / W4 待实现 | 本地 hash 不能替代发布签名；本机 wheel 成功不等于跨平台或 CI 安全 |
 
 ## W3 开工与准入
 
 W01–W04 是未关闭事项，不因 D14 MVP 验收通过而关闭。W3 开始时，把每项拆成 `docs/security-model.md` 中的可信资产、攻击者能力、实现责任模块、攻击 fixture、预期拒绝和实测记录；新发现的边界追加 ID，不把“未测”改成空白。
 
-在首次运行未知仓库前，W3-A/B 至少必须证明：仓库引用不会越过允许的挂载边界；缺失 base/head/不明 diff 返回 unknown；恶意目标不能访问宿主私有文件/网络或写只读挂载；资源及日志上限生效；超时后子孙进程不能遗留；未声明插件/fixture 明确失败；依赖安装不在宿主执行。每项要有可重复命令、失败时证据和实现版本；这些是待完成的准入条件，**当前没有通过记录**。
+在首次运行未知仓库前，W3-A/B 至少必须证明：仓库引用不会越过允许的挂载边界；缺失 base/head/不明 diff 返回 unknown；恶意目标不能访问宿主私有文件/网络或写只读挂载；资源及日志上限生效；超时后子孙进程不能遗留；未声明插件/fixture 明确失败；依赖安装不在宿主执行。最小输入挂载、隔离与失败语义已有临时缓存基础镜像的重复记录；**正式 runner 镜像的同组复验仍未通过**，因此首次未知仓库准入继续关闭。
 
 只有检查点全部通过才允许 W3-D 未知仓库试点；失败时保留诊断并停止该类执行，不用可信本地模式绕过。Registry/CI 接入前再关闭 W04 对应项。此流程不改变 scope_v1 的标签、指标或历史验收。
 

@@ -1,12 +1,16 @@
 # W3 安全模型与准入记录
 
-基线：本地 MVP tag `v0.1.0`（`54b39d9`）；W3-A 增加只读检查，W3-B 的 Docker 执行尚未实现。[攻击面清单](attack-surface-checklist.md) 继续保留未关闭事项。本页不是通用沙箱或全面安全认证。
+基线：本地 MVP tag `v0.1.0`（`54b39d9`）；W3-A 增加只读检查，W3-B 源码版增加独立授权与 Docker 受限执行。[攻击面清单](attack-surface-checklist.md) 继续保留未关闭事项。本页不是通用沙箱或全面安全认证。W3-B 的隔离机制已用本机缓存基础镜像实测，正式 runner 因 Docker Hub 网络不可达尚未完成供应链验收，不能把这次结果写成发布镜像通过。
 
 ## 资产、输入和信任
 
 可信：本机 Python、Pydantic、Git 可执行文件、调用者的 PATH/OS、工具源码与工作区权限。不可信：仓库的 Python、Git 配置/hooks、路径、引用、对象数据，以及可能来自仓库的项目配置。显式选择配置文件不等于它已经过语义审核。
 
-保护宿主文件/凭据、历史产物、冻结数据、来源关联和“未执行”的语义。W3-A 只产生改动候选；所有报告与目标均为 execution_allowed=false，execution_outcome=not_run。没有 Guard 调度、Scope 判定、依赖安装、pytest 或目标模块导入。
+保护宿主文件/凭据、历史产物、冻结数据、来源关联和“未执行”的语义。W3-A 只产生改动候选；`InspectionReport` 与 `TargetImpact` 的 Schema 把 `execution_allowed` 定义为 `const false`，代码中没有将其置真的路径。ready 不会翻转开关。
+
+W3-B 使用另一份 `docker-execution-authorization.v1`。只有可信宿主控制面调用 `authorize_docker_execution`，同时复核当前检查器源码、Inspection 自摘要、配置原字节、ready/affected 且无不确定项、head 输入 Git/内容 pin、物化工作区、Guard 测试、精确 replay 请求、固定 Docker policy 和本地镜像 ID，才产生一次请求绑定。配置必须显式声明由 `source_ref` 唯一推导出的 Python `module`，防止执行时导入另一个可见模块。DockerExecutor 启动前和退出后都从这些可信来源重建授权；仅给 JSON 重算自摘要不够。仓库配置、被测 Python 和 Inspection 本身均不能授权，Docker 不可用或镜像身份不符也不会回退到 `LocalTrustedExecutor`。
+
+这里的“可信宿主控制面”是进程内信任假设：当前库函数没有用户身份、Registry 角色或签名认证。W3-C/W4 必须限制谁能调用授权路径并保存授权来源；在那之前，不能把任意拥有宿主 Python 执行权的调用者视为已鉴权。
 
 ## W3-A 的具体控制
 
@@ -28,9 +32,32 @@
 | 元数据 | 每次目录遍历 16384 项；合成引用 2048；普通 SHA-1、ASCII heads/tags 与 HEAD/祖先语法 |
 | 对象 | 存储文件合计 128 MiB；映射文件单个 1 MiB、累计读 8 MiB |
 | Git 输出/时间 | 单次 stdout 2 MiB、stderr 64 KiB；单进程 5 秒，启动前核对 30 秒检查预算；超限 unknown |
-| 影响范围 | 精确 source/contract/dependency refs；只显式忽略 .md/.rst；其他未映射改动 unknown |
+| 影响范围 | 精确 source/contract/dependency refs；ignored_paths 必须逐路径声明，且只接受文档、根级许可证/变更日志/仓库元数据和少量 CI 控制文件；其他未映射改动 unknown |
 
 ready 只代表指定提交可读且声明映射覆盖当前改动，不证明符号存在、契约业务语义、配置受信、依赖完整或 Guard 适用。unaffected 不是 Scope 的 inapplicable。删除/缺失 head 输入 unknown；新目标/契约仍需后续人工审核及真实验证。
+
+一个 PR 同时修改源码和 `.github/workflows/ci.yml` 时，只有配置把这个**精确路径**放入 `ignored_paths` 才得到 affected/ready；没有声明则 unknown。允许声明的是直接位于 `.github/workflows/` 的 yml/yaml、`.github/dependabot.yml|yaml`、`.circleci/config.yml`、根级 `.gitignore`/CI 元数据，以及文档/许可证/变更日志等有限集合。`.github/actions/`、图片、requirements、构建脚本仍是 unknown，不能用宽泛 glob 隐藏。这里的 ignore 表示“本次文件影响映射不参与目标语义”，不表示文件可信。
+
+## fsck 实测与 W3-D 仓库规模
+
+[原始 JSON](results/w3b-v1/fsck-benchmark.json) 使用与 W3-A 相同的 `fsck --full --strict --no-reflogs --no-dangling <base> <head>`，在 Windows 11、Git 2.53.0.windows.2 上各跑 5 次：
+
+| 可达对象 | loose 最大耗时 | packed 最大耗时 | 是否触及 5 秒 |
+|---:|---:|---:|---|
+| 1,003 | 493.51 ms | 256.69 ms | 否 |
+| 5,003 | 1,276.50 ms | 190.10 ms | 否 |
+| 10,003 | 2,112.88 ms | 178.24 ms | 否 |
+| 16,003 | 2,088.14 ms | 130.60 ms | 否 |
+
+当前仓库为 838 个 loose 对象，最大 391.21 ms。**本机没有测到“多少对象必然接近 5 秒”的阈值**；同样对象数在 loose/packed 下相差一个数量级，缓存、对象大小和文件系统也会改变结果，不能把对象数拟合成通用承诺。W3-D 不选 pandas 量级仓库；首个试点限定为存储不超过 64 MiB、loose 元数据不超过 10,000 项，并要求在实际机器按同命令预跑 5 次、最大值不超过 2.5 秒。packed 仓库也必须预跑，不能因目录项少就跳过。超出该准入返回 unknown 或更换更小试点，不提高 5 秒标准。
+
+## W3-B Docker 固定策略
+
+`docker-policy.v1` 的字段均为 Literal 常量，不接收项目配置覆盖：network/ipc none、只读根文件系统与工作区 bind、UID/GID 65532、drop ALL capabilities、no-new-privileges、64 PID、256 MiB 内存且不使用额外 swap、1 CPU、64 MiB `/tmp` tmpfs、30 秒测试上限，以及 stdout/stderr/JUnit/传输上限。镜像必须按本地 `sha256:` image ID 存在，运行使用 `--pull=never`；未传宿主环境、凭据、Docker socket或其他宿主目录。
+
+工作区 bind 的宿主来源不是仓库根，而是本次运行中新建的最小目录；它只含授权 pin 的 source/contract/dependency 和 Guard test，并在复制时再次核对摘要。未声明文件、项目配置、`.git`、`conftest.py` 和 `pytest.ini` 不进入 mount；因此它们不只是在 pytest 参数层被忽略，而是在文件系统层不可见。
+
+容器 entrypoint 只接受严格 base64 JSON manifest，自建空 pytest.ini，保持插件自动发现关闭，使用 `--noconftest -p no:cacheprovider --capture=no`，并以进程组终止超时/日志洪泛。Docker PID 1 退出后容器删除；宿主还有独立墙钟与传输上限并尝试 `docker rm -f`。真实 fixture 已在 WSL2/Linux engine 上读取 `/proc` 和 cgroup 值，验证非 root、只读写边界、无网络、CapEff=0、NoNewPrivs=1、CPU/内存/PID限制、宿主秘密不在环境、恶意 conftest/pytest.ini 不加载、超时子孙清理和日志洪泛不成为 pass。详见 [W3-B 记录](progress/w3b.md)。
 
 不支持的合法布局/格式或缺失历史 unknown；越界/链接/损坏对象拒绝（退出 5），不自动修复、拉取或回退到全仓执行。过大仓库或不能通过 strict fsck 的旧对象也可能被保守拒绝，不宣称支持所有 Git 仓库。
 
@@ -44,8 +71,8 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 | W02-D | 缺提交、浅克隆、packed refs、损坏对象、引用变化 | test_repository.py | 不补历史/网络；损坏拒绝、变化 unknown |
 | W02-E | 输出/时间超额、含凭据 stderr | test_repository_limits.py 的外部进程故障注入 | 固定原因码；不是实际恶意 Git fuzz |
 | W02-F | dirty tree、重复读、三格式 | 真实 CLI；progress/w3a.md、results/w3a-v1 | 仓库字节/mtime 不变，未导入目标 |
-| W01 | 文件/网络、CPU/内存/PID、子孙进程隔离 | W3-B Docker 待实现 | 未通过，未知代码执行仍禁止 |
-| W03 | 插件/conftest、安装/build hooks | W3-B 待实现 | 未通过，当前未加载/安装/执行 |
+| W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | runners/docker、entrypoint；真实 test_docker_runner.py | 机制实测通过；正式基础镜像拉取/构建尚未通过，发布准入保持开放 |
+| W03 | 插件/conftest、安装/build hooks | 固定空配置、禁自动插件/conftest；容器内不安装项目 | v1 以明确不支持来关闭隐式加载；需要插件/fixture/安装的项目拒绝进入试点 |
 | W04 | Registry/CI 权限与状态、公开日志 | W3-C/W4 待实现 | 未通过，inspect 不直接授权调度 |
 
 ## 剩余风险与准入
@@ -54,6 +81,6 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 路径/元数据检查不是 OS 原子快照；引用变化检测不证明抵抗恶意替换并恢复、权限攻击或全部 TOCTOU。摘要和 fsck 不认证作者/仓库身份，也不消除 SHA-1 与工具链的信任假设。
 
-W3-B 必须用攻击 fixture 验收非 root、只读挂载/根文件系统、临时写目录、禁网、CPU/内存/PID/时间/日志上限、删除 capabilities、无宿主凭据和超时清理；配置/插件/安装也须覆盖。Git 控制面是否迁入受限环境需明确并实测，当前未做 OS 资源隔离。
+W3-B 的 Docker 限制保护宿主，不证明容器内被测代码诚实。目标与 pytest 位于同一解释器，恶意目标可能干扰 pytest/JUnit；严格 envelope 和宿主重建能防止畸形/超限输出被当成通过，却不是远程证明或独立 oracle。Docker daemon、WSL2/内核、runner 基础镜像和宿主控制面仍是可信计算基。Git 检查仍在宿主受限进程中执行，没有迁入容器。
 
-W3-D 只有在 W3-A/B 待关闭项全部有实现版本、命令及实测记录后才能执行未知仓库；W3-C/W4 再关闭 Registry/CI 项。Docker 不可用或检查失败时，不以本地执行器替代。
+W3-D 只有在正式 `python:3.13` runner 成功构建、记录基础镜像来源和最终 image ID、重复跑过同一攻击 fixture 后才执行未知仓库；本轮临时镜像只说明隔离机制在本机有效。W3-C/W4 再关闭 Registry/CI 项。Docker 不可用或检查失败时，不以本地执行器替代。

@@ -6,10 +6,8 @@ import importlib.metadata
 import importlib.util
 import math
 import os
-import platform
 import re
 import subprocess
-import sys
 import time
 import uuid
 import xml.etree.ElementTree as ET
@@ -29,6 +27,7 @@ from evidenceguard.models import (
     TargetRef,
 )
 from evidenceguard.path_limits import require_run_directory
+from evidenceguard.runners.base import PreparedRun, ProcessAdapter
 
 DEFAULT_TIMEOUT_SECONDS = 30.0
 
@@ -117,22 +116,6 @@ class PytestRunRequest:
 
 
 @dataclass(frozen=True, slots=True)
-class _PreparedRun:
-    run_id: str
-    cwd: Path
-    test_ref: str
-    run_dir: Path
-    stdout_path: Path
-    stderr_path: Path
-    junit_path: Path
-    stdout_ref: str
-    stderr_ref: str
-    junit_ref: str
-    known_case_ids: tuple[str, ...]
-    contract_ref: str | None
-
-
-@dataclass(frozen=True, slots=True)
 class _JunitResult:
     case_results: tuple[CaseResult, ...]
     problems: tuple[str, ...]
@@ -147,68 +130,45 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
     runs become ``process_error``.
     """
 
-    pytest_version = require_pytest()
+    from evidenceguard.runners.local import LocalTrustedExecutor
+
+    # Resolve the patched object at call time so the historical tests and
+    # trusted-local callers keep their exact interception seam.
+    return LocalTrustedExecutor(process_runner=subprocess.run).execute(request)
+
+
+def _execute_with_adapter(
+    request: PytestRunRequest,
+    adapter: ProcessAdapter,
+) -> RunRecord:
+    """Share output persistence and JUnit semantics across execution backends."""
     prepared = _prepare_run(request)
-    argv = (
-        sys.executable,
-        "-m",
-        "pytest",
-        prepared.test_ref,
-        "-c",
-        _workspace_ref(prepared.run_dir / "pytest.ini", prepared.cwd, "pytest config"),
-        "--noconftest",
-        "-q",
-        "--junitxml",
-        prepared.junit_ref,
-    )
-    environment = _controlled_environment(request.target, prepared.contract_ref)
     started_at = datetime.now(UTC)
     started_monotonic = time.monotonic()
-    pytest_exit_code: int | None
     case_results: tuple[CaseResult, ...] = ()
-    error_detail: str | None = None
+    raw = adapter.execute_process(request, prepared)
 
-    try:
-        completed = subprocess.run(
-            argv,
-            cwd=prepared.cwd,
-            env=environment,
-            capture_output=True,
-            timeout=request.timeout_seconds,
-            check=False,
-            shell=False,
-        )
-    except subprocess.TimeoutExpired as error:
-        stdout = _output_bytes(error.stdout)
-        stderr = _output_bytes(error.stderr)
-        pytest_exit_code = None
-        outcome = RunOutcome.TIMEOUT
-        error_detail = f"pytest exceeded timeout of {request.timeout_seconds:g} seconds"
-    except OSError as error:
-        stdout = b""
-        stderr = f"could not launch pytest: {type(error).__name__}: {error}".encode(
-            "utf-8", errors="replace"
-        )
-        error_detail = f"could not launch pytest: {type(error).__name__}"
-        pytest_exit_code = None
-        outcome = RunOutcome.LAUNCH_ERROR
+    prepared.stdout_path.write_bytes(raw.stdout)
+    prepared.stderr_path.write_bytes(raw.stderr)
+    prepared.junit_path.write_bytes(raw.junit)
+    pytest_exit_code = raw.pytest_exit_code
+    error_detail = raw.error_detail
+    if raw.terminal_outcome is None:
+        if pytest_exit_code is None:
+            raise RuntimeError("execution adapter omitted both exit code and terminal outcome")
+        if not raw.junit_produced and pytest_exit_code in {0, 1}:
+            outcome = RunOutcome.PROCESS_ERROR
+            error_detail = "pytest did not produce a JUnit report"
+        else:
+            outcome, case_results, error_detail = _classify_completed_run(
+                pytest_exit_code,
+                prepared.junit_path,
+                prepared.known_case_ids,
+            )
     else:
-        stdout = _output_bytes(completed.stdout)
-        stderr = _output_bytes(completed.stderr)
-        pytest_exit_code = completed.returncode
-        outcome, case_results, error_detail = _classify_completed_run(
-            pytest_exit_code,
-            prepared.junit_path,
-            prepared.known_case_ids,
-        )
+        outcome = raw.terminal_outcome
 
     duration_ms = max(0, round((time.monotonic() - started_monotonic) * 1000))
-    prepared.stdout_path.write_bytes(stdout)
-    prepared.stderr_path.write_bytes(stderr)
-    if not prepared.junit_path.exists():
-        # RunRecord references are intentionally non-optional. An empty file is
-        # explicit raw evidence that pytest produced no JUnit report.
-        prepared.junit_path.write_bytes(b"")
 
     return RunRecord(
         run_id=prepared.run_id,
@@ -217,7 +177,7 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
         contract_digest=request.contract_digest,
         target=request.target,
         target_digest=request.target_digest,
-        argv=argv,
+        argv=raw.argv,
         cwd=".",
         started_at=started_at,
         duration_ms=duration_ms,
@@ -231,13 +191,13 @@ def run_pytest(request: PytestRunRequest) -> RunRecord:
         stderr_digest=digest_file(prepared.stderr_path),
         junit_ref=prepared.junit_ref,
         junit_digest=digest_file(prepared.junit_path),
-        python_version=platform.python_version(),
-        pytest_version=pytest_version,
+        python_version=raw.python_version,
+        pytest_version=raw.pytest_version,
         error_detail=error_detail,
     )
 
 
-def _prepare_run(request: PytestRunRequest) -> _PreparedRun:
+def _prepare_run(request: PytestRunRequest) -> PreparedRun:
     cwd = request.cwd.resolve(strict=True)
     if not cwd.is_dir():
         raise ValueError("cwd must be a directory")
@@ -289,11 +249,12 @@ def _prepare_run(request: PytestRunRequest) -> _PreparedRun:
     stdout_path = run_dir / "stdout.txt"
     stderr_path = run_dir / "stderr.txt"
     junit_path = run_dir / "junit.xml"
-    return _PreparedRun(
+    return PreparedRun(
         run_id=run_id,
         cwd=cwd,
         test_ref=test_ref,
         run_dir=run_dir,
+        config_ref=_workspace_ref(run_dir / "pytest.ini", cwd, "pytest config"),
         stdout_path=stdout_path,
         stderr_path=stderr_path,
         junit_path=junit_path,
@@ -487,14 +448,6 @@ def _junit_message(element: ET.Element) -> str | None:
     pieces = [element.get("message", "").strip(), (element.text or "").strip()]
     message = "\n".join(piece for piece in pieces if piece)
     return message[:8000] or None
-
-
-def _output_bytes(output: bytes | str | None) -> bytes:
-    if output is None:
-        return b""
-    if isinstance(output, bytes):
-        return output
-    return output.encode("utf-8", errors="replace")
 
 
 def require_pytest() -> str:

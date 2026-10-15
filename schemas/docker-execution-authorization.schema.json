@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Audit record produced by the trusted admission gate, never by target code.",
+  "properties": {
+    "schema_version": {
+      "const": "docker-execution-authorization.v1",
+      "default": "docker-execution-authorization.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "inspection_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Inspection Digest",
+      "type": "string"
+    },
+    "config_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Config Digest",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "head_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Head Commit",
+      "type": "string"
+    },
+    "target_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Target Id",
+      "type": "string"
+    },
+    "guard_id": {
+      "minLength": 1,
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "input_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "minItems": 2,
+      "title": "Input Pins",
+      "type": "array"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Image Digest",
+      "type": "string"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "role": {
+      "const": "replay",
+      "default": "replay",
+      "title": "Role",
+      "type": "string"
+    },
+    "contract_id": {
+      "minLength": 1,
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/TargetRef"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "test_ref": {
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "known_case_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Known Case Ids",
+      "type": "array"
+    },
+    "timeout_seconds": {
+      "exclusiveMinimum": 0,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "artifact_root_ref": {
+      "minLength": 1,
+      "title": "Artifact Root Ref",
+      "type": "string"
+    },
+    "requested_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Requested Run Id"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "inspection_digest",
+    "config_digest",
+    "project_id",
+    "head_commit",
+    "target_id",
+    "guard_id",
+    "input_pins",
+    "image_digest",
+    "policy_digest",
+    "contract_id",
+    "contract_digest",
+    "contract_ref",
+    "target",
+    "target_digest",
+    "test_ref",
+    "test_digest",
+    "known_case_ids",
+    "timeout_seconds",
+    "artifact_root_ref",
+    "requested_run_id",
+    "artifact_digest"
+  ],
+  "title": "DockerExecutionAuthorization",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

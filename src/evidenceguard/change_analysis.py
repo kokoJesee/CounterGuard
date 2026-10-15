@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Literal
 
 from evidenceguard.digests import digest_file, digest_json_artifact
+from evidenceguard.errors import ArtifactIntegrityError
 from evidenceguard.models import Digest, FrozenModel
 from evidenceguard.project_config import ProjectConfig, RepositoryPath, load_project_config
 from evidenceguard.repository import FileChange, FilePin, RepositorySnapshot, read_repository
@@ -45,6 +46,31 @@ class InspectionReport(FrozenModel):
     execution_allowed: Literal[False] = False
     execution_outcome: Literal["not_run"] = "not_run"
     artifact_digest: Digest
+
+
+def inspection_implementation_digests() -> dict[str, Digest]:
+    """Hash every Python source file in the installed EvidenceGuard package."""
+    package = Path(__file__).parent
+    return {
+        path.relative_to(package).as_posix(): digest_file(path)
+        for path in sorted(package.rglob("*.py"))
+    }
+
+
+def verify_inspection_report(
+    report: InspectionReport, *, require_current_implementation: bool = True
+) -> InspectionReport:
+    """Verify report integrity and, for execution admission, its current code binding."""
+    if digest_json_artifact(report) != report.artifact_digest:
+        raise ArtifactIntegrityError("Repository inspection artifact digest mismatch")
+    if (
+        require_current_implementation
+        and report.implementation_digests != inspection_implementation_digests()
+    ):
+        raise ArtifactIntegrityError(
+            "Repository inspection was produced by a different EvidenceGuard implementation"
+        )
+    return report
 
 
 def analyze_changes(
@@ -100,8 +126,6 @@ def inspect_repository(
     status = (
         "rejected" if snapshot.status == "rejected" else "unknown" if reasons else snapshot.status
     )
-    package = Path(__file__).parent
-    code = {path.name: digest_file(path) for path in sorted(package.glob("*.py"))}
     report = InspectionReport(
         project_id=config.project_id,
         status=status,
@@ -113,7 +137,7 @@ def inspect_repository(
         shallow=snapshot.shallow,
         git_version=snapshot.git_version,
         config_digest=digest,
-        implementation_digests=code,
+        implementation_digests=inspection_implementation_digests(),
         changes=snapshot.changes,
         files=snapshot.files,
         unmapped_paths=unmapped,

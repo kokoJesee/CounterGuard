@@ -23,7 +23,9 @@ uv run evidenceguard inspect --repo D:/repo --base main~1 --head main --config D
 
 ## 映射与结果
 
-每个目标声明 target_id、guard_id、source_ref（.py）、symbol（简单标识符）、contract_ref（.json），可附 dependency_refs。仅这些精确路径的变化确定候选关系；不自动推断依赖。其他改动 unknown；ignored_paths 仅可显式列出 .md/.rst，不能隐藏代码/依赖或已映射输入。
+每个目标声明 target_id、guard_id、source_ref（.py）、symbol（简单标识符）、contract_ref（.json），可附 dependency_refs。`module` 对只读 W3-A 可省略；要进入 W3-B Docker 授权则必须显式填写，并与 source_ref 推导的导入路径完全一致（如 `src/pricing.py` 对应 `src.pricing`）。仅这些精确路径的变化确定候选关系；不自动推断依赖。其他改动 unknown；ignored_paths 必须逐路径声明，且运行时只接受以下窄集合：`.md/.rst` 文档、根级 LICENSE/NOTICE/CHANGELOG/CONTRIBUTING/SECURITY/AUTHORS 族、`.gitignore` 等少量根元数据、直接位于 `.github/workflows/` 的 yml/yaml、Dependabot 和 CircleCI 主配置。它不能隐藏映射输入、requirements、构建脚本、`.github/actions/` 或图片资源，也不接受 glob。
+
+因此源码与 `.github/workflows/ci.yml` 同时变化时：配置精确声明这个 workflow 路径，结果是 source 对应目标 affected 且整体可 ready；未声明时整体 unknown。这个保守默认要求接入者审核每类辅助文件一次，避免工具自行认定任意“非 .py 文件”都与行为无关。
 
 | 退出码 | status / 含义 |
 |---|---|
@@ -32,7 +34,7 @@ uv run evidenceguard inspect --repo D:/repo --base main~1 --head main --config D
 | 4 | unknown：缺历史、不支持布局、未映射或超限等；JSON 保留原因 |
 | 5 | rejected：链接、特殊元数据或对象完整性拒绝；JSON 保留固定原因 |
 
-target.impact 为 affected/unaffected/unknown，不是 Scope 的 applicable/inapplicable。所有结果 execution_allowed=false、execution_outcome=not_run；ready 不表示测试通过、契约有效、符号存在或允许执行。没有 Registry Guard 加载或 pytest 启动。
+target.impact 为 affected/unaffected/unknown，不是 Scope 的 applicable/inapplicable。所有结果 execution_allowed=false、execution_outcome=not_run；这两个字段在 Schema 中是常量，ready 不表示测试通过、契约有效、符号存在或允许执行。W3-B 也不修改它，而是从 ready Inspection、当前配置/源码 pin、精确 replay 请求、固定 Docker policy 和镜像摘要另行生成授权；详见 [安全模型](security-model.md)。
 
 报告绑定请求修订、解析提交、配置原字节 SHA-256、映射文件对象/内容、Git 版本及包源码摘要。读固定提交，不读 dirty tree；不含绝对仓库路径、源码正文或原始 stderr。不为确定性虚构时间，当前只读报告没有 created_at。改变输入得到新摘要，重复读不写仓库。
 

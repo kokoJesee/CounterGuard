@@ -12,6 +12,26 @@ from evidenceguard.models import FrozenModel
 
 CONFIG_LIMIT = 128 * 1024
 _RESERVED = re.compile(r"^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)", re.I)
+_AUXILIARY_ROOT_FILES = frozenset(
+    {
+        ".editorconfig",
+        ".gitattributes",
+        ".gitignore",
+        ".gitlab-ci.yml",
+        ".mailmap",
+        ".travis.yml",
+        "azure-pipelines.yml",
+    }
+)
+_AUXILIARY_ROOT_PREFIXES = (
+    "authors",
+    "changelog",
+    "code_of_conduct",
+    "contributing",
+    "license",
+    "notice",
+    "security",
+)
 
 
 def repository_path(value: str) -> str:
@@ -41,12 +61,41 @@ RepositoryPath = Annotated[
 ]
 Identifier = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$")]
 Symbol = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z_][a-zA-Z0-9_]*$", max_length=128)]
+Module = Annotated[
+    str,
+    StringConstraints(
+        pattern=r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$",
+        max_length=256,
+    ),
+]
+
+
+def is_explicit_auxiliary_path(value: str) -> bool:
+    """Allow exact declarations only for files outside target execution semantics."""
+    path = PurePosixPath(value)
+    folded = value.casefold()
+    if path.suffix.casefold() in {".md", ".rst"}:
+        return True
+    if len(path.parts) == 1:
+        name = path.name.casefold()
+        return name in _AUXILIARY_ROOT_FILES or any(
+            name == prefix or name.startswith(prefix + ".")
+            for prefix in _AUXILIARY_ROOT_PREFIXES
+        )
+    if len(path.parts) == 3 and path.parts[:2] == (".github", "workflows"):
+        return path.suffix.casefold() in {".yml", ".yaml"}
+    return folded in {
+        ".circleci/config.yml",
+        ".github/dependabot.yml",
+        ".github/dependabot.yaml",
+    }
 
 
 class TargetMapping(FrozenModel):
     target_id: Identifier
     guard_id: Annotated[str, StringConstraints(pattern=r"^grd_[a-zA-Z0-9_-]+$", max_length=96)]
     source_ref: RepositoryPath
+    module: Module | None = None
     symbol: Symbol
     contract_ref: RepositoryPath
     dependency_refs: Annotated[tuple[RepositoryPath, ...], Field(max_length=64)] = ()
@@ -57,6 +106,11 @@ class TargetMapping(FrozenModel):
             raise ValueError(
                 "Targets require a .py source and an explicit .json contract reference"
             )
+        source_module = self.source_ref.removesuffix(".py").replace("/", ".")
+        if source_module.endswith(".__init__"):
+            source_module = source_module.removesuffix(".__init__")
+        if self.module is not None and self.module != source_module:
+            raise ValueError("Declared module must be the import path of source_ref")
         if len(set(self.dependency_refs)) != len(self.dependency_refs):
             raise ValueError("Dependency references must be distinct")
         return self
@@ -80,8 +134,11 @@ class ProjectConfig(FrozenModel):
             self.ignored_paths
         ):
             raise ValueError("Ignored paths must be unique and cannot hide a mapped input")
-        if any(not p.endswith((".md", ".rst")) for p in self.ignored_paths):
-            raise ValueError("Only explicitly listed .md/.rst documentation may be ignored")
+        if any(not is_explicit_auxiliary_path(p) for p in self.ignored_paths):
+            raise ValueError(
+                "Ignored paths must be exact documentation, repository metadata, "
+                "or CI control files"
+            )
         return self
 
 

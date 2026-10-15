@@ -8,10 +8,10 @@
 - mvp.yaml 只接受 JSON 语法这一 YAML 子集；不支持通用 YAML 缩进、注释或锚点。完整内容见 [快速开始](quickstart.md)。
 - 标准 Demo 使用录制候选、固定可信模板和本地 fixture，未接入实时模型或任意新 oracle 生成。
 - pytest 是可选 runner extra；基础安装缺少它时，Demo/Pipeline 和执行器提前拒绝执行并提示安装，退出 3，不把缺依赖当作测试违规。检查元数据/模块存在不保证任意损坏安装的功能正常。
-- 当前执行器面向可信本地代码，尚无 Docker/OS 级隔离、网络封锁、资源配额或针对任意子孙进程的安全终止保证。pytest 插件自动发现和 conftest 被隔离，但这不是通用 Python 沙箱。
+- v0.1.0 wheel/tag 的执行器仍只面向可信本地代码。源码开发版 W3-B 已有 Docker 受控模式，只挂载摘要绑定的 source/contract/dependency 与 Guard test，并固定非 root、只读、禁网和资源/日志限制；正式 Python runner 镜像因 Docker Hub 网络不可达尚未完成构建验收，因此未知仓库试点仍未开放。pytest/容器隔离也不是通用 Python 沙箱或结果远程证明。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
 
-W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run；普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git 原生解析器、资源耗尽、TOCTOU 等剩余风险及准入要求见 [安全模型](security-model.md)；W3-B 的 Docker/OS 隔离尚未完成。
+W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run，`execution_allowed` 在类型和 Schema 上恒为 false；W3-B 使用另一份来源重建授权，不翻转该字段。普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git、Docker daemon/WSL2、TOCTOU、容器内恶意目标干扰 pytest，以及正式 runner 供应链等剩余风险见 [安全模型](security-model.md)。
 
 ## 证据能证明什么
 

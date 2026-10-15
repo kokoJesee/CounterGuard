@@ -1,0 +1,167 @@
+{
+  "current_repository": {
+    "fsck": {
+      "max_ms": 391.21,
+      "median_ms": 277.16,
+      "min_ms": 275.88,
+      "p95_ms": 391.21,
+      "runs_ms": [
+        391.21,
+        290.11,
+        275.88,
+        276.5,
+        277.16
+      ],
+      "under_w3a_process_limit": true
+    },
+    "storage": {
+      "count": 838,
+      "garbage": 0,
+      "in-pack": 0,
+      "packs": 0,
+      "prune-packable": 0,
+      "size": 1677,
+      "size-garbage": 0,
+      "size-pack": 0
+    }
+  },
+  "git_version": "git version 2.53.0.windows.2",
+  "interpretation": "Object count alone is not a timeout predictor; loose versus packed storage and host filesystem cache materially change the result. Admit pilots by local preflight margin.",
+  "measurement_date": "2026-10-15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "profile": "fsck --full --strict --no-reflogs --no-dangling <base> <head>",
+  "python_version": "3.13.3",
+  "repeats": 5,
+  "schema_version": "fsck-benchmark.v1",
+  "synthetic": [
+    {
+      "loose": {
+        "max_ms": 493.51,
+        "median_ms": 421.9,
+        "min_ms": 365.61,
+        "p95_ms": 493.51,
+        "runs_ms": [
+          444.81,
+          371.74,
+          365.61,
+          493.51,
+          421.9
+        ],
+        "under_w3a_process_limit": true
+      },
+      "packed": {
+        "max_ms": 256.69,
+        "median_ms": 208.68,
+        "min_ms": 196.98,
+        "p95_ms": 256.69,
+        "runs_ms": [
+          196.98,
+          201.79,
+          208.68,
+          245.13,
+          256.69
+        ],
+        "under_w3a_process_limit": true
+      },
+      "reachable_object_count": 1003,
+      "requested_blob_count": 1000
+    },
+    {
+      "loose": {
+        "max_ms": 1276.5,
+        "median_ms": 1043.63,
+        "min_ms": 897.73,
+        "p95_ms": 1276.5,
+        "runs_ms": [
+          1276.5,
+          1054.66,
+          1043.63,
+          966.28,
+          897.73
+        ],
+        "under_w3a_process_limit": true
+      },
+      "packed": {
+        "max_ms": 190.1,
+        "median_ms": 178.5,
+        "min_ms": 172.71,
+        "p95_ms": 190.1,
+        "runs_ms": [
+          175.34,
+          178.5,
+          172.71,
+          190.1,
+          179.08
+        ],
+        "under_w3a_process_limit": true
+      },
+      "reachable_object_count": 5003,
+      "requested_blob_count": 5000
+    },
+    {
+      "loose": {
+        "max_ms": 2112.88,
+        "median_ms": 1616.59,
+        "min_ms": 1429.06,
+        "p95_ms": 2112.88,
+        "runs_ms": [
+          2112.88,
+          1748.6,
+          1616.59,
+          1429.06,
+          1457.41
+        ],
+        "under_w3a_process_limit": true
+      },
+      "packed": {
+        "max_ms": 178.24,
+        "median_ms": 171.21,
+        "min_ms": 164.0,
+        "p95_ms": 178.24,
+        "runs_ms": [
+          167.54,
+          171.21,
+          164.0,
+          178.24,
+          173.06
+        ],
+        "under_w3a_process_limit": true
+      },
+      "reachable_object_count": 10003,
+      "requested_blob_count": 10000
+    },
+    {
+      "loose": {
+        "max_ms": 2088.14,
+        "median_ms": 1877.57,
+        "min_ms": 1738.6,
+        "p95_ms": 2088.14,
+        "runs_ms": [
+          1738.6,
+          1839.65,
+          2088.14,
+          1877.57,
+          1987.81
+        ],
+        "under_w3a_process_limit": true
+      },
+      "packed": {
+        "max_ms": 130.6,
+        "median_ms": 124.44,
+        "min_ms": 120.58,
+        "p95_ms": 130.6,
+        "runs_ms": [
+          124.44,
+          130.6,
+          123.55,
+          120.58,
+          125.15
+        ],
+        "under_w3a_process_limit": true
+      },
+      "reachable_object_count": 16003,
+      "requested_blob_count": 16000
+    }
+  ],
+  "w3a_single_process_limit_ms": 5000
+}
