@@ -42,6 +42,12 @@ v2 的 `user_guidance` 和同文 `next_step` 明确当前支持、用户动作�
 
 ## 基础 runner 的 legacy 检查
 
+若完整树返回 conftest/配置/fixture 待审，可以另运行 [bootstrap plan](bootstrap-plans.md)，
+分别查看所选目标的候选导入闭包、选中测试投影和全仓测试环境。
+全仓 finding 是保守排查记录，不必然表示选中函数真实依赖 fixture：例如 `TestCase` 方法的 `self`、
+仅含 packaging 节的 setup.cfg、无 pytest 节的 tox.ini 都需按内容复核。
+新计划不会把原预检改成通过，也不授予避开这些文件的执行许可。
+
 ```powershell
 uv run counterguard preflight --repo artifacts/pilot/validators-discovery-v1/repo --revision 6ffd8625ee4272dade063653bff615014bdc4734
 ```

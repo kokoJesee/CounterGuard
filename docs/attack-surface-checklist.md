@@ -40,6 +40,14 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W02/W03 增加[只读 bootstrap 计划](bootstrap-plans.md)：完整提交树 pins 与模块级候选闭包并列，
+包初始化、相对/子模块/条件导入、冲突/遮蔽、动态与资源访问提示、配置节观察、20 次乱序及输出不覆盖，
+见[单元测试](../tests/unit/test_bootstrap_plan.py)。
+[真实 Git 专项](../tests/integration/test_bootstrap_plan.py)中 dirty tree 的依赖和删除的 conftest 均不能替换提交事实；
+包/测试/conftest 内的拒绝执行哨兵从未运行。它不是准入授权，不能进入已有 Guard 模型或 Registry，
+固定 execution_allowed=false 且 CLI 总是返回 4。Docker policy、catalog 与旧 strict profile 语义未改变。
+动态别名、任意副作用/资源和 oracle 独立性仍需审核；通用 Docker bootstrap 与上游 pytest 引导仍未覆盖，W03 保持部分。
+
 新增只读契约草案边界见 [contract-drafts.md](contract-drafts.md)。
 [单元测试](../tests/unit/test_contract_draft.py)覆盖提交来源 pin、20 次稳定结果、字面量类型、
 参数/局部变量与异常名遮蔽、预算、未知 helper/控制流/嵌套调用的拒绝，以及断言覆盖对账。

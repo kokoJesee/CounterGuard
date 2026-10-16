@@ -207,6 +207,10 @@ restricted grammar of existing tests. Unsupported assertions remain explicit; pr
 cannot execute or enter the Registry. The [onboarding trial](docs/results/onboarding-boltons-v1/README.md)
 records a real blocked attempt, while the [roadmap](docs/roadmap.md) identifies remaining support.
 
+[bootstrap plan](docs/bootstrap-plans.md) separates proposed target imports from upstream
+test bootstrap requirements, retaining the full committed-tree provenance. It does not
+authorize execution. Zero runtime dependencies do not imply plugin-free tests.
+
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
 uv run ruff check .

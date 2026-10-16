@@ -1,5 +1,8 @@
 # CLI 与报告约定
 
+`bootstrap plan` 提供[独立 Guard 输入计划](bootstrap-plans.md)：读取提交树，分别列出目标导入闭包、
+草案覆盖及全仓引导需求。计划始终不可执行并返回 4；它不是通用 verify 或契约批准入口。
+
 源码开发版提供 [统一 verify](verify.md)、[Guard 生命周期](guard-lifecycle.md) 和 [runner 发现](runners.md)：`runner list/show` 只读展示审核来源和本机可用性；`verify --runner-id ...` 绑定已审核镜像，仅使用 Docker。当前报告为 `verify-report.v2`，旧 v1 与 `command-report.v1` 保留原契约。`guard transition/history` 使用独立的追加式事件格式。
 
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。

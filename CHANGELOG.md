@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- 新增只读 `bootstrap plan`：模块级候选导入闭包与上游测试环境分层，完整提交 pins、草案未支持项和人工审核要求均保留；不改变旧 strict 预检或授予执行能力。
+- 复核 boltons 收集 hook、配置节与文件级 fixture 待审的真实含义；将受控 pytest 引导明确列为原生测试路线前置，记录旧计时无法完整归因的限制。
+
 - 新增 `contract draft`：从提交内的受限字面量断言/参数化生成未审核、不可执行的 contract-proposal.v1；逐项报告 unsupported，不执行或导入仓库代码，不扩展已有可执行契约。
 - repository-admission.v2 为内部工程前置补充用户下一步、维护者责任与无承诺日期的跟踪落点；读取失败不冒充兼容性判断。
 - 记录真实 boltons 首次接入试走及后续草案复验。首次遇阻时间与完整接入时间分开；没有完成 Evidence/Scope/Shadow，也没有绕过现有准入。

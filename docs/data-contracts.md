@@ -361,3 +361,15 @@ manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重
 批输出不是无上限的 stdout：先 batch-check 每个大小与原 8 MiB 总预算，
 再按预检总字节 + 每条受限头部设定输出上限；每条 body 按长度解析并重算 Git SHA-1，
 仍由提交 pins 的 SHA-256 检查内容。空/binary/重复对象、截断、错头、额外字节、错哈希和大小超限均有回归。
+
+## 只读 bootstrap 计划的依赖
+
+`bootstrap-plan.v1` 不是执行链上的契约/Guard。[输入计划](bootstrap-plans.md)的 artifact_digest
+覆盖除自身外全部字段：提交与完整文件 pins、显式目标/包根/测试函数、模块级候选闭包及边、
+草案 case/unsupported/计数、引导文件的静态观察、原 whole-tree 判断、固定 false 的执行声明、
+缺失能力/下一步和当前工具逐文件源码摘要。没有随机 ID、时间、宿主路径或输出目录参与摘要。
+固定实现和提交的计划可重复生成到不同新目录；既有目录不覆盖。
+
+提交、目标、包根、测试、闭包算法或工具实现变化时新建计划，保留旧计划。
+本层不消费旧 Evidence/Scope，也不回写或重签任何历史执行产物。工具源码变化仍使旧执行链在新验证器下过期；
+需要当前执行结论时按上表在新命名空间重物化，不能据本层“只读”豁免源码绑定。

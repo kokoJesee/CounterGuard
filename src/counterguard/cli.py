@@ -50,6 +50,8 @@ app.add_typer(registry_app, name="registry")
 app.add_typer(runner_app, name="runner")
 contract_app = typer.Typer(no_args_is_help=True, help="Prepare review-only contract proposals.")
 app.add_typer(contract_app, name="contract")
+bootstrap_app = typer.Typer(no_args_is_help=True, help="Plan review-only new-project inputs.")
+app.add_typer(bootstrap_app, name="bootstrap")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
 guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
@@ -103,6 +105,42 @@ def contract_draft_command(
     typer.echo(canonical_json_bytes(proposal).decode())
     if proposal.status != "draft_ready":
         raise typer.Exit(4)
+
+
+@bootstrap_app.command("plan")
+def bootstrap_plan_command(
+    repo: Annotated[Path, typer.Option(help="Read committed files; never import or execute.")],
+    revision: Annotated[str, typer.Option(help="Commit/ref containing target and source test.")],
+    target: Annotated[str, typer.Option(help="One declared module:symbol target.")],
+    import_root: Annotated[str, typer.Option(help="Explicit . or src import root.")],
+    test_ref: Annotated[str, typer.Option(help="Committed upstream test path.")],
+    test_function: Annotated[str, typer.Option(help="Selected top-level test_* function.")],
+    output: Annotated[Path, typer.Option(help="New review plan directory outside target repo.")],
+) -> None:
+    """Separate target import closure from whole-repository test bootstrap requirements."""
+    from counterguard.bootstrap_plan import plan_bootstrap
+    from counterguard.repository import RepositoryProblem
+
+    try:
+        plan = plan_bootstrap(
+            repo,
+            revision,
+            target=target,
+            import_root=import_root,
+            test_ref=test_ref,
+            test_function=test_function,
+            output=output,
+        )
+    except RepositoryProblem as error:
+        _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(plan).decode())
+    # Even a complete static plan needs review and unimplemented execution
+    # capabilities. Exit zero must never be mistaken for generic admission.
+    raise typer.Exit(4)
 
 
 @app.command("preflight")

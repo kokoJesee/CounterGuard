@@ -154,6 +154,8 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 已有回归测试可用 [contract draft](docs/contract-drafts.md)机械起草受限契约提案，逐项保留不支持的断言；提案不可执行，仍需人审。[实际试走](docs/results/onboarding-boltons-v1/README.md)和[接入路线](docs/roadmap.md)分别记录遇阻数据与尚缺能力。
 
+[bootstrap plan](docs/bootstrap-plans.md)进一步分列目标导入闭包与上游测试环境，保留完整提交来源；计划不授予执行权限。零运行时依赖不代表无需 fixture、hook 或测试插件。
+
 ```powershell
 uv run pytest -m "not slow" -q      # 快测：秒级
 uv run ruff check .
