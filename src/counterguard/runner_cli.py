@@ -29,6 +29,7 @@ def _show(runner_id, offline, format):
             typer.echo("  image: " + row["image_digest"])
             typer.echo("  build: " + row["provenance"]["build_receipt_ref"])
             typer.echo("  attacks: " + row["provenance"]["attack_receipt_ref"])
+            typer.echo("  receipt integrity: " + row["receipt_integrity"])
         typer.echo("Image execution count: 0")
     if value["exit_code"]:
         raise typer.Exit(value["exit_code"])

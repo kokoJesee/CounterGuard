@@ -196,6 +196,12 @@ Use `counterguard runner list` to discover reviewed image IDs and their sources,
 then select a stable `--runner-id`. Other projects must meet the explicit
 [admission conditions](docs/project-admission.md).
 
+The [onboarding checklist](docs/onboarding.md) assigns responsibility for contracts,
+bug/fix sources and initial Scope. `preflight --profile minimal-python --import-root src`
+classifies static no-install/no-plugin candidates without authorizing execution.
+The [CI example and Summary export](docs/github-actions.md) currently cover trusted tool
+fixtures; generic project onboarding and live GitHub platform acceptance remain open.
+
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
 uv run ruff check .

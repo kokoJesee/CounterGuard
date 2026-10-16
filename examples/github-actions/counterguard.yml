@@ -1,0 +1,74 @@
+{
+  "name": "CounterGuard controlled CI demo",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "scenario": {
+          "type": "choice", "default": "fixed",
+          "options": ["fixed", "shadow-regression", "active-regression", "unknown"],
+          "description": "Trusted demo only; Active regression intentionally fails the job"
+        }
+      }
+    }
+  },
+  "permissions": {"contents": "read"},
+  "jobs": {
+    "verify": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "env": {
+        "CG_TOOL_SHA": "REPLACE_WITH_REVIEWED_COUNTERGUARD_COMMIT",
+        "CG_IMAGE_ARCHIVE_URL": "${{ vars.COUNTERGUARD_REVIEWED_RUNNER_URL }}",
+        "CG_ARCHIVE_SHA256": "c405aecaa89e465d8b41a50999f4bdbfaada16723eccb007cf7f51a8fd1cd970",
+        "CG_SCENARIO": "${{ inputs.scenario }}"
+      },
+      "steps": [
+        {
+          "name": "Require an audited tool commit and reviewed image delivery",
+          "shell": "bash",
+          "run": "set -euo pipefail\n[[ \"$CG_TOOL_SHA\" =~ ^[0-9a-f]{40}$ ]] || { echo 'Configure an audited tool commit first'; exit 2; }\n[[ \"$CG_IMAGE_ARCHIVE_URL\" == https://* ]] || { echo 'Reviewed image delivery is not configured'; exit 3; }"
+        },
+        {
+          "uses": "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "with": {
+            "repository": "kokoJesee/CounterGuard", "ref": "${{ env.CG_TOOL_SHA }}",
+            "fetch-depth": 0, "persist-credentials": false, "path": "tool"
+          }
+        },
+        {
+          "uses": "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065",
+          "with": {"python-version": "3.13"}
+        },
+        {
+          "name": "Install the trusted tool checkout only",
+          "run": "python -m pip install './tool[runner]'"
+        },
+        {
+          "name": "Load exact reviewed archive; do not rebuild or trust tags",
+          "shell": "bash",
+          "run": "set -euo pipefail\ncurl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --max-time 300 --max-filesize 536870912 --output \"$RUNNER_TEMP/runner.tar\" \"$CG_IMAGE_ARCHIVE_URL\"\nprintf '%s  %s\\n' \"$CG_ARCHIVE_SHA256\" \"$RUNNER_TEMP/runner.tar\" | sha256sum --check -\ndocker load --input \"$RUNNER_TEMP/runner.tar\"\ncounterguard runner show root-pytest8 --format text"
+        },
+        {
+          "name": "Verify trusted demo through Docker and preserve its exit code",
+          "run": "python tool/scripts/run_ci_fixture.py --workspace ci-run --scenario \"$CG_SCENARIO\""
+        },
+        {
+          "name": "Write allowlisted Step Summary even on failure",
+          "if": "${{ always() }}",
+          "shell": "bash",
+          "run": "if [ -f ci-run/public/summary.md ]; then\n  cat ci-run/public/summary.md >> \"$GITHUB_STEP_SUMMARY\"\nelse\n  printf '# CounterGuard\\n\\nPrerequisite or setup failed; verification was not completed.\\n' >> \"$GITHUB_STEP_SUMMARY\"\nfi"
+        },
+        {
+          "name": "Upload public projections only, even on failure",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "counterguard-summary-${{ github.run_id }}-${{ github.run_attempt }}",
+            "path": "ci-run/public/summary.json\nci-run/public/summary.md",
+            "if-no-files-found": "error", "retention-days": 7, "include-hidden-files": false
+          }
+        }
+      ]
+    }
+  }
+}

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 新增 `preflight --profile minimal-python --import-root .|src`：静态检查免安装/免插件候选条件，逐项说明缺失前置；新增用户接入责任清单，不把候选分类当作通用 verify 支持。
+- runner 发现与解析逐项核对随包交付的构建/攻击收据，缺失、篡改或重签时在 Docker 探测前拒绝；catalog/review 的既有 pin 保留。
+- 新增 `ci-report`，由 verify JSON 生成受限公开 Summary 并保留退出码；提供人工触发的受控 GitHub Actions 示例。真实项目的可携带来源/权限、镜像公开交付和远程平台验收仍未关闭。
+
 - 新增 `runner list/show`：展示精确 image ID、构建/攻击复验来源与本机可用性；`verify --runner-id` 只使用安装包目录中已审核的镜像，未知原始 ID 不再被接受。
 - `verify-report.v2` 绑定 runner review；固定 validators 的仓库 Guard、src/pytest9 和精确快照 Scope 接入统一入口，采用新运行目录与授权 v3，不修改历史 owner 提交或产物。
 

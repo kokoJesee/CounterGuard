@@ -1,5 +1,41 @@
 # 候选仓库的只读执行预检
 
+## 免安装/免插件候选检查
+
+```powershell
+counterguard preflight --repo <repo> --revision <full-commit-sha> --profile minimal-python --import-root src
+# 根布局显式使用 --import-root .
+```
+
+新增 `repository-admission.v1` / `minimal-python.v1`，默认 legacy 预检保留。
+它读取完整已提交树，复用 Git 对象完整性、文件/总量/时间预算；不 checkout、import、运行测试或安装依赖。
+工作树里删除 conftest 或更改依赖声明不能隐藏提交中的事实。
+
+| 可机器检查的条件 | 不满足时对应前置 |
+|---|---|
+| 顶层 pyproject 显式 `project.dependencies=[]`，没有 dynamic dependencies；嵌套项目、legacy setup 元数据不得有未审核语义 | ③依赖安装或补足明确元数据；嵌套项目需另行审核 |
+| 包根显式为 `.` 或 `src`；普通带 `__init__.py` 包/顶层模块，可解析且没有已知自定义 import 路径、namespace 或标准库/pytest 遮蔽；声明的 Python 约束不排除已审核 3.13.16（不支持的版本表达式 unknown） | ①导入布局/闭包 |
+| 所有 Python imports 静态指向已列出的本地模块、检查器固定的 Linux Python 3.13 标准库词汇，或测试中的 pytest | ③第三方依赖；无法解析时 unknown，先审核①再判断是否需③ |
+| 完整仓库无 conftest、pytest_plugins、required_plugins、显式 `-p`、未支持的 pytest 配置；声明的 pytest 版本/导入路径符合该候选 profile | ②受控 pytest 引导，或明确配置/runner 兼容性审核 |
+| 测试只用独立断言/标准库，允许 pytest raises/approx 和 literal parametrize；无 fixture 参数、间接参数化、自定义 marker/decorator/hook、异步测试、未审核的 pytest API/别名 | ②；本检查比“pytest 内置功能都能用”更窄 |
+| 无 native 扩展；没有已知动态执行/import、importlib/runpy 加载框架或未解析的 Python | ①/③独立审核；动态行为并不能由静态检查穷尽 |
+
+可选 extras 会显示但不安装；扫描完整提交树的 imports，即使只出现在开发脚本也会列为待审。
+检查器是保守的候选分类器，不是完备的 Python 依赖/fixture 证明器；固定词汇之外的标准库模块也可能 unknown。
+它不读取或执行 build backend，build-system 的存在不意味着目标需要安装。
+
+返回 0/eligible_candidate 表示上述**可见条件**未发现阻塞，工程上可以优先只做①+④；
+这不是“只做两项就一定能运行”的语义证明。输出仍为 execution_allowed=false、verify_supported=false，
+④还包括真实契约、B/F、Docker 捕获、Guard、初始精确快照 Scope 和人工审核，尚未通用实现。
+在受限 Docker 中实际执行生成的契约并验证依赖闭包仍是后续硬门槛。
+
+返回 4/blocked 或 unknown 时，每项 finding 包含路径、原因、`prerequisite` 和 `next_step`：
+缺失元数据/映射可以提供材料后在新提交重查；确需第三方依赖或 fixture 的项目当前不支持，需要③/②。
+可以提交独立且经过审核的目标/契约闭包重新评估是否确实不需要这些能力，但不能仅隐藏原配置、
+删除依赖声明、添加忽略项或用本地执行绕过。链接/对象等安全拒绝仍返回 5。
+
+## 基础 runner 的 legacy 检查
+
 ```powershell
 uv run counterguard preflight --repo artifacts/pilot/validators-discovery-v1/repo --revision 6ffd8625ee4272dade063653bff615014bdc4734
 ```

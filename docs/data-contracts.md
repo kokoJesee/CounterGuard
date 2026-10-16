@@ -1,5 +1,20 @@
 # 数据契约与摘要边界
 
+## 静态接入、runner 收据与 CI 投影
+
+| 格式 | 新增语义 | 上游变化与重算 |
+|---|---|---|
+| repository-admission.v1 / minimal-python.v1 | 完整提交树/显式导入根的静态兼容分类；finding 绑定前置与下一步，verify_supported/execution_allowed 固定 false；无运行时间 | 提交/导入根、检查器实现或 scanner Python 变化→新报告。它不作为 Evidence/Guard 授权来源 |
+| runner-discovery.v2 | 保留 catalog/review v1 pin；先逐项核对包内 build/attacks 摘要及 image/lock/version/攻击结论，再 image inspect；收据坏则整体退出5 | 发现结果只描述本次本机状态，不复用为授权。catalog/review/构建记录的字节未变，无需重建 runner；新审核语义需新 catalog版本/pin |
+| github-summary.v1 | 输入 verify v1/v2 的自摘要、decision/count/exit一致性校验后进行有限字段投影；summary.json 与 Markdown 同源 | 输入 report 变化→新公开目录；投影器变化→新投影。source_report_digest 不是身份/执行认证；不重签原 report |
+| github-summary-failure.v1 | 原报告缺失/损坏/超预算时的固定安全失败，exit=5；不含原错误或路径 | 修复后另用新目录，不覆盖失败记录 |
+
+runner 的四份收据以原字节进入包，review 仍固定原规范化摘要；公开 docs 引用只是来源标签，
+运行时不联网或从目标仓库读取它。安装包内的 catalog 与所有收据核验是发现/解析的共同前置。
+新实现改变全包 .py 摘要：当前源码绑定的 Inspection/授权/仓库 Evidence/Guard 需在新命名空间重物化；
+不修改历史记录。本轮真实 CI 验证使用全新可信 fixture 捕获，不把旧 validators 产物补签为当前有效。
+冻结 scope_v1 的标注、实现、协议与期望值不变。
+
 ## W3-D 只读准入报告
 
 `repository-preflight.v1` 是工具生成的静态完整提交树报告，包含 exact commit、逐文件 pins、固定执行 profile、findings/warnings、依赖声明和实际源码摘要；无执行时间，execution_allowed=false/not_run。eligible_candidate 不等于 Inspection.ready 或执行许可。原始 Git/配置不确定性不能转换成 applicable/inapplicable。

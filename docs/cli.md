@@ -77,6 +77,19 @@ compile 自检失败时，CLI 会先输出实际 Run，再以 3 退出；这是�
 
 标准 Demo 使用已录制请求和显式 pin 的可信本地源码/契约。它不访问网络，不依赖 API key，不使用仓库旧 artifacts、未记录的 pytest 插件或 conftest。pytest/Python/Pydantic/Typer 版本记录在 Pipeline 中；改变环境后使用新 workspace。任意仓库代码需要独立的隔离与准入，当前受限 Docker 接入见下文。
 
+## 新项目分类与 CI 输出
+
+```powershell
+counterguard preflight --repo <repo> --revision <full-sha> --profile minimal-python --import-root src
+counterguard runner list
+counterguard ci-report --report <verify-output>/report.json --output <new-public-output>
+```
+
+新 profile 只做静态候选分类，不给执行授权；findings 指向①导入、②pytest 引导或③安装，
+④通用仓库 Guard/bootstrap 仍需实现与审核。人工责任见[首次接入](onboarding.md)。
+runner 发现逐项核对包内构建/攻击收据，再探测精确 image ID；损坏时退出 5。
+CI 输出保留 verify 退出码，仅导出受限公开字段；详见 [CI](github-actions.md)。
+
 ## fork MAC 试点专用入口
 
 当前 `counterguard preflight` 的默认命令仍对应正式 v1 的 pytest8.4.2/root-imports，

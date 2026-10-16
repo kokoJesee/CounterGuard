@@ -77,6 +77,14 @@ daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名
 
 ## 统一 verify 的当前边界
 
+[接入清单](onboarding.md)把首次准备拆为六项人工决策；没有用户实测能支持“30 分钟内接入”或项目覆盖比例。
+新 minimal-python 静态检查只分类免安装/免插件候选，不能穷尽动态 Python 行为，也不补齐通用 Guard/Docker bootstrap。
+初次没有合法反例时只有经审核的精确快照边界；新的源码版本仍可能频繁 unknown。
+
+[CI Summary](github-actions.md)是有限字段的展示投影，不是通用脱敏器或执行认证。
+受控 workflow 没有实际 GitHub 运行记录；它不解决本机绝对路径来源的可携带交付、远程 Active 权限或签名/撤销。
+本地真实 Docker 测试通过不能当作 Beta CI/跨平台验收完成。
+
 统一入口支持 `guard.v1` / `project-config.v1` 根布局已审核快照，以及固定 validators owner head 的 `src`/pytest9 profile。同一文件的其他版本、其他项目的依赖闭包和通用学习 Scope 绑定仍为 unknown；没有为推进而降低既有 Docker 或契约来源约束。生命周期是本地追加审阅记录，不提供用户身份、角色、签名或防回滚保证，远程 CI 授权仍未实现。
 
 已审核 runner 的目录随安装包固定摘要，只读发现不会构建、拉取或运行镜像。当前未发布 OCI 镜像仓库或公开离线归档；其他机器仍需取得或重新审核构建产物。没有 Docker/镜像时明确 unavailable，不能用相同 tag 或任意新 ID 代替。

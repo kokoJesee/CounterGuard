@@ -28,6 +28,17 @@ validators 固定仓库使用 `--runner-id validators-pytest9`。两者属于不
 
 目录是安装包中的 `data/runner-catalog.v1.json`，其完整内容摘要固定在可信宿主代码中；各 review 另有自摘要。只改目录并重算自摘要不能批准新镜像。`verify-report.v2` 记录选中的 runner ID、image ID 和 review digest，各行也绑定同一审核记录。目录只信任当前安装的 CounterGuard；它不是签名服务或用户身份系统。
 
+`runner-discovery.v2` 在探测任何本地镜像**之前**，逐项读取安装包内 `data/runner-receipts.v1/` 的四份 build/attacks 收据。
+先比较各收据的规范化摘要与已固定 review，再交叉核对 image ID、lock digest、基础 registry digest、runner 源码、pytest 版本和四项攻击 accepted/exit/passed/log digest。
+收据缺失、篡改、重算自摘要或超出预算均导致整体退出 5；不输出部分 available。
+`resolve_runner` 走同一核验，`--image` 也不能绕过。轮包内带收据，不依赖源码仓库的 docs 路径或网络获取。
+输出的 docs 引用是公开来源地址，实际核验的是包内对应副本；两者发布时应逐字节一致。
+
+因此，available 的准确含义是：**安装包固定审核链/收据完整，而且本机 image inspect 的精确 ID 相同**。
+发现命令没有重跑攻击或读取已归档原日志，只核对审核记录绑定的日志摘要；它也不认证审核人的身份。
+若攻击者连可信 CounterGuard Python 代码及其 pin 一起替换，本机制不能检测安装包整体失陷。
+镜像身份只是必要边界之一，实际执行仍需来源、Scope、状态和固定 Docker policy 的独立授权。
+
 两项 profile 的来源见 [构建/复验记录](results/runner-catalog-v1/README.md)。本轮没有发布 OCI 仓库或大型镜像归档下载服务。其他机器若没有这些 image ID，会明确显示 unavailable，不把某个同名 tag 当成已安装或已审核。
 
 需要自行重建时，使用现有 Dockerfile（pytest9 通过 `--build-arg PYTEST_VERSION=9.0.3`），在新目录运行 `scripts/record_runner_build.py` 和 `scripts/accept_pilot_runner.py`。新 image ID 只有在锁定、四项攻击实测并经维护者审核后才进入新目录版本；当前没有“信任任意本机镜像”的快捷开关。构建归档与原始日志默认只留本地，不提交到源码 Git 仓库。

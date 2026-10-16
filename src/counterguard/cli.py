@@ -74,9 +74,22 @@ app.add_typer(pipeline_app, name="pipeline")
 def preflight_command(
     repo: Annotated[Path, typer.Option(help="Repository root; only committed files are read.")],
     revision: Annotated[str, typer.Option(help="Commit/ref to assess without imports or install.")],
+    profile: Annotated[
+        str, typer.Option(help="legacy or minimal-python static admission.")
+    ] = "legacy",
+    import_root: Annotated[str, typer.Option(help="Explicit . or src for minimal-python.")] = ".",
 ) -> None:
     """Statically check compatibility with the fixed Docker no-install profile."""
-    result = preflight_repository(repo, revision)
+    if profile == "minimal-python":
+        from counterguard.admission import admission_repository
+
+        if import_root not in {".", "src"}:
+            _error("Use --import-root . or src", 2)
+        result = admission_repository(repo, revision, import_root=import_root)
+    elif profile == "legacy" and import_root == ".":
+        result = preflight_repository(repo, revision)
+    else:
+        _error("Use --profile legacy or --profile minimal-python --import-root .|src", 2)
     typer.echo(json.dumps(result, ensure_ascii=False, sort_keys=True))
     if result["status"] != "eligible_candidate":
         raise typer.Exit(5 if result["status"] == "rejected" else 4)
@@ -121,6 +134,24 @@ def verify_command(
     )
     if report.exit_code:
         raise typer.Exit(report.exit_code)
+
+
+@app.command("ci-report")
+def ci_report_command(
+    report: Annotated[Path, typer.Option(help="Existing verify report.json; never executed.")],
+    output: Annotated[Path, typer.Option(help="New directory for safe summary.json/md only.")],
+) -> None:
+    """Export an allowlisted GitHub Summary, preserving the verification exit code."""
+    from counterguard.github_report import export_github_report
+
+    try:
+        code = export_github_report(report, output)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError) as error:
+        _error(str(error), 2)
+    if code:
+        raise typer.Exit(code)
 
 
 @guard_app.command("transition")

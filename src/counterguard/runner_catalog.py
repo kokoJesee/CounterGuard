@@ -1,5 +1,6 @@
-"""Pinned review provenance plus read-only local image discovery, never image execution."""
+"""Pinned reviews, bundled receipt verification and read-only image discovery."""
 
+import json
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -12,6 +13,7 @@ from counterguard.runners.docker import _docker_executable, _run_bounded
 
 CATALOG_DIGEST = "sha256:cca05916cd88669c735d8c19b427874df6c824498a6e898260461ebc99dfcd87"
 CATALOG_PATH = Path(__file__).parent / "data/runner-catalog.v1.json"
+RECEIPTS_PATH = Path(__file__).parent / "data/runner-receipts.v1"
 
 
 class RunnerReview(FrozenModel):
@@ -48,6 +50,51 @@ class RunnerCatalog(FrozenModel):
     artifact_digest: Digest
 
 
+def _receipt(ref: str, expected_digest: str) -> dict:
+    # The catalog, including these names and digests, must pass the code pin first.
+    # Never fetch a URL or follow a repository-supplied path to acquire evidence.
+    path = RECEIPTS_PATH / Path(ref).name
+    with path.open("rb") as stream:
+        raw = stream.read(131073)
+    if len(raw) > 131072:
+        raise ValueError("Runner receipt exceeds byte budget")
+    value = json.loads(raw)
+    if (
+        not isinstance(value, dict)
+        or value.get("artifact_digest") != expected_digest
+        or digest_json_artifact(value) != expected_digest
+    ):
+        raise ValueError("Runner receipt differs from the pinned review")
+    return value
+
+
+def _verify_receipts(review: RunnerReview) -> None:
+    build = _receipt(review.build_receipt_ref, review.build_receipt_digest)
+    attacks = _receipt(review.attack_receipt_ref, review.attack_receipt_digest)
+    if (
+        build.get("schema_version") != "runner-build-receipt.v1"
+        or attacks.get("schema_version") != "runner-attack-acceptance.v1"
+        or build.get("image_id") != review.image_digest
+        or attacks.get("image_id") != review.image_digest
+        or build.get("lock_digest") != review.lock_digest
+        or attacks.get("runner_lock_digest") != review.lock_digest
+        or build.get("base_registry_digests") != list(review.base_registry_digests)
+        or any(
+            build.get("files", {}).get(ref) != digest
+            for ref, digest in review.container_source_digests.items()
+        )
+        or not any(
+            item.get("name") == "pytest" and item.get("version") == review.pytest_version
+            for item in build.get("packages", [])
+        )
+        or attacks.get("accepted") is not True
+        or attacks.get("exit_code") != 0
+        or attacks.get("passed") != review.attacks_passed
+        or attacks.get("log_digest") != review.attack_log_digest
+    ):
+        raise ValueError("Runner receipts contradict the pinned review")
+
+
 def load_catalog() -> RunnerCatalog:
     try:
         raw = CATALOG_PATH.read_bytes()
@@ -63,6 +110,8 @@ def load_catalog() -> RunnerCatalog:
             or digest_json_artifact(catalog) != CATALOG_DIGEST
         ):
             raise ValueError("Runner catalog differs from the installed trust pin")
+        for review in catalog.reviews:
+            _verify_receipts(review)
         return catalog
     except (OSError, ValueError) as error:
         raise ArtifactIntegrityError("Installed runner review catalog is invalid") from error
@@ -115,6 +164,7 @@ def list_runners(*, offline: bool = False, runner_id: str | None = None) -> dict
                 "review_digest": review.artifact_digest,
                 "availability": availability,
                 "usable": availability == "available",
+                "receipt_integrity": "verified",
                 "reason_code": None
                 if availability == "available"
                 else (
@@ -124,7 +174,7 @@ def list_runners(*, offline: bool = False, runner_id: str | None = None) -> dict
             }
         )
     return {
-        "schema_version": "runner-discovery.v1",
+        "schema_version": "runner-discovery.v2",
         "catalog_digest": catalog.artifact_digest,
         "image_execution_count": 0,
         "runners": rows,

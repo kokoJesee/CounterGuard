@@ -89,3 +89,53 @@ def test_cli_offline_lists_reviewed_names_and_sources_without_processes():
     assert json.loads(result.output)["runners"][0]["provenance"]["attack_receipt_digest"]
     result = CliRunner().invoke(app, ["runner", "show", "validators-pytest9", "--offline"])
     assert result.exit_code == 0 and "9.0.3" in result.output
+
+
+@pytest.mark.parametrize("change", ["missing", "tamper", "rehash", "oversize"])
+@pytest.mark.parametrize(
+    "filename",
+    ["root-build.json", "root-attacks.json", "validators-build.json", "validators-attacks.json"],
+)
+def test_receipt_damage_fails_before_any_local_probe(tmp_path, monkeypatch, change, filename):
+    import shutil
+
+    shutil.copytree(catalog_module.RECEIPTS_PATH, tmp_path / "receipts")
+    monkeypatch.setattr(catalog_module, "RECEIPTS_PATH", tmp_path / "receipts")
+    monkeypatch.setattr(catalog_module, "_availability", lambda *_: pytest.fail("Docker probed"))
+    path = tmp_path / "receipts" / filename
+    if change == "missing":
+        path.unlink()
+    elif change == "oversize":
+        path.write_bytes(b" " * 131073)
+    else:
+        data = json.loads(path.read_bytes())
+        data["image_id"] = "sha256:" + "f" * 64
+        if change == "rehash":
+            data["artifact_digest"] = digest_json_artifact(data)
+        path.write_bytes(canonical_json_bytes(data))
+    with pytest.raises(ArtifactIntegrityError):
+        list_runners()
+    with pytest.raises(ArtifactIntegrityError):
+        resolve_runner(runner_id="root-pytest8", image_digest=None)
+    result = CliRunner().invoke(app, ["runner", "list", "--offline"])
+    assert result.exit_code == 5 and "available" not in result.output
+
+
+def test_available_requires_all_receipts_and_exact_image(monkeypatch):
+    monkeypatch.setattr(catalog_module, "_availability", lambda *_: "available")
+    report = list_runners()
+    assert report["schema_version"] == "runner-discovery.v2"
+    assert all(
+        row["usable"] and row["receipt_integrity"] == "verified" for row in report["runners"]
+    )
+
+
+def test_bundled_receipts_preserve_the_public_source_bytes():
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    for review in load_catalog().reviews:
+        for ref in (review.build_receipt_ref, review.attack_receipt_ref):
+            assert (root / ref).read_bytes() == (
+                catalog_module.RECEIPTS_PATH / Path(ref).name
+            ).read_bytes()

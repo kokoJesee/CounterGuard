@@ -89,7 +89,7 @@ def inspect_execution_requirements(
                 if config is not None:
                     pytest_config(config, ref)
                 where = tool.get("setuptools", {}).get("packages", {}).get("find", {})
-                if isinstance(where, dict) and where.get("where", ["."]) != [import_root]:
+                if isinstance(where, dict) and where and where.get("where", ["."]) != [import_root]:
                     finding("package_import_mapping_requires_review", ref, unknown=True)
                 if optional_dependencies:
                     warnings.append(("optional_extras_are_not_installed", ref))

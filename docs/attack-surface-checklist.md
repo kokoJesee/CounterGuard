@@ -38,6 +38,25 @@
 | W03 受控模式已测，项目兼容部分 | 完整提交树静态预检；显式 project-config.v2 的 src 导入根和锁定 pytest9；契约来自 H，B/F 分别授权；保持 MAC 装饰器、位置参数与固定 ValidationError 类 oracle；旧格式拒绝新授权；Scope/unknown 不伪造 pass | [早期拒绝记录](results/w3d-fork-v1/historical-capture-refusal.json)；[fork 执行验收](results/w3d-fork-v1/final-acceptance.json)、[新回归](../tests/unit/test_repository_pilot.py)：B/F 双向捕获、H 自检及独立重放 | 仅审核 validators 固定 B/F/H 的 10 个 MAC case，精确快照 Scope，不是学习作用域；其余 25 case、全仓测试、任意装饰器/oracle、显式插件/fixture/安装模式、动态依赖证明仍未覆盖；通用 preflight 不自动切换 pilot profile |
 | W04 本地 Registry/生命周期已测，整体部分 | 不可变登记/事件 JSON、SQLite 核对、ID 冲突、禁用/退休终态、索引恢复、来源损坏拒绝调度；状态转换追加事件，verify 仅调度 Shadow/Active | [Registry](registry.md)、[原登记专项](results/w3c-v1/registry-tests.txt)、[fork 验收](results/w3d-fork-v1/final-acceptance.json)、[生命周期](../tests/unit/test_lifecycle.py)、[verify](../tests/unit/test_verify.py)；[真实来源链临时副本测试](../tests/integration/test_repository_registry_live.py)两项有显式 manifest 实测，非默认 CI 保证 | 本机操作者只是审计文本；身份角色、签名/防回滚、CI 凭据/上传、公开脱敏与多平台仍未关闭；固定 validators profile 已接入统一 verify，通用学习 Scope 仍未接入 |
 
+## 接入检查与 CI 展示的补充边界
+
+W03 增加[免安装/免插件静态候选检查](preflight.md#免安装免插件候选检查)：完整提交树、
+显式包根、依赖/导入、conftest/plugins/fixture 和动态代码的已知形态；仍然不生成执行许可。
+[单元测试](../tests/unit/test_admission.py)含 20 次乱序、别名与条件缺项；
+[真实 Git 专项](../tests/integration/test_admission.py)检查工作树删除 conftest 不能隐藏提交内容。
+任意 Python 的动态依赖/fixture 完备性不由静态分析证明。
+
+W01/W03 增加[包内收据逐项核验](../tests/unit/test_runner_catalog.py)：catalog 仍由可信代码 pin，
+build/attacks 缺失、改写、重签或超预算都在 image inspect 前拒绝；未知镜像不能借同名目录获准。
+这不是重新执行四项攻击、校验远程签名或防止整个安装包/主机失陷；Docker policy/容器源码未改变。
+
+W04 的 CI 展示与上传范围已有[有限字段投影测试](../tests/unit/test_github_report.py)、
+[workflow 权限/触发/固定上传路径检查](../tests/unit/test_github_workflow.py)及
+[本地真实 Docker 驱动专项](../tests/integration/test_ci_fixture.py)。
+Shadow/Active/unknown/异常退出策略、JSON/Markdown 计数同源、公开输出不含任意来源文本已覆盖。
+模板仅人工触发可信 fixture，不在 .github 下启用；实际 GitHub job、可携带来源/Registry、
+远程角色/撤销、公开 runner 交付与宿主供应链仍未关闭。W04 整体保持**部分**，不标为全面已测。
+
 ## W3 开工与准入
 
 runner 与固定仓库统一入口补充：[两类镜像各四项复验](results/runner-catalog-v1/README.md)，[目录与错误镜像拒绝测试](../tests/unit/test_runner_catalog.py)，[新运行目录授权 v3 测试](../tests/unit/test_repository_verify.py)。新目录由代码 pin，发现仅 inspect、不执行镜像；跨未经审核仓库/布局仍 unknown。真实重复重放的独立来源审核由 [显式 opt-in 专项](../tests/integration/test_repository_verify_live.py) 覆盖，只有提供实际 manifest/两份报告时才运行。
