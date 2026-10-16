@@ -1,6 +1,6 @@
 # 当前 MVP 的范围与限制
 
-本文件记录当前可信本地 MVP 的能力边界。打包、安装和正式验收以 [D14 记录](progress/day14.md) 为准；攻击面覆盖以 [排查清单](attack-surface-checklist.md) 为准。
+本文件记录当前可信本地 MVP 的能力边界。打包、安装和正式验收以 [发布说明](release.md) 为准；攻击面覆盖以 [排查清单](attack-surface-checklist.md) 为准。
 
 ## 输入和执行
 

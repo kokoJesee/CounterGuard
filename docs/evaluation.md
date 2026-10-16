@@ -1,6 +1,6 @@
 # MVP 评测口径和可主张的结果
 
-权威标准仍是 [冻结协议](../experiments/scope_v1.json)、[冻结 split](../benchmarks/splits/scope_v1.json) 和 [计划 §5](development-plan-v2.md)。本页汇总已有结果，不修改标准、不重新标注，也不把公开过的 holdout 当成新盲测。
+权威标准仍是 [冻结协议](../experiments/scope_v1.json) 和 [冻结 split](../benchmarks/splits/scope_v1.json)。本页汇总已有结果，不修改标准、不重新标注，也不把公开过的 holdout 当成新盲测。
 
 训练集有 9 行，initial 使用其中 7 行，refined 加入 2 个已确认合法反例后使用 9 行。两族规则从 `contract_version == v1` 变成 version AND interface；learner 的每条保留 clause 都有不可删除的反例见证。这是相对给定标签的必要性，不是全局最小或泛化证明。
 

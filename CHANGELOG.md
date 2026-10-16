@@ -16,7 +16,7 @@
 - 环境变量前缀：`EVIDENCEGUARD_` → `COUNTERGUARD_`
 - 已冻结的 `guard-test.v1/v2` 将旧变量名写入 Guard 的测试内容摘要；执行器只根据核验后的目标元数据生成内部兼容别名，不读取或透传宿主上的旧前缀变量
 - `benchmarks/context/scope_v1.json` 的内容随之变化，其 `artifact_digest` 已按新内容重算；`SCOPE_V1_CONTEXT_DIGEST` 常量同步更新
-- 历史开发日志（`docs/progress/`）与既有产物快照（`docs/results/`）**保留原名**，作为当时的真实记录，不做追溯修改
+- 更名前的历史开发日志与产物快照在该次更名时保留原名，作为当时的真实记录，不做追溯修改
 
 ## 0.1.0 — 2026-10-15
 

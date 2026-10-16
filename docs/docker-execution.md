@@ -38,7 +38,7 @@ uv run pytest -m docker tests/integration/test_docker_runner.py -q
 docker desktop disable model-runner
 ```
 
-不要用恢复出厂设置作为第一步。该命令见 [Docker Desktop disable 文档](https://docs.docker.com/reference/cli/docker/desktop/disable/)；官方功能字段是 `enableInference`，不是控制 Gordon 的 `enableDockerAI`。本机持久化位置未取证确认；实际大小写键、已知变化及还原方式见 [全局设置留痕](docker-host-changes.md)，不能把官方字段当作本机历史 diff。
+不要用恢复出厂设置作为第一步。该命令见 [Docker Desktop disable 文档](https://docs.docker.com/reference/cli/docker/desktop/disable/)；官方功能字段是 `enableInference`，不是控制 Gordon 的 `enableDockerAI`。本机持久化位置未取证确认；不能把官方字段当作本机历史 diff。
 
 ## 固定边界
 
