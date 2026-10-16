@@ -373,3 +373,19 @@ manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重
 提交、目标、包根、测试、闭包算法或工具实现变化时新建计划，保留旧计划。
 本层不消费旧 Evidence/Scope，也不回写或重签任何历史执行产物。工具源码变化仍使旧执行链在新验证器下过期；
 需要当前执行结论时按上表在新命名空间重物化，不能据本层“只读”豁免源码绑定。
+
+## 通用契约与 B/F/H 绑定
+
+`contract.v3` / `standalone-literals.v1` 的[字段与流程](standalone-contracts.md)与固定 validators 的
+contract.v2 分开。契约 pin B/F、显式导入映射、闭包 refs、F 内测试 blob/字节/完整投影以及受支持 case；
+H SHA 不放入其自身 blob，避免提交内容自引用。H 的新增契约与未改写的 F 文件由绑定器从对象库独立核对。
+
+`contract-preparation.v1` 保存契约字节摘要、B/F 评估、完整 case/unsupported 覆盖和当前实现，固定需人审/不执行。
+`bootstrap-binding.v1` 摘要覆盖除自身外所有字段：B/F/H 全树 pins、契约原始摘要与解析值、线性父子规则、
+文件来源、每棵树的静态闭包/测试引导观察、完整投影/unsupported、输入状态、固定不执行和 reproduced=null 声明、
+语义/身份限制及逐文件工具源码摘要。没有时间、随机 ID、宿主路径或输出位置进入摘要。
+独立 verify-binding 重读 Git，重新提取并比较完整记录；自摘要或重签不能代替这个过程。
+
+提交、契约、投影规则、闭包或工具实现变化时在新目录重新 prepare/bind；旧产物不补签。
+读取/历史/内容拒绝保存独立 bootstrap-binding-failure.v1，不能被当成已绑定事实。
+本层不证明 buggy 真失败，不能进入旧执行器/Registry；未来实际捕获须使用新的执行来源版本。

@@ -1,5 +1,9 @@
 # CLI 与报告约定
 
+新增 [H 内通用契约与来源绑定](standalone-contracts.md)：`contract prepare` 返回 4/须人审；
+所有者提交后 `bootstrap bind` 与 `bootstrap verify-binding` 重建 B/F/H。返回 0 仅表示来源事实已核对且静态输入待审，
+unknown/blocked 返回 4，完整性拒绝返回 5；不生成 Evidence 或执行授权。
+
 `bootstrap plan` 提供[独立 Guard 输入计划](bootstrap-plans.md)：读取提交树，分别列出目标导入闭包、
 草案覆盖及全仓引导需求。计划始终不可执行并返回 4；它不是通用 verify 或契约批准入口。
 

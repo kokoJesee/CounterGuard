@@ -32,6 +32,7 @@ Git/路径完整性拒绝返回 5；参数/不可读取的草案内容等错误�
 即使没有 finding，也须审核调用绑定、包副作用、资源、oracle 和 case 独立性。
 
 用户下一步是审核计划及未支持项，准备真实 B/F 和由所有者提交到 H 的最终契约。
-通用契约审批格式、Docker 双向捕获、最小 Guard 独立来源验证及精确快照 Scope 仍在[路线](roadmap.md)中，
+现在可继续使用[contract prepare 与 bootstrap bind](standalone-contracts.md)准备并重建 H 内契约和 B/F 来源；
+这不提供自动审批。Docker 双向捕获、最小 Guard 独立来源验证及精确快照 Scope 仍在[路线](roadmap.md)中，
 不能用本地 capture、删 conftest/配置、重签计划或任意布尔开关代替。
 运行上游原生测试套件是另一条路线，先完成配置、conftest/hooks、fixture、插件及其依赖的受控引导。

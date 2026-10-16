@@ -10,9 +10,9 @@
 | 顺序 | 用户/项目所有者确认什么 | 工具负责什么 | 当前状态 |
 |---|---|---|---|
 | 1 | 选择一个真实修复，给出仓库、buggy/fixed 的完整提交 SHA，并确认许可证和缺陷背景 | 读取两棵 Git 提交树，核对来源，不要求手工复制两份源码 | 固定 validators profile 已实现；任意仓库的通用 bootstrap 尚缺 |
-| 2 | 编写或审核契约：输入、预期行为、稳定 case ID；把最终契约提交到 assertion head | `contract draft` 可静态提取受支持的已有断言，列明未支持项；用户审核后才进入后续契约流程 | 已有受限草案命令，尚无任意测试/自然语言到可执行契约的自动批准能力 |
+| 2 | 编写或审核契约：输入、预期行为、稳定 case ID；把最终契约提交到 assertion head | `contract draft` 提取待审断言；`contract prepare` 准备含 B/F 的 contract.v3，由所有者单独提交 H，`bootstrap bind` 重建来源 | 已有受限准备/来源核验命令；不自动批准或执行 |
 | 3 | 确认目标符号、`.`/`src` 导入根、需要纳入的本地依赖及变更映射 | 静态检查声明、imports、Git pins；后续仍须在受限 Docker 内核对 | `preflight` 做全仓分类，`bootstrap plan` 并列目标闭包与测试环境；仍不支持通用执行 |
-| 4 | 审阅首次捕获结果，确认 buggy 的失败确为缺陷、fixed 符合契约 | Docker 中分别运行 buggy/fixed，保存真实 JUnit/日志；基础设施错误不能当作缺陷 | 固定试点可自动捕获与编译。全新项目不能使用本地 capture 代替尚缺的 Docker 路径 |
+| 4 | 审阅首次捕获结果，确认 buggy 的失败确为缺陷、fixed 符合契约 | Docker 中分别运行 buggy/fixed，保存真实 JUnit/日志；基础设施错误不能当作缺陷 | 固定试点可捕获与编译；通用来源绑定不产生 Evidence，全新项目不能用本地 capture 绕过 |
 | 5 | 审核首版适用边界 | 没有已确认合法反例时，只能采用**已审核源码/依赖闭包的精确快照**；新源码 unknown | 不默认 always-applicable、不伪造训练样本、不继承 scope_v1 的学习结论 |
 | 6 | 审核来源后把 Candidate 提为 Shadow；有实际接受记录后才考虑 Active | 追加状态事件，保存操作者标签/原因；每次执行重验来源与状态 | 不自动提升，也不把本机 actor 文本当作远程身份凭据 |
 

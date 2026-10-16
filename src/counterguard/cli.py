@@ -107,6 +107,99 @@ def contract_draft_command(
         raise typer.Exit(4)
 
 
+@contract_app.command("prepare")
+def contract_prepare_command(
+    repo: Annotated[Path, typer.Option(help="Read committed objects only.")],
+    buggy: Annotated[str, typer.Option(help="Full buggy commit SHA.")],
+    fixed: Annotated[str, typer.Option(help="Full direct-child fix SHA.")],
+    contract_id: Annotated[str, typer.Option(help="New semantic contract identity.")],
+    target: Annotated[str, typer.Option(help="Declared module:symbol.")],
+    import_root: Annotated[str, typer.Option(help="Explicit . or src.")],
+    test_ref: Annotated[str, typer.Option(help="Committed fixed regression test.")],
+    test_function: Annotated[str, typer.Option(help="One top-level test_* function.")],
+    output: Annotated[Path, typer.Option(help="New preparation directory outside target repo.")],
+) -> None:
+    """Prepare contract.v3 for owner review and a separate head commit; never execute."""
+    from counterguard.bootstrap_binding import prepare_contract
+    from counterguard.repository import RepositoryProblem
+
+    try:
+        value = prepare_contract(
+            repo,
+            buggy=buggy,
+            fixed=fixed,
+            contract_id=contract_id,
+            target=target,
+            import_root=import_root,
+            test_ref=test_ref,
+            test_function=test_function,
+            output=output,
+        )
+    except RepositoryProblem as error:
+        _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(value).decode())
+    raise typer.Exit(4)
+
+
+@bootstrap_app.command("bind")
+def bootstrap_bind_command(
+    repo: Annotated[Path, typer.Option(help="Read committed objects only.")],
+    head: Annotated[str, typer.Option(help="Full owner assertion-head SHA.")],
+    contract_ref: Annotated[str, typer.Option(help="Contract path in head, never external input.")],
+    output: Annotated[Path, typer.Option(help="New binding directory outside target repo.")],
+) -> None:
+    """Rebuild B/F/H history, contract cases and source closures without executing."""
+    from counterguard.bootstrap_binding import bind_contract
+    from counterguard.repository import RepositoryProblem
+
+    try:
+        value = bind_contract(repo, head, contract_ref, output=output)
+    except RepositoryProblem as error:
+        _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(value).decode())
+    if value["binding_status"] != "sources_verified":
+        raise typer.Exit(5 if value["binding_status"] == "rejected" else 4)
+    if value["capture_input_status"] != "review_required":
+        raise typer.Exit(4)
+
+
+@bootstrap_app.command("verify-binding")
+def bootstrap_verify_binding_command(
+    path: Annotated[Path, typer.Argument(help="Existing binding.json to independently rebuild.")],
+    repo: Annotated[Path, typer.Option(help="Repository containing the pinned Git objects.")],
+) -> None:
+    """Compare a source binding with actual committed facts, not just its self hash."""
+    from counterguard.bootstrap_binding import verify_binding
+    from counterguard.repository import RepositoryProblem
+
+    try:
+        value = verify_binding(repo, path)
+    except RepositoryProblem as error:
+        _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
+    except (ArtifactIntegrityError, OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 5)
+    typer.echo(
+        canonical_json_bytes(
+            {
+                "source_binding_verified": True,
+                "artifact_digest": value["artifact_digest"],
+                "capture_input_status": value["capture_input_status"],
+                "execution_allowed": False,
+            }
+        ).decode()
+    )
+    if value["capture_input_status"] != "review_required":
+        raise typer.Exit(4)
+
+
 @bootstrap_app.command("plan")
 def bootstrap_plan_command(
     repo: Annotated[Path, typer.Option(help="Read committed files; never import or execute.")],

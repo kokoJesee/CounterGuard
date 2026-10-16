@@ -40,6 +40,14 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W02/W03 增加 [contract.v3 与 B/F/H 来源绑定](standalone-contracts.md)：契约必须读取 H blob，
+F 唯一父提交为 B、H 唯一父提交为 F 且只新增契约；case/测试投影/闭包 refs 和完整源 pins 独立重建。
+[专项](../tests/unit/test_bootstrap_binding.py)覆盖 H 夹带源码/测试改动、外置/缺失契约、oracle/来源/闭包漂移、
+合并/错误父提交、重签执行/复现声明、实现过期、JSON 歧义与发布/读取预算、20 次乱序。
+[真实 Git 专项](../tests/integration/test_bootstrap_binding.py)覆盖根与 src、dirty tree 不替代 H、重复绑定及独立重建；
+目标包、原测试和 conftest 均带拒绝执行哨兵，未运行。来源核对不认证所有者身份、不证明 oracle/缺陷语义，
+不提供 Docker 捕获或消费旧 Registry 的路径。W01/W03 通用执行与 W04 远程权限均保持未闭环。
+
 W02/W03 增加[只读 bootstrap 计划](bootstrap-plans.md)：完整提交树 pins 与模块级候选闭包并列，
 包初始化、相对/子模块/条件导入、冲突/遮蔽、动态与资源访问提示、配置节观察、20 次乱序及输出不覆盖，
 见[单元测试](../tests/unit/test_bootstrap_plan.py)。

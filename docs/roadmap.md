@@ -8,6 +8,7 @@
 | 新项目的只读分类与可操作指引 | 已实现 repository-admission.v2 | 运行 preflight，读取 next_step/user_guidance，不把内部工程编号当待办 |
 | 现有测试的机械草案提取 | 已实现受限语法，不可执行 | 运行 [contract draft](contract-drafts.md)，人工审核及记录不支持的断言 |
 | 通用 bootstrap 的输入计划 | 已实现只读模块闭包与测试环境分层 | 运行 [bootstrap plan](bootstrap-plans.md)；它不批准契约、不启动 Docker |
+| H 内通用契约与 B/F 来源绑定 | 已实现受限 contract.v3、准备与独立重建 | 按[来源绑定](standalone-contracts.md)审核并由所有者提交；来源已核实不等于缺陷已复现 |
 | 通用受限 Docker bootstrap | **下一项产品开发；未实现** | 可准备真实 B/F、草案和导入映射；当前用户不能靠配置自己打开它 |
 | 真实项目的可携带来源/Registry 与远程 CI 权限 | 未实现 | 不能搬运/改签本机条目；仅有 [受控 CI 示例](github-actions.md) |
 | 上游原生测试的受控 pytest 引导 | **明确的接入前置；未实现** | 运行上游套件前必须审核配置、conftest/hooks、fixture、插件及依赖；不能因运行时零依赖跳过 |
@@ -22,8 +23,9 @@
 它需要新的通用契约/来源版本及反篡改验收，保留已有 validators 和 scope_v1 格式/结果；不通过删 Literal 或新增宽松布尔开关实现。
 安装依赖、运行项目测试套件、自动提升 Active、学习跨提交泛化与远程发布都不属于这项最小范围。
 
-通用 bootstrap 按三个可核验环节推进：输入计划（已实现、只读）；所有者 H 内的新通用契约与 B/F 来源绑定（下一步）；
-受限 Docker 捕获、编译、独立验证与精确 Scope/Shadow（未实现）。本轮没有把后一环节标为完成。
+通用 bootstrap 按三个可核验环节推进：输入计划（已实现、只读）；所有者 H 内的新通用契约与 B/F 来源绑定（受限版本已实现、只读）；
+受限 Docker 捕获、编译、独立验证与精确 Scope/Shadow（下一环，未实现）。来源绑定不会替所有者制造提交，
+也不会在未运行 B/F 时把 reproduced 写成 true。
 原生测试兼容路线的②不再作为笼统的低优先级“可选项”；5–10 人日仅是单一受控 profile 的原工程估算，
 任意插件/fixture 的兼容工期不确定，也不保证不需要③。它与独立 Guard 路线的优先顺序不由猜测覆盖比例决定。
 依据见[固定提交研究](research/pytest-project-bootstrap.md)及[计时/阻塞复核](results/onboarding-audit-v1/README.md)。

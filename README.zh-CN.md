@@ -156,6 +156,8 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 [bootstrap plan](docs/bootstrap-plans.md)进一步分列目标导入闭包与上游测试环境，保留完整提交来源；计划不授予执行权限。零运行时依赖不代表无需 fixture、hook 或测试插件。
 
+[contract prepare / bootstrap bind](docs/standalone-contracts.md)支持 H 内受限通用契约和 B/F 来源重建；所有者须审核并提交，尚不开放通用 Docker 捕获。
+
 ```powershell
 uv run pytest -m "not slow" -q      # 快测：秒级
 uv run ruff check .

@@ -211,6 +211,10 @@ records a real blocked attempt, while the [roadmap](docs/roadmap.md) identifies 
 test bootstrap requirements, retaining the full committed-tree provenance. It does not
 authorize execution. Zero runtime dependencies do not imply plugin-free tests.
 
+[contract prepare / bootstrap bind](docs/standalone-contracts.md) prepare literal contracts
+for an owner assertion-head commit and independently reconstruct B/F/H provenance.
+They do not reproduce a defect or enable generic Docker capture.
+
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
 uv run ruff check .

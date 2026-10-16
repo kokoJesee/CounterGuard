@@ -10,6 +10,8 @@
 
 预检中的 engineering_prerequisites 是工具维护者的工程工作，不是让用户写实现。用户应读取 v2 的 next_step/user_guidance；
 可以通过 [contract draft](contract-drafts.md)准备未审核的测试投影，但当前仍不能自行启用通用 verify。
+现可进一步用 [contract prepare / bootstrap bind](standalone-contracts.md)准备 H 内的受限通用契约并重建 B/F 来源；
+这一步不产生 Evidence 或可执行 Guard，也不替代后续受控捕获与语义审核。
 [路线与跟踪落点](roadmap.md)明确未承诺日期。已有一次 [boltons 试走](results/onboarding-boltons-v1/README.md)，
 已记录首次遇阻时间，尚未得到完整接入耗时，不能把原工程人日表转换成用户等待时间。
 

@@ -31,11 +31,13 @@ from counterguard.runner_catalog import RunnerCatalog, RunnerReview
 from counterguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
+from counterguard.standalone_contracts import StandaloneContract
 from counterguard.verification_gate import GateResult
 from counterguard.verify import VerifyReport, VerifyReportV2
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "standalone-contract": StandaloneContract,
     "contract-proposal": ContractProposal,
     "evidence": Evidence,
     "guard": Guard,

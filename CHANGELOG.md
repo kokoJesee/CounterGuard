@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 新增 contract.v3 / standalone-literals.v1、`contract prepare`、`bootstrap bind/verify-binding`：从 H 内 Git blob 重建线性 B/F/H、完整来源 pins 与测试投影，保留 unsupported，拒绝篡改与重签结论；不开放通用 Docker 执行。
+
 - 新增只读 `bootstrap plan`：模块级候选导入闭包与上游测试环境分层，完整提交 pins、草案未支持项和人工审核要求均保留；不改变旧 strict 预检或授予执行能力。
 - 复核 boltons 收集 hook、配置节与文件级 fixture 待审的真实含义；将受控 pytest 引导明确列为原生测试路线前置，记录旧计时无法完整归因的限制。
 
