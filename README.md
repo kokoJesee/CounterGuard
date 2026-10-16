@@ -3,6 +3,8 @@
 CounterGuard turns verified bug evidence into reusable regression guards with explicit
 applicability boundaries.
 
+> English · [中文](README.zh-CN.md)
+
 MVP 0.1.0 covers the trusted local Python/pytest pipeline: bidirectional Evidence, minimal
 Guard compilation, initial/refined Scope learning, Replay, and an offline Demo. See the
 [architecture](docs/architecture.md), [frozen evaluation](docs/evaluation.md), and
