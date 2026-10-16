@@ -4,13 +4,13 @@ import json
 
 import pytest
 
-from evidenceguard.project_config import (
+from counterguard.project_config import (
     CONFIG_LIMIT,
     ProjectConfig,
     load_project_config,
     repository_path,
 )
-from evidenceguard.repository import validate_revision
+from counterguard.repository import validate_revision
 
 
 def mapping(**updates):

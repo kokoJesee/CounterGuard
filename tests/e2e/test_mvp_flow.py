@@ -7,19 +7,19 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.models import Guard
-from evidenceguard.pipeline import (
+from counterguard.cli import app
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.models import Guard
+from counterguard.pipeline import (
     PipelineExecutionError,
     PipelineFailure,
     run_pipeline,
     verify_pipeline,
 )
-from evidenceguard.replay import ReplayResult
-from evidenceguard.scope import FitManifest, ScopeLearningResult
-from evidenceguard.workspace import (
+from counterguard.replay import ReplayResult
+from counterguard.scope import FitManifest, ScopeLearningResult
+from counterguard.workspace import (
     WorkspaceManifest,
     verify_workspace,
 )
@@ -139,10 +139,10 @@ def test_repeat_and_verify_are_read_only(flow, monkeypatch):
 
     for target in (
         "subprocess.run",
-        "evidenceguard.pipeline.capture_candidate",
-        "evidenceguard.pipeline.compile_guard",
-        "evidenceguard.pipeline.fit_scopes",
-        "evidenceguard.pipeline.replay_guard",
+        "counterguard.pipeline.capture_candidate",
+        "counterguard.pipeline.compile_guard",
+        "counterguard.pipeline.fit_scopes",
+        "counterguard.pipeline.replay_guard",
     ):
         monkeypatch.setattr(target, forbidden)
     assert verify_pipeline(root / "out/run_manifest.json", cwd=root) == manifest
@@ -202,7 +202,7 @@ def test_candidate_rejection_stops_before_compiler_and_keeps_failure(fresh, monk
     def forbidden(*args, **kwargs):
         pytest.fail("Rejected candidate must not reach Compiler")
 
-    monkeypatch.setattr("evidenceguard.pipeline.compile_guard", forbidden)
+    monkeypatch.setattr("counterguard.pipeline.compile_guard", forbidden)
     with pytest.raises(PipelineExecutionError) as error:
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     assert error.value.exit_code == 2
@@ -217,7 +217,7 @@ def test_candidate_rejection_stops_before_compiler_and_keeps_failure(fresh, monk
 
 
 def test_changed_gate_test_stops_before_next_capture_or_compile(fresh, monkeypatch):
-    from evidenceguard.pipeline import capture_candidate
+    from counterguard.pipeline import capture_candidate
 
     calls = []
 
@@ -228,7 +228,7 @@ def test_changed_gate_test_stops_before_next_capture_or_compile(fresh, monkeypat
         test.write_bytes(test.read_bytes() + b"\n")
         return result
 
-    monkeypatch.setattr("evidenceguard.pipeline.capture_candidate", corrupt)
+    monkeypatch.setattr("counterguard.pipeline.capture_candidate", corrupt)
     with pytest.raises(PipelineExecutionError) as error:
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     assert error.value.exit_code == 5 and len(calls) == 1
@@ -238,7 +238,7 @@ def test_changed_gate_test_stops_before_next_capture_or_compile(fresh, monkeypat
 
 
 def test_changed_learning_stops_before_refinement_or_replay(fresh, monkeypatch):
-    from evidenceguard.pipeline import fit_scopes
+    from counterguard.pipeline import fit_scopes
 
     phases = []
 
@@ -252,7 +252,7 @@ def test_changed_learning_stops_before_refinement_or_replay(fresh, monkeypatch):
         path.write_bytes(canonical_json_bytes(payload))
         return result
 
-    monkeypatch.setattr("evidenceguard.pipeline.fit_scopes", corrupt)
+    monkeypatch.setattr("counterguard.pipeline.fit_scopes", corrupt)
     with pytest.raises(PipelineExecutionError) as error:
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     assert error.value.exit_code == 5 and phases == ["initial"]
@@ -295,7 +295,7 @@ def test_unexpected_fault_keeps_diagnostic_without_echoing_error_payload(fresh, 
     def broken(*args, **kwargs):
         raise RuntimeError("SECRET_FAULT_PAYLOAD_MUST_NOT_BE_SAVED")
 
-    monkeypatch.setattr("evidenceguard.pipeline.capture_candidate", broken)
+    monkeypatch.setattr("counterguard.pipeline.capture_candidate", broken)
     with pytest.raises(PipelineExecutionError):
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     raw = (fresh / "out/failure.json").read_bytes()
@@ -331,7 +331,7 @@ def test_capture_timeout_does_not_become_a_successful_pipeline(fresh):
 
 
 def test_missing_completed_replay_stops_before_another_replay(fresh, monkeypatch):
-    from evidenceguard.pipeline import replay_guard
+    from counterguard.pipeline import replay_guard
 
     calls = []
 
@@ -341,7 +341,7 @@ def test_missing_completed_replay_stops_before_another_replay(fresh, monkeypatch
         (args[0].cwd / f"artifacts/replays/{result.replay_id}/result.json").unlink()
         return result
 
-    monkeypatch.setattr("evidenceguard.pipeline.replay_guard", remove)
+    monkeypatch.setattr("counterguard.pipeline.replay_guard", remove)
     with pytest.raises(PipelineExecutionError) as error:
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     assert error.value.exit_code == 5 and len(calls) == 1
@@ -349,7 +349,7 @@ def test_missing_completed_replay_stops_before_another_replay(fresh, monkeypatch
 
 
 def test_changed_source_stops_before_second_capture(fresh, monkeypatch):
-    from evidenceguard.pipeline import capture_candidate
+    from counterguard.pipeline import capture_candidate
 
     calls = []
 
@@ -360,7 +360,7 @@ def test_changed_source_stops_before_second_capture(fresh, monkeypatch):
         path.write_bytes(path.read_bytes() + b"\n")
         return result
 
-    monkeypatch.setattr("evidenceguard.pipeline.capture_candidate", change)
+    monkeypatch.setattr("counterguard.pipeline.capture_candidate", change)
     with pytest.raises(PipelineExecutionError) as error:
         run_pipeline(SCENARIO, cwd=fresh, workspace="out")
     assert error.value.exit_code == 5 and len(calls) == 1
@@ -368,7 +368,7 @@ def test_changed_source_stops_before_second_capture(fresh, monkeypatch):
 
 
 def test_workspace_does_not_copy_credentials_or_git(fresh):
-    from evidenceguard.workspace import prepare_workspace
+    from counterguard.workspace import prepare_workspace
 
     for ref in (".env", ".git/config", ".venv/secret.txt", "unlisted.txt"):
         path = fresh / ref

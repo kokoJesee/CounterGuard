@@ -11,21 +11,21 @@ from types import ModuleType, SimpleNamespace
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import canonical_json_bytes, digest_bytes
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.execution import PytestRunRequest
-from evidenceguard.models import RunRole, TargetRef
-from evidenceguard.pilot_inputs import ZERO
-from evidenceguard.preflight import inspect_execution_requirements
-from evidenceguard.project_config import ProjectConfig
-from evidenceguard.repository_contracts import (
+from counterguard.digests import canonical_json_bytes, digest_bytes
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.execution import PytestRunRequest
+from counterguard.models import RunRole, TargetRef
+from counterguard.pilot_inputs import ZERO
+from counterguard.preflight import inspect_execution_requirements
+from counterguard.project_config import ProjectConfig
+from counterguard.repository_contracts import (
     CONTRACT_REF,
     SOURCE_REF,
     extract_mac_contract,
     read_contract,
     render_repository_test,
 )
-from evidenceguard.runners import repository as runner
+from counterguard.runners import repository as runner
 
 UPSTREAM_TEST = b'''"""Upstream parameter/oracle shape, represented as inert test data."""
 @pytest.mark.parametrize("validate,value", [
@@ -112,8 +112,8 @@ def _invoke_generated(monkeypatch, oracle, result, error_class, passes):
     module.mac_address, utils.ValidationError = positional_only, error_class
     monkeypatch.setitem(sys.modules, "validators.mac_address", module)
     monkeypatch.setitem(sys.modules, "validators.utils", utils)
-    monkeypatch.setenv("EVIDENCEGUARD_TARGET", "validators.mac_address")
-    monkeypatch.setenv("EVIDENCEGUARD_SYMBOL", "mac_address")
+    monkeypatch.setenv("COUNTERGUARD_TARGET", "validators.mac_address")
+    monkeypatch.setenv("COUNTERGUARD_SYMBOL", "mac_address")
     namespace = {}
     exec(
         compile(
@@ -160,7 +160,7 @@ def _config(version="project-config.v2", root="src"):
                 "import_root": root,
             }
         ],
-        "audit_refs": ["evidenceguard.yaml"],
+        "audit_refs": ["counterguard.yaml"],
     }
 
 
@@ -303,11 +303,11 @@ def test_resigned_authorization_does_not_start_docker_or_local(admitted_request,
     workspace, manifest, request = admitted_request
     auth = runner.authorize_repository_execution(manifest, workspace, request, phase="capture")
     forged = auth.model_copy(update={"image_digest": "sha256:" + "1" * 64})
-    from evidenceguard.digests import digest_json_artifact
+    from counterguard.digests import digest_json_artifact
 
     forged = forged.model_copy(update={"artifact_digest": digest_json_artifact(forged)})
     monkeypatch.setattr(runner, "_docker_executable", lambda: pytest.fail("Docker must not start"))
-    from evidenceguard.runners.local import LocalTrustedExecutor
+    from counterguard.runners.local import LocalTrustedExecutor
 
     monkeypatch.setattr(
         LocalTrustedExecutor, "execute", lambda *args: pytest.fail("No local fallback")
@@ -361,9 +361,9 @@ def test_container_protocol_rejects_arbitrary_import_roots(tmp_path, monkeypatch
     ],
 )
 def test_explicit_scope_rejects_resigned_bindings(admitted_request, field):
-    from evidenceguard.pilot_inputs import closure_digest, signed
-    from evidenceguard.repository_contracts import ExplicitPilotScope
-    from evidenceguard.repository_guard import verify_pilot_scope
+    from counterguard.pilot_inputs import closure_digest, signed
+    from counterguard.repository_contracts import ExplicitPilotScope
+    from counterguard.repository_guard import verify_pilot_scope
 
     workspace, manifest_path, request = admitted_request
     facts = runner.load_inputs(manifest_path, workspace)
@@ -386,8 +386,8 @@ def test_explicit_scope_rejects_resigned_bindings(admitted_request, field):
 
 
 def test_static_refusal_cannot_be_used_as_execution_proof(tmp_path):
-    from evidenceguard.pilot import verify_pilot_report
-    from evidenceguard.pilot_inputs import signed
+    from counterguard.pilot import verify_pilot_report
+    from counterguard.pilot_inputs import signed
 
     path = tmp_path / "report.json"
     path.write_bytes(
@@ -406,7 +406,7 @@ def test_static_refusal_cannot_be_used_as_execution_proof(tmp_path):
 
 
 def test_repeatability_rejects_reusing_one_run(monkeypatch, tmp_path):
-    from evidenceguard import pilot
+    from counterguard import pilot
 
     report = {
         "schema_version": "pilot-execution-report.v2",
@@ -422,7 +422,7 @@ def test_repeatability_rejects_reusing_one_run(monkeypatch, tmp_path):
 
 
 def test_repeatability_does_not_turn_unknown_into_pass(monkeypatch, tmp_path):
-    from evidenceguard import pilot
+    from counterguard import pilot
 
     first = {
         "schema_version": "pilot-execution-report.v2",
@@ -447,8 +447,8 @@ def test_repeatability_does_not_turn_unknown_into_pass(monkeypatch, tmp_path):
 def test_run_cwd_dot_is_relative_to_authorized_snapshot(admitted_request, monkeypatch):
     from datetime import UTC, datetime
 
-    from evidenceguard import repository_guard
-    from evidenceguard.models import CaseOutcome, CaseResult, RunOutcome, RunRecord
+    from counterguard import repository_guard
+    from counterguard.models import CaseOutcome, CaseResult, RunOutcome, RunRecord
 
     workspace, manifest_path, request = admitted_request
     auth = runner.authorize_repository_execution(manifest_path, workspace, request, phase="capture")
@@ -508,18 +508,18 @@ def test_run_cwd_dot_is_relative_to_authorized_snapshot(admitted_request, monkey
 @pytest.mark.parametrize(
     "field,bad",
     [
-        ("output_root_ref", "src/evidenceguard/overwrite"),
+        ("output_root_ref", "src/counterguard/overwrite"),
         ("output_root_ref", "../outside"),
         ("workspace_root_ref", "artifacts/pilot/other/ws"),
-        ("registry_root_ref", ".evidenceguard"),
+        ("registry_root_ref", ".counterguard"),
         ("scope_ref", "benchmarks/scope.json"),
         ("config_ref", "external-config.json"),
         ("contract_ref", "external-contract.json"),
     ],
 )
 def test_manifest_cannot_redirect_sources_or_outputs_before_git(tmp_path, field, bad):
-    from evidenceguard.pilot_inputs import TOOL_FILES, load_inputs, signed
-    from evidenceguard.repository_contracts import BASE, FIXED, FORK_URL, UPSTREAM_URL
+    from counterguard.pilot_inputs import TOOL_FILES, load_inputs, signed
+    from counterguard.repository_contracts import BASE, FIXED, FORK_URL, UPSTREAM_URL
 
     value = {
         "schema_version": "pilot-manifest.v2",
@@ -535,7 +535,7 @@ def test_manifest_cannot_redirect_sources_or_outputs_before_git(tmp_path, field,
         "workspace_root_ref": "artifacts/pilot/second/ws",
         "registry_root_ref": "artifacts/pilot/second/registry",
         "scope_ref": "artifacts/pilot/second/scope.json",
-        "config_ref": "artifacts/pilot/first/repo/evidenceguard.yaml",
+        "config_ref": "artifacts/pilot/first/repo/counterguard.yaml",
         "contract_ref": "artifacts/pilot/first/repo/contracts/mac-complete-v2.json",
     }
     value[field] = bad

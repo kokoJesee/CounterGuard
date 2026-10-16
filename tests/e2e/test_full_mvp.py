@@ -8,12 +8,12 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.demo import run_demo
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.replay import ReplayRequest, replay_guard, verify_replay
-from evidenceguard.report import CommandReport, OutputFormat, render_report
+from counterguard.cli import app
+from counterguard.demo import run_demo
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.replay import ReplayRequest, replay_guard, verify_replay
+from counterguard.report import CommandReport, OutputFormat, render_report
 
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -38,7 +38,7 @@ def _synthetic_repo(path: Path, blobs: int) -> tuple[str, str]:
         tree.extend(f"100644 file-{index:08d}.txt\0".encode("ascii"))
         tree.extend(bytes.fromhex(oid))
     tree_oid = _object(path, b"tree", bytes(tree))
-    identity = b"EvidenceGuard <fixture@example.invalid> 946684800 +0000"
+    identity = b"CounterGuard <fixture@example.invalid> 946684800 +0000"
     base_body = b"tree " + tree_oid.encode() + b"\nauthor " + identity + b"\ncommitter "
     base_body += identity + b"\n\nbase\n"
     base = _object(path, b"commit", base_body)

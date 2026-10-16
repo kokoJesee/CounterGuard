@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.models import (
+from counterguard.models import (
     CaseOutcome,
     Guard,
     RaisesGuardCase,

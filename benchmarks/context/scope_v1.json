@@ -1,7 +1,7 @@
 {
   "schema_version": "module-context.v1",
   "context_id": "scope_v1_module_context",
-  "owner": "EvidenceGuard benchmark maintainers",
+  "owner": "CounterGuard benchmark maintainers",
   "provenance": "D2 fixture architecture: package responsibilities established before scope learning; no applicability or compliance labels used.",
   "rules": [
     {
@@ -15,5 +15,5 @@
       "basis": "This package contains shared query and worker input validation across contract versions."
     }
   ],
-  "artifact_digest": "sha256:08f548c920924dac44f2058014b64c79e6d18f348b820a6535be7b1795f1ad6a"
+  "artifact_digest": "sha256:8f55d8564259edb5b03bcfd82c4055eaf5e31f3025adbd00ed2dfa6f475b0691"
 }

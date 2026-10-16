@@ -1,6 +1,6 @@
 # 方法论来源核验（2026-10-14）
 
-本文件只记录原始来源及其能够支持的结论。对 EvidenceGuard 的建议明确标为工程推论；不修改冻结协议、样本或历史 artifact。核验时对照了 `src/evidenceguard/scope.py` 与 `docs/data-contracts.md`。
+本文件只记录原始来源及其能够支持的结论。对 CounterGuard 的建议明确标为工程推论；不修改冻结协议、样本或历史 artifact。核验时对照了 `src/counterguard/scope.py` 与 `docs/data-contracts.md`。
 
 ## CEGAR 与 lazy abstraction
 
@@ -8,7 +8,7 @@ Clarke 等人的 [CAV 2000 原论文](https://web.stanford.edu/class/cs357/cegar
 
 Henzinger、Jhala、Majumdar、Sutre 的 [POPL 2002 原论文 Lazy Abstraction](https://web.stanford.edu/class/archive/cs/cs295/cs295.1086/papers/lazy.pdf) 说明：按需构建抽象可达模型，允许不同位置采用不同精度，从反例的 pivot 位置局部精化，并复用先前工作。论文的第 5 节还讨论复用子树与精化循环的取舍。[作者托管的同篇论文](https://ranjitjhala.github.io/static/lazy_abstraction.pdf) 可供交叉核对。
 
-**工程推论：** EvidenceGuard 的“已确认合法反例 → 作用域收紧”具有反例驱动精化的结构相似性，但它没有上述抽象可达模型、路径可实现性检查或形式化的性质保持证明。不能把所有 Scope false positive 直接改名为 spurious counterexample，也不能把“每遇到一条负例就增加一条全局 AND”称为完整实现 BLAST lazy abstraction。
+**工程推论：** CounterGuard 的“已确认合法反例 → 作用域收紧”具有反例驱动精化的结构相似性，但它没有上述抽象可达模型、路径可实现性检查或形式化的性质保持证明。不能把所有 Scope false positive 直接改名为 spurious counterexample，也不能把“每遇到一条负例就增加一条全局 AND”称为完整实现 BLAST lazy abstraction。
 
 目前的 `learn_scope` 在固定候选域内枚举 1–3 条合取，并以完整训练集、逐条件负例见证及固定排名选优。工程上，纯贪心加条件不能自动继承最少条件数保证；每条条件有见证只证明不可单独删除，不证明全局最优。排序输入与 tie-break 可以恢复同一训练集合的顺序无关性，但无法证明追加历史不同的增量路径会得到相同结果。若要替换算法，应先定义新算法版本及反例选择、回溯、删冗余和失败处理规则，不原地修改 `scope_v1`。
 
@@ -26,7 +26,7 @@ Garg、Löding、Madhusudan、Neider 的 [ICE: A Robust Framework for Learning I
 
 [Stryker 官方等价 mutant 文档](https://stryker-mutator.io/docs/mutation-testing-elements/equivalent-mutants/) 说明等价 mutant 不能通过行为测试区分，并明确工具没有自动完整识别它们的办法。[官方结果与指标文档](https://stryker-mutator.io/docs/mutation-testing-elements/mutant-states-and-metrics/) 区分 killed、survived、timeout、runtime error 与 compile error；其默认指标将 timeout 计入 detected，运行/编译错误不计入有效 mutant 分母。
 
-**工程推论：** 有限契约 case 全部通过，只能证明这些观察没有发现差异；即便 mutant 不等价，也可能只在未覆盖输入上改变行为。必须区分“观察到差异”“未观察到差异”“另有依据确认等价”“运行无结论”。EvidenceGuard 不能照搬将 timeout 当 detected 的口径来宣称获得了缺陷断言证据。
+**工程推论：** 有限契约 case 全部通过，只能证明这些观察没有发现差异；即便 mutant 不等价，也可能只在未覆盖输入上改变行为。必须区分“观察到差异”“未观察到差异”“另有依据确认等价”“运行无结论”。CounterGuard 不能照搬将 timeout 当 detected 的口径来宣称获得了缺陷断言证据。
 
 `guard_applicable` 和 `guard_violation` 是独立轴：原接口、版本与上下文中，修复实现、等价 mutant 和缺陷 mutant 都可能适用同一 Guard；差别是执行是否违反断言。因此“非等价 = Scope 正例 / 等价 = Scope 负例”不成立。变异可作为独立的检出能力样本池，但不能自动写回现有 Scope 标签。
 
@@ -40,7 +40,7 @@ Garg、Löding、Madhusudan、Neider 的 [ICE: A Robust Framework for Learning I
 
 作者的 [QuickerCheck 原论文](https://arxiv.org/abs/2404.16062) 区分确定性与贪心并行 shrinking；二者可得到局部最小反例，但贪心不保证与顺序 shrinking 得到同一个结果。因此应声明具体简化关系与预算，不能普遍宣称“全局最小”。
 
-**工程推论：** EvidenceGuard 目前按失败 case 筛选是删除整条断言；纵向 shrinking 会改动输入，必须重新计算正确期望，而不能沿用原 case 的 expected。fixed 实现返回值只能作为候选 oracle；正式契约仍需独立认可。每个被接受的缩减候选应同时满足参数类型/合法域、确实更简单、buggy 存在断言失败、fixed 通过且两侧没有工具错误。新输入形成新契约/新 Evidence/新 Guard，不覆盖旧 case 或历史产物。对当前两个简单场景的实际收益尚不确定，需要执行成本与可读性数据。
+**工程推论：** CounterGuard 目前按失败 case 筛选是删除整条断言；纵向 shrinking 会改动输入，必须重新计算正确期望，而不能沿用原 case 的 expected。fixed 实现返回值只能作为候选 oracle；正式契约仍需独立认可。每个被接受的缩减候选应同时满足参数类型/合法域、确实更简单、buggy 存在断言失败、fixed 通过且两侧没有工具错误。新输入形成新契约/新 Evidence/新 Guard，不覆盖旧 case 或历史产物。对当前两个简单场景的实际收益尚不确定，需要执行成本与可读性数据。
 
 ## 本轮建议边界
 
@@ -48,4 +48,4 @@ Garg、Löding、Madhusudan、Neider 的 [ICE: A Robust Framework for Learning I
 - mutation 先分清结果类型与分母，生成/执行以及样本纳入规则另行版本化。
 - lazy 算法、ICE 蕴含与纵向 shrinking 先保留具体设计；当前证据不足以承诺提高效果，且替换算法或改输入会影响来源链。
 
-以上工程建议不是上述论文对 EvidenceGuard 的有效性证明；性能收益、适用性保持和未知 mutant 的等价性仍需本项目自己的验证。
+以上工程建议不是上述论文对 CounterGuard 的有效性证明；性能收益、适用性保持和未知 mutant 的等价性仍需本项目自己的验证。

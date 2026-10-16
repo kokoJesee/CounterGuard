@@ -6,11 +6,11 @@ import sqlite3
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.compiler import CompileRequest, compile_guard
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.registry import Registry
+from counterguard.cli import app
+from counterguard.compiler import CompileRequest, compile_guard
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.registry import Registry
 from tests.unit.test_integrity import captured  # noqa: F401
 
 GUARD_ID = "grd_registry_v1"

@@ -1,6 +1,6 @@
-# EvidenceGuard
+# CounterGuard
 
-EvidenceGuard turns verified bug evidence into reusable regression guards with explicit
+CounterGuard turns verified bug evidence into reusable regression guards with explicit
 applicability boundaries.
 
 MVP 0.1.0 covers the trusted local Python/pytest pipeline: bidirectional Evidence, minimal
@@ -18,7 +18,7 @@ the library wheel. No PyPI or GitHub publication is implied by local acceptance.
 The local `v0.1.0` tag anchors the validated MVP, including the missing-runner install hint.
 Its distributions live in `dist/v0.1.0-freeze/`; earlier D14 files retain their original hashes.
 Without pytest, execution fails before output creation with exit 3 and an
-`evidenceguard[runner]` installation hint. Both install choices are in the quickstart.
+`counterguard[runner]` installation hint. Both install choices are in the quickstart.
 
 Start with the [offline quickstart](docs/quickstart.md). Although the scenario is named
 `mvp.yaml`, it currently requires JSON syntax; YAML indentation, comments and anchors are
@@ -47,9 +47,9 @@ trusted code renders the tests, and a Verification Gate promotes only real buggy
 followed by fixed passes. This does not yet generate new oracle cases or call a live model.
 
 ```powershell
-uv run evidenceguard capture --request examples/demo/requests/discount_agent.json --agent-source recorded --workspace artifacts/day10
-uv run evidenceguard capture --request examples/demo/requests/query_agent.json --agent-source recorded --workspace artifacts/day10
-uv run evidenceguard verification verify artifacts/day10/candidates/cnd_discount_agent_v1/gate.json
+uv run counterguard capture --request examples/demo/requests/discount_agent.json --agent-source recorded --workspace artifacts/day10
+uv run counterguard capture --request examples/demo/requests/query_agent.json --agent-source recorded --workspace artifacts/day10
+uv run counterguard verification verify artifacts/day10/candidates/cnd_discount_agent_v1/gate.json
 ```
 
 Completed requests are read-only on repeat; changed inputs require a new semantic request ID.
@@ -60,8 +60,8 @@ New artifact paths, atomic temporary files and pytest caches must fit a 240 UTF-
 Day 11 runs that flow from clean inputs in an independent pinned workspace:
 
 ```powershell
-uv run evidenceguard pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/pipeline-example-v1
-uv run evidenceguard pipeline verify artifacts/pipeline-example-v1/run_manifest.json
+uv run counterguard pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/pipeline-example-v1
+uv run counterguard pipeline verify artifacts/pipeline-example-v1/run_manifest.json
 ```
 
 The scenario uses JSON-compatible YAML and the frozen training members only. It builds both
@@ -75,10 +75,10 @@ links use the source project root.
 Day 12 adds the one-command offline Demo and reports from the same JSON facts:
 
 ```powershell
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format json
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format markdown
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --verify-only
+uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
+uv run counterguard demo --workspace artifacts/quickstart-v1 --format json
+uv run counterguard demo --workspace artifacts/quickstart-v1 --format markdown
+uv run counterguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
 The first command creates `report.json` and `report.md` alongside the Pipeline. Repeating it
@@ -150,9 +150,9 @@ uv run pytest tests/contract_tests/test_membership_discount_v1.py
 It fails reproducibly for the buggy target, which charges members 90%:
 
 ```powershell
-$env:EVIDENCEGUARD_TARGET = "examples.discount.implementations.final_price_v1_buggy"
+$env:COUNTERGUARD_TARGET = "examples.discount.implementations.final_price_v1_buggy"
 uv run pytest tests/contract_tests/test_membership_discount_v1.py
-Remove-Item Env:EVIDENCEGUARD_TARGET
+Remove-Item Env:COUNTERGUARD_TARGET
 ```
 
 The benchmark labels under `benchmarks/` record guard applicability separately from contract
@@ -173,9 +173,9 @@ uv run pytest tests/contract_tests/test_query_limit_v1.py
 It fails reproducibly on the source bug, which accidentally accepts zero:
 
 ```powershell
-$env:EVIDENCEGUARD_TARGET = "examples.validation.implementations.query_limit_v1_buggy"
+$env:COUNTERGUARD_TARGET = "examples.validation.implementations.query_limit_v1_buggy"
 uv run pytest tests/contract_tests/test_query_limit_v1.py
-Remove-Item Env:EVIDENCEGUARD_TARGET
+Remove-Item Env:COUNTERGUARD_TARGET
 ```
 
 Legal v2 query parsers and v1 batch parsers are labeled inapplicable even though their signatures
@@ -206,8 +206,8 @@ Run from the repository root with the trusted example fixtures:
 
 ```powershell
 uv run python scripts/prepare_scope_v1.py
-uv run evidenceguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json
-uv run evidenceguard evidence inventory
+uv run counterguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json
+uv run counterguard evidence inventory
 ```
 
 The preparation script captures both scenarios and compiles their Guards without modifying the
@@ -236,9 +236,9 @@ artifacts under `artifacts/` are excluded from Git.
 ## Compile and directly replay a minimal Guard
 
 ```powershell
-uv run evidenceguard compile --guard-id grd_discount_member_rate_regression_v2 --evidence artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json --artifact-root artifacts
-uv run evidenceguard guard verify artifacts/guards/grd_discount_member_rate_regression_v2/guard.json
-uv run python -m evidenceguard guard run artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
+uv run counterguard compile --guard-id grd_discount_member_rate_regression_v2 --evidence artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json --artifact-root artifacts
+uv run counterguard guard verify artifacts/guards/grd_discount_member_rate_regression_v2/guard.json
+uv run python -m counterguard guard run artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
 ```
 
 The discount Guard contains two assertions; the query-limit Guard contains the one zero-rejection
@@ -248,21 +248,21 @@ Guard does not require the historical contract file. Guard runs return `0` for p
 assertion failure, `3` for execution errors, and `5` for corrupted assets. These direct smoke runs
 do not yet decide Scope applicability.
 
-`python -m evidenceguard` and the installed console script share one CLI. The
+`python -m counterguard` and the installed console script share one CLI. The
 [execution policy](docs/pytest-execution-policy.md) explains plugin/conftest loading and the explicit
 exception whitelist. The [Day 4 record](docs/progress/day4.md) includes the completed acceptance
 commands, artifact identities, and six direct replay results.
 
 The current `guard-test.v2` generator gives an actionable configuration error when manually run
-without `EVIDENCEGUARD_TARGET` or `EVIDENCEGUARD_SYMBOL`. Use `guard run --target module:symbol`
+without `COUNTERGUARD_TARGET` or `COUNTERGUARD_SYMBOL`. Use `guard run --target module:symbol`
 to supply them consistently. Old v1 assets remain auditable.
 
 ## Run the frozen training baselines
 
 ```powershell
 uv run python scripts/prepare_scope_v1.py
-uv run evidenceguard experiment verify --protocol experiments/scope_v1.json
-uv run evidenceguard benchmark baselines --protocol experiments/scope_v1.json --split train
+uv run counterguard experiment verify --protocol experiments/scope_v1.json
+uv run counterguard benchmark baselines --protocol experiments/scope_v1.json --split train
 ```
 
 | Method | TP | FP | TN | FN | Guard executions |
@@ -291,7 +291,7 @@ documented in [data contracts](docs/data-contracts.md).
 ## Audit automatic AST features
 
 ```powershell
-uv run evidenceguard features audit --benchmark-root benchmarks --output artifacts/audits/day6-feature-parity.json
+uv run counterguard features audit --benchmark-root benchmarks --output artifacts/audits/day6-feature-parity.json
 ```
 
 The audit compares all 15 samples with the frozen annotations, including both splits, without
@@ -316,8 +316,8 @@ the [adjudication process](docs/feature-adjudication.md).
 
 ```powershell
 uv run python scripts/prepare_scope_v1.py
-uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/experiments/scope-v1/fitted/learning-v2/initial
-uv run evidenceguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/experiments/scope-v1/fitted/learning-v2/refined
+uv run counterguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/experiments/scope-v1/fitted/learning-v2/initial
+uv run counterguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/experiments/scope-v1/fitted/learning-v2/refined
 ```
 
 Both initial rules use `contract_version == v1`. Adding the two frozen legal counterexamples and
@@ -357,7 +357,7 @@ mutation testing, and shrinking designs and limits.
 ## Run Scope-aware training replay
 
 ```powershell
-uv run evidenceguard benchmark replay --protocol experiments/scope_v1.json --phase refined --split train
+uv run counterguard benchmark replay --protocol experiments/scope_v1.json --phase refined --split train
 ```
 
 The expected exit code is **1**, because two applicable targets really violate their Guards.
@@ -373,7 +373,7 @@ does not mean the recorded verdict was pass.
 Individual replay can explicitly omit contract metadata to produce unknown without starting pytest:
 
 ```powershell
-uv run evidenceguard replay run --guard artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --scope artifacts/experiments/scope-v1/fitted/learning-v2/refined/grd_discount_member_rate_regression_v2.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
+uv run counterguard replay run --guard artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --scope artifacts/experiments/scope-v1/fitted/learning-v2/refined/grd_discount_member_rate_regression_v2.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price
 ```
 
 This returns 4 and preserves the missing-information reason. Supply `--contract` for the declared
@@ -384,8 +384,8 @@ afterward; changes during a run produce stale with the actual run preserved. See
 ## Evaluate all four methods on the frozen holdout
 
 ```powershell
-uv run evidenceguard experiment evaluate --protocol experiments/scope_v1.json --split holdout --fitted artifacts/experiments/scope-v1/fitted --output artifacts/experiments/scope-v1/final
-uv run evidenceguard experiment verify --run artifacts/experiments/scope-v1/final
+uv run counterguard experiment evaluate --protocol experiments/scope_v1.json --split holdout --fitted artifacts/experiments/scope-v1/fitted --output artifacts/experiments/scope-v1/final
+uv run counterguard experiment verify --run artifacts/experiments/scope-v1/final
 ```
 
 Evaluation consumes existing fits, executes the same six rows for all methods, and separately probes

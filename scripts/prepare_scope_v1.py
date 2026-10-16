@@ -4,9 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
-from evidenceguard.compiler import CompileRequest, compile_guard
-from evidenceguard.evidence import CaptureRequest, capture_evidence, verify_evidence
-from evidenceguard.models import Guard
+from counterguard.compiler import CompileRequest, compile_guard
+from counterguard.evidence import CaptureRequest, capture_evidence, verify_evidence
+from counterguard.models import Guard
 
 SCENARIOS = (
     {

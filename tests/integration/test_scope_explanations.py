@@ -2,9 +2,9 @@
 
 import pytest
 
-from evidenceguard.digests import digest_file
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.scope_explanations import explain_fitted_scopes
+from counterguard.digests import digest_file
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.scope_explanations import explain_fitted_scopes
 
 
 def snapshot(root):

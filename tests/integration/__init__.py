@@ -1,1 +1,1 @@
-"""Integration tests for EvidenceGuard public workflows."""
+"""Integration tests for CounterGuard public workflows."""

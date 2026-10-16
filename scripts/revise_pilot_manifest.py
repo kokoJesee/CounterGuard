@@ -4,10 +4,10 @@ import argparse
 import json
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes
-from evidenceguard.pilot_inputs import read_fact, signed
-from evidenceguard.repository_contracts import EVIDENCE_ID
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes
+from counterguard.pilot_inputs import read_fact, signed
+from counterguard.repository_contracts import EVIDENCE_ID
 
 
 def main():

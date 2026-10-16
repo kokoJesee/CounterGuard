@@ -24,7 +24,7 @@ def git(root: Path, *args: str) -> str:
 def sample_repository(root: Path) -> tuple[str, str]:
     root.mkdir(parents=True, exist_ok=True)
     git(root, "init", "-b", "main")
-    git(root, "config", "user.name", "EvidenceGuard fixture")
+    git(root, "config", "user.name", "CounterGuard fixture")
     git(root, "config", "user.email", "fixture@example.invalid")
     (root / "src").mkdir()
     (root / "contracts").mkdir()

@@ -10,17 +10,17 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.evidence import (
+from counterguard.cli import app
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.evidence import (
     CaptureRequest,
     capture_evidence,
     inventory_evidence,
     load_evidence,
     verify_evidence,
 )
-from evidenceguard.models import RunOutcome
+from counterguard.models import RunOutcome
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -142,7 +142,7 @@ def test_execution_error_cannot_become_reproduced_evidence(workspace: Path) -> N
 def test_import_error_inside_test_body_is_an_execution_error(workspace: Path) -> None:
     source = workspace / "examples/discount/implementations/final_price_v1_buggy.py"
     source.write_text(
-        "import evidenceguard_missing_dependency_for_test\n" + source.read_text(encoding="utf-8"),
+        "import counterguard_missing_dependency_for_test\n" + source.read_text(encoding="utf-8"),
         encoding="utf-8",
     )
     evidence = capture_evidence(_discount_request(workspace))
@@ -187,7 +187,7 @@ def test_capture_is_idempotent_and_rejects_same_id_with_different_inputs(
     def unexpected_run(*args: object, **kwargs: object) -> None:
         raise AssertionError("an idempotent capture must not rerun pytest")
 
-    monkeypatch.setattr("evidenceguard.evidence.run_pytest", unexpected_run)
+    monkeypatch.setattr("counterguard.evidence.run_pytest", unexpected_run)
     assert capture_evidence(request) == first
 
     conflicting = _discount_request(
@@ -234,7 +234,7 @@ def test_inputs_changed_during_capture_are_not_published(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     request = _discount_request(workspace)
-    from evidenceguard.evidence import run_pytest
+    from counterguard.evidence import run_pytest
 
     def mutate_after_run(run_request: object) -> object:
         result = run_pytest(run_request)  # type: ignore[arg-type]
@@ -242,7 +242,7 @@ def test_inputs_changed_during_capture_are_not_published(
         source.write_bytes(source.read_bytes() + b"\n# changed during capture\n")
         return result
 
-    monkeypatch.setattr("evidenceguard.evidence.run_pytest", mutate_after_run)
+    monkeypatch.setattr("counterguard.evidence.run_pytest", mutate_after_run)
     with pytest.raises(ArtifactIntegrityError, match="changed during capture"):
         capture_evidence(request)
     assert not (workspace / "artifacts/evidence" / request.evidence_id / "evidence.json").exists()

@@ -2,9 +2,9 @@
 
 from datetime import timedelta
 
-from evidenceguard.digests import canonical_json_bytes, digest_bytes
-from evidenceguard.models import Guard
-from evidenceguard.protocol import GUARD_SEMANTIC_FIELDS, guard_semantic_digest
+from counterguard.digests import canonical_json_bytes, digest_bytes
+from counterguard.models import Guard
+from counterguard.protocol import GUARD_SEMANTIC_FIELDS, guard_semantic_digest
 from tests.unit.test_guard import guard_payload
 from tests.unit.test_models import SHA_C
 

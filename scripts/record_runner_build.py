@@ -8,8 +8,8 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
 
 INVENTORY = r"""
 import base64, hashlib, importlib.metadata as m, json, platform
@@ -105,7 +105,7 @@ def write_receipt(value: dict, record: Path, receipt_path: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--verify", type=Path)
-    parser.add_argument("--image", default="evidenceguard-runner:w3b-formal-v1")
+    parser.add_argument("--image", default="counterguard-runner:w3b-formal-v1")
     parser.add_argument("--base", default="python:3.13-slim-bookworm")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--receipt", type=Path)

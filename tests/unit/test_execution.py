@@ -9,9 +9,9 @@ from typing import Any
 
 import pytest
 
-from evidenceguard.digests import digest_file
-from evidenceguard.execution import PytestRunRequest, run_pytest
-from evidenceguard.models import (
+from counterguard.digests import digest_file
+from counterguard.execution import PytestRunRequest, run_pytest
+from counterguard.models import (
     CaseOutcome,
     RunOutcome,
     RunRole,
@@ -86,7 +86,7 @@ def _fake_completed_run(
             stderr=b"captured stderr\n",
         )
 
-    monkeypatch.setattr("evidenceguard.execution.subprocess.run", fake_run)
+    monkeypatch.setattr("counterguard.execution.subprocess.run", fake_run)
     return call
 
 
@@ -111,14 +111,18 @@ import pytest
 @pytest.mark.parametrize("value", [pytest.param(1, id="target-case")])
 def test_controlled_environment(value: int) -> None:
     assert value == 1
+    assert os.environ["COUNTERGUARD_TARGET"] == "package.implementation"
+    assert os.environ["COUNTERGUARD_SYMBOL"] == "target"
     assert os.environ["EVIDENCEGUARD_TARGET"] == "package.implementation"
     assert os.environ["EVIDENCEGUARD_SYMBOL"] == "target"
-    assert "EVIDENCEGUARD_SHOULD_NOT_LEAK" not in os.environ
+    assert "COUNTERGUARD_SHOULD_NOT_LEAK" not in os.environ
     assert Path.cwd() == Path(__file__).parent
 """,
         encoding="utf-8",
     )
-    monkeypatch.setenv("EVIDENCEGUARD_SHOULD_NOT_LEAK", "secret")
+    monkeypatch.setenv("COUNTERGUARD_SHOULD_NOT_LEAK", "secret")
+    monkeypatch.setenv("EVIDENCEGUARD_TARGET", "host-controlled.module")
+    monkeypatch.setenv("EVIDENCEGUARD_SYMBOL", "host_controlled")
     (tmp_path / "conftest.py").write_text("raise RuntimeError('conftest must not load')\n")
     (tmp_path / "pytest.ini").write_text("[pytest]\naddopts = -p missing_project_plugin\n")
     request = PytestRunRequest(
@@ -176,8 +180,8 @@ def test_exit_one_requires_exact_known_case_mapping(
     assert call["kwargs"]["check"] is False
     assert call["kwargs"]["timeout"] == 30.0
     assert call["kwargs"]["cwd"] == tmp_path.resolve()
-    assert call["kwargs"]["env"]["EVIDENCEGUARD_TARGET"].endswith("final_price_v1_buggy")
-    assert call["kwargs"]["env"]["EVIDENCEGUARD_SYMBOL"] == "calculate_price"
+    assert call["kwargs"]["env"]["COUNTERGUARD_TARGET"].endswith("final_price_v1_buggy")
+    assert call["kwargs"]["env"]["COUNTERGUARD_SYMBOL"] == "calculate_price"
 
 
 def test_unknown_junit_node_cannot_become_test_failure(
@@ -271,7 +275,7 @@ def test_timeout_is_not_reported_as_a_test_failure(
             stderr=b"partial stderr",
         )
 
-    monkeypatch.setattr("evidenceguard.execution.subprocess.run", time_out)
+    monkeypatch.setattr("counterguard.execution.subprocess.run", time_out)
 
     record = run_pytest(_request(tmp_path, timeout_seconds=0.01))
 
@@ -291,7 +295,7 @@ def test_launch_error_is_not_reported_as_a_test_failure(
     ) -> subprocess.CompletedProcess[bytes]:
         raise FileNotFoundError("python executable disappeared")
 
-    monkeypatch.setattr("evidenceguard.execution.subprocess.run", fail_to_launch)
+    monkeypatch.setattr("counterguard.execution.subprocess.run", fail_to_launch)
 
     record = run_pytest(_request(tmp_path))
 

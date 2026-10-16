@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.protocol import verify_protocol
+from counterguard.cli import app
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.protocol import verify_protocol
 from scripts.prepare_scope_v1 import prepare
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

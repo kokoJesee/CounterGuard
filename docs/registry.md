@@ -3,10 +3,10 @@
 Registry 只登记和审核已有 Guard，不捕获 Evidence、不执行测试、不决定 Scope，也不提升为 Active。`enabled` 表示允许进入后续核验候选，不等于生命周期 Active；W4 状态机尚未实现。
 
 ```powershell
-uv run evidenceguard registry add artifacts/guards/<guard-id>/guard.json --cwd <source-workspace> --root .evidenceguard
-uv run evidenceguard registry list --root .evidenceguard --format json
-uv run evidenceguard registry show <guard-id> --root .evidenceguard --with-evidence
-uv run evidenceguard registry disable <guard-id> --root .evidenceguard --reason "manual review"
+uv run counterguard registry add artifacts/guards/<guard-id>/guard.json --cwd <source-workspace> --root .counterguard
+uv run counterguard registry list --root .counterguard --format json
+uv run counterguard registry show <guard-id> --root .counterguard --with-evidence
+uv run counterguard registry disable <guard-id> --root .counterguard --reason "manual review"
 uv run pytest tests/unit/test_registry.py tests/integration/test_registry_cli.py -q
 ```
 
@@ -15,7 +15,7 @@ uv run pytest tests/unit/test_registry.py tests/integration/test_registry_cli.py
 持久化布局：
 
 ```text
-.evidenceguard/
+.counterguard/
   registry.json             # 不可变 registry 身份
   entries/<guard-id>.json   # Guard/Evidence 快照、原工作区/ref/原文件摘要
   events/00000001.json      # 全局追加序列、前驱摘要、Guard 摘要、操作者/时间/原因

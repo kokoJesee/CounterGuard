@@ -2,7 +2,7 @@
 
 import pytest
 
-from evidenceguard.preflight import preflight_repository
+from counterguard.preflight import preflight_repository
 from tests.repository_support import git
 
 pytestmark = pytest.mark.slow

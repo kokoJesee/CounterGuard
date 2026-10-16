@@ -1,3 +1,3 @@
 # Read-only inspection fixture
 
-This package must not be imported or executed by EvidenceGuard inspect.
+This package must not be imported or executed by CounterGuard inspect.

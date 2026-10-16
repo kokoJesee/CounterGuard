@@ -23,7 +23,7 @@
 
 1. `tests/integration/`、`tests/e2e/` 整体标记 slow。其中一些单项不执行子进程，但准备/审核成本较高；保守归入慢测。
 2. pytest 的传递 fixture 依赖闭包若包含 `replay_workspace` 或 `flow`，也标记 slow。只读/篡改测试若依赖已执行的准备阶段，同样不能伪装成快测。
-3. 位于其他目录且真实启动子进程的用例显式 `@pytest.mark.slow`。当前是受控 pytest 执行器实测和 `python -m evidenceguard` 入口实测。
+3. 位于其他目录且真实启动子进程的用例显式 `@pytest.mark.slow`。当前是受控 pytest 执行器实测和 `python -m counterguard` 入口实测。
 4. 剩余测试标记 fast。fast/slow 同时出现直接报配置错误；`--strict-markers` 防止拼错 marker 静默失效。
 
 不支持用 fast 标记覆盖重型目录/fixture 规则。将来新准备 fixture 使用明确 slow 标记或扩充慢 fixture 名称表；不能通过改目录名或偷偷 mock 实际执行来让耗时好看。

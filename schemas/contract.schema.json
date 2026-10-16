@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://evidenceguard.dev/schemas/contract.v1.json",
-  "title": "EvidenceGuard contract",
+  "$id": "https://counterguard.dev/schemas/contract.v1.json",
+  "title": "CounterGuard contract",
   "type": "object",
   "additionalProperties": false,
   "required": [

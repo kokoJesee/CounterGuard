@@ -10,22 +10,22 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.change_analysis import InspectionReport, TargetImpact, inspect_repository
-from evidenceguard.digests import digest_file, digest_json_artifact
-from evidenceguard.execution import PytestRunRequest
-from evidenceguard.models import RunOutcome, RunRole, TargetRef
-from evidenceguard.project_config import load_project_config
-from evidenceguard.repository import FilePin
-from evidenceguard.runners.docker import DockerExecutor, authorize_docker_execution
+from counterguard.change_analysis import InspectionReport, TargetImpact, inspect_repository
+from counterguard.digests import digest_file, digest_json_artifact
+from counterguard.execution import PytestRunRequest
+from counterguard.models import RunOutcome, RunRole, TargetRef
+from counterguard.project_config import load_project_config
+from counterguard.repository import FilePin
+from counterguard.runners.docker import DockerExecutor, authorize_docker_execution
 from tests.repository_support import git
 
 pytestmark = [pytest.mark.slow, pytest.mark.docker]
 
 
 def _image_digest() -> str:
-    value = os.environ.get("EVIDENCEGUARD_RUNNER_IMAGE_DIGEST")
+    value = os.environ.get("COUNTERGUARD_RUNNER_IMAGE_DIGEST")
     if not value:
-        pytest.skip("set EVIDENCEGUARD_RUNNER_IMAGE_DIGEST to run real Docker attacks")
+        pytest.skip("set COUNTERGUARD_RUNNER_IMAGE_DIGEST to run real Docker attacks")
     return value
 
 
@@ -33,7 +33,7 @@ def _workspace(tmp_path: Path, test_body: str, *, timeout: float = 5.0):
     source = tmp_path / "src/pricing.py"
     contract = tmp_path / "contracts/price.json"
     test = tmp_path / "guards/test_guard.py"
-    config = tmp_path / "evidenceguard.yaml"
+    config = tmp_path / "counterguard.yaml"
     for path in (source, contract, test):
         path.parent.mkdir(parents=True, exist_ok=True)
     source.write_text("def price(value):\n    return value\n", encoding="utf-8")
@@ -134,7 +134,7 @@ def _workspace(tmp_path: Path, test_body: str, *, timeout: float = 5.0):
 def test_real_container_enforces_identity_filesystem_network_and_cgroups(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("EVIDENCEGUARD_SHOULD_NOT_LEAK", "host-secret")
+    monkeypatch.setenv("COUNTERGUARD_SHOULD_NOT_LEAK", "host-secret")
     body = r'''
 import os
 import socket
@@ -147,9 +147,11 @@ import pytest
 def test_isolation(case):
     assert case == 1
     assert os.getuid() == 65532 and os.getgid() == 65532
-    assert os.environ.get("EVIDENCEGUARD_SHOULD_NOT_LEAK") is None
+    assert os.environ.get("EVIDENCEGUARD_TARGET") == "src.pricing"
+    assert os.environ.get("EVIDENCEGUARD_SYMBOL") == "price"
+    assert os.environ.get("COUNTERGUARD_SHOULD_NOT_LEAK") is None
     assert Path.cwd() == Path("/workspace")
-    assert not Path("/workspace/evidenceguard.yaml").exists()
+    assert not Path("/workspace/counterguard.yaml").exists()
     assert not Path("/workspace/conftest.py").exists()
     assert not Path("/workspace/pytest.ini").exists()
     with pytest.raises(OSError):
@@ -193,7 +195,7 @@ def test_real_inspection_requires_separate_authorization_before_docker_replay(
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-b", "main")
-    git(repo, "config", "user.name", "EvidenceGuard fixture")
+    git(repo, "config", "user.name", "CounterGuard fixture")
     git(repo, "config", "user.email", "fixture@example.invalid")
     (repo / "src").mkdir()
     (repo / "contracts").mkdir()
@@ -300,7 +302,7 @@ def test_timeout(case):
     assert record.outcome is RunOutcome.TIMEOUT
     docker = shutil.which("docker")
     remaining = subprocess.run(
-        [docker, "ps", "-a", "--filter", "name=evidenceguard-w3b-", "--format", "{{.Names}}"],
+        [docker, "ps", "-a", "--filter", "name=counterguard-w3b-", "--format", "{{.Names}}"],
         capture_output=True,
         text=True,
         timeout=5,

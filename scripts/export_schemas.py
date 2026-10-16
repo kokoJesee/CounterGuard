@@ -3,32 +3,32 @@
 import json
 from pathlib import Path
 
-from evidenceguard.baselines import FeatureVector, ScopePredicate
-from evidenceguard.change_analysis import InspectionReport
-from evidenceguard.demo import DemoReport
-from evidenceguard.evaluation import EvaluationReport
-from evidenceguard.evaluation_metrics import EvaluationMetrics, Prediction
-from evidenceguard.features import FeatureRecord
-from evidenceguard.independent_verifier import (
+from counterguard.baselines import FeatureVector, ScopePredicate
+from counterguard.change_analysis import InspectionReport
+from counterguard.demo import DemoReport
+from counterguard.evaluation import EvaluationReport
+from counterguard.evaluation_metrics import EvaluationMetrics, Prediction
+from counterguard.features import FeatureRecord
+from counterguard.independent_verifier import (
     AgentContext,
     CandidateRecord,
     CandidateTest,
     VerificationRequest,
 )
-from evidenceguard.models import Evidence, Guard, RunRecord
-from evidenceguard.module_context import ModuleContext
-from evidenceguard.pipeline import PipelineFailure, PipelineManifest
-from evidenceguard.project_config import ProjectConfig
-from evidenceguard.protocol import ExperimentProtocol, SplitManifest
-from evidenceguard.registry import RegistryEntry, RegistryEvent, RegistryIdentity
-from evidenceguard.replay import ReplayResult
-from evidenceguard.report import CommandReport, ReplayPresentation
-from evidenceguard.repository import RepositorySnapshot
-from evidenceguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
-from evidenceguard.scope import FitManifest, ScopeLearningResult, TrainingExample
-from evidenceguard.scope_explanations import ScopeExplanation
-from evidenceguard.verification_gate import GateResult
-from evidenceguard.workspace import PipelineScenario, WorkspaceManifest
+from counterguard.models import Evidence, Guard, RunRecord
+from counterguard.module_context import ModuleContext
+from counterguard.pipeline import PipelineFailure, PipelineManifest
+from counterguard.project_config import ProjectConfig
+from counterguard.protocol import ExperimentProtocol, SplitManifest
+from counterguard.registry import RegistryEntry, RegistryEvent, RegistryIdentity
+from counterguard.replay import ReplayResult
+from counterguard.report import CommandReport, ReplayPresentation
+from counterguard.repository import RepositorySnapshot
+from counterguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
+from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
+from counterguard.scope_explanations import ScopeExplanation
+from counterguard.verification_gate import GateResult
+from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
     "evidence": Evidence,

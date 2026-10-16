@@ -4,8 +4,8 @@ import sys
 
 import pytest
 
-from evidenceguard.digests import canonical_json_bytes
-from evidenceguard.pilot_inputs import read_fact, signed
+from counterguard.digests import canonical_json_bytes
+from counterguard.pilot_inputs import read_fact, signed
 from scripts import run_pilot
 
 

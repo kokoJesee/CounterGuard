@@ -6,20 +6,20 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.digests import canonical_json_bytes
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.pilot_inputs import read_fact, signed
-from evidenceguard.registry import Registry
-from evidenceguard.repository_contracts import GUARD_ID
+from counterguard.digests import canonical_json_bytes
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.pilot_inputs import read_fact, signed
+from counterguard.registry import Registry
+from counterguard.repository_contracts import GUARD_ID
 
 pytestmark = pytest.mark.slow
 
 
 @pytest.fixture
 def registry_copy(tmp_path):
-    manifest_ref = os.environ.get("EVIDENCEGUARD_PILOT_MANIFEST")
+    manifest_ref = os.environ.get("COUNTERGUARD_PILOT_MANIFEST")
     if not manifest_ref:
-        pytest.skip("set EVIDENCEGUARD_PILOT_MANIFEST for the completed real fork pilot")
+        pytest.skip("set COUNTERGUARD_PILOT_MANIFEST for the completed real fork pilot")
     root = Path(__file__).resolve().parents[2]
     manifest = read_fact(root / manifest_ref)
     destination = tmp_path / "registry-copy"

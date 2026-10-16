@@ -13,7 +13,7 @@
 
 ```text
 context_id: scope_v1_module_context
-artifact_digest: sha256:08f548c920924dac44f2058014b64c79e6d18f348b820a6535be7b1795f1ad6a
+artifact_digest: sha256:8f55d8564259edb5b03bcfd82c4055eaf5e31f3025adbd00ed2dfa6f475b0691
 ```
 
 规则使用点分包边界匹配，禁止重复或重叠前缀；未匹配或歧义时失败。`examples.discounted` 不属于 `examples.discount`。当前固定两条架构包规则；D7 同时核对 context 自摘要和固定摘要，因此修改值后重新计算自摘要也不能悄悄改变 scope_v1。

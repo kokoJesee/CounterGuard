@@ -2,7 +2,7 @@
 
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。
 
-Q1 的可执行只读入口为 `uv run evidenceguard preflight --repo <repo> --revision <sha>`，覆盖完整提交树及新旧 pytest TOML 配置；不 import/安装仓库。0 仅表示静态候选，blocked/unknown 退出 4、拒绝退出 5，均保持 execution_allowed=false。详见 [预检说明](preflight.md)。
+Q1 的可执行只读入口为 `uv run counterguard preflight --repo <repo> --revision <sha>`，覆盖完整提交树及新旧 pytest TOML 配置；不 import/安装仓库。0 仅表示静态候选，blocked/unknown 退出 4、拒绝退出 5，均保持 execution_allowed=false。详见 [预检说明](preflight.md)。
 
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
 
@@ -34,12 +34,12 @@ Q1 的可执行只读入口为 `uv run evidenceguard preflight --repo <repo> --r
 capture/compile/learn/evaluate 不是“新目标是否通过”的单行 Replay：它们的 replays 为空，不给出虚构 scope_decision。evaluate 的四方法完整事实/指标/Markdown 继续由 D9 不可变结果文件提供，CLI 格式选项仅展示原 EvaluationReport，不把验收摘要冒充逐行执行。
 
 ```powershell
-uv run evidenceguard learn --protocol experiments/scope_v1.json --phase refined --output artifacts/fitted-new/refined --format markdown
-uv run evidenceguard replay run --guard <guard.json> --scope <scope.json> --target <module:symbol> --contract <contract.json> --format json
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/cli-demo-v1
-uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --format json
-uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --format markdown
-uv run evidenceguard demo --workspace artifacts/cli-demo-v1 --verify-only
+uv run counterguard learn --protocol experiments/scope_v1.json --phase refined --output artifacts/fitted-new/refined --format markdown
+uv run counterguard replay run --guard <guard.json> --scope <scope.json> --target <module:symbol> --contract <contract.json> --format json
+uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/cli-demo-v1
+uv run counterguard demo --workspace artifacts/cli-demo-v1 --format json
+uv run counterguard demo --workspace artifacts/cli-demo-v1 --format markdown
+uv run counterguard demo --workspace artifacts/cli-demo-v1 --verify-only
 ```
 
 尖括号路径需要替换为同一来源链中的实际资产。不要混用旧 Guard 与新 fit 的摘要。已有失败、部分目录或代码/输入已变更时，选择新的 workspace 版本，不删除/重签原产物来恢复。
@@ -77,7 +77,7 @@ D12 修正了 compile 自检错误分支：旧实现调用 `_emit_run` 时，tes
 
 ## fork MAC 试点专用入口
 
-当前 `evidenceguard preflight` 的默认命令仍对应正式 v1 的 pytest8.4.2/root-imports，
+当前 `counterguard preflight` 的默认命令仍对应正式 v1 的 pytest8.4.2/root-imports，
 不会因为安装了新镜像而自动放宽。pytest9/src 的受限试点使用显式冻结 manifest：
 
 ```powershell
@@ -88,7 +88,7 @@ uv run python scripts/run_pilot.py --manifest integrations/pilot/manifest-v5.yam
 每个输出目录必须全新。`build-guard` 每个捕获版本只运行一次，不能重复覆盖工作区或旧产物；
 已完成的 Guard 用 replay 重放。新版本仓库 Evidence/Guard 只能经这个 Docker 路径捕获/自检/执行，
 不支持通过原 trusted-local compile/guard run 绕过审核。
-配置 `evidenceguard.yaml` 仍是 **JSON 语法子集**，不是带缩进/注释的通用 YAML。
+配置 `counterguard.yaml` 仍是 **JSON 语法子集**，不是带缩进/注释的通用 YAML。
 
 独立复核并比较两次真实重放：
 

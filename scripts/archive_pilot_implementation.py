@@ -7,10 +7,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.change_analysis import inspection_implementation_digests
-from evidenceguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
-from evidenceguard.pilot_inputs import signed
+from counterguard.artifacts import write_immutable
+from counterguard.change_analysis import inspection_implementation_digests
+from counterguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
+from counterguard.pilot_inputs import signed
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     before = inspection_implementation_digests()
     refs = sorted(
         {
-            *Path("src/evidenceguard").rglob("*.py"),
+            *Path("src/counterguard").rglob("*.py"),
             *Path("scripts").glob("*.py"),
             Path("pyproject.toml"),
             Path("uv.lock"),

@@ -8,9 +8,9 @@
 - B `e01166b00424be9d7d544d262e0e0873e1f0a999`：真实 buggy。
 - F `6ffd8625ee4272dade063653bff615014bdc4734`：真实上游修复及新增测试。
 - H `a7565a59962bf9c784cd1c6dc4ad8df0ee0effd5`：fork 中单独一次工具方提交，直接继承 F，
-  提交信息为 `NOT upstream: add EvidenceGuard MAC pilot configuration and contracts`。
+  提交信息为 `NOT upstream: add CounterGuard MAC pilot configuration and contracts`。
 
-H 只新增 `evidenceguard.yaml`、`contracts/mac-complete-v2.json` 和
+H 只新增 `counterguard.yaml`、`contracts/mac-complete-v2.json` 和
 `contracts/provenance.json`。全部上游文件逐字节与 F 比较，不能修改、删除或替换。
 manifest 的 file_origins 逐文件记录 upstream/tool、来源提交和内容摘要。
 许可为上游 `LICENSE.txt` 的 MIT，原字节摘要也被固定。

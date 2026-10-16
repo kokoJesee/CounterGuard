@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from evidenceguard.repository import read_repository
+from counterguard.repository import read_repository
 
 
 class Process:

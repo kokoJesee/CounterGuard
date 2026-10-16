@@ -5,16 +5,16 @@ from collections.abc import Mapping
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.baselines import (
+from counterguard.baselines import (
     ScopeClause,
     ScopePredicate,
     count_predictions,
     decide_scope,
     make_baseline,
 )
-from evidenceguard.digests import digest_json_artifact
-from evidenceguard.models import Guard
-from evidenceguard.protocol import EXPECTED_TRAIN
+from counterguard.digests import digest_json_artifact
+from counterguard.models import Guard
+from counterguard.protocol import EXPECTED_TRAIN
 from tests.benchmark_support import TRAIN_FILES, load_samples
 from tests.unit.test_guard import guard_payload
 from tests.unit.test_models import SHA_A

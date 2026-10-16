@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.baselines import ConfusionCounts, ScopeClause
-from evidenceguard.digests import canonical_json_bytes, digest_bytes, digest_json_artifact
-from evidenceguard.errors import InsufficientScopeEvidence
-from evidenceguard.predicates import VOCABULARY, FeatureVector
-from evidenceguard.scope import ScopeLearningResult, TrainingExample, learn_scope
+from counterguard.baselines import ConfusionCounts, ScopeClause
+from counterguard.digests import canonical_json_bytes, digest_bytes, digest_json_artifact
+from counterguard.errors import InsufficientScopeEvidence
+from counterguard.predicates import VOCABULARY, FeatureVector
+from counterguard.scope import ScopeLearningResult, TrainingExample, learn_scope
 from tests.unit.test_scope import row
 
 ORDER = (
@@ -130,7 +130,7 @@ def test_masks_cover_more_than_sixty_four_rows_and_three_necessary_clauses():
 
 
 def test_predicate_matching_is_cached_once_per_candidate_and_training_row(monkeypatch):
-    import evidenceguard.scope as scope
+    import counterguard.scope as scope
 
     calls = []
     original = scope._matches

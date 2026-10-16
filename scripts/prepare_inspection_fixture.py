@@ -38,7 +38,7 @@ def prepare(output: Path) -> dict[str, str]:
         source / "base", output, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__")
     )
     git("init", "-b", "main")
-    git("config", "user.name", "EvidenceGuard inspection fixture")
+    git("config", "user.name", "CounterGuard inspection fixture")
     git("config", "user.email", "fixture@example.invalid")
     git("add", ".")
     git("commit", "-m", "fixture base")

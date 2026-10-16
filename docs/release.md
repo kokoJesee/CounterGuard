@@ -10,9 +10,9 @@ D14 交付本地源码分发、wheel、冻结评测汇总和新 Demo。正式执
 
 ```powershell
 uv sync --frozen
-uv run evidenceguard version
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/freeze-demo
-uv run evidenceguard demo --workspace artifacts/freeze-demo --verify-only
+uv run counterguard version
+uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/freeze-demo
+uv run counterguard demo --workspace artifacts/freeze-demo --verify-only
 ```
 
 选择未使用过的 workspace。反复调用已完成目录只读验证；源码或依赖版本变化后用新目录。mvp.yaml 只支持 JSON 子集，见 [快速开始](quickstart.md)。
@@ -23,21 +23,21 @@ uv run evidenceguard demo --workspace artifacts/freeze-demo --verify-only
 uv build --out-dir dist/v0.1.0-freeze
 uv venv .release-env
 uv export --frozen --all-extras --no-dev --no-emit-project --output-file release-constraints.txt
-uv pip install --python .release-env/Scripts/python.exe --constraint release-constraints.txt './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl[runner]'
-.release-env/Scripts/evidenceguard.exe --help
-.release-env/Scripts/python.exe -I -m evidenceguard version
+uv pip install --python .release-env/Scripts/python.exe --constraint release-constraints.txt './dist/v0.1.0-freeze/counterguard-0.1.0-py3-none-any.whl[runner]'
+.release-env/Scripts/counterguard.exe --help
+.release-env/Scripts/python.exe -I -m counterguard version
 ```
 
 `runner` 声明既有 pytest 执行器依赖，不引入新的第三方库。基础 wheel 的 pydantic/typer 足够加载 CLI/数据模型，却不足以运行 pytest；需要执行的安装选择 runner。dev 组继续供源码测试使用。约束文件保留本次锁定版本；不使用它重新解析依赖时，未来版本可能与已发布证据的环境 pin 不同。
 
 基础/执行两种安装命令见 [快速开始](quickstart.md)。缺少 pytest 的执行请求会在创建运行目录前给出安装提示，退出 3；版本元数据和模块查找均检查，但这不证明任意损坏或被篡改的 pytest 安装可运行。
 
-wheel 只装 Python 库与 console entry point；Demo 输入位于源码分发的 examples、benchmarks、experiments、tests/contract_tests。为了排除从当前 checkout 偷偷导入源码，安装验收要在 checkout 外运行，使用解释器的 `-I` 并检查 evidenceguard.__file__ 位于新环境 site-packages。指定 `--cwd` 到解压后的源码输入根目录，再用新输出目录运行：
+wheel 只装 Python 库与 console entry point；Demo 输入位于源码分发的 examples、benchmarks、experiments、tests/contract_tests。为了排除从当前 checkout 偷偷导入源码，安装验收要在 checkout 外运行，使用解释器的 `-I` 并检查 counterguard.__file__ 位于新环境 site-packages。指定 `--cwd` 到解压后的源码输入根目录，再用新输出目录运行：
 
 ```powershell
 # 将以下两个绝对路径替换成实际安装环境与解压后的源码分发目录。
-& 'D:/release-env/Scripts/python.exe' -I -m evidenceguard demo --cwd 'D:/release-source' --scenario examples/demo/mvp.yaml --workspace artifacts/wheel-demo --format json
-& 'D:/release-env/Scripts/python.exe' -I -m evidenceguard demo --cwd 'D:/release-source' --workspace artifacts/wheel-demo --verify-only
+& 'D:/release-env/Scripts/python.exe' -I -m counterguard demo --cwd 'D:/release-source' --scenario examples/demo/mvp.yaml --workspace artifacts/wheel-demo --format json
+& 'D:/release-env/Scripts/python.exe' -I -m counterguard demo --cwd 'D:/release-source' --workspace artifacts/wheel-demo --verify-only
 ```
 
 安装 Demo 必须真的完成双向 Capture、最小 Guard 自检、两阶段学习与 Replay；单独 `--help` 成功不能替代这条验收。生成输入和原始日志的源码引用是相对路径；代码 pin 对应实际导入的 wheel 文件。

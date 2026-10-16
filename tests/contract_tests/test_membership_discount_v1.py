@@ -9,16 +9,16 @@ from typing import Any, Protocol
 
 import pytest
 
-from evidenceguard.contracts import resolve_exception
+from counterguard.contracts import resolve_exception
 
 DEFAULT_TARGET = "examples.discount.implementations.final_price_v1_fixed"
-TARGET_MODULE = os.environ.get("EVIDENCEGUARD_TARGET", DEFAULT_TARGET)
-TARGET_SYMBOL = os.environ.get("EVIDENCEGUARD_SYMBOL", "calculate_price")
+TARGET_MODULE = os.environ.get("COUNTERGUARD_TARGET", DEFAULT_TARGET)
+TARGET_SYMBOL = os.environ.get("COUNTERGUARD_SYMBOL", "calculate_price")
 DEFAULT_CONTRACT = (
     Path(__file__).resolve().parents[2]
     / "examples/discount/contracts/membership_discount_final_price_v1.json"
 )
-CONTRACT_PATH = Path(os.environ.get("EVIDENCEGUARD_CONTRACT", str(DEFAULT_CONTRACT)))
+CONTRACT_PATH = Path(os.environ.get("COUNTERGUARD_CONTRACT", str(DEFAULT_CONTRACT)))
 CONTRACT = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
 

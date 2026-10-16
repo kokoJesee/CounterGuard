@@ -7,12 +7,12 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.baselines import ScopeClause
-from evidenceguard.digests import digest_json_artifact
-from evidenceguard.errors import InsufficientScopeEvidence
-from evidenceguard.features import FeatureRecord
-from evidenceguard.predicates import FeatureVector
-from evidenceguard.scope import ScopeLearningResult, TrainingExample, learn_scope
+from counterguard.baselines import ScopeClause
+from counterguard.digests import digest_json_artifact
+from counterguard.errors import InsufficientScopeEvidence
+from counterguard.features import FeatureRecord
+from counterguard.predicates import FeatureVector
+from counterguard.scope import ScopeLearningResult, TrainingExample, learn_scope
 
 
 def vector(**changes):

@@ -1,1 +1,1 @@
-"""Executable examples used by the EvidenceGuard benchmark."""
+"""Executable examples used by the CounterGuard benchmark."""

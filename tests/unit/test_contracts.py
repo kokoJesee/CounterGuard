@@ -2,7 +2,7 @@
 
 import pytest
 
-from evidenceguard.contracts import convert_contract_value, resolve_exception
+from counterguard.contracts import convert_contract_value, resolve_exception
 
 
 @pytest.mark.parametrize(

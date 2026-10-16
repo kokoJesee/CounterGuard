@@ -5,10 +5,10 @@ import subprocess
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.diagnostics import public_diagnostic
-from evidenceguard.execution import run_pytest, verify_run_record
-from evidenceguard.report import OutputFormat, command_report, render_report
+from counterguard.cli import app
+from counterguard.diagnostics import public_diagnostic
+from counterguard.execution import run_pytest, verify_run_record
+from counterguard.report import OutputFormat, command_report, render_report
 from tests.unit.test_execution import _request
 
 
@@ -167,13 +167,13 @@ def test_cli_rejects_general_yaml_with_actionable_json_hint_before_output(tmp_pa
 
 
 def test_api_keys_are_not_forwarded_to_pytest_or_copied_into_run_metadata(tmp_path, monkeypatch):
-    for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "EVIDENCEGUARD_SECRET"):
+    for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "COUNTERGUARD_SECRET"):
         monkeypatch.setenv(name, "d13-environment-secret-needle")
 
     def completed(argv, **kwargs):
         assert not any(
             name in kwargs["env"]
-            for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "EVIDENCEGUARD_SECRET")
+            for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "COUNTERGUARD_SECRET")
         )
         (tmp_path / argv[argv.index("--junitxml") + 1]).write_text(
             '<testsuite><testcase name="test_case[member-price]"/></testsuite>', encoding="utf-8"

@@ -7,12 +7,12 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.evidence import verify_evidence
-from evidenceguard.models import RunOutcome
-from evidenceguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
+from counterguard.cli import app
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.evidence import verify_evidence
+from counterguard.models import RunOutcome
+from counterguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -71,7 +71,7 @@ def test_repeat_is_read_only_and_does_not_forge_time(workspace, monkeypatch):
         pytest.fail("Completed requests must not execute pytest or call the provider")
 
     monkeypatch.setattr("subprocess.run", forbidden)
-    monkeypatch.setattr("evidenceguard.model_client.RecordedModelClient.generate", forbidden)
+    monkeypatch.setattr("counterguard.model_client.RecordedModelClient.generate", forbidden)
     repeated = capture_candidate(path, cwd=workspace, workspace="out")
     assert repeated == result
     assert repeated.created_at == result.created_at
@@ -124,13 +124,13 @@ def test_target_import_error_cannot_become_verified_failure(workspace):
 
 
 def test_collection_error_cannot_be_promoted(workspace, monkeypatch):
-    from evidenceguard.independent_verifier import render_candidate
+    from counterguard.independent_verifier import render_candidate
 
     # Fault injection in the trusted renderer, never execution of model code.
     def broken_renderer(candidate, context):
         return b"import missing_collection_dependency_eg\n" + render_candidate(candidate, context)
 
-    monkeypatch.setattr("evidenceguard.verification_gate.render_candidate", broken_renderer)
+    monkeypatch.setattr("counterguard.verification_gate.render_candidate", broken_renderer)
     result = capture(workspace)
     evidence = verify_evidence(result.diagnostic_evidence_ref, cwd=workspace)
     assert evidence.buggy_run.pytest_exit_code == 2
@@ -197,7 +197,7 @@ def test_long_gate_path_rejected_before_response_or_outputs(workspace, monkeypat
     def forbidden(*args, **kwargs):
         pytest.fail("Path preflight must run before calling the provider")
 
-    monkeypatch.setattr("evidenceguard.model_client.RecordedModelClient.generate", forbidden)
+    monkeypatch.setattr("counterguard.model_client.RecordedModelClient.generate", forbidden)
     output = workspace / ("a" * 90) / ("b" * 60)
     with pytest.raises(ValueError, match="UTF-16"):
         capture_candidate(request_file(workspace), cwd=workspace, workspace=output)

@@ -1,7 +1,7 @@
 # 候选仓库的只读执行预检
 
 ```powershell
-uv run evidenceguard preflight --repo artifacts/pilot/validators-discovery-v1/repo --revision 6ffd8625ee4272dade063653bff615014bdc4734
+uv run counterguard preflight --repo artifacts/pilot/validators-discovery-v1/repo --revision 6ffd8625ee4272dade063653bff615014bdc4734
 ```
 
 预检只读取完整 Git 提交树，不 checkout、不安装、不加载 conftest、不 import 目标或执行 Python。复用 W3-A 的对象/路径/fsck 安全 profile；最多 2048 个文件、单文件 1 MiB、总原始文件 8 MiB。结果列出每个文件的 Git/内容 pin 与实际实现摘要，重复同输入逐字节一致，不伪造执行时间。工作树删改不隐藏提交里的要求。

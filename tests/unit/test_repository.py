@@ -7,10 +7,10 @@ import subprocess
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.change_analysis import inspect_repository, render_inspection
-from evidenceguard.cli import app
-from evidenceguard.digests import digest_json_artifact
-from evidenceguard.repository import read_repository
+from counterguard.change_analysis import inspect_repository, render_inspection
+from counterguard.cli import app
+from counterguard.digests import digest_json_artifact
+from counterguard.repository import read_repository
 from tests.repository_support import git, sample_repository
 from tests.unit.test_project_config import project
 

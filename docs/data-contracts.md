@@ -12,7 +12,7 @@
 
 SQLite 逐字节索引规范 JSON，并追加镜像同一事件；每次访问与完整 JSON 事实核对。缺失/损坏/不一致不调度；显式重建只能消费完整合法事实与历史。来源依旧保留在原工作区，运行前重验，不把登记快照当作永久通过证书。首次登记时间真实保留，重复相同 digest 无新事件/时间；相同 ID 不同 digest 拒绝。该存储层不改变 Guard 的 candidate 生命周期字段，亦不改变冻结实验。
 
-本文说明当前持久化接口，字段校验以 `src/evidenceguard/models.py`、`predicates.py`、`features.py`、`baselines.py`、`protocol.py`、`scope.py` 和 `scope_explanations.py` 为准。JSON Schema 位于 `schemas/`，业务跨字段不变量另由严格模型与 verify 检查。
+本文说明当前持久化接口，字段校验以 `src/counterguard/models.py`、`predicates.py`、`features.py`、`baselines.py`、`protocol.py`、`scope.py` 和 `scope_explanations.py` 为准。JSON Schema 位于 `schemas/`，业务跨字段不变量另由严格模型与 verify 检查。
 
 ## 依赖与重算规则
 

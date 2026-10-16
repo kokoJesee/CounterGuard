@@ -1,1 +1,1 @@
-"""Unit tests for EvidenceGuard domain contracts."""
+"""Unit tests for CounterGuard domain contracts."""

@@ -9,11 +9,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes, digest_bytes, digest_file
-from evidenceguard.pilot_inputs import TOOL_FILES, read_fact, signed
-from evidenceguard.repository import read_commit_metadata, read_committed_files
-from evidenceguard.repository_contracts import (
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes, digest_bytes, digest_file
+from counterguard.pilot_inputs import TOOL_FILES, read_fact, signed
+from counterguard.repository import read_commit_metadata, read_committed_files
+from counterguard.repository_contracts import (
     BASE,
     CONFIG_REF,
     CONTRACT_REF,
@@ -142,7 +142,7 @@ def main() -> int:
         str(repo),
         "commit",
         "-m",
-        "NOT upstream: add EvidenceGuard MAC pilot configuration and contracts",
+        "NOT upstream: add CounterGuard MAC pilot configuration and contracts",
     )
     head = run("-C", str(repo), "rev-parse", "HEAD")
     bundle = root / "owner-head.bundle"

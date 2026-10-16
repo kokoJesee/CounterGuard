@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.scope import fit_scopes
+from counterguard.scope import fit_scopes
 from scripts.prepare_scope_v1 import prepare
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -11,18 +11,18 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.compiler import (
+from counterguard.cli import app
+from counterguard.compiler import (
     CompileRequest,
     compile_guard,
     load_guard,
     run_guard,
     verify_guard,
 )
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
-from evidenceguard.evidence import CaptureRequest, capture_evidence
-from evidenceguard.models import RunOutcome
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError, GuardSelfCheckError, InvalidEvidenceError
+from counterguard.evidence import CaptureRequest, capture_evidence
+from counterguard.models import RunOutcome
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 KINDS = {
@@ -135,7 +135,7 @@ def test_compilation_is_idempotent_and_test_bytes_are_deterministic(
     def unexpected_run(*args, **kwargs):
         raise AssertionError("idempotent compilation must not rerun pytest")
 
-    monkeypatch.setattr("evidenceguard.compiler.run_pytest", unexpected_run)
+    monkeypatch.setattr("counterguard.compiler.run_pytest", unexpected_run)
     assert compile_guard(compile_request(workspace)) == first
     assert load_guard(path, cwd=workspace) == first
 
@@ -189,7 +189,7 @@ def test_no_guard_json_is_published_when_self_check_fails(
     workspace: Path, monkeypatch: pytest.MonkeyPatch, bad_test: bytes, outcome: RunOutcome
 ) -> None:
     capture_evidence(capture_request(workspace))
-    monkeypatch.setattr("evidenceguard.compiler._render_test", lambda payload: bad_test)
+    monkeypatch.setattr("counterguard.compiler._render_test", lambda payload: bad_test)
     with pytest.raises(GuardSelfCheckError) as caught:
         compile_guard(compile_request(workspace))
     assert caught.value.run.outcome is outcome
@@ -269,8 +269,8 @@ def test_cli_compile_audit_and_direct_replay(workspace: Path) -> None:
 def test_manual_guard_run_without_env_has_actionable_error(workspace: Path) -> None:
     _, guard, _ = make_guard(workspace)
     environment = os.environ.copy()
-    environment.pop("EVIDENCEGUARD_TARGET", None)
-    environment.pop("EVIDENCEGUARD_SYMBOL", None)
+    environment.pop("COUNTERGUARD_TARGET", None)
+    environment.pop("COUNTERGUARD_SYMBOL", None)
     environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
     result = subprocess.run(
         [sys.executable, "-m", "pytest", guard.test_ref, "--noconftest", "-q"],

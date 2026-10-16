@@ -6,15 +6,15 @@ import shutil
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import (
+from counterguard.cli import app
+from counterguard.digests import (
     canonical_json_bytes,
     digest_bytes,
     digest_file,
     digest_json_artifact,
 )
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.evaluation import evaluate_methods, verify_evaluation
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.evaluation import evaluate_methods, verify_evaluation
 
 
 @pytest.fixture(scope="module")
@@ -54,7 +54,7 @@ def test_all_methods_have_real_replays_and_source_probes(evaluated, monkeypatch)
         pytest.fail("Audit and idempotent evaluation must not execute or refit")
 
     monkeypatch.setattr("subprocess.run", forbidden)
-    monkeypatch.setattr("evidenceguard.scope.fit_scopes", forbidden)
+    monkeypatch.setattr("counterguard.scope.fit_scopes", forbidden)
     actual = verify_evaluation("evaluations/first", cwd=workspace)
     assert actual == report
     repeated = evaluate_methods(
@@ -82,7 +82,7 @@ def test_fresh_repeat_has_identical_predictions_metrics_and_distinct_real_times(
     evaluated, monkeypatch
 ):
     workspace, first = evaluated
-    import evidenceguard.execution as execution
+    import counterguard.execution as execution
 
     original = execution.subprocess.run
     calls = []
@@ -198,7 +198,7 @@ def test_mid_evaluation_failure_is_retained_and_cannot_be_overwritten(
     def fail(*args, **kwargs):
         raise ArtifactIntegrityError("Injected stale binding")
 
-    monkeypatch.setattr("evidenceguard.evaluation.replay_guard", fail)
+    monkeypatch.setattr("counterguard.evaluation.replay_guard", fail)
     output = evaluation_workspace / "evaluations/failed"
     with pytest.raises(ArtifactIntegrityError, match="Injected"):
         evaluate_methods(

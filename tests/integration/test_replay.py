@@ -8,12 +8,12 @@ import pytest
 from pydantic import ValidationError
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.compiler import run_guard as direct_run
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.models import RunOutcome
-from evidenceguard.replay import (
+from counterguard.cli import app
+from counterguard.compiler import run_guard as direct_run
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.models import RunOutcome
+from counterguard.replay import (
     ReplayRequest,
     ReplayResult,
     render_replay_report,
@@ -40,8 +40,8 @@ def forbid_execution(monkeypatch):
     def forbidden(*args, **kwargs):
         raise AssertionError("Skipped/unknown replay must never start pytest or a subprocess")
 
-    monkeypatch.setattr("evidenceguard.replay.run_guard", forbidden)
-    monkeypatch.setattr("evidenceguard.execution.subprocess.run", forbidden)
+    monkeypatch.setattr("counterguard.replay.run_guard", forbidden)
+    monkeypatch.setattr("counterguard.execution.subprocess.run", forbidden)
 
 
 def test_inapplicable_does_not_start_any_process_and_is_never_rendered_pass(
@@ -186,7 +186,7 @@ def test_execution_failures_are_neither_pass_nor_violation(
             "error_detail": "controlled runner failure",
         }
     )
-    monkeypatch.setattr("evidenceguard.replay.run_guard", lambda *args, **kwargs: fake)
+    monkeypatch.setattr("counterguard.replay.run_guard", lambda *args, **kwargs: fake)
     result = replay_guard(spec)
     assert result.verdict == verdict and result.violated_case_ids == ()
     assert replay_exit_code(result) == code
@@ -200,7 +200,7 @@ def test_target_change_after_real_execution_is_stale_and_preserves_run(
     source.write_bytes(
         (root / "examples/discount/implementations/final_price_v1_fixed.py").read_bytes()
     )
-    import evidenceguard.compiler as compiler
+    import counterguard.compiler as compiler
 
     real_runner = compiler.run_pytest
 

@@ -7,9 +7,9 @@ import subprocess
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.errors import RunnerDependencyError
-from evidenceguard.execution import run_pytest
+from counterguard.cli import app
+from counterguard.errors import RunnerDependencyError
+from counterguard.execution import run_pytest
 from tests.unit.test_execution import _request
 
 
@@ -40,7 +40,7 @@ def test_missing_pytest_gives_install_hint_before_output(tmp_path, missing_runne
         args += ["run", "--scenario", "examples/demo/mvp.yaml"]
     result = CliRunner().invoke(app, args + ["--cwd", str(tmp_path), "--workspace", "out"])
     assert result.exit_code == 3, repr(result.exception)
-    assert "evidenceguard[runner]" in result.stderr
+    assert "counterguard[runner]" in result.stderr
     assert "Traceback" not in result.output
     assert not (tmp_path / "out").exists()
 
@@ -50,7 +50,7 @@ def test_executor_missing_pytest_never_launches_or_publishes(tmp_path, missing_r
         pytest.fail("Missing runner must be detected before subprocess execution")
 
     monkeypatch.setattr(subprocess, "run", forbidden)
-    with pytest.raises(RunnerDependencyError, match=r"evidenceguard\[runner\]"):
+    with pytest.raises(RunnerDependencyError, match=r"counterguard\[runner\]"):
         run_pytest(_request(tmp_path))
     assert not (tmp_path / "artifacts").exists()
 

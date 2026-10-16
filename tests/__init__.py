@@ -1,1 +1,1 @@
-"""EvidenceGuard test support package."""
+"""CounterGuard test support package."""

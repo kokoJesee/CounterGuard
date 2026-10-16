@@ -9,15 +9,15 @@ from pathlib import Path
 
 from benchmark_fsck import _measure, _summary
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import (
+from counterguard.artifacts import write_immutable
+from counterguard.digests import (
     canonical_json_bytes,
     digest_bytes,
     digest_file,
     digest_json_artifact,
 )
-from evidenceguard.project_config import ProjectConfig
-from evidenceguard.repository import read_committed_files
+from counterguard.project_config import ProjectConfig
+from counterguard.repository import read_committed_files
 
 
 def main() -> None:
@@ -36,7 +36,7 @@ def main() -> None:
     contract = {
         "schema_version": "pilot-contract-proposal.v1",
         "contract_id": "validators-mac-complete-v1",
-        "status": "proposal_not_admitted_as_evidenceguard_contract",
+        "status": "proposal_not_admitted_as_counterguard_contract",
         "target": {
             "module": "src.validators.mac_address",
             "symbol": "mac_address",
@@ -127,7 +127,7 @@ def main() -> None:
                 "docs/results/w3c-v1/fast-tests.txt",
             )
         },
-        "registry_root": ".evidenceguard",
+        "registry_root": ".counterguard",
         "prerequisites": {"w3b_commit": "1260b45", "w3c_commit": "abb2124"},
         "design_ref": "integrations/pilot/design.md",
         "design_digest": digest_file("integrations/pilot/design.md"),

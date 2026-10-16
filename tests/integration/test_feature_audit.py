@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.digests import digest_json_artifact
-from evidenceguard.features import FeatureRecord
+from counterguard.cli import app
+from counterguard.digests import digest_json_artifact
+from counterguard.features import FeatureRecord
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = "artifacts/audits/day6-feature-parity.json"

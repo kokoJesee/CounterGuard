@@ -24,8 +24,8 @@
 目录扫描必须调用 `inventory_evidence`，逐份执行与 CLI 相同的完整验证，不能靠文件名选最新版。遇到分支后继保留全部可用末端，不任意裁决。扫描不会删除或修改历史记录：
 
 ```powershell
-uv run evidenceguard evidence inventory
-uv run evidenceguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json
+uv run counterguard evidence inventory
+uv run counterguard evidence verify artifacts/evidence/evd_discount_v1_member_rate_fix_v2/evidence.json
 ```
 
 inventory 返回 0 只表示检查完成；消费者必须读取每行 `usable` / `eligible`，不能把命令成功当成目录内全有效。
@@ -33,7 +33,7 @@ inventory 返回 0 只表示检查完成；消费者必须读取每行 `usable` 
 ## 重新捕获与 Guard 迁移
 
 ```powershell
-uv run evidenceguard capture --evidence-id evd_discount_v1_member_rate_fix_v2 --contract examples/discount/contracts/membership_discount_final_price_v1.json --test tests/contract_tests/test_membership_discount_v1.py --buggy-target examples.discount.implementations.final_price_v1_buggy:calculate_price --fixed-target examples.discount.implementations.final_price_v1_fixed:calculate_price --supersedes artifacts/evidence/evd_discount_v1_member_rate_fix_d4/evidence.json --reason "Adopt semantic capture revisions and explicit replacement provenance; retain the verified exception whitelist and isolated execution harness."
+uv run counterguard capture --evidence-id evd_discount_v1_member_rate_fix_v2 --contract examples/discount/contracts/membership_discount_final_price_v1.json --test tests/contract_tests/test_membership_discount_v1.py --buggy-target examples.discount.implementations.final_price_v1_buggy:calculate_price --fixed-target examples.discount.implementations.final_price_v1_fixed:calculate_price --supersedes artifacts/evidence/evd_discount_v1_member_rate_fix_d4/evidence.json --reason "Adopt semantic capture revisions and explicit replacement provenance; retain the verified exception whitelist and isolated execution harness."
 ```
 
 以上命令用于已有 D4 前驱的工作区。干净检出执行 `uv run python scripts/prepare_scope_v1.py`：它创建语义 v1 前驱，再捕获 v2；已有 v2 时验证并复用，不改实验协议。

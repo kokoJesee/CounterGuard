@@ -2,9 +2,9 @@
 
 import pytest
 
-from evidenceguard.errors import FeatureExtractionError
-from evidenceguard.features import extract_ast_features
-from evidenceguard.predicates import VOCABULARY
+from counterguard.errors import FeatureExtractionError
+from counterguard.features import extract_ast_features
+from counterguard.predicates import VOCABULARY
 
 PAIRS = [
     (

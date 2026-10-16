@@ -5,10 +5,10 @@ import random
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.scope import ScopeLearningResult, learn_scope
-from evidenceguard.scope_explanations import (
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.scope import ScopeLearningResult, learn_scope
+from counterguard.scope_explanations import (
     ScopeExplanation,
     explain_scope,
     verify_scope_explanation,

@@ -5,8 +5,8 @@ import json
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.preflight import inspect_execution_requirements
+from counterguard.cli import app
+from counterguard.preflight import inspect_execution_requirements
 
 META = b'[project]\nname="fixture"\ndependencies=[]\n'
 
@@ -108,7 +108,7 @@ def test_separate_native_pytest_toml_is_not_missed(ref):
 
 def test_preflight_cli_unknown_never_launches_a_local_executor(monkeypatch):
     payload = {"status": "blocked", "execution_allowed": False, "execution_outcome": "not_run"}
-    monkeypatch.setattr("evidenceguard.cli.preflight_repository", lambda *_: payload)
+    monkeypatch.setattr("counterguard.cli.preflight_repository", lambda *_: payload)
     result = CliRunner().invoke(app, ["preflight", "--repo", ".", "--revision", "HEAD"])
     assert result.exit_code == 4
     assert json.loads(result.stdout)["execution_allowed"] is False

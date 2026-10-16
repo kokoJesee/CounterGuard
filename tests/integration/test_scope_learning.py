@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.baselines import ScopePredicate, count_predictions, decide_scope
-from evidenceguard.cli import app
-from evidenceguard.errors import InsufficientScopeEvidence
-from evidenceguard.scope import fit_scopes
+from counterguard.baselines import ScopePredicate, count_predictions, decide_scope
+from counterguard.cli import app
+from counterguard.errors import InsufficientScopeEvidence
+from counterguard.scope import fit_scopes
 from scripts.prepare_scope_v1 import prepare
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -88,7 +88,7 @@ def test_initial_refined_fit_is_reproducible_and_has_no_holdout_members(prepared
 
 
 def test_failed_audit_blocks_fit_without_publishing_scopes(prepared, tmp_path, monkeypatch):
-    import evidenceguard.scope as module
+    import counterguard.scope as module
 
     real_audit = module.audit_features
 
@@ -122,7 +122,7 @@ def test_holdout_fit_phase_is_rejected():
 
 
 def test_holdout_id_injected_into_training_membership_is_refused(prepared, monkeypatch):
-    import evidenceguard.scope as module
+    import counterguard.scope as module
 
     real_verify = module.verify_protocol
 
@@ -144,7 +144,7 @@ def test_holdout_id_injected_into_training_membership_is_refused(prepared, monke
 
 
 def test_missing_source_pair_and_legal_counterexample_are_refused(prepared, monkeypatch):
-    import evidenceguard.scope as module
+    import counterguard.scope as module
 
     real_reader = module._read_samples
 

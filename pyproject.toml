@@ -3,7 +3,7 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "evidenceguard"
+name = "counterguard"
 version = "0.1.0"
 description = "Turn verified bug evidence into reusable, scope-aware regression guards."
 readme = "README.md"
@@ -17,7 +17,7 @@ dependencies = [
 runner = ["pytest>=8.4,<9"]
 
 [project.scripts]
-evidenceguard = "evidenceguard.cli:app"
+counterguard = "counterguard.cli:app"
 
 [dependency-groups]
 dev = [
@@ -26,7 +26,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/evidenceguard"]
+packages = ["src/counterguard"]
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
@@ -35,7 +35,7 @@ testpaths = ["tests"]
 markers = [
   "slow: real subprocesses, integration/e2e flows, or expensive prepared fixtures",
   "fast: in-process checks without a slow fixture or a real child process",
-  "docker: requires Docker Engine and the pinned EvidenceGuard runner image",
+  "docker: requires Docker Engine and the pinned CounterGuard runner image",
 ]
 
 [tool.ruff]

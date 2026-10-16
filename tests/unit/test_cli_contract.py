@@ -6,12 +6,12 @@ from types import SimpleNamespace
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.demo import run_demo
-from evidenceguard.digests import canonical_json_bytes
-from evidenceguard.errors import ArtifactIntegrityError, InsufficientScopeEvidence
-from evidenceguard.models import RunOutcome
-from evidenceguard.report import (
+from counterguard.cli import app
+from counterguard.demo import run_demo
+from counterguard.digests import canonical_json_bytes
+from counterguard.errors import ArtifactIntegrityError, InsufficientScopeEvidence
+from counterguard.models import RunOutcome
+from counterguard.report import (
     CommandReport,
     OutputFormat,
     ReplayPresentation,
@@ -194,15 +194,15 @@ def test_commands_share_formatting_and_preserve_exit_codes(
     monkeypatch, format, command, patch, payload, args
 ):
     record = SimpleNamespace(model_dump=lambda **kwargs: payload, accepted=False)
-    monkeypatch.setattr(f"evidenceguard.cli.{patch}", lambda *a, **k: record)
-    monkeypatch.setattr("evidenceguard.cli.evidence_exit_code", lambda value: 0)
+    monkeypatch.setattr(f"counterguard.cli.{patch}", lambda *a, **k: record)
+    monkeypatch.setattr("counterguard.cli.evidence_exit_code", lambda value: 0)
     result = RUNNER.invoke(app, [command, *args, "--format", format.value])
     assert result.exit_code == (1 if command == "evaluate" else 0), result.output
     if format is OutputFormat.JSON:
         report = CommandReport.model_validate_json(result.stdout)
         assert report.operation == command and report.payload == payload
     else:
-        assert f"EvidenceGuard {command}" in result.stdout
+        assert f"CounterGuard {command}" in result.stdout
 
 
 @pytest.mark.parametrize(
@@ -216,7 +216,7 @@ def test_commands_share_formatting_and_preserve_exit_codes(
 def test_replay_skip_cli_preserves_raw_state_and_exit(monkeypatch, scope, verdict, code, format):
     payload = replay(scope, None, verdict)
     record = SimpleNamespace(model_dump=lambda **kwargs: payload, verdict=verdict)
-    monkeypatch.setattr("evidenceguard.cli.replay_guard", lambda *a, **k: record)
+    monkeypatch.setattr("counterguard.cli.replay_guard", lambda *a, **k: record)
     args = ["replay", "run", "--guard", "g.json", "--scope", "s.json", "--target", "m:t"]
     if format is not None:
         args += ["--format", format.value]
@@ -234,7 +234,7 @@ def test_unknown_output_format_fails_before_execution(monkeypatch):
     def forbidden(*a, **k):
         pytest.fail("Invalid format must not launch Demo")
 
-    monkeypatch.setattr("evidenceguard.cli.run_demo", forbidden)
+    monkeypatch.setattr("counterguard.cli.run_demo", forbidden)
     assert RUNNER.invoke(app, ["demo", "--format", "html"]).exit_code == 2
 
 
@@ -242,7 +242,7 @@ def test_learning_refusal_retains_reason_and_code(monkeypatch):
     def refuse(*a, **k):
         raise InsufficientScopeEvidence("test_reason", "not enough evidence")
 
-    monkeypatch.setattr("evidenceguard.cli.fit_scopes", refuse)
+    monkeypatch.setattr("counterguard.cli.fit_scopes", refuse)
     result = RUNNER.invoke(
         app,
         [
@@ -265,7 +265,7 @@ def test_demo_integrity_failure_retains_exit_five(monkeypatch):
     def stale(*a, **k):
         raise ArtifactIntegrityError("stale Demo")
 
-    monkeypatch.setattr("evidenceguard.cli.run_demo", stale)
+    monkeypatch.setattr("counterguard.cli.run_demo", stale)
     result = RUNNER.invoke(app, ["demo"])
     assert result.exit_code == 5 and "stale Demo" in result.stderr
 
@@ -274,7 +274,7 @@ def test_demo_preflights_paths_before_pipeline_or_directory(tmp_path, monkeypatc
     def forbidden(*a, **k):
         pytest.fail("Demo path preflight must happen before Pipeline execution")
 
-    monkeypatch.setattr("evidenceguard.demo.run_pipeline", forbidden)
+    monkeypatch.setattr("counterguard.demo.run_pipeline", forbidden)
     output = tmp_path / ("x" * 80) / ("y" * 80)
     with pytest.raises(ValueError, match="Artifact path"):
         run_demo("not-read.yaml", cwd=tmp_path, workspace=output)
@@ -285,7 +285,7 @@ def test_demo_refuses_partial_directory_without_pipeline_or_rewrites(tmp_path, m
     def forbidden(*a, **k):
         pytest.fail("Partial Demo must not restart the Pipeline")
 
-    monkeypatch.setattr("evidenceguard.demo.run_pipeline", forbidden)
+    monkeypatch.setattr("counterguard.demo.run_pipeline", forbidden)
     output = tmp_path / "partial"
     output.mkdir()
     (output / "report.md").write_bytes(b"partial history")

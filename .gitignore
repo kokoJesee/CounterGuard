@@ -3,7 +3,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .task-audits/
-.evidenceguard/
+.counterguard/
 *.py[cod]
 dist/
 build/

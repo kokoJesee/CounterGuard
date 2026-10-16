@@ -5,9 +5,9 @@ from pathlib import PureWindowsPath
 
 import pytest
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.execution import run_pytest
-from evidenceguard.path_limits import (
+from counterguard.artifacts import write_immutable
+from counterguard.execution import run_pytest
+from counterguard.path_limits import (
     PATH_BUDGET,
     PLACEHOLDER_ID,
     path_units,
@@ -56,7 +56,7 @@ def test_overlong_run_rejected_before_mkdir_or_subprocess(tmp_path, monkeypatch)
 
 @pytest.mark.parametrize("day", ["day10", "day11", "day13-smoke", "demo-run"])
 def test_planned_d10_to_d14_layouts_fit_the_portable_budget(day):
-    root = PureWindowsPath("D:/workspace/evidenceguard/artifacts") / day
+    root = PureWindowsPath("D:/workspace/counterguard/artifacts") / day
     candidate = root / "candidates" / f"cnd_{PLACEHOLDER_ID}"
     require_publication(candidate / "candidate.json")
     require_publication(candidate / "gate.json")
@@ -68,6 +68,6 @@ def test_planned_d10_to_d14_layouts_fit_the_portable_budget(day):
 def test_actual_d9_layout_includes_cache_and_long_report_filenames():
     require_evaluation_directory(
         PureWindowsPath(
-            "D:/workspace/evidenceguard/artifacts/experiments/scope-v1/final-repeat-v1"
+            "D:/workspace/counterguard/artifacts/experiments/scope-v1/final-repeat-v1"
         )
     )

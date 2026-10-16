@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import digest_bytes
-from evidenceguard.independent_verifier import (
+from counterguard.digests import digest_bytes
+from counterguard.independent_verifier import (
     AgentContext,
     CandidateTest,
     VerificationRequest,
@@ -16,8 +16,8 @@ from evidenceguard.independent_verifier import (
     propose_candidate,
     render_candidate,
 )
-from evidenceguard.model_client import MAX_RESPONSE_BYTES, RecordedModelClient
-from evidenceguard.verification_gate import _context
+from counterguard.model_client import MAX_RESPONSE_BYTES, RecordedModelClient
+from counterguard.verification_gate import _context
 
 ROOT = Path(__file__).resolve().parents[2]
 

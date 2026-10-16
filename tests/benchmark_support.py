@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from evidenceguard.contracts import convert_contract_value, resolve_exception
+from counterguard.contracts import convert_contract_value, resolve_exception
 
 PROJECT_ROOT = Path(__file__).parents[1]
 TRAIN_FILES = tuple(sorted((PROJECT_ROOT / "benchmarks/train").glob("*_scope_samples.json")))

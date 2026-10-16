@@ -1,4 +1,4 @@
-# EvidenceGuard 方法迁移评估与本轮优化
+# CounterGuard 方法迁移评估与本轮优化
 
 日期：2026-10-14；评估起点为 D8、`conjunction.v1`、275 个既有测试。原始来源核验见 [研究记录](methodology-sources-2026-10-14.md)。本文区分文献事实、代码现状和工程建议；工程成本是单人、当前两个场景下的粗估，不是承诺。
 
@@ -72,7 +72,7 @@ ICE 的蕴含是样本对上的分类约束，不是“version 与 interface 同
 
 独立检出度量：对每个 Guard 的**已确认适用、已独立确认非等价且确有待检契约违规、执行有效**的 mutant 子集，统计 `killed / (killed + survived)`；killed 只认真实 Guard 断言违规。报告必须同时给出生成总数、待审等价性/违规性、等价、合法行为变化、不适用/unknown、错误和超时数量及纳入规则，分母为零显示未定义。标准 mutation score 与这个受限的 Guard 缺陷检出率分别命名，不冒充所有 mutant 的总体能力。用 Guard 自己是否报错来认定“应检出”，再计算它的检出率，会产生循环度量。
 
-Stryker 默认指标将 timeout 归入 detected；EvidenceGuard 若采用“必须有真实失败断言”口径，须用新实验协议明确区别，而不能偷偷更改既有实验标准。[Stryker 状态与指标](https://stryker-mutator.io/docs/mutation-testing-elements/mutant-states-and-metrics/)
+Stryker 默认指标将 timeout 归入 detected；CounterGuard 若采用“必须有真实失败断言”口径，须用新实验协议明确区别，而不能偷偷更改既有实验标准。[Stryker 状态与指标](https://stryker-mutator.io/docs/mutation-testing-elements/mutant-states-and-metrics/)
 
 共存方式：保留 15 个手工样本与 `scope_v1` 作为稳定对照；新数据用独立 ID、协议、拆分和结果目录，不回填旧标签。按父实现/缺陷族分组拆分，避免相似 mutants 跨 train/holdout；先独立确定适用性，再做行为观察与违规判定。单一算子生成大量近似样本，不能当作大量独立缺陷或独立反例支持。
 

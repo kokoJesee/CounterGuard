@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.registry import Registry
+from counterguard.registry import Registry
 from tests.unit.test_integrity import captured  # noqa: F401
 from tests.unit.test_registry import registered_inputs  # noqa: F401
 
@@ -26,7 +26,7 @@ def test_separate_cli_processes_preserve_registration_and_terminal_disable(
 
     def command(*args, code=0):
         result = subprocess.run(
-            [sys.executable, "-m", "evidenceguard", "registry", *args, "--root", str(root)],
+            [sys.executable, "-m", "counterguard", "registry", *args, "--root", str(root)],
             cwd=ROOT,
             capture_output=True,
             text=True,

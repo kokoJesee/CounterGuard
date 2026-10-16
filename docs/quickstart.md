@@ -8,15 +8,15 @@
 
 ```powershell
 # 基础安装：CLI、数据模型与库；不安装 pytest 执行器。
-python -m pip install './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl'
+python -m pip install './dist/v0.1.0-freeze/counterguard-0.1.0-py3-none-any.whl'
 
 # 执行安装：需要运行 Demo、Capture 或 Guard 时选择 runner。
-python -m pip install './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl[runner]'
+python -m pip install './dist/v0.1.0-freeze/counterguard-0.1.0-py3-none-any.whl[runner]'
 ```
 
-安装源提供同名包后，对应包名写法分别是 `python -m pip install evidenceguard` 和 `python -m pip install "evidenceguard[runner]"`。两者是可选方式，不必先装基础包再装 runner。uv 用户可以使用 `uv pip install` 加相同的 wheel/extra 参数；请安装到实际运行 CLI 的 Python 环境。
+安装源提供同名包后，对应包名写法分别是 `python -m pip install counterguard` 和 `python -m pip install "counterguard[runner]"`。两者是可选方式，不必先装基础包再装 runner。uv 用户可以使用 `uv pip install` 加相同的 wheel/extra 参数；请安装到实际运行 CLI 的 Python 环境。
 
-基础安装缺少 pytest 时，新 Demo 返回 **3**，给出 `pytest runner is unavailable` 和安装 `evidenceguard[runner]` 的提示，不显示 traceback、不启动 pytest、不创建输出目录。CLI 的 version/help 仍可使用。若缺少 Demo 的源码输入，安装 runner 不能替代输入文件；需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。
+基础安装缺少 pytest 时，新 Demo 返回 **3**，给出 `pytest runner is unavailable` 和安装 `counterguard[runner]` 的提示，不显示 traceback、不启动 pytest、不创建输出目录。CLI 的 version/help 仍可使用。若缺少 Demo 的源码输入，安装 runner 不能替代输入文件；需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。
 
 ## 从源码开始 Demo
 
@@ -24,10 +24,10 @@ python -m pip install './dist/v0.1.0-freeze/evidenceguard-0.1.0-py3-none-any.whl
 
 ```powershell
 uv sync
-uv run evidenceguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format json
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --format markdown
-uv run evidenceguard demo --workspace artifacts/quickstart-v1 --verify-only
+uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
+uv run counterguard demo --workspace artifacts/quickstart-v1 --format json
+uv run counterguard demo --workspace artifacts/quickstart-v1 --format markdown
+uv run counterguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
 完整的独立安装及 checkout 外运行命令见 [安装与发布验收](release.md)。
@@ -77,7 +77,7 @@ protocol_ref: experiments/scope_v1.json
 unknown 表示缺少足够信息，和已经确认 inapplicable 不同。可以在上面的新 workspace 中实际运行一次缺少声明契约的重放：
 
 ```powershell
-uv run evidenceguard replay run --guard artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --scope artifacts/fitted/refined/grd_discount_member_rate_regression_v2.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price --cwd artifacts/quickstart-v1/w --artifact-root artifacts/unknown-example --format json
+uv run counterguard replay run --guard artifacts/guards/grd_discount_member_rate_regression_v2/guard.json --scope artifacts/fitted/refined/grd_discount_member_rate_regression_v2.json --target examples.discount.implementations.final_price_v1_fixed:calculate_price --cwd artifacts/quickstart-v1/w --artifact-root artifacts/unknown-example --format json
 ```
 
 这条命令有意省略 --contract，预期退出 **4**；报告为 scope_decision=unknown、execution_outcome=not_run、final_verdict=skipped，payload.verdict=skipped_unknown、payload.run=null，并说明缺少目标契约元数据。它确实调用公开 Replay 路径，但不会启动 pytest。不要给这条命令补 --contract 后又把结果称为同一个 unknown 案例。

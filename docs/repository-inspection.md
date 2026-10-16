@@ -8,7 +8,7 @@ W3-A 是 MVP 冻结后的源码开发功能。v0.1.0 wheel/tag 保持原样，�
 
 ```powershell
 uv run python scripts/prepare_inspection_fixture.py --output artifacts/w3a-repo-v1
-uv run evidenceguard inspect --repo artifacts/w3a-repo-v1 --base HEAD~1 --head HEAD --config examples/project-config/evidenceguard.yaml --format json
+uv run counterguard inspect --repo artifacts/w3a-repo-v1 --base HEAD~1 --head HEAD --config examples/project-config/counterguard.yaml --format json
 ```
 
 head 源码含立即抛异常的顶层代码；inspect 只读 Git 对象，不导入它。重复 inspect 应得相同摘要；重复 prepare 必须用新目录，不能覆盖历史仓库。
@@ -16,10 +16,10 @@ head 源码含立即抛异常的顶层代码；inspect 只读 Git 对象，不�
 对自己的普通 Git 仓库，显式给出根目录、base/head 和配置：
 
 ```powershell
-uv run evidenceguard inspect --repo D:/repo --base main~1 --head main --config D:/config/evidenceguard.yaml --format markdown
+uv run counterguard inspect --repo D:/repo --base main~1 --head main --config D:/config/counterguard.yaml --format markdown
 ```
 
-.yaml 文件内容**只能是 JSON 子集**，不接受缩进 YAML、注释或命令。见 [示例](../examples/project-config/evidenceguard.yaml) / [Schema](../schemas/project-config.schema.json)。运行时还检查路径规范、唯一性和配额；Schema 形状校验不能替代语义检查。
+.yaml 文件内容**只能是 JSON 子集**，不接受缩进 YAML、注释或命令。见 [示例](../examples/project-config/counterguard.yaml) / [Schema](../schemas/project-config.schema.json)。运行时还检查路径规范、唯一性和配额；Schema 形状校验不能替代语义检查。
 
 ## 映射与结果
 

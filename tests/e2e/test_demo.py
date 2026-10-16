@@ -8,11 +8,11 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.demo import DemoReport, run_demo, verify_demo
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.report import OutputFormat, render_report
+from counterguard.cli import app
+from counterguard.demo import DemoReport, run_demo, verify_demo
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.report import OutputFormat, render_report
 
 ROOT = Path(__file__).resolve().parents[2]
 SCENARIO = "examples/demo/mvp.yaml"
@@ -79,9 +79,9 @@ def test_demo_repeat_and_all_formats_never_execute_or_rewrite(demo_flow, monkeyp
 
     for name in (
         "subprocess.run",
-        "evidenceguard.demo.run_pipeline",
-        "evidenceguard.pipeline.capture_candidate",
-        "evidenceguard.pipeline.fit_scopes",
+        "counterguard.demo.run_pipeline",
+        "counterguard.pipeline.capture_candidate",
+        "counterguard.pipeline.fit_scopes",
     ):
         monkeypatch.setattr(name, forbidden)
     assert run_demo(SCENARIO, cwd=root, workspace="out") == record
@@ -148,7 +148,7 @@ def test_tampering_and_partial_publication_never_regenerate(mutable_demo, monkey
     def forbidden(*a, **k):
         pytest.fail("Corrupt/partial Demo must not execute or regenerate")
 
-    monkeypatch.setattr("evidenceguard.demo.run_pipeline", forbidden)
+    monkeypatch.setattr("counterguard.demo.run_pipeline", forbidden)
     with pytest.raises((ArtifactIntegrityError, OSError)):
         run_demo(SCENARIO, cwd=root, workspace="out")
     assert before == {p: p.read_bytes() for p in (root / "out").rglob("*") if p.is_file()}

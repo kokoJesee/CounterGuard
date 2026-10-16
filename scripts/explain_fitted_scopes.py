@@ -4,8 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
-from evidenceguard.errors import EvidenceGuardError
-from evidenceguard.scope_explanations import explain_fitted_scopes
+from counterguard.errors import CounterGuardError
+from counterguard.scope_explanations import explain_fitted_scopes
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     try:
         explanations = explain_fitted_scopes(args.fit, output=args.output, cwd=args.cwd)
-    except (EvidenceGuardError, OSError, ValueError) as error:
+    except (CounterGuardError, OSError, ValueError) as error:
         parser.exit(2, f"Explanation rejected: {error}\n")
     print(json.dumps({key: item.artifact_digest for key, item in explanations.items()}, indent=2))
 

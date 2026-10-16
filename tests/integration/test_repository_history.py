@@ -2,7 +2,7 @@
 
 import pytest
 
-from evidenceguard.repository import read_commit_metadata, read_committed_files
+from counterguard.repository import read_commit_metadata, read_committed_files
 from tests.repository_support import git, sample_repository
 
 pytestmark = pytest.mark.slow

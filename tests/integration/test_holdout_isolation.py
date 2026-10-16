@@ -5,9 +5,9 @@ import subprocess
 
 import pytest
 
-from evidenceguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.scope import fit_scopes
+from counterguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.scope import fit_scopes
 
 GOLDEN = {
     "initial": {

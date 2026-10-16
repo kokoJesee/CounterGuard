@@ -1,4 +1,4 @@
-"""PID 1 for the EvidenceGuard Python runner image; emits one bounded JSON envelope."""
+"""PID 1 for the CounterGuard Python runner image; emits one bounded JSON envelope."""
 
 from __future__ import annotations
 
@@ -185,7 +185,7 @@ def _response(
 
 
 def _run(value: dict[str, object]) -> dict[str, object]:
-    run_dir = Path("/tmp") / ("evidenceguard-" + uuid.uuid4().hex)
+    run_dir = Path("/tmp") / ("counterguard-" + uuid.uuid4().hex)
     run_dir.mkdir(mode=0o700)
     home = run_dir / "home"
     home.mkdir(mode=0o700)
@@ -193,9 +193,13 @@ def _run(value: dict[str, object]) -> dict[str, object]:
     config.write_text("[pytest]\n", encoding="utf-8")
     junit_path = run_dir / "junit.xml"
     environment = {
+        "COUNTERGUARD_TARGET": str(value["target_module"]),
+        "COUNTERGUARD_SYMBOL": str(value["target_symbol"]),
+        "COUNTERGUARD_CONTRACT": str(value["contract_ref"]),
+        # Frozen guard-test.v1/v2 templates embed these names. They are derived
+        # from the validated request and are never copied from the host.
         "EVIDENCEGUARD_TARGET": str(value["target_module"]),
         "EVIDENCEGUARD_SYMBOL": str(value["target_symbol"]),
-        "EVIDENCEGUARD_CONTRACT": str(value["contract_ref"]),
         "HOME": str(home),
         "LANG": "C.UTF-8",
         "PATH": "/usr/local/bin:/usr/bin:/bin",

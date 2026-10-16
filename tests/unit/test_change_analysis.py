@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from evidenceguard.change_analysis import InspectionReport, TargetImpact, analyze_changes
-from evidenceguard.project_config import ProjectConfig
-from evidenceguard.repository import FileChange, FilePin, RepositorySnapshot
+from counterguard.change_analysis import InspectionReport, TargetImpact, analyze_changes
+from counterguard.project_config import ProjectConfig
+from counterguard.repository import FileChange, FilePin, RepositorySnapshot
 from tests.unit.test_project_config import project
 
 

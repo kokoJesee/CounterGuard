@@ -6,11 +6,11 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes, digest_file
-from evidenceguard.pilot import compare_replays, run_phase
-from evidenceguard.pilot_inputs import read_fact, signed
-from evidenceguard.project_config import reject_links
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes, digest_file
+from counterguard.pilot import compare_replays, run_phase
+from counterguard.pilot_inputs import read_fact, signed
+from counterguard.project_config import reject_links
 
 
 def main() -> int:

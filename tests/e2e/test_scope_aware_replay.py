@@ -4,12 +4,12 @@ import json
 
 from typer.testing import CliRunner
 
-from evidenceguard.cli import app
-from evidenceguard.replay import verify_replay
+from counterguard.cli import app
+from counterguard.replay import verify_replay
 
 
 def test_refined_training_replay_runs_four_and_skips_five(replay_workspace, monkeypatch):
-    import evidenceguard.execution as execution
+    import counterguard.execution as execution
 
     real_subprocess = execution.subprocess.run
     calls = []
@@ -64,7 +64,7 @@ def test_refined_training_replay_runs_four_and_skips_five(replay_workspace, monk
 
 
 def test_d8_holdout_replay_is_rejected_before_any_process(monkeypatch):
-    import evidenceguard.execution as execution
+    import counterguard.execution as execution
 
     def forbidden(*args, **kwargs):
         raise AssertionError("Holdout cannot run during D8")

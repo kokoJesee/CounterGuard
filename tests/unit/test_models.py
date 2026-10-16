@@ -9,13 +9,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import (
+from counterguard.digests import (
     canonical_json_bytes,
     digest_bytes,
     digest_file,
     digest_json_artifact,
 )
-from evidenceguard.models import (
+from counterguard.models import (
     CaseOutcome,
     CaseResult,
     Evidence,
@@ -332,7 +332,7 @@ def test_fixed_pass_cannot_hide_a_skipped_case() -> None:
 
 
 def test_legacy_evidence_keeps_its_original_digest_shape(tmp_path: Path) -> None:
-    from evidenceguard.evidence import load_evidence
+    from counterguard.evidence import load_evidence
 
     payload = {**evidence_payload(), "schema_version": "evidence.v1"}
     legacy = Evidence.model_validate(payload)

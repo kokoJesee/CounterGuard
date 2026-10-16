@@ -5,7 +5,7 @@ import time
 
 import pytest
 
-from evidenceguard import repository
+from counterguard import repository
 
 
 def oid(body):

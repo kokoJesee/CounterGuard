@@ -8,14 +8,14 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.change_analysis import inspect_repository
-from evidenceguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
-from evidenceguard.errors import FeatureExtractionError
-from evidenceguard.features import extract_ast_features
-from evidenceguard.preflight import preflight_repository
-from evidenceguard.registry import Registry
-from evidenceguard.repository import read_committed_files
+from counterguard.artifacts import write_immutable
+from counterguard.change_analysis import inspect_repository
+from counterguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
+from counterguard.errors import FeatureExtractionError
+from counterguard.features import extract_ast_features
+from counterguard.preflight import preflight_repository
+from counterguard.registry import Registry
+from counterguard.repository import read_committed_files
 
 
 def main() -> int:

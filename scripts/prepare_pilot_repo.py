@@ -10,9 +10,9 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.repository import read_repository
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.repository import read_repository
 
 URL = "https://github.com/python-validators/validators"
 

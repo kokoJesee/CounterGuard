@@ -9,7 +9,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 
 RUN python -m pip install --no-cache-dir "pytest==${PYTEST_VERSION}"
 
-COPY containers/python-runner/entrypoint.py /opt/evidenceguard/entrypoint.py
+COPY containers/python-runner/entrypoint.py /opt/counterguard/entrypoint.py
 
 USER 65532:65532
-ENTRYPOINT ["python", "-I", "/opt/evidenceguard/entrypoint.py"]
+ENTRYPOINT ["python", "-I", "/opt/counterguard/entrypoint.py"]

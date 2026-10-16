@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.module_context import SCOPE_V1_CONTEXT_DIGEST, ModuleContext, load_module_context
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.module_context import SCOPE_V1_CONTEXT_DIGEST, ModuleContext, load_module_context
 
 ROOT = Path(__file__).resolve().parents[2]
 

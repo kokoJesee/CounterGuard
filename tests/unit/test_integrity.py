@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.compiler import CompileRequest, compile_guard, verify_guard
-from evidenceguard.digests import canonical_json_bytes, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError
-from evidenceguard.evidence import CaptureRequest, capture_evidence, verify_evidence
+from counterguard.compiler import CompileRequest, compile_guard, verify_guard
+from counterguard.digests import canonical_json_bytes, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError
+from counterguard.evidence import CaptureRequest, capture_evidence, verify_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 GUARD = "grd_integrity_v1"
@@ -26,7 +26,7 @@ def captured(tmp_path, monkeypatch):
 
     def completed(argv, **kwargs):
         selected = CASES[:2] if argv[3].endswith("test_guard.py") else CASES
-        buggy = kwargs["env"]["EVIDENCEGUARD_TARGET"].endswith("_buggy")
+        buggy = kwargs["env"]["COUNTERGUARD_TARGET"].endswith("_buggy")
         nodes = []
         for name in selected:
             body = '<failure message="assertion failed" />' if buggy and name in CASES[:2] else ""

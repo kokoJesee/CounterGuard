@@ -10,9 +10,9 @@ from pathlib import Path
 
 from record_runner_build import verify
 
-from evidenceguard.artifacts import write_immutable
-from evidenceguard.digests import canonical_json_bytes, digest_file
-from evidenceguard.pilot_inputs import signed
+from counterguard.artifacts import write_immutable
+from counterguard.digests import canonical_json_bytes, digest_file
+from counterguard.pilot_inputs import signed
 
 
 def main() -> int:
@@ -24,7 +24,7 @@ def main() -> int:
         raise ValueError("Acceptance output exists")
     lock = verify(args.runner_lock)
     environment = dict(
-        os.environ, EVIDENCEGUARD_RUNNER_IMAGE_DIGEST=lock["image_id"], PYTHONIOENCODING="utf-8"
+        os.environ, COUNTERGUARD_RUNNER_IMAGE_DIGEST=lock["image_id"], PYTHONIOENCODING="utf-8"
     )
     command = ["uv", "run", "pytest", "tests/integration/test_docker_runner.py", "-q"]
     started_at, started = datetime.now(UTC).isoformat(), time.monotonic()

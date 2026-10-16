@@ -6,8 +6,8 @@ import random
 import pytest
 from pydantic import ValidationError
 
-from evidenceguard.digests import canonical_json_bytes
-from evidenceguard.evaluation_metrics import (
+from counterguard.digests import canonical_json_bytes
+from counterguard.evaluation_metrics import (
     METHOD_ORDER,
     EvaluationMetrics,
     Metric,
@@ -15,9 +15,9 @@ from evidenceguard.evaluation_metrics import (
     compute_metrics,
     paired_refinement,
 )
-from evidenceguard.models import RunOutcome
-from evidenceguard.protocol import SampleLabels
-from evidenceguard.report import render_evaluation
+from counterguard.models import RunOutcome
+from counterguard.protocol import SampleLabels
+from counterguard.report import render_evaluation
 
 
 def predictions():

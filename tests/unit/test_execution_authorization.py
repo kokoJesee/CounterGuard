@@ -7,18 +7,18 @@ from pathlib import Path
 
 import pytest
 
-from evidenceguard.change_analysis import (
+from counterguard.change_analysis import (
     InspectionReport,
     TargetImpact,
     inspection_implementation_digests,
 )
-from evidenceguard.digests import digest_file, digest_json_artifact
-from evidenceguard.errors import ArtifactIntegrityError, GuardReplayIntegrityError
-from evidenceguard.execution import PytestRunRequest
-from evidenceguard.models import RunRole, TargetRef
-from evidenceguard.project_config import load_project_config
-from evidenceguard.repository import FilePin
-from evidenceguard.runners.docker import (
+from counterguard.digests import digest_file, digest_json_artifact
+from counterguard.errors import ArtifactIntegrityError, GuardReplayIntegrityError
+from counterguard.execution import PytestRunRequest
+from counterguard.models import RunRole, TargetRef
+from counterguard.project_config import load_project_config
+from counterguard.repository import FilePin
+from counterguard.runners.docker import (
     DockerExecutionAuthorization,
     DockerExecutor,
     DockerPolicyV1,
@@ -34,7 +34,7 @@ def _inputs(workspace: Path) -> tuple[Path, Path, Path, Path]:
     source = workspace / "src/pricing.py"
     contract = workspace / "contracts/price.json"
     test = workspace / "guards/test_price.py"
-    config = workspace / "evidenceguard.yaml"
+    config = workspace / "counterguard.yaml"
     for path in (source, contract, test):
         path.parent.mkdir(parents=True, exist_ok=True)
     source.write_text("def price(value):\n    return value\n", encoding="utf-8")
@@ -245,7 +245,7 @@ def test_execution_admission_requires_the_current_inspector_implementation(
         update={"implementation_digests": {"change_analysis.py": "sha256:" + "0" * 64}}
     )
     stale = stale.model_copy(update={"artifact_digest": digest_json_artifact(stale)})
-    with pytest.raises(ArtifactIntegrityError, match="different EvidenceGuard implementation"):
+    with pytest.raises(ArtifactIntegrityError, match="different CounterGuard implementation"):
         authorize_docker_execution(
             stale,
             config_path=config,
@@ -276,9 +276,9 @@ def test_missing_pinned_image_fails_before_outputs_without_local_fallback(
     def missing_image(*_args, **_kwargs):
         raise OSError("Pinned Docker runner image is unavailable")
 
-    monkeypatch.setattr("evidenceguard.runners.local.LocalTrustedExecutor.execute", forbidden)
+    monkeypatch.setattr("counterguard.runners.local.LocalTrustedExecutor.execute", forbidden)
     monkeypatch.setattr(
-        "evidenceguard.runners.docker._require_image_identity",
+        "counterguard.runners.docker._require_image_identity",
         missing_image,
     )
     executor = DockerExecutor(
@@ -313,8 +313,8 @@ def test_post_execution_revalidation_preserves_run_and_rejects_changed_input(
         source.write_text("def price(value):\n    return value + 1\n", encoding="utf-8")
         return preserved_run
 
-    monkeypatch.setattr("evidenceguard.runners.docker._require_image_identity", lambda *_: None)
-    monkeypatch.setattr("evidenceguard.execution._execute_with_adapter", execute_then_change)
+    monkeypatch.setattr("counterguard.runners.docker._require_image_identity", lambda *_: None)
+    monkeypatch.setattr("counterguard.execution._execute_with_adapter", execute_then_change)
     executor = DockerExecutor(
         authorization=authorization,
         inspection_report=report,

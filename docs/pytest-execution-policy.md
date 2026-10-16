@@ -31,6 +31,6 @@
 
 生成的独立 pytest 文件内嵌相同的异常映射，不依赖源契约或源码包中的异常解析函数。扩展白名单需要同步 Schema 与生成器，并新增回归样本。用户自定义异常将在后续契约版本中显式声明和解析，当前没有默认开放。
 
-### 3. python -m evidenceguard
+### 3. python -m counterguard
 
-缺少 `__main__.py` 是遗漏，现已补齐。它与 console script 都调用 `evidenceguard.cli.app`。模块入口已实际验证 version 和 Guard 重放，不存在另一套参数或退出码逻辑。
+缺少 `__main__.py` 是遗漏，现已补齐。它与 console script 都调用 `counterguard.cli.app`。模块入口已实际验证 version 和 Guard 重放，不存在另一套参数或退出码逻辑。
