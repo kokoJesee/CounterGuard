@@ -1,5 +1,11 @@
 # 数据契约与摘要边界
 
+## W3-D 只读准入报告
+
+`repository-preflight.v1` 是工具生成的静态完整提交树报告，包含 exact commit、逐文件 pins、固定执行 profile、findings/warnings、依赖声明和实际源码摘要；无执行时间，execution_allowed=false/not_run。eligible_candidate 不等于 Inspection.ready 或执行许可。原始 Git/配置不确定性不能转换成 applicable/inapplicable。
+
+`pilot-manifest.v1` 固定 URL/许可/base/head、完整树、契约提案、配置、阶段收据和准入标准。提案 admitted=false 不是可执行 Guard 契约，也不生成伪 Evidence。`pilot-admission-report.v1` 保存真实生成时间、实际实现版本/摘要、各层检查、逐 Registry Guard 的未判断原因/run=null 和计数；可重复比较的是去时间的 projection_digest。报告 accepted=false 时，两次拒绝一致也不表示 Docker 执行试点通过。源码、冻结输入或 Registry 状态变化需新目录/版本，不重签旧记录。
+
 ## W3-C Registry 事实与状态
 
 `registry.v1` 是不可变本地身份；`registry-entry.v1` 保存实际登记时间、原工作区与 Guard ref/原始文件 digest、完整 Guard/Evidence 快照及自身摘要。`registry-event.v1` 保存全局 sequence、前驱 digest、Registry/Guard 身份与摘要、registered/disabled、实际 UTC 时间、操作者和原因。首事件无前驱，后续严格连续；disabled 不能复活。

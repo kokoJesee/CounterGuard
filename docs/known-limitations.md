@@ -8,12 +8,15 @@
 - mvp.yaml 只接受 JSON 语法这一 YAML 子集；不支持通用 YAML 缩进、注释或锚点。完整内容见 [快速开始](quickstart.md)。
 - 标准 Demo 使用录制候选、固定可信模板和本地 fixture，未接入实时模型或任意新 oracle 生成。
 - pytest 是可选 runner extra；基础安装缺少它时，Demo/Pipeline 和执行器提前拒绝执行并提示安装，退出 3，不把缺依赖当作测试违规。检查元数据/模块存在不保证任意损坏安装的功能正常。
-- v0.1.0 wheel/tag 的执行器仍只面向可信本地代码。源码开发版 W3-B 已有 Docker 受控模式，只挂载摘要绑定的 source/contract/dependency 与 Guard test，并固定非 root、只读、禁网和资源/日志限制；正式 Python runner 镜像因 Docker Hub 网络不可达尚未完成构建验收，因此未知仓库试点仍未开放。pytest/容器隔离也不是通用 Python 沙箱或结果远程证明。
+- v0.1.0 wheel/tag 的执行器仍只面向可信本地代码。源码开发版 W3-B 的正式 Python runner 已完成四项攻击复验、镜像/依赖字节锁定及归档恢复；W3-C 本地 Registry 已验收。validators 自身准入因 pytest9/src、外置契约/位置参数/装饰器/返回类和 Evidence/Scope 缺口被拒，未执行仓库代码。pytest/容器隔离也不是通用 Python 沙箱或结果远程证明。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
+- Docker 授权 v1 只支持 replay；新未知仓库的 capture/compile 尚未接入 Docker，默认入口仍只可用于可信本地样本。未知代码的新 Guard 来源链必须先完成独立的 Docker 捕获/自检设计，不能调用本地入口绕过本次准入。
 
 W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run，`execution_allowed` 在类型和 Schema 上恒为 false；W3-B 使用另一份来源重建授权，不翻转该字段。普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git、Docker daemon/WSL2、TOCTOU、容器内恶意目标干扰 pytest，以及正式 runner 供应链等剩余风险见 [安全模型](security-model.md)。
 
 ## 证据能证明什么
+
+本地 Registry 的 enabled 仅表示可继续核验候选，不是 Active 或执行授权；每次使用仍重验原工作区来源，移动/损坏即拒绝。缺索引不自动重建，禁用为终态。Registry 身份角色、签名/防回滚、CI 权限与完整生命周期仍未覆盖，见 [Registry](registry.md)；validators 的具体阻塞见 [W3-D](progress/w3d.md)。
 
 Evidence 要求 buggy 实际断言失败且 fixed 通过；Guard 只保留这次已失败且修复后通过的 case。验证器对引用文件校验摘要，并从原始 JUnit 重建 case 集、结果和执行分类。pytest exit 1 只有完整且准确的断言失败映射才是 violation；2/3/4/5、收集错误、缺失/矛盾 JUnit、timeout 和 launch error 不能冒充缺陷证据。
 

@@ -28,7 +28,7 @@ $env:EVIDENCEGUARD_RUNNER_IMAGE_DIGEST = docker image inspect evidenceguard-runn
 uv run pytest -m docker tests/integration/test_docker_runner.py -q
 ```
 
-执行时只使用这个 ID，并传 `--pull=never`。tag 不是授权身份。发布前还应把基础镜像的 registry digest 和依赖解析记录纳入构建记录；当前代码只完成运行时 image ID 绑定。
+执行时只使用这个 ID，并传 `--pull=never`。tag 不是授权身份。2026-10-16 已记录基础 registry digest、完整解析依赖/分发 RECORD、runner ID，并保存可离线恢复归档与 SHA-256；正式 Dockerfile 未修改，原四项攻击通过。收据和复验命令见 [正式镜像收尾](progress/w3b-formal.md)。以后重建必须新锁新验收；不承诺未来源码构建逐位相同或上游身份签名。
 
 本机 2026-10-15 因访问 `auth.docker.io` 超时，正式基础镜像没有拉取成功。为验证机制，测试临时使用已有缓存 Python 镜像作为 base，生成新的本地 image ID，跑完四项攻击 fixture；该临时 Dockerfile 位于忽略的测试目录，不是项目产物，也不替换正式 Dockerfile。当前状态和准确边界见 [W3-B 验收](progress/w3b.md)。
 
@@ -38,7 +38,7 @@ uv run pytest -m docker tests/integration/test_docker_runner.py -q
 docker desktop disable model-runner
 ```
 
-不要用恢复出厂设置作为第一步。该命令见 [Docker Desktop disable 文档](https://docs.docker.com/reference/cli/docker/desktop/disable/)；设置键是 `enableInference`，不是控制 Gordon 的 `enableDockerAI`。
+不要用恢复出厂设置作为第一步。该命令见 [Docker Desktop disable 文档](https://docs.docker.com/reference/cli/docker/desktop/disable/)；官方功能字段是 `enableInference`，不是控制 Gordon 的 `enableDockerAI`。本机持久化位置未取证确认；实际大小写键、已知变化及还原方式见 [全局设置留痕](docker-host-changes.md)，不能把官方字段当作本机历史 diff。
 
 ## 固定边界
 

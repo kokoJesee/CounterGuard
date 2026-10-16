@@ -2,6 +2,8 @@
 
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。
 
+Q1 的可执行只读入口为 `uv run evidenceguard preflight --repo <repo> --revision <sha>`，覆盖完整提交树及新旧 pytest TOML 配置；不 import/安装仓库。0 仅表示静态候选，blocked/unknown 退出 4、拒绝退出 5，均保持 execution_allowed=false。详见 [预检说明](preflight.md)。
+
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
 
 ## W3-A inspect

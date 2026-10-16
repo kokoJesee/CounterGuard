@@ -6,3 +6,9 @@
 *.py text eol=lf
 *.toml text eol=lf
 *.yaml text eol=lf
+integrations/pilot/LICENSE.validators.txt text eol=lf
+containers/python-runner/Dockerfile text eol=lf
+# Raw captured output is hashed as bytes; preserve native whitespace and line endings.
+docs/results/w3b-formal-v1/** -text -whitespace
+docs/results/w3c-v1/** -text -whitespace
+docs/results/w3d-v1/** -text -whitespace

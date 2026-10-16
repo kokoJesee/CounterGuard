@@ -1,6 +1,6 @@
 # W3 安全模型与准入记录
 
-基线：本地 MVP tag `v0.1.0`（`54b39d9`）；W3-A 增加只读检查，W3-B 源码版增加独立授权与 Docker 受限执行。[攻击面清单](attack-surface-checklist.md) 继续保留未关闭事项。本页不是通用沙箱或全面安全认证。W3-B 的隔离机制已用本机缓存基础镜像实测，正式 runner 因 Docker Hub 网络不可达尚未完成供应链验收，不能把这次结果写成发布镜像通过。
+更新：2026-10-16。本地 MVP tag `v0.1.0`（`54b39d9`）保留；W3-A 只读检查、W3-B 独立授权与受限执行、W3-C 本地 Registry 均已有记录。正式 runner 四项攻击与接受镜像字节锁定/恢复在 `1260b45` 通过；validators 在 `c9c8771` 的只读准入被阻断，未执行仓库代码。[攻击面清单](attack-surface-checklist.md) 保留未覆盖事项，本页不是通用沙箱或全面安全认证。
 
 ## 资产、输入和信任
 
@@ -10,7 +10,7 @@
 
 W3-B 使用另一份 `docker-execution-authorization.v1`。只有可信宿主控制面调用 `authorize_docker_execution`，同时复核当前检查器源码、Inspection 自摘要、配置原字节、ready/affected 且无不确定项、head 输入 Git/内容 pin、物化工作区、Guard 测试、精确 replay 请求、固定 Docker policy 和本地镜像 ID，才产生一次请求绑定。配置必须显式声明由 `source_ref` 唯一推导出的 Python `module`，防止执行时导入另一个可见模块。DockerExecutor 启动前和退出后都从这些可信来源重建授权；仅给 JSON 重算自摘要不够。仓库配置、被测 Python 和 Inspection 本身均不能授权，Docker 不可用或镜像身份不符也不会回退到 `LocalTrustedExecutor`。
 
-这里的“可信宿主控制面”是进程内信任假设：当前库函数没有用户身份、Registry 角色或签名认证。W3-C/W4 必须限制谁能调用授权路径并保存授权来源；在那之前，不能把任意拥有宿主 Python 执行权的调用者视为已鉴权。
+这里的“可信宿主控制面”是进程内信任假设：当前库函数没有身份角色或签名认证。W3-C 保存本机登记/禁用事实并重验来源，不认证操作者身份。W4 仍须限制授权调用者并完善身份/签名/CI 权限，不能把任意拥有宿主 Python 执行权的调用者视为已鉴权。
 
 ## W3-A 的具体控制
 
@@ -71,9 +71,9 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 | W02-D | 缺提交、浅克隆、packed refs、损坏对象、引用变化 | test_repository.py | 不补历史/网络；损坏拒绝、变化 unknown |
 | W02-E | 输出/时间超额、含凭据 stderr | test_repository_limits.py 的外部进程故障注入 | 固定原因码；不是实际恶意 Git fuzz |
 | W02-F | dirty tree、重复读、三格式 | 真实 CLI；progress/w3a.md、results/w3a-v1 | 仓库字节/mtime 不变，未导入目标 |
-| W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | runners/docker、entrypoint；真实 test_docker_runner.py | 机制实测通过；正式基础镜像拉取/构建尚未通过，发布准入保持开放 |
-| W03 | 插件/conftest、安装/build hooks | 固定空配置、禁自动插件/conftest；容器内不安装项目 | v1 以明确不支持来关闭隐式加载；需要插件/fixture/安装的项目拒绝进入试点 |
-| W04 | Registry/CI 权限与状态、公开日志 | W3-C/W4 待实现 | 未通过，inspect 不直接授权调度 |
+| W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | [正式 runner 四项原 fixture](progress/w3b-formal.md) | 已测，正式镜像与字节锁定/恢复通过；非通用内核/daemon 安全证明 |
+| W03 | 插件/conftest、安装/build hooks、声明配置 | 正式受控执行；[完整提交树预检](preflight.md) | 受控模式已测；validators 的配置、目标/契约不兼容而阻断；显式插件模式未实现 |
+| W04 | Registry 状态/完整性，CI 权限/公开日志 | [本地 Registry 专项与真实 CLI](progress/w3c.md) | 本地子项已测；身份角色、签名/防回滚、生命周期、CI 和公开日志继续开放 |
 
 ## 剩余风险与准入
 
@@ -83,4 +83,4 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 W3-B 的 Docker 限制保护宿主，不证明容器内被测代码诚实。目标与 pytest 位于同一解释器，恶意目标可能干扰 pytest/JUnit；严格 envelope 和宿主重建能防止畸形/超限输出被当成通过，却不是远程证明或独立 oracle。Docker daemon、WSL2/内核、runner 基础镜像和宿主控制面仍是可信计算基。Git 检查仍在宿主受限进程中执行，没有迁入容器。
 
-W3-D 只有在正式 `python:3.13` runner 成功构建、记录基础镜像来源和最终 image ID、重复跑过同一攻击 fixture 后才执行未知仓库；本轮临时镜像只说明隔离机制在本机有效。W3-C/W4 再关闭 Registry/CI 项。Docker 不可用或检查失败时，不以本地执行器替代。
+W3-B 正式镜像和 W3-C 的前置准入已通过；[validators](progress/w3d.md) 仍因自身配置/契约/Guard/Scope 缺口停止在执行前，unknown 不算执行试点成功。正式 runner 以后重建必须新锁新验收，tag 不能替代 image ID。W4 继续关闭权限/签名/CI 等剩余项；Docker 不可用或检查失败时，不以本地执行器替代。

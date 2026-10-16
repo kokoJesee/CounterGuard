@@ -1,0 +1,19 @@
+{
+  "schema_version": "paired-pilot-admission.v1",
+  "implementation_commit": "c9c87719d1f95ff4d87229873c5017d18f42930b",
+  "base_sha": "e01166b00424be9d7d544d262e0e0873e1f0a999",
+  "head_sha": "6ffd8625ee4272dade063653bff615014bdc4734",
+  "first_report": "artifacts/pilot/validators-admission-v2/report.json",
+  "second_report": "artifacts/pilot/validators-admission-v3/report.json",
+  "first_projection_digest": "sha256:88f8f1941c0bb2d9db050051172296a4df763a345ebf3f48c87491b4905161c9",
+  "second_projection_digest": "sha256:88f8f1941c0bb2d9db050051172296a4df763a345ebf3f48c87491b4905161c9",
+  "static_refusal_repeatable": true,
+  "execution_repeatability_tested": false,
+  "pilot_execution_accepted": false,
+  "counts": {
+    "execution": 0,
+    "registered_guards": 2,
+    "skipped_disabled": 1,
+    "skipped_unknown": 1
+  }
+}
