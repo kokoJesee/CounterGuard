@@ -16,6 +16,10 @@ SQLite 逐字节索引规范 JSON，并追加镜像同一事件；每次访问�
 
 ## 依赖与重算规则
 
+统一验证新增 `verify-report.v1` 和 `guard-lifecycle-event.v1`，不改变旧 Registry 事件、Guard、Scope 或冻结协议的字节。生命周期事件依赖登记身份、Guard/Evidence 摘要与前驱事件；状态变更只追加事件，不重新捕获 Evidence。未来持久 Scope 绑定需另开事件版本。
+
+verify 报告依赖 inspection、Registry 登记与事件链快照、逐行 Scope 绑定、执行授权、RunRecord/日志及当前实现摘要。上述任一来源变化都需新输出目录；旧报告不重签。`decision_digest` 绑定规范排序的逐行来源/状态/Scope/执行类别和汇总，排除 RunRecord、运行工作目录、时间与运行 ID；完整 `artifact_digest` 仍绑定所有报告字段。两个摘要用途不同，不把重复运行的完整摘要伪造为相同。详见 [verify](verify.md)。
+
 当前 Evidence 只有 `artifact_digest`，没有 semantic_digest；Guard 才提供语义投影摘要。Feature 也不由 Guard 派生，而是由目标源码、声明契约和独立 module context 派生。纯 learning 依赖训练特征与适用性标签；物化 Scope/fit manifest 再绑定 Guard 和协议来源。这些分支在 Replay 汇合。
 
 | 本层 | 摘要的直接依赖 | 上游变化时必须做什么 |

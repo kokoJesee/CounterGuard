@@ -74,3 +74,9 @@ Git 读取优化仅合并 blob I/O：先检查大小，再批读并逐个验证 
 本机 Windows + Docker Linux 固定 profile 的记录不覆盖其他平台、恶意目标干扰 pytest/JUnit、
 daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名或 W4 的 CI 角色/凭据权限。
 源码绑定变更后的旧执行授权不是当前实现的凭据；恢复旧源码复验也不能扩大原覆盖范围。
+
+## 统一 verify 的当前边界
+
+通用入口仅支持 `guard.v1` / `project-config.v1` 的根导入布局与已审核 buggy/fixed 源码字节。同一文件的其他版本、项目依赖闭包、validators 的 `src`/pytest9 仓库 Guard 和通用学习 Scope 绑定仍为 unknown；没有为推进而降低既有 Docker 或契约来源约束。生命周期是本地追加审阅记录，不提供用户身份、角色、签名或防回滚保证，远程 CI 授权仍未实现。
+
+新增实现会改变全包源码绑定。已有 Inspection、Docker 授权和仓库 Evidence/Guard 在当前验证器下可能过期；保留其原字节，在新命名空间重新物化，不重签历史记录。冻结 scope_v1 的数据、算法、标签与期望值没有因此改变。详见 [统一验证](verify.md)。

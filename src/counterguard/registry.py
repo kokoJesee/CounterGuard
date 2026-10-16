@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import getpass
+import json
 import re
 import sqlite3
 import uuid
@@ -19,6 +20,7 @@ from counterguard.compiler import verify_guard
 from counterguard.digests import canonical_json_bytes, digest_file, digest_json_artifact
 from counterguard.errors import ArtifactIntegrityError
 from counterguard.evidence import verify_evidence
+from counterguard.lifecycle import GuardState, LifecycleEvent, require_transition, state_from_events
 from counterguard.models import ArtifactRef, Digest, Evidence, FrozenModel, Guard, UtcDateTime
 from counterguard.project_config import reject_links
 from counterguard.repository_models import RepositoryEvidence, RepositoryGuard
@@ -75,8 +77,8 @@ class RegistryEvent(FrozenModel):
 @dataclass(frozen=True)
 class VerifiedRegistryGuard:
     entry: RegistryEntry
-    guard: Guard
-    evidence: Evidence
+    guard: Guard | RepositoryGuard
+    evidence: Evidence | RepositoryEvidence
 
 
 def _signed(model):
@@ -88,11 +90,16 @@ def _read(path: Path, model):
     try:
         if path.stat().st_size > 2 * 1024 * 1024:
             raise ValueError("Registry fact exceeds size limit")
-        value = model.model_validate_json(path.read_bytes())
+        raw = path.read_bytes()
+        if model is RegistryEvent and json.loads(raw).get("schema_version") == (
+            "guard-lifecycle-event.v1"
+        ):
+            model = LifecycleEvent
+        value = model.model_validate_json(raw)
         if digest_json_artifact(value) != value.artifact_digest:
             raise ValueError("Registry fact digest mismatch")
         return value
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, AttributeError) as error:
         raise ArtifactIntegrityError("Registry JSON fact is invalid or unavailable") from error
 
 
@@ -156,6 +163,7 @@ class Registry:
                         raise ArtifactIntegrityError("Registry event history is incomplete")
                     events.append(value)
         states = {}
+        review_states = {}
         previous = ZERO
         for sequence, event in enumerate(events, 1):
             entry = entries.get(event.guard_id)
@@ -168,9 +176,21 @@ class Registry:
                 and event.guard_id in states
                 or event.kind == "disabled"
                 and states.get(event.guard_id) != "enabled"
+                or event.kind == "transitioned"
+                and (
+                    states.get(event.guard_id) != "enabled"
+                    or event.before != review_states.get(event.guard_id)
+                    or event.evidence_digest != entry.evidence.artifact_digest
+                )
             ):
                 raise ArtifactIntegrityError("Registry state history contradicts its facts")
-            states[event.guard_id] = "enabled" if event.kind == "registered" else "disabled"
+            if event.kind == "registered":
+                states[event.guard_id] = "enabled"
+                review_states[event.guard_id] = GuardState.CANDIDATE
+            elif event.kind == "disabled":
+                states[event.guard_id] = "disabled"
+            else:
+                review_states[event.guard_id] = event.after
             previous = event.artifact_digest
         if set(entries) != set(states):
             raise ArtifactIntegrityError("Registry has an incomplete registration")
@@ -299,9 +319,19 @@ class Registry:
             "guard_id": entry.guard.guard_id,
             "guard_digest": entry.guard.artifact_digest,
             "entry_digest": entry.artifact_digest,
+            "source_evidence_id": entry.evidence.evidence_id,
+            "source_evidence_ref": entry.guard.source_evidence_ref,
+            "source_evidence_digest": entry.evidence.artifact_digest,
             "status": state,
+            "lifecycle_state": state_from_events(events, entry.guard.guard_id).value,
             "integrity": integrity,
-            "schedulable": state == "enabled" and integrity == "verified",
+            "schedulable": state == "enabled"
+            and integrity == "verified"
+            and state_from_events(events, entry.guard.guard_id) is not GuardState.RETIRED,
+            "verification_schedulable": state == "enabled"
+            and integrity == "verified"
+            and state_from_events(events, entry.guard.guard_id)
+            in {GuardState.SHADOW, GuardState.ACTIVE},
             "reason_code": "source_chain_invalid" if integrity == "invalid" else None,
             "events": [
                 e.model_dump(mode="json") for e in events if e.guard_id == entry.guard.guard_id
@@ -351,12 +381,56 @@ class Registry:
 
     def resolve_for_execution(self, guard_id: str) -> VerifiedRegistryGuard:
         guard_id = _id(guard_id)
-        with self._transaction() as (_, (_, entries, _, states)):
+        with self._transaction() as (_, (_, entries, events, states)):
             if guard_id not in entries:
                 raise ValueError("Registry Guard ID is not registered")
             if states[guard_id] == "disabled":
                 raise ArtifactIntegrityError("Registry Guard is disabled")
+            if state_from_events(events, guard_id) is GuardState.RETIRED:
+                raise ArtifactIntegrityError("Registry Guard is retired")
             return self._verify_source(entries[guard_id])
+
+    def transition(
+        self, guard_id: str, *, to: GuardState, reason: str, actor: str = "local-operator"
+    ) -> dict:
+        """Append a review decision; enabled is never an implicit Active promotion."""
+        guard_id = _id(guard_id)
+        to = GuardState(to)
+        reason, actor = _text(reason, "reason"), _text(actor, "actor")
+        with self._transaction(writable=True) as (connection, facts):
+            identity, entries, events, states = facts
+            if guard_id not in entries:
+                raise ValueError("Registry Guard ID is not registered")
+            if states[guard_id] == "disabled":
+                raise ArtifactIntegrityError("Registry Guard is disabled")
+            before = state_from_events(events, guard_id)
+            require_transition(before, to)
+            entry = entries[guard_id]
+            # Retirement remains available when a source chain has become stale.
+            if to is not GuardState.RETIRED:
+                self._verify_source(entry)
+            if len(events) >= MAX_FACTS:
+                raise ArtifactIntegrityError("Registry event limit exceeded")
+            event = _signed(
+                LifecycleEvent(
+                    registry_id=identity.registry_id,
+                    sequence=len(events) + 1,
+                    guard_id=guard_id,
+                    guard_digest=entry.guard.artifact_digest,
+                    evidence_digest=entry.evidence.artifact_digest,
+                    before=before,
+                    after=to,
+                    actor=actor,
+                    reason=reason,
+                    created_at=datetime.now(UTC),
+                    previous_digest=events[-1].artifact_digest,
+                    artifact_digest=ZERO,
+                )
+            )
+            raw = canonical_json_bytes(event)
+            write_immutable(self.root / f"events/{event.sequence:08d}.json", raw)
+            connection.execute("INSERT INTO events VALUES (?, ?)", (event.sequence, raw))
+        return self.show(guard_id)
 
     def rebuild_index(self) -> None:
         """Explicit recovery from all JSON facts, including terminal disable history."""

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- 新增统一 `verify`：提交差异、Registry、审阅状态、已审核快照 Scope、Docker 重放与 JSON/Markdown 报告；unknown、跳过、执行异常和违规分开汇总。
+- 新增追加式 Guard 生命周期及 `guard transition/history`；Candidate 不默认升级，Shadow 违规不阻断，Active 的确认违规返回 1，Retired/disabled 不复活。
+- 当前通用入口限于根导入布局的原始源码快照，不扩展冻结 scope_v1 的学习结论；validators 专用 profile 与远程 CI 权限尚未并入该入口。
+
 ## 更名说明 — 2026-10-16
 
 本项目原名 **EvidenceGuard**。开源前做同名冲突检查时发现：

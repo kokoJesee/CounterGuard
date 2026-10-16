@@ -11,6 +11,7 @@ from counterguard.change_analysis import inspect_repository, render_inspection
 from counterguard.compiler import CompileRequest, compile_guard, run_guard, verify_guard
 from counterguard.demo import run_demo, verify_demo
 from counterguard.diagnostics import public_diagnostic
+from counterguard.digests import canonical_json_bytes
 from counterguard.errors import (
     ArtifactIntegrityError,
     GuardSelfCheckError,
@@ -77,6 +78,94 @@ def preflight_command(
     typer.echo(json.dumps(result, ensure_ascii=False, sort_keys=True))
     if result["status"] != "eligible_candidate":
         raise typer.Exit(5 if result["status"] == "rejected" else 4)
+
+
+@app.command("verify")
+def verify_command(
+    repo: Annotated[
+        Path, typer.Option(help="Committed target repository; never executed locally.")
+    ],
+    base: Annotated[str, typer.Option()],
+    head: Annotated[str, typer.Option()],
+    config: Annotated[Path, typer.Option(help="Explicit project configuration.")],
+    registry: Annotated[Path, typer.Option(help="Verified local Registry root.")],
+    output: Annotated[Path, typer.Option(help="New report directory below cwd, outside repo.")],
+    image: Annotated[str, typer.Option(help="Exact SHA-256 ID of a reviewed Docker runner.")],
+    runner: Annotated[str, typer.Option(help="Only docker is supported.")] = "docker",
+    format: OutputFormat = OutputFormat.TEXT,
+) -> None:
+    """Verify historical Shadow/Active Guards and preserve reports on domain failures."""
+    from counterguard.verify import VerifyRequest, render_verify, verify_repository
+
+    if runner != "docker":
+        _error("verify requires --runner docker; no local fallback exists", 2)
+    try:
+        report = verify_repository(VerifyRequest(repo, base, head, config, registry, output, image))
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError) as error:
+        _error(str(error), 2)
+    typer.echo(
+        canonical_json_bytes(report).decode()
+        if format is OutputFormat.JSON
+        else render_verify(report)
+    )
+    if report.exit_code:
+        raise typer.Exit(report.exit_code)
+
+
+@guard_app.command("transition")
+def guard_transition(
+    guard_id: str,
+    to: Annotated[str, typer.Option(help="shadow, active or retired; legal transitions only.")],
+    reason: Annotated[str, typer.Option()],
+    root: Path = Path(".counterguard"),
+    actor: Annotated[
+        str, typer.Option(help="Local audit label, not an authenticated identity.")
+    ] = "local-operator",
+    format: OutputFormat = OutputFormat.JSON,
+) -> None:
+    from counterguard.lifecycle import GuardState
+    from counterguard.registry import Registry
+
+    try:
+        value = Registry(root).transition(guard_id, to=GuardState(to), reason=reason, actor=actor)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError) as error:
+        _error(str(error), 2)
+    _emit_guard_history(value, format)
+
+
+@guard_app.command("history")
+def guard_history(
+    guard_id: str,
+    root: Path = Path(".counterguard"),
+    format: OutputFormat = OutputFormat.JSON,
+) -> None:
+    from counterguard.registry import Registry
+
+    try:
+        value = Registry(root).show(guard_id)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError) as error:
+        _error(str(error), 2)
+    _emit_guard_history(value, format)
+
+
+def _emit_guard_history(value, format):
+    if format is OutputFormat.JSON:
+        typer.echo(canonical_json_bytes(value).decode())
+        return
+    typer.echo(f"{value['guard_id']}: {value['status']} / {value['lifecycle_state']}")
+    for event in value["events"]:
+        typer.echo(
+            public_diagnostic(
+                f"{event['sequence']} | {event['kind']} | {event.get('before', '-')} -> "
+                f"{event.get('after', '-')} | {event['actor']} | {event['reason']}"
+            ).replace("\n", " ")
+        )
 
 
 @app.command("inspect")
@@ -534,9 +623,7 @@ def experiment_evaluate(
 @benchmark_app.command("baselines")
 def benchmark_baselines(
     protocol: Annotated[Path, typer.Option(help="Frozen experiment protocol JSON.")],
-    split: Annotated[
-        str, typer.Option(help="Use only the training split.")
-    ] = "train",
+    split: Annotated[str, typer.Option(help="Use only the training split.")] = "train",
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
     artifact_root: Annotated[Path, typer.Option(help="Report output below cwd.")] = Path(
         "artifacts"

@@ -187,6 +187,12 @@ reproduced bug**.
 
 ## Development
 
+The source checkout also provides [repository verification](docs/verify.md) and an
+[append-only Guard lifecycle](docs/guard-lifecycle.md). `verify` replays reviewed
+Shadow/Active Guards in Docker, with separate unknown, skipped, and execution-error
+results. Its current scope is known source snapshots under the root-import profile;
+the validators integration retains its dedicated pilot entry point.
+
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
 uv run ruff check .

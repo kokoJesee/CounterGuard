@@ -15,6 +15,7 @@ from counterguard.independent_verifier import (
     CandidateTest,
     VerificationRequest,
 )
+from counterguard.lifecycle import LifecycleEvent
 from counterguard.models import Evidence, Guard, RunRecord
 from counterguard.module_context import ModuleContext
 from counterguard.pipeline import PipelineFailure, PipelineManifest
@@ -28,6 +29,7 @@ from counterguard.runners.docker import DockerExecutionAuthorization, DockerPoli
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
 from counterguard.verification_gate import GateResult
+from counterguard.verify import VerifyReport
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
@@ -68,6 +70,8 @@ MODELS = {
     "registry": RegistryIdentity,
     "registry-entry": RegistryEntry,
     "registry-event": RegistryEvent,
+    "guard-lifecycle-event": LifecycleEvent,
+    "verify-report": VerifyReport,
 }
 
 if __name__ == "__main__":

@@ -148,6 +148,8 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 ## 开发
 
+源码版新增 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。当前仅支持根导入布局的已知源码快照；validators 集成继续使用专用 pilot 入口。
+
 ```powershell
 uv run pytest -m "not slow" -q      # 快测：秒级
 uv run ruff check .

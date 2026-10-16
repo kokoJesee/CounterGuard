@@ -1,6 +1,6 @@
 # 本地 Registry
 
-Registry 只登记和审核已有 Guard，不捕获 Evidence、不执行测试、不决定 Scope，也不提升为 Active。`enabled` 表示允许进入后续核验候选，不等于生命周期 Active；W4 状态机尚未实现。
+Registry 的 add/list/show/disable 只登记和审核已有 Guard，不捕获 Evidence、不执行测试、不决定 Scope，也不提升为 Active。`enabled` 表示允许进入后续核验候选，不等于生命周期 Active。[生命周期事件](guard-lifecycle.md)另行记录人工审阅状态，[verify](verify.md)仅自动调度 Shadow/Active。
 
 ```powershell
 uv run counterguard registry add artifacts/guards/<guard-id>/guard.json --cwd <source-workspace> --root .counterguard
@@ -26,4 +26,4 @@ JSON 是事实来源。SQLite UPDATE/DELETE 触发器拒绝原地改写事实与
 
 登记后仍保留原工作区，不复制、重签或重写任何既有 Evidence/Guard/log。每次 `resolve_for_execution` 都重新调用完整 `verify_guard` 与 `verify_evidence`，核对 Guard/原始 JUnit/源码/契约/来源身份和登记快照；原工作区移动、缺失或变动即拒绝。这是有意的本地实现约束，不是可携带备份格式。调度器必须在执行前调用这个入口，并另行完成 Scope、Inspection 和 Docker 授权；直接调用 LocalTrustedExecutor 不构成 Registry 调度。
 
-操作者取本机账户名或受信宿主传入的审计文本，不认证身份；单用户工作区权限是信任假设。可以同时改写整个 Registry、全部来源和验证器的本机管理员，或回滚整份目录的攻击，不由本地 hash/SQLite 解决。签名、权限角色、撤销、防回滚、CI 凭据/上传、公开日志和多平台发布继续属于 W04/W4。缺失索引始终拒绝，不在正常 list/show 时自动重建。
+操作者是本机审计文本，不认证身份；原登记/禁用事件沿用本机账户名或宿主标签，新生命周期事件默认使用 `local-operator`。单用户工作区权限是信任假设。可以同时改写整个 Registry、全部来源和验证器的本机管理员，或回滚整份目录的攻击，不由本地 hash/SQLite 解决。签名、权限角色、撤销、防回滚、CI 凭据/上传、公开日志和多平台发布仍未关闭。缺失索引始终拒绝，不在正常 list/show 时自动重建。

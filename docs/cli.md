@@ -1,5 +1,7 @@
 # CLI 与报告约定
 
+源码开发版新增 [统一 verify](verify.md) 和 [Guard 生命周期](guard-lifecycle.md)：`verify` 仅使用 Docker，逐行区分状态、Scope、执行与判定；`guard transition/history` 使用独立的追加式事件格式。报告为 `verify-report.v1`，不改变旧 `command-report.v1`。
+
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。
 
 Q1 的可执行只读入口为 `uv run counterguard preflight --repo <repo> --revision <sha>`，覆盖完整提交树及新旧 pytest TOML 配置；不 import/安装仓库。0 仅表示静态候选，blocked/unknown 退出 4、拒绝退出 5，均保持 execution_allowed=false。详见 [预检说明](preflight.md)。
