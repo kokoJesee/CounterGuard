@@ -434,8 +434,11 @@ def admission_repository(repo: str | Path, revision: str, *, import_root: str) -
             "findings": [{"code": "admission_unavailable"}],
             "verify_supported": False,
         }
+    guidance = admission_user_guidance(
+        assessment["status"], finding_codes={item["code"] for item in assessment["findings"]}
+    )
     report = {
-        "schema_version": "repository-admission.v1",
+        "schema_version": "repository-admission.v2",
         "profile": PROFILE,
         "requested_revision": revision,
         "commit": commit,
@@ -446,6 +449,49 @@ def admission_repository(repo: str | Path, revision: str, *, import_root: str) -
         "files": [pin.model_dump(mode="json") for pin in pins],
         "implementation_digests": inspection_implementation_digests(),
         **assessment,
+        "user_guidance": guidance,
+        "next_step": guidance["next_action"],
     }
     report["artifact_digest"] = digest_json_artifact(report)
     return report
+
+
+def admission_user_guidance(status: str, *, finding_codes=()) -> dict:
+    """Product support is separate from a static tree's compatibility findings."""
+    if set(finding_codes).intersection({"repository_unavailable", "admission_unavailable"}):
+        action = (
+            "Repository data could not be read. Check the clone, complete commit history and "
+            "local read/snapshot permissions, then rerun this read-only command. This result "
+            "has not classified project compatibility and cannot authorize execution."
+        )
+    elif status == "eligible_candidate":
+        action = (
+            "This is a static candidate, not a supported new-project verify profile. "
+            "Use contract draft to prepare review-only test material. Only use verify if your "
+            "project already satisfies an explicitly supported profile; otherwise wait for "
+            "maintainer implementation and review of generic Docker bootstrap."
+        )
+    elif status == "rejected":
+        action = (
+            "Stop before execution. Resolve the Git/path integrity rejection and rerun this "
+            "read-only check. Do not use local capture to bypass it."
+        )
+    else:
+        action = (
+            "Read each finding's next_step. Supply missing metadata or an audited target/test "
+            "mapping for review; required dependency or fixture support is currently unavailable. "
+            "Even clearing findings does not implement generic bootstrap. Use an already "
+            "supported profile or wait for tool support; choosing a simpler project "
+            "is not a guarantee."
+        )
+    return {
+        "current_support": "generic_project_verify_not_supported",
+        "user_can_enable_verify": False,
+        "next_action": action,
+        "maintainer_action": "Implement and audit import closure plus generic repository "
+        "contract/Guard capture; engineering_prerequisites are internal work, not user steps.",
+        "eta": None,
+        "tracking_url": "https://github.com/kokoJesee/CounterGuard/blob/main/docs/roadmap.md",
+        "notification": "No feature-specific subscription or promised date; GitHub Watch can "
+        "follow repository updates. This command does not schedule notifications.",
+    }

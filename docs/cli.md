@@ -80,6 +80,13 @@ compile 自检失败时，CLI 会先输出实际 Run，再以 3 退出；这是�
 ## 新项目分类与 CI 输出
 
 ```powershell
+counterguard contract draft --repo <repo> --revision <sha> --test-ref tests/test_price.py --test-function test_price --target package.pricing:price --output artifacts/proposals/new-id
+```
+
+该命令不执行目标。draft_ready/0 只代表语法投影完整；partial 或 unsupported/4 保留未支持项并先写草案。
+用户必须审核，且草案不能进入 Registry/verify。完整语法和来源边界见[测试转草案](contract-drafts.md)。
+
+```powershell
 counterguard preflight --repo <repo> --revision <full-sha> --profile minimal-python --import-root src
 counterguard runner list
 counterguard ci-report --report <verify-output>/report.json --output <new-public-output>
@@ -87,6 +94,7 @@ counterguard ci-report --report <verify-output>/report.json --output <new-public
 
 新 profile 只做静态候选分类，不给执行授权；findings 指向①导入、②pytest 引导或③安装，
 ④通用仓库 Guard/bootstrap 仍需实现与审核。人工责任见[首次接入](onboarding.md)。
+v2 另有 user_guidance/next_step，直接告诉用户先做什么；工程编号只给维护者，不能靠配置打开未实现能力。
 runner 发现逐项核对包内构建/攻击收据，再探测精确 image ID；损坏时退出 5。
 CI 输出保留 verify 退出码，仅导出受限公开字段；详见 [CI](github-actions.md)。
 

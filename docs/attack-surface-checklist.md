@@ -40,6 +40,16 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+新增只读契约草案边界见 [contract-drafts.md](contract-drafts.md)。
+[单元测试](../tests/unit/test_contract_draft.py)覆盖提交来源 pin、20 次稳定结果、字面量类型、
+参数/局部变量与异常名遮蔽、预算、未知 helper/控制流/嵌套调用的拒绝，以及断言覆盖对账。
+[真实 Git 专项](../tests/integration/test_contract_draft.py)确认 dirty tree 和 conftest 不会被执行或替代提交断言。
+`contract-proposal.v1` 强制需审核/不可执行，旧 Guard 模型拒绝它；没有新增执行授权。
+未覆盖任意测试的语义等价、动态模块重绑、fixture/setup 迁移或所有 AST 拒绝服务形态；
+语法 import 绑定必须人工审核，完整原测试也没有被宣称可在当前 runner 运行。
+一次 [boltons 试走](results/onboarding-boltons-v1/README.md)只证明材料/阻塞与提取实测，
+不将未知项目标成可执行，也不扩大现有 W01–W04 的通过范围。
+
 W03 增加[免安装/免插件静态候选检查](preflight.md#免安装免插件候选检查)：完整提交树、
 显式包根、依赖/导入、conftest/plugins/fixture 和动态代码的已知形态；仍然不生成执行许可。
 [单元测试](../tests/unit/test_admission.py)含 20 次乱序、别名与条件缺项；

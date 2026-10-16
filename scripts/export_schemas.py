@@ -5,6 +5,7 @@ from pathlib import Path
 
 from counterguard.baselines import FeatureVector, ScopePredicate
 from counterguard.change_analysis import InspectionReport
+from counterguard.contract_draft_models import ContractProposal
 from counterguard.demo import DemoReport
 from counterguard.evaluation import EvaluationReport
 from counterguard.evaluation_metrics import EvaluationMetrics, Prediction
@@ -35,6 +36,7 @@ from counterguard.verify import VerifyReport, VerifyReportV2
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "contract-proposal": ContractProposal,
     "evidence": Evidence,
     "guard": Guard,
     "run-record": RunRecord,

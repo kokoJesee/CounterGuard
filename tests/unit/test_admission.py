@@ -6,7 +6,7 @@ import random
 import pytest
 from typer.testing import CliRunner
 
-from counterguard.admission import assess_minimal_python
+from counterguard.admission import admission_user_guidance, assess_minimal_python
 from counterguard.cli import app
 
 META = b'[project]\nname="example"\nversion="0.1"\ndependencies=[]\n'
@@ -168,6 +168,21 @@ def test_twenty_input_orders_preserve_static_result():
     for seed in range(20):
         random.Random(seed).shuffle(entries)
         assert assess_minimal_python(dict(entries), import_root="src") == expected
+
+
+@pytest.mark.parametrize("status", ["eligible_candidate", "blocked", "unknown", "rejected"])
+def test_user_guidance_never_asks_users_to_implement_internal_prerequisites(status):
+    value = admission_user_guidance(status)
+    assert value["next_action"] and value["maintainer_action"]
+    assert value["eta"] is None and value["user_can_enable_verify"] is False
+    assert value["tracking_url"].endswith("/docs/roadmap.md")
+    assert "1_import_layout" not in value["next_action"]
+
+
+def test_read_failure_points_to_repository_recovery_instead_of_feature_work():
+    value = admission_user_guidance("unknown", finding_codes={"repository_unavailable"})
+    assert "Check the clone" in value["next_action"]
+    assert "has not classified" in value["next_action"]
 
 
 def test_cli_explicit_mode_and_invalid_profile(monkeypatch):

@@ -152,6 +152,8 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 [首次接入清单](docs/onboarding.md)明确材料、责任和初始 Scope；新项目可以先用 `preflight --profile minimal-python --import-root src` 做只读分类，尚不自动获准执行。[CI 示例与 Summary](docs/github-actions.md)当前仅覆盖工具自带可信 fixture，未宣称任意项目或真实 GitHub 平台已验收。
 
+已有回归测试可用 [contract draft](docs/contract-drafts.md)机械起草受限契约提案，逐项保留不支持的断言；提案不可执行，仍需人审。[实际试走](docs/results/onboarding-boltons-v1/README.md)和[接入路线](docs/roadmap.md)分别记录遇阻数据与尚缺能力。
+
 ```powershell
 uv run pytest -m "not slow" -q      # 快测：秒级
 uv run ruff check .

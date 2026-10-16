@@ -202,6 +202,11 @@ classifies static no-install/no-plugin candidates without authorizing execution.
 The [CI example and Summary export](docs/github-actions.md) currently cover trusted tool
 fixtures; generic project onboarding and live GitHub platform acceptance remain open.
 
+Use [contract draft](docs/contract-drafts.md) to prepare review-only proposals from a
+restricted grammar of existing tests. Unsupported assertions remain explicit; proposals
+cannot execute or enter the Registry. The [onboarding trial](docs/results/onboarding-boltons-v1/README.md)
+records a real blocked attempt, while the [roadmap](docs/roadmap.md) identifies remaining support.
+
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
 uv run ruff check .

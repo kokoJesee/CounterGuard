@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 新增 `contract draft`：从提交内的受限字面量断言/参数化生成未审核、不可执行的 contract-proposal.v1；逐项报告 unsupported，不执行或导入仓库代码，不扩展已有可执行契约。
+- repository-admission.v2 为内部工程前置补充用户下一步、维护者责任与无承诺日期的跟踪落点；读取失败不冒充兼容性判断。
+- 记录真实 boltons 首次接入试走及后续草案复验。首次遇阻时间与完整接入时间分开；没有完成 Evidence/Scope/Shadow，也没有绕过现有准入。
+
 - 新增 `preflight --profile minimal-python --import-root .|src`：静态检查免安装/免插件候选条件，逐项说明缺失前置；新增用户接入责任清单，不把候选分类当作通用 verify 支持。
 - runner 发现与解析逐项核对随包交付的构建/攻击收据，缺失、篡改或重签时在 Docker 探测前拒绝；catalog/review 的既有 pin 保留。
 - 新增 `ci-report`，由 verify JSON 生成受限公开 Summary 并保留退出码；提供人工触发的受控 GitHub Actions 示例。真实项目的可携带来源/权限、镜像公开交付和远程平台验收仍未关闭。

@@ -7,7 +7,7 @@ counterguard preflight --repo <repo> --revision <full-commit-sha> --profile mini
 # 根布局显式使用 --import-root .
 ```
 
-新增 `repository-admission.v1` / `minimal-python.v1`，默认 legacy 预检保留。
+当前输出 `repository-admission.v2` / `minimal-python.v1`，默认 legacy 预检保留。
 它读取完整已提交树，复用 Git 对象完整性、文件/总量/时间预算；不 checkout、import、运行测试或安装依赖。
 工作树里删除 conftest 或更改依赖声明不能隐藏提交中的事实。
 
@@ -28,6 +28,12 @@ counterguard preflight --repo <repo> --revision <full-commit-sha> --profile mini
 这不是“只做两项就一定能运行”的语义证明。输出仍为 execution_allowed=false、verify_supported=false，
 ④还包括真实契约、B/F、Docker 捕获、Guard、初始精确快照 Scope 和人工审核，尚未通用实现。
 在受限 Docker 中实际执行生成的契约并验证依赖闭包仍是后续硬门槛。
+
+`engineering_prerequisites` 只给工具维护者描述内部开发工作，用户不需要实现这些模块。
+v2 的 `user_guidance` 和同文 `next_step` 明确当前支持、用户动作、维护者责任、空的 ETA 和[跟踪落点](roadmap.md)：
+静态候选可以先用 [contract draft](contract-drafts.md)准备待审核材料，但通用 verify 仍不可由用户打开；
+当前只能改用确实满足来源/Scope 的已有 profile，或等待工具支持。信息不足时先修复仓库读取条件；
+没有专属功能订阅/承诺日期，不让用户拿工程估算自行倒计时。v1 旧报告保留，不补写该指引。
 
 返回 4/blocked 或 unknown 时，每项 finding 包含路径、原因、`prerequisite` 和 `next_step`：
 缺失元数据/映射可以提供材料后在新提交重查；确需第三方依赖或 fixture 的项目当前不支持，需要③/②。

@@ -48,6 +48,8 @@ from counterguard.verification_gate import capture_candidate, gate_exit_code, ve
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 app.add_typer(registry_app, name="registry")
 app.add_typer(runner_app, name="runner")
+contract_app = typer.Typer(no_args_is_help=True, help="Prepare review-only contract proposals.")
+app.add_typer(contract_app, name="contract")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
 guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
@@ -68,6 +70,39 @@ verification_app = typer.Typer(no_args_is_help=True, help="Audit independent can
 app.add_typer(verification_app, name="verification")
 pipeline_app = typer.Typer(no_args_is_help=True, help="Run or audit the offline MVP pipeline.")
 app.add_typer(pipeline_app, name="pipeline")
+
+
+@contract_app.command("draft")
+def contract_draft_command(
+    repo: Annotated[Path, typer.Option(help="Read committed data only; never imported.")],
+    revision: Annotated[str, typer.Option(help="Commit/ref containing the test.")],
+    test_ref: Annotated[str, typer.Option(help="Committed test path, relative to repo.")],
+    test_function: Annotated[str, typer.Option(help="One top-level test_* function.")],
+    target: Annotated[str, typer.Option(help="Declared module:symbol; syntax only.")],
+    output: Annotated[Path, typer.Option(help="New proposal directory outside target repo.")],
+) -> None:
+    """Statically extract literal assertions; proposals never authorize execution."""
+    from counterguard.contract_draft import draft_contract
+    from counterguard.repository import RepositoryProblem
+
+    try:
+        proposal = draft_contract(
+            repo,
+            revision,
+            test_ref=test_ref,
+            test_function=test_function,
+            target=target,
+            output=output,
+        )
+    except RepositoryProblem as error:
+        _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(proposal).decode())
+    if proposal.status != "draft_ready":
+        raise typer.Exit(4)
 
 
 @app.command("preflight")
