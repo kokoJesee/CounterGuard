@@ -1,5 +1,7 @@
 # CLI 与报告约定
 
+源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。
+
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
 
 ## W3-A inspect

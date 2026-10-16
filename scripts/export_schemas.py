@@ -20,6 +20,7 @@ from evidenceguard.module_context import ModuleContext
 from evidenceguard.pipeline import PipelineFailure, PipelineManifest
 from evidenceguard.project_config import ProjectConfig
 from evidenceguard.protocol import ExperimentProtocol, SplitManifest
+from evidenceguard.registry import RegistryEntry, RegistryEvent, RegistryIdentity
 from evidenceguard.replay import ReplayResult
 from evidenceguard.report import CommandReport, ReplayPresentation
 from evidenceguard.repository import RepositorySnapshot
@@ -64,6 +65,9 @@ MODELS = {
     "repository-inspection": InspectionReport,
     "docker-policy": DockerPolicyV1,
     "docker-execution-authorization": DockerExecutionAuthorization,
+    "registry": RegistryIdentity,
+    "registry-entry": RegistryEntry,
+    "registry-event": RegistryEvent,
 }
 
 if __name__ == "__main__":

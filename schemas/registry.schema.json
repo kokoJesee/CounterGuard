@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "registry.v1",
+      "default": "registry.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_id": {
+      "title": "Registry Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "registry_id",
+    "created_at",
+    "artifact_digest"
+  ],
+  "title": "RegistryIdentity",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

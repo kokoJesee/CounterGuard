@@ -1,0 +1,771 @@
+{
+  "$defs": {
+    "CaseOutcome": {
+      "description": "Normalized result for one stable contract case.",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "error"
+      ],
+      "title": "CaseOutcome",
+      "type": "string"
+    },
+    "CaseResult": {
+      "additionalProperties": false,
+      "description": "The result of one case, linked by its stable contract case ID.",
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/CaseOutcome"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        }
+      },
+      "required": [
+        "case_id",
+        "node_id",
+        "outcome"
+      ],
+      "title": "CaseResult",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "description": "A bidirectionally verified bug reproduction artifact.",
+      "properties": {
+        "schema_version": {
+          "default": "evidence.v2",
+          "enum": [
+            "evidence.v1",
+            "evidence.v2"
+          ],
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^evd_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_ref": {
+          "minLength": 1,
+          "title": "Contract Ref",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "test_ref": {
+          "minLength": 1,
+          "title": "Test Ref",
+          "type": "string"
+        },
+        "test_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Test Digest",
+          "type": "string"
+        },
+        "buggy_target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "fixed_target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "buggy_target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Buggy Target Digest",
+          "type": "string"
+        },
+        "fixed_target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Fixed Target Digest",
+          "type": "string"
+        },
+        "buggy_run": {
+          "$ref": "#/$defs/RunRecord"
+        },
+        "fixed_run": {
+          "$ref": "#/$defs/RunRecord"
+        },
+        "failing_case_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Failing Case Ids",
+          "type": "array"
+        },
+        "reproduced": {
+          "title": "Reproduced",
+          "type": "boolean"
+        },
+        "rejection_reasons": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Rejection Reasons",
+          "type": "array"
+        },
+        "tool_version": {
+          "minLength": 1,
+          "title": "Tool Version",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        },
+        "capture_revision": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Capture Revision",
+          "type": "integer"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "recapture_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recapture Reason"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "created_at",
+        "contract_id",
+        "contract_ref",
+        "contract_digest",
+        "test_ref",
+        "test_digest",
+        "buggy_target",
+        "fixed_target",
+        "buggy_target_digest",
+        "fixed_target_digest",
+        "buggy_run",
+        "fixed_run",
+        "failing_case_ids",
+        "reproduced",
+        "tool_version",
+        "artifact_digest"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceLink": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "minLength": 1,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "evidence_ref",
+        "artifact_digest"
+      ],
+      "title": "EvidenceLink",
+      "type": "object"
+    },
+    "Guard": {
+      "additionalProperties": false,
+      "description": "A minimal, self-contained regression test with explicit provenance.",
+      "properties": {
+        "schema_version": {
+          "const": "guard.v1",
+          "default": "guard.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "guard_id": {
+          "pattern": "^grd_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Guard Version",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "source_evidence_id": {
+          "pattern": "^evd_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Source Evidence Id",
+          "type": "string"
+        },
+        "source_evidence_ref": {
+          "minLength": 1,
+          "title": "Source Evidence Ref",
+          "type": "string"
+        },
+        "source_evidence_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Evidence Digest",
+          "type": "string"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "target_interface": {
+          "$ref": "#/$defs/TargetInterface"
+        },
+        "argument_types": {
+          "additionalProperties": {
+            "enum": [
+              "boolean",
+              "decimal",
+              "integer",
+              "optional_string"
+            ],
+            "type": "string"
+          },
+          "title": "Argument Types",
+          "type": "object"
+        },
+        "return_type": {
+          "enum": [
+            "boolean",
+            "decimal",
+            "integer",
+            "optional_string"
+          ],
+          "title": "Return Type",
+          "type": "string"
+        },
+        "cases": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ValueGuardCase"
+              },
+              {
+                "$ref": "#/$defs/RaisesGuardCase"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Cases",
+          "type": "array"
+        },
+        "generator_version": {
+          "default": "guard-test.v2",
+          "enum": [
+            "guard-test.v1",
+            "guard-test.v2"
+          ],
+          "title": "Generator Version",
+          "type": "string"
+        },
+        "test_ref": {
+          "minLength": 1,
+          "title": "Test Ref",
+          "type": "string"
+        },
+        "test_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Test Digest",
+          "type": "string"
+        },
+        "source_buggy_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Buggy Digest",
+          "type": "string"
+        },
+        "source_fixed_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Fixed Digest",
+          "type": "string"
+        },
+        "validation_run": {
+          "$ref": "#/$defs/RunRecord"
+        },
+        "state": {
+          "const": "candidate",
+          "default": "candidate",
+          "title": "State",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "created_at",
+        "source_evidence_id",
+        "source_evidence_ref",
+        "source_evidence_digest",
+        "contract_id",
+        "contract_digest",
+        "target_interface",
+        "argument_types",
+        "return_type",
+        "cases",
+        "test_ref",
+        "test_digest",
+        "source_buggy_digest",
+        "source_fixed_digest",
+        "validation_run",
+        "artifact_digest"
+      ],
+      "title": "Guard",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "RaisesGuardCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "args": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Args",
+          "type": "object"
+        },
+        "raises": {
+          "enum": [
+            "ValueError",
+            "TypeError",
+            "OverflowError"
+          ],
+          "title": "Raises",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "args",
+        "raises"
+      ],
+      "title": "RaisesGuardCase",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "RunRecord": {
+      "additionalProperties": false,
+      "description": "Immutable, reproducible record of one pytest invocation.",
+      "properties": {
+        "schema_version": {
+          "const": "run-record.v1",
+          "default": "run-record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/RunRole"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Argv",
+          "type": "array"
+        },
+        "cwd": {
+          "minLength": 1,
+          "title": "Cwd",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 30.0,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        },
+        "pytest_exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pytest Exit Code"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        "case_results": {
+          "items": {
+            "$ref": "#/$defs/CaseResult"
+          },
+          "title": "Case Results",
+          "type": "array"
+        },
+        "stdout_ref": {
+          "minLength": 1,
+          "title": "Stdout Ref",
+          "type": "string"
+        },
+        "stdout_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stdout Digest",
+          "type": "string"
+        },
+        "stderr_ref": {
+          "minLength": 1,
+          "title": "Stderr Ref",
+          "type": "string"
+        },
+        "stderr_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stderr Digest",
+          "type": "string"
+        },
+        "junit_ref": {
+          "minLength": 1,
+          "title": "Junit Ref",
+          "type": "string"
+        },
+        "junit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Junit Digest",
+          "type": "string"
+        },
+        "python_version": {
+          "minLength": 1,
+          "title": "Python Version",
+          "type": "string"
+        },
+        "pytest_version": {
+          "minLength": 1,
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "error_detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Detail"
+        }
+      },
+      "required": [
+        "run_id",
+        "role",
+        "contract_id",
+        "contract_digest",
+        "target",
+        "target_digest",
+        "argv",
+        "cwd",
+        "started_at",
+        "duration_ms",
+        "pytest_exit_code",
+        "outcome",
+        "case_results",
+        "stdout_ref",
+        "stdout_digest",
+        "stderr_ref",
+        "stderr_digest",
+        "junit_ref",
+        "junit_digest",
+        "python_version",
+        "pytest_version"
+      ],
+      "title": "RunRecord",
+      "type": "object"
+    },
+    "RunRole": {
+      "description": "The purpose of a captured pytest execution.",
+      "enum": [
+        "buggy",
+        "fixed",
+        "replay"
+      ],
+      "title": "RunRole",
+      "type": "string"
+    },
+    "TargetInterface": {
+      "additionalProperties": false,
+      "description": "Trusted contract metadata; target source identity is supplied at replay.",
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature"
+      ],
+      "title": "TargetInterface",
+      "type": "object"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    },
+    "ValueGuardCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "args": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Args",
+          "type": "object"
+        },
+        "expected": {
+          "$ref": "#/$defs/JsonValue"
+        }
+      },
+      "required": [
+        "case_id",
+        "args",
+        "expected"
+      ],
+      "title": "ValueGuardCase",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "registry-entry.v1",
+      "default": "registry-entry.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_id": {
+      "title": "Registry Id",
+      "type": "string"
+    },
+    "registered_at": {
+      "format": "date-time",
+      "title": "Registered At",
+      "type": "string"
+    },
+    "source_workspace": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Source Workspace",
+      "type": "string"
+    },
+    "guard_ref": {
+      "minLength": 1,
+      "title": "Guard Ref",
+      "type": "string"
+    },
+    "guard_file_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard File Digest",
+      "type": "string"
+    },
+    "guard": {
+      "$ref": "#/$defs/Guard"
+    },
+    "evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "registry_id",
+    "registered_at",
+    "source_workspace",
+    "guard_ref",
+    "guard_file_digest",
+    "guard",
+    "evidence",
+    "artifact_digest"
+  ],
+  "title": "RegistryEntry",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

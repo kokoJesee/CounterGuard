@@ -130,11 +130,15 @@ CODE_MODULES = (
     "replay",
     "repository",
     "report",
+    "registry",
+    "registry_cli",
     "runners/__init__",
     "runners/base",
     "runners/docker",
     "runners/local",
     "scope",
+    "storage/__init__",
+    "storage/sqlite",
 )
 
 

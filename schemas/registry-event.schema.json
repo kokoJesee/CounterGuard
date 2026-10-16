@@ -1,0 +1,81 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "registry-event.v1",
+      "default": "registry-event.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_id": {
+      "title": "Registry Id",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 1,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "guard_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "registered",
+        "disabled"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "actor": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "previous_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Previous Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "registry_id",
+    "sequence",
+    "guard_id",
+    "guard_digest",
+    "kind",
+    "actor",
+    "reason",
+    "created_at",
+    "previous_digest",
+    "artifact_digest"
+  ],
+  "title": "RegistryEvent",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

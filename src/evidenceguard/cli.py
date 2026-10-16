@@ -30,6 +30,7 @@ from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
 from evidenceguard.pipeline import PipelineExecutionError, run_pipeline, verify_pipeline
 from evidenceguard.protocol import run_train_baselines, verify_protocol
+from evidenceguard.registry_cli import app as registry_app
 from evidenceguard.replay import (
     ReplayRequest,
     replay_exit_code,
@@ -42,6 +43,7 @@ from evidenceguard.scope import fit_scopes
 from evidenceguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
+app.add_typer(registry_app, name="registry")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
 guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
