@@ -431,3 +431,58 @@ def read_repository(
         shallow=shallow,
         git_version=git_version,
     )
+
+
+def read_committed_files(
+    repo: str | Path,
+    revision: str,
+) -> tuple[str, dict[str, bytes], tuple[FilePin, ...]]:
+    """Read a bounded complete tree for static preflight, never the dirty working tree."""
+    snapshot = read_repository(repo, revision, revision)
+    if snapshot.status != "ready":
+        raise RepositoryProblem(snapshot.reason_codes[0], rejected=snapshot.status == "rejected")
+    gitdir = Path(repo).absolute() / ".git"
+    before = _metadata(gitdir)
+    objects = gitdir / "objects"
+    deadline = time.monotonic() + 30
+    files, pins, total = {}, [], 0
+    with tempfile.TemporaryDirectory(prefix="eg-tree-") as temporary:
+        isolated = Path(temporary)
+        _prepare_metadata(before, isolated)
+        entries = _git(
+            isolated,
+            objects,
+            "ls-tree",
+            "-r",
+            "-z",
+            "--full-tree",
+            snapshot.head_commit,
+            deadline=deadline,
+        )
+        for entry in entries.split(b"\0"):
+            if not entry:
+                continue
+            if len(files) >= 2048:
+                raise RepositoryProblem("repository_budget_exceeded")
+            header, raw_ref = entry.split(b"\t", 1)
+            mode, kind, oid = header.decode("ascii").split()
+            _check_mode(mode)
+            ref = repository_path(raw_ref.decode("utf-8"))
+            if kind != "blob" or not _OID.fullmatch(oid) or ref in files:
+                raise RepositoryProblem("invalid_git_output", rejected=True)
+            body = _git(
+                isolated, objects, "cat-file", "blob", oid, deadline=deadline, limit=BLOB_LIMIT
+            )
+            total += len(body)
+            if total > 8 * BLOB_LIMIT:
+                raise RepositoryProblem("blob_budget_exceeded")
+            blob = b"blob " + str(len(body)).encode("ascii") + b"\0" + body
+            if hashlib.sha1(blob, usedforsecurity=False).hexdigest() != oid:
+                raise RepositoryProblem("git_object_integrity", rejected=True)
+            files[ref] = body
+            pins.append(
+                FilePin(revision="head", path=ref, object_id=oid, content_digest=digest_bytes(body))
+            )
+    if before != _metadata(gitdir):
+        raise RepositoryProblem("repository_changed_during_inspection")
+    return snapshot.head_commit, files, tuple(sorted(pins, key=lambda pin: pin.path))

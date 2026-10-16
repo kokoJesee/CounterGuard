@@ -125,6 +125,7 @@ CODE_MODULES = (
     "module_context",
     "path_limits",
     "predicates",
+    "preflight",
     "project_config",
     "protocol",
     "replay",

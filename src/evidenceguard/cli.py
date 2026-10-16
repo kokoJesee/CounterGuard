@@ -29,6 +29,7 @@ from evidenceguard.evidence import (
 from evidenceguard.features import audit_features
 from evidenceguard.models import Evidence, RunOutcome, RunRecord
 from evidenceguard.pipeline import PipelineExecutionError, run_pipeline, verify_pipeline
+from evidenceguard.preflight import preflight_repository
 from evidenceguard.protocol import run_train_baselines, verify_protocol
 from evidenceguard.registry_cli import app as registry_app
 from evidenceguard.replay import (
@@ -64,6 +65,18 @@ verification_app = typer.Typer(no_args_is_help=True, help="Audit independent can
 app.add_typer(verification_app, name="verification")
 pipeline_app = typer.Typer(no_args_is_help=True, help="Run or audit the offline MVP pipeline.")
 app.add_typer(pipeline_app, name="pipeline")
+
+
+@app.command("preflight")
+def preflight_command(
+    repo: Annotated[Path, typer.Option(help="Repository root; only committed files are read.")],
+    revision: Annotated[str, typer.Option(help="Commit/ref to assess without imports or install.")],
+) -> None:
+    """Statically check compatibility with the fixed Docker no-install profile."""
+    result = preflight_repository(repo, revision)
+    typer.echo(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    if result["status"] != "eligible_candidate":
+        raise typer.Exit(5 if result["status"] == "rejected" else 4)
 
 
 @app.command("inspect")

@@ -1,0 +1,190 @@
+####################
+#   Build System   #
+####################
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+####################
+#     Metadata     #
+####################
+
+[project]
+name = "validators"
+description = "Python Data Validation for Humans™"
+authors = [{ name = "Konsta Vesterinen", email = "konsta@fastmonkeys.com" }]
+license = { text = "MIT" }
+readme = "README.md"
+keywords = ["validation", "validator", "python-validator"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.11"
+dynamic = ["version"]
+dependencies = []
+
+[project.urls]
+Homepage = "https://python-validators.github.io/validators"
+Documentation = "https://nandgator.github.io/pyvalidators"
+Repository = "https://github.com/python-validators/validators"
+Changelog = "https://github.com/python-validators/validators/blob/master/CHANGES.md"
+
+###########################
+#  Optional Dependencies  #
+###########################
+
+[project.optional-dependencies]
+crypto-eth-addresses = ["eth-hash[pycryptodome]>=0.7.0"]
+
+##############################
+#  Development Dependencies  #
+##############################
+
+[dependency-groups]
+docs-offline = [
+    "myst-parser>=3.0.1",
+    "pypandoc-binary>=1.13",
+    "sphinx>=7.1.2",
+    "furo>=2024.8.6",
+]
+docs-online = [
+    "zensical>=0.0.69",
+    "mkdocstrings-python>=1.14.0", # `inventories` option replaces `import`
+    "mike", # Zensical-compatible fork, see `tool.uv.sources`
+]
+package = ["build>=1.2.1"]
+runner = ["tox>=4.22"]
+sast = ["bandit[toml]>=1.7.9"]
+testing = ["pytest>=9.0.3"]
+tooling = [
+    "ruff>=0.6.3",
+    "pyright>=1.1.378",
+    "pytest>=9.0.3",
+    "pypandoc-binary>=1.13", # helps with type checking
+]
+
+####################
+#  Configurations  #
+####################
+
+[tool.uv.sources]
+# Temporary: Zensical has no native versioning yet; this fork of `mike` bridges it.
+mike = { git = "https://github.com/squidfunk/mike.git" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["validators*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+validators = ["py.typed", "_tld.txt"]
+
+[tool.setuptools.dynamic]
+version = { attr = "validators.__version__" }
+
+[tool.bandit]
+exclude_dirs = [
+    ".github",
+    ".pytest_cache",
+    ".tox",
+    ".venv",
+    ".venv.dev",
+    ".vscode",
+    "site",
+    "tests",
+]
+
+[tool.pyright]
+extraPaths = ["src"]
+exclude = [
+    "**/__pycache__/",
+    ".pytest_cache/",
+    ".tox/",
+    ".venv/",
+    ".venv.dev/",
+    "site/",
+]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+
+[tool.pytest]
+minversion = "9.0"
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = ["--doctest-modules"]
+
+[tool.ruff]
+lint.select = [
+    # Pyflakes
+    "F",
+    # pycodestyle
+    "W",
+    "E",
+    # mccabe
+    # C90
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["**/__pycache__", ".pytest_cache", "site"]
+
+[tool.ruff.lint.isort]
+# case-sensitive = true
+combine-as-imports = true
+force-sort-within-sections = true
+force-wrap-aliases = true
+known-local-folder = ["src"]
+relative-imports-order = "closest-to-furthest"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.tox]
+requires = ["tox>=4.22"]
+env_list = ["lint", "type", "format", "sast", "py311", "py312", "py313", "py314"]
+
+[tool.tox.env.lint]
+description = "ruff linter"
+dependency_groups = ["tooling"]
+commands = [["ruff", "check", "."]]
+
+[tool.tox.env.type]
+description = "pyright type checker"
+dependency_groups = ["tooling"]
+extras = ["crypto-eth-addresses"]
+commands = [["pyright", "."]]
+
+[tool.tox.env.format]
+description = "code formatter"
+dependency_groups = ["tooling"]
+commands = [["ruff", "format", "."]]
+
+[tool.tox.env.sast]
+description = "bandit security checks"
+dependency_groups = ["sast"]
+commands = [["bandit", "-c", "pyproject.toml", "-r", "."]]
+
+[tool.tox.env_run_base]
+description = "unit tests"
+dependency_groups = ["testing"]
+extras = ["crypto-eth-addresses"]
+commands = [["pytest", "."]]
