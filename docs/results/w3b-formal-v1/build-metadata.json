@@ -1,0 +1,43 @@
+{
+  "buildx.build.provenance": {
+    "builder": {
+      "id": ""
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/python@3.13-slim-bookworm?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "a1165e272e578941b84abc79e4ab38a0305cd12803a5c4247979ac7655f4d641"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "desktop-linux/desktop-linux/1kxpactvgoezbpx8qhrkhha7z",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "digest": "sha256:3c7ff58df09df6049924dbce20514a9e7718e879da82a51ca1e1d5cec9b9433f",
+    "size": 856
+  },
+  "containerimage.digest": "sha256:3c7ff58df09df6049924dbce20514a9e7718e879da82a51ca1e1d5cec9b9433f",
+  "image.name": "docker.io/library/evidenceguard-runner:w3b-formal-v1"
+}
