@@ -1,6 +1,6 @@
 # scope_v1 训练预期的独立推导
 
-这份记录按 D2 已确认标签和 D5 已冻结方法手算，不根据 Guard 运行结果反推作用域。单位是一行 `(guard_id, sample_id)`；仅使用 9 个 train 样本。对应四方法定义在 `experiments/scope_v1.json`，这里推导其中两个 Baseline 的训练验收值。
+这份记录依据已确认的 benchmark 标签和冻结的 protocol 定义手算，不根据 Guard 运行结果反推作用域。单位是一行 `(guard_id, sample_id)`；仅使用 9 个 train 样本。对应四方法定义在 `experiments/scope_v1.json`，这里推导其中两个 Baseline 的训练验收值。
 
 人工判定依据：discount 的 v1 final-price、input-limit 的 v1 query-parameter 是适用语义；不同契约版本或接口含义不适用。这里使用版本和接口确认**真实标签**；B2 自己只允许比较接口，不能借用标签判据中的版本。
 

@@ -1,6 +1,6 @@
 # Evidence 版本、有效性与历史记录
 
-新捕获使用 `evidence.v2`。推荐 ID 为 `<语义名称>_v1`、`<语义名称>_v2`；末尾的版本表示捕获修订，不是业务契约版本或开发日期。新捕获拒绝 `_d4`、`_d5` 等日程后缀。历史 v1 记录保持原始字节、ID 和 digest，不重命名、不覆盖。
+新捕获使用 `evidence.v2`。推荐 ID 为 `<语义名称>_v1`、`<语义名称>_v2`；末尾的版本表示捕获修订，与业务契约版本分别管理。ID 应保持简短并表达业务语义。历史 v1 记录保持原始字节、ID 和 digest，不重命名、不覆盖。
 
 | 字段 | 规则 |
 |---|---|
@@ -32,10 +32,8 @@ inventory 返回 0 只表示检查完成；消费者必须读取每行 `usable` 
 
 ## 重新捕获与 Guard 迁移
 
-```powershell
-uv run counterguard capture --evidence-id evd_discount_v1_member_rate_fix_v2 --contract examples/discount/contracts/membership_discount_final_price_v1.json --test tests/contract_tests/test_membership_discount_v1.py --buggy-target examples.discount.implementations.final_price_v1_buggy:calculate_price --fixed-target examples.discount.implementations.final_price_v1_fixed:calculate_price --supersedes artifacts/evidence/evd_discount_v1_member_rate_fix_d4/evidence.json --reason "Adopt semantic capture revisions and explicit replacement provenance; retain the verified exception whitelist and isolated execution harness."
-```
+重新捕获时使用语义修订 ID，并通过 CLI 的 `--supersedes` 与 `--reason` 显式记录前驱关系和原因。工作区必须已有可验证的前驱 Evidence。
 
-以上命令用于已有 D4 前驱的工作区。干净检出执行 `uv run python scripts/prepare_scope_v1.py`：它创建语义 v1 前驱，再捕获 v2；已有 v2 时验证并复用，不改实验协议。
+干净检出执行 `uv run python scripts/prepare_scope_v1.py`：它创建语义 v1 前驱，再捕获 v2；已有 v2 时验证并复用，不改实验协议。
 
 生成器升级为 `guard-test.v2`，缺少目标环境变量时给出 `pytest.UsageError` 和 CLI 使用方式；不跳过断言。新的两份 Guard 使用 `_v2` ID、`guard_version=2`。旧 v1 模板仍可加载与审计，旧资产保持不变。

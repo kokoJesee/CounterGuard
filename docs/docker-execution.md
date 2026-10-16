@@ -1,6 +1,6 @@
 # Docker 受限执行
 
-W3-B 源码版提供一个库级 `DockerExecutor`，用于已经完成 W3-A 检查的精确 replay 请求。它尚未接入公开 CLI 或 Registry；在 W3-C/D 调度落地前，调用者必须显式持有 Inspection、同一配置、请求和镜像 ID。
+W3-B 提供库级 `DockerExecutor`，用于已审核的精确 replay 请求。W3-C Registry 与 W3-D validators 试点通过专用流程接入它；这不构成面向任意仓库的通用执行命令。运行边界和试点准入见[安全模型](security-model.md)、[预检说明](preflight.md)与[pilot 设计](../integrations/pilot/design-fork-v1.md)。
 
 ## 授权不是布尔开关
 
@@ -20,7 +20,7 @@ DockerExecutor 在启动前和退出后都重建这份授权。启动时把授�
 
 ## 构建与真实测试
 
-正式 Dockerfile 使用 Python 3.13 slim 和 pytest 8.4.2：
+基础 runner 的正式构建与锁定记录见 [runner receipt](results/w3b-formal-v1/runner-receipt.json)。validators 固定试点另使用 pytest 9.0.3 的专用镜像；已接受镜像 ID、依赖锁和四项原始攻击复验见 [试点 runner receipt](results/w3d-fork-v1/runner-receipt.json) 与 [Docker 攻击结果](results/w3d-fork-v1/attacks/acceptance.json)。下面的命令重建基础 runner；重建不会自动继承已接受的镜像 ID，必须生成新锁并复验：
 
 ```powershell
 docker build --pull -t counterguard-runner:w3b -f containers/python-runner/Dockerfile .
@@ -28,9 +28,7 @@ $env:COUNTERGUARD_RUNNER_IMAGE_DIGEST = docker image inspect counterguard-runner
 uv run pytest -m docker tests/integration/test_docker_runner.py -q
 ```
 
-执行时只使用这个 ID，并传 `--pull=never`。tag 不是授权身份。2026-10-16 已记录基础 registry digest、完整解析依赖/分发 RECORD、runner ID，并保存可离线恢复归档与 SHA-256；正式 Dockerfile 未修改，原四项攻击通过。收据和复验命令见 [正式镜像收尾](progress/w3b-formal.md)。以后重建必须新锁新验收；不承诺未来源码构建逐位相同或上游身份签名。
-
-本机 2026-10-15 因访问 `auth.docker.io` 超时，正式基础镜像没有拉取成功。为验证机制，测试临时使用已有缓存 Python 镜像作为 base，生成新的本地 image ID，跑完四项攻击 fixture；该临时 Dockerfile 位于忽略的测试目录，不是项目产物，也不替换正式 Dockerfile。当前状态和准确边界见 [W3-B 验收](progress/w3b.md)。
+执行时只使用已核验的 image ID，并传 `--pull=never`。tag 不是授权身份。基础 runner 的 Dockerfile、依赖锁、runner ID 与原四项攻击通过记录见 [正式 runner receipt](results/w3b-formal-v1/runner-receipt.json) 和 [Docker 测试输出](results/w3b-formal-v1/docker-tests.txt)。以后重建必须新锁新验收；不承诺未来源码构建逐位相同或上游身份签名。
 
 若 Docker Desktop 4.71 在 Windows 报 Inference manager 的 `unix://C:\...\dockerInference` 路径错误，可先退出弹窗，再从正常桌面会话启动，并按官方命令关闭与本项目无关的 Model Runner：
 

@@ -1,8 +1,8 @@
 # MVP 冻结评测汇总
 
-这是 D9 历史结果的投影，不是 D14 新留出实验。
+这是冻结留出评测的汇总，不是新的留出实验。
 
-原提交：`b883ca3`；原 manifest：`sha256:154d19625e3f858d82235bb348c18b4cedf07f6b31bdeee70e8b4aad6399ad38`。
+原 manifest：`sha256:154d19625e3f858d82235bb348c18b4cedf07f6b31bdeee70e8b4aad6399ad38`。
 
 | 方法 | TP / FP / TN / FN | 执行数 | false_alert_rate | bug_recall |
 |---|---|---:|---|---|
@@ -16,8 +16,5 @@
 false_alert_rate 的分母为全部 5 个合规目标；input-limit 族的 Bug recall 分母为 0，保留 null。
 四方法共 16 次执行，来源缺陷另复检 4 次，不混入留出分母。
 
-[完整口径](../evaluation.md)、[原始报告](scope-v1/day9/report.md)、
-[本次只读复验](day14/historical-verification.json)、[旧验证覆盖限制](../known-limitations.md#历史验证结论的边界)。
-原代码复验通过不提供 D13 A01–A04 的完整保证；没有重签或改写旧产物。
-
-本汇总 JSON 摘要：`sha256:ef0873e4cffc8d45bf16b8840e0f54dd46f6151649c3c42b42e734ab2c7f1c8d`。
+[完整口径](../evaluation.md)、[原始报告](scope-v1/evaluation/report.md)、[历史验证覆盖限制](../known-limitations.md#历史验证结论的边界)。
+没有重签或改写旧产物。

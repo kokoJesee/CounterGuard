@@ -12,7 +12,7 @@ from counterguard.digests import digest_json_artifact
 from counterguard.features import FeatureRecord
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT = "artifacts/audits/day6-feature-parity.json"
+OUTPUT = "artifacts/audits/feature-parity.json"
 
 
 @pytest.fixture
@@ -182,7 +182,7 @@ def test_context_corruption_retains_error_report(workspace):
 
 
 def test_historical_feature_record_keeps_original_digest_shape():
-    path = PROJECT_ROOT / "docs/results/scope-v1/day6-feature-parity.json"
+    path = PROJECT_ROOT / "docs/results/scope-v1/feature-parity.json"
     historic = json.loads(path.read_bytes())
     row = historic["entries"][0]
     # Build the v1 shape from recorded sources without adding context fields.

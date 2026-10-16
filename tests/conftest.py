@@ -1,4 +1,4 @@
-"""Share one real D8 capture/compile/fit setup while keeping mutated checks isolated."""
+"""Share one real capture/compile/fit setup while keeping mutated checks isolated."""
 
 import shutil
 import subprocess

@@ -206,7 +206,7 @@ def evaluate_methods(
     timeout_seconds: float = 30.0,
 ) -> EvaluationReport:
     if split != "holdout":
-        raise ValueError("D9 evaluates the frozen holdout only")
+        raise ValueError("Only the frozen holdout split can be evaluated.")
     if timeout_seconds <= 0 or not math.isfinite(timeout_seconds):
         raise ValueError("Evaluation timeout must be positive and finite")
     workspace = Path(cwd).resolve(strict=True)

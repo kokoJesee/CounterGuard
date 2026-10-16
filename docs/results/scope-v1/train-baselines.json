@@ -1,0 +1,260 @@
+{
+  "counts": {
+    "b1_always": {
+      "fn": 0,
+      "fp": 5,
+      "tn": 0,
+      "tp": 4
+    },
+    "b2_interface": {
+      "fn": 0,
+      "fp": 3,
+      "tn": 2,
+      "tp": 4
+    }
+  },
+  "execution_count": 16,
+  "infrastructure_errors": 0,
+  "predictions": [
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-v1-discount-amount",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_discount_member_rate_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-v1-fixed",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_discount_member_rate_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-v1-source-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_discount_member_rate_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-v2-legal",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_discount_member_rate_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-batch-v1-legal",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_query_limit_zero_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-query-v1-fixed",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_query_limit_zero_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-query-v1-source-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_query_limit_zero_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-query-v2-legal",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_query_limit_zero_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b1_always",
+      "sample_id": "train-query-v2-own-contract-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b1_always_grd_query_limit_zero_regression_v2",
+      "trace": []
+    },
+    {
+      "execution_outcome": "not_run",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-v1-discount-amount",
+      "scope_decision": "inapplicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_discount_member_rate_regression_v2",
+      "trace": [
+        {
+          "actual": "discount_amount",
+          "expected": "final_price",
+          "field": "interface_kind",
+          "matched": false,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-v1-fixed",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_discount_member_rate_regression_v2",
+      "trace": [
+        {
+          "actual": "final_price",
+          "expected": "final_price",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-v1-source-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_discount_member_rate_regression_v2",
+      "trace": [
+        {
+          "actual": "final_price",
+          "expected": "final_price",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_discount_member_rate_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-v2-legal",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_discount_member_rate_regression_v2",
+      "trace": [
+        {
+          "actual": "final_price",
+          "expected": "final_price",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "not_run",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-batch-v1-legal",
+      "scope_decision": "inapplicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_query_limit_zero_regression_v2",
+      "trace": [
+        {
+          "actual": "worker_batch",
+          "expected": "query_parameter",
+          "field": "interface_kind",
+          "matched": false,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-query-v1-fixed",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_query_limit_zero_regression_v2",
+      "trace": [
+        {
+          "actual": "query_parameter",
+          "expected": "query_parameter",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "test_failed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-query-v1-source-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_query_limit_zero_regression_v2",
+      "trace": [
+        {
+          "actual": "query_parameter",
+          "expected": "query_parameter",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-query-v2-legal",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_query_limit_zero_regression_v2",
+      "trace": [
+        {
+          "actual": "query_parameter",
+          "expected": "query_parameter",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    },
+    {
+      "execution_outcome": "passed",
+      "guard_id": "grd_query_limit_zero_regression_v2",
+      "method": "b2_interface",
+      "sample_id": "train-query-v2-own-contract-bug",
+      "scope_decision": "applicable",
+      "scope_id": "scp_scope_v1_b2_interface_grd_query_limit_zero_regression_v2",
+      "trace": [
+        {
+          "actual": "query_parameter",
+          "expected": "query_parameter",
+          "field": "interface_kind",
+          "matched": true,
+          "op": "eq"
+        }
+      ]
+    }
+  ],
+  "protocol_digest": "sha256:1f401186a3f51c17e582dbbdc96f9324e47e128f90fcb91f29594690bc8daa3a",
+  "protocol_id": "scope_v1",
+  "sample_count": 9,
+  "schema_version": "baseline-train-report.v1",
+  "split": "train",
+  "split_digest": "sha256:f04170d16cd6e54f09edcc4b1c3cdb39f84ce4dbd2928c5923da7ccc21cd0cef"
+}

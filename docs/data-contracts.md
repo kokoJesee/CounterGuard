@@ -26,27 +26,27 @@ SQLite 逐字节索引规范 JSON，并追加镜像同一事件；每次访问�
 | Feature / audit | 目标源码、声明契约、module context、自身特征；audit 还依赖样本文件、手工标注、词汇/提取器与快照 | 重提受影响目标并重新审计；context 来源或记录格式变化生成新记录版本。audit 不能靠改标注变绿。相关训练特征/标签变化须重新学习；其他目标变化无需重训无关规则 |
 | Learning / Scope / fit | 纯 learning：规范排序的训练 FeatureVector+标签、算法/结果格式；Scope/fit：另绑定训练身份、Guard artifact、protocol/split/context/audit 和创建记录 | 特征、标签、成员或算法变化要重学对应 Guard/phase；仅来源绑定或结果记录格式变化可保留验证后的相同规则，但必须重新物化相关结果/manifest。旧引用不可静默换成新 digest |
 | 可选 ScopeExplanation | learning artifact_digest、训练多重集 digest、正负例计数、逐条件删除见证、证书格式 | learning 或训练变化时在新目录重生成证书；该证书是旁路审计产物，不改变已有 Scope/fit/Replay 绑定，也不触发它们重物化 |
-| ReplayResult（D8） | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
-| EvaluationReport（D9） | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
-| Candidate / VerificationGate（D10） | 请求原始字节、白名单 AgentContext、recorded 响应指纹、可信模板测试、fixed 来源以及 D3 双向 Evidence | 请求、响应、契约、目标或模板改变，必须使用新的 request ID/修订和新 candidate/Evidence；历史完成标记只读审核。Gate 是 Evidence 的生成分支，不依赖 Scope，也不自动触发既有 Scope/评测重算 |
-| Workspace / Pipeline（D11） | 场景与来源/输入镜像原字节、冻结 protocol/split、各阶段正式模型摘要、实际 Replay/JUnit、执行代码与依赖版本 | 任一来源或运行代码变化，历史结果不能在新版本下冒充当前运行。重新运行使用新的 workspace 版本目录；不得重签旧 manifest、复制旧 artifacts 充当新 capture/fit，或修改冻结配置迁就新路径 |
-| Command / Demo 展示（D12） | command-report.v1 投影原 JSON；demo-report.v1 另绑定 Pipeline 引用/摘要、demo.py/report.py 原始代码摘要、真实生成时间、规则/逐行展示与自摘要；Markdown 逐字节由该 JSON 渲染 | 只读切换格式无需任何新执行；已发布 Demo 改动/缺失即拒绝，不重新生成缺失文件。新输入/代码使用新 workspace 和 report，不重签旧记录。当前 D9/D11 包含 cli.py/report.py 代码 pin，因此本轮展示修改也会使它们在新运行时审核失效；历史记录保留，原提交可复验 |
+| ReplayResult | 实际 Guard、Scope、fit 来源、目标与声明契约/context/Feature、作用域 trace、真实运行及日志 | 任一实际输入绑定变化需新的 replay ID 和记录。已有 skipped/unknown 不可改为 pass；完整性失败须显式拒绝或 stale，不能自动刷新上游后继续冒充旧 replay |
+| EvaluationReport | 协议/拆分、冻结标签、全部逐行预测/ReplayResult、指标实现与环境清单 | 重放或度量输入变化须新 evaluation；冻结口径变化用新协议。仅渲染修改可从同一原始 JSON 重生成展示，不重新计算事实 |
+| Candidate / VerificationGate | 请求原始字节、白名单 AgentContext、recorded 响应指纹、可信模板测试、fixed 来源以及已验证的双向 Evidence | 请求、响应、契约、目标或模板改变，必须使用新的 request ID/修订和新 candidate/Evidence；历史完成标记只读审核。Gate 是 Evidence 的生成分支，不依赖 Scope，也不自动触发既有 Scope/评测重算 |
+| Workspace / Pipeline | 场景与来源/输入镜像原字节、冻结 protocol/split、各阶段正式模型摘要、实际 Replay/JUnit、执行代码与依赖版本 | 任一来源或运行代码变化，历史结果不能在新版本下冒充当前运行。重新运行使用新的 workspace 版本目录；不得重签旧 manifest、复制旧 artifacts 充当新 capture/fit，或修改冻结配置迁就新路径 |
+| Command / Demo 展示 | command-report.v1 投影原 JSON；demo-report.v1 另绑定 Pipeline 引用/摘要、demo.py/report.py 原始代码摘要、真实生成时间、规则/逐行展示与自摘要；Markdown 逐字节由该 JSON 渲染 | 只读切换格式无需任何新执行；已发布 Demo 改动/缺失即拒绝，不重新生成缺失文件。新输入/代码使用新 workspace 和 report，不重签旧记录。当前 evaluation/Pipeline 包含 cli.py/report.py 代码 pin，因此本轮展示修改也会使它们在新运行时审核失效；历史记录保留，原提交可复验 |
 
 操作顺序：先定位最早变化层 → 标记其下游现有引用不可用于新工作 → 在新 ID/版本/目录重建必要产物 → 逐层 verify → 最后发布新 Replay/Evaluation。不得通过重新计算旧文件的自摘要来“修复”来源错配。
 
-## D13 独立验证补强
+## 独立验证补强
 
 自摘要和文件摘要只保证被引用的字节一致，不足以保证 JSON 中的执行声明来自这些字节。公开 `verify_evidence`、`verify_guard`、`verify_replay` 现在都调用 `execution.verify_run_record`：检查日志引用留在 workspace 内、三份日志摘要、已知 case 集，再从原始 JUnit 与实际记录的 pytest exit code 重建 outcome/case_results。记录里的未知 case、重签后的假失败集/自检结果均拒绝；timeout/launch error 没有正常返回码时不得伪造 collected cases。此检查不启动进程。
 
-Evidence 同时核对源契约的实际 contract_id，以及 buggy/fixed 的模块、符号、原始源码与声明引用一致。Replay 明确绑定 Guard/Scope 身份、protocol 摘要、执行契约和目标源码身份；已知决策的完整 trace 从真实 FeatureVector 重建，unknown 的 trace/原因从缺失信息或当前提取失败重建。重新签名 trace 或身份字段不能替代这些交叉核对。D9/D11 仍保留原整体来源审核，独立入口不再依赖调用者额外补一层审核才能拒绝这些矛盾声明。
+Evidence 同时核对源契约的实际 contract_id，以及 buggy/fixed 的模块、符号、原始源码与声明引用一致。Replay 明确绑定 Guard/Scope 身份、protocol 摘要、执行契约和目标源码身份；已知决策的完整 trace 从真实 FeatureVector 重建，unknown 的 trace/原因从缺失信息或当前提取失败重建。重新签名 trace 或身份字段不能替代这些交叉核对。evaluation/Pipeline 仍保留原整体来源审核，独立入口不再依赖调用者额外补一层审核才能拒绝这些矛盾声明。
 
-没有改变现有持久化模型/Schema、Guard semantic_digest 的九字段集合、特征词汇、learner 搜索或冻结指标。加强的是 verify 接受条件：内部自洽但违背原始来源的记录应拒绝。新增 diagnostics.py 纳入执行代码摘要；CLI 自产错误诊断脱敏和 launch error 摘要收紧会改变新代码/新执行的 artifact 绑定，正式验收使用 day13-smoke 新目录，不重签旧 manifest 或覆盖历史记录。
+没有改变现有持久化模型/Schema、Guard semantic_digest 的九字段集合、特征词汇、learner 搜索或冻结指标。加强的是 verify 接受条件：内部自洽但违背原始来源的记录应拒绝。新增 diagnostics.py 纳入执行代码摘要；CLI 自产错误诊断脱敏和 launch error 摘要收紧会改变新代码/新执行的 artifact 绑定，正式验收使用 verification-smoke 新目录，不重签旧 manifest 或覆盖历史记录。
 
 脱敏只约束明确的公开错误摘要，不改写原始 stdout/stderr/JUnit，也不将原始 RunRecord 或报告包装为公开导出包。具体范围见 `docs/known-limitations.md`。独立 unknown 样例另外保留原 ReplayResult 与同源 CommandReport 的三种展示，不增加标准 Demo 行数或评测分母。
 
-## CLI 与 Demo 展示（D12）
+## CLI 与 Demo 展示
 
-`report.py` 定义 `command-report.v1`、`ReplayPresentation`（Schema 文件为 replay-presentation.schema.json，内层行没有独立 schema_version）与三格式纯渲染器。`demo.py` 定义 `demo-report.v1`、`run_demo`、`verify_demo`，复用 D11 管线而不再实现一套执行路径。
+`report.py` 定义 `command-report.v1`、`ReplayPresentation`（Schema 文件为 replay-presentation.schema.json，内层行没有独立 schema_version）与三格式纯渲染器。`demo.py` 定义 `demo-report.v1`、`run_demo`、`verify_demo`，复用 Pipeline 管线而不再实现一套执行路径。
 
 显式 `--format text|json|markdown` 都消费同一 CommandReport。payload 保存原完整 JSON，不改变内层 artifact_digest 的覆盖集合；包装层是展示 DTO，不冒充原始 artifact 或新执行证据。capture/compile/learn/evaluate 没有 Replay 时 replays=[]，不虚构适用性结论。既有命令未传 --format 保持原始 JSON 形状，新增 demo 默认 text。命令/别名、退出码和状态表见 `docs/cli.md`。
 
@@ -54,13 +54,13 @@ Replay 行保留 guard_id、可选 sample_id/source_ref、三种 scope_decision�
 
 严格行模型拒绝 skipped 配执行、unknown 无解释、执行错误配 pass/violation；Replay CommandReport 还要与原 payload 的投影完全一致。Demo 的六行、验收、最小失败 case、规则与来源全部从已 verify 的 Pipeline/Guard/Learning/Replay 重建。规则和 trace 是原数据的解释，不新学条件、不重算指标。
 
-Demo 首次在空 workspace 运行；report.md 先发布，report.json 最后作为展示完成标记。中途失败保留已有 Pipeline/文件，重复调用拒绝部分目录，改用新版本目录。report.json 的 digest 覆盖除自身 artifact_digest 外全部字段；Markdown 包含该摘要并要求从同一 JSON 重建逐字节相同，不在 JSON 中再包含 Markdown 摘要造成循环依赖。生成时间使用实际 UTC，重复复验不改时间。命令自身不修改 pre-D12 artifact 或冻结协议。
+Demo 首次在空 workspace 运行；report.md 先发布，report.json 最后作为展示完成标记。中途失败保留已有 Pipeline/文件，重复调用拒绝部分目录，改用新版本目录。report.json 的 digest 覆盖除自身 artifact_digest 外全部字段；Markdown 包含该摘要并要求从同一 JSON 重建逐字节相同，不在 JSON 中再包含 Markdown 摘要造成循环依赖。生成时间使用实际 UTC，重复复验不改时间。命令自身不修改 existing artifact 或冻结协议。
 
 重复 Demo/`demo --verify-only` 先审核 Pipeline 全来源、代码/环境、原始 JUnit，再重建 JSON 事实和 Markdown；不调用 provider、pytest、compile 或 fit。自摘要正确但事实/代码/Markdown 不匹配仍拒绝。输出 ref 相对于源 cwd，内层原 artifact 引用继续遵守 w/ 命名空间。
 
-## 独立 Workspace 与 Pipeline（D11）
+## 独立 Workspace 与 Pipeline
 
-`pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/day11` 在新目录依次执行 D10 recorded capture → D4 最小 compile → D7 initial/refined fit → D8 refined replay。示例 `.yaml` 内容采用 JSON 形式，当前读取器只接受此子集，使用标准库与现有 Pydantic，不引入通用 YAML 依赖。`pipeline-scenario.v1` 不允许指定新的期待指标或标签；只选择原冻结协议的两份 Guard、两份验证请求和各三个 train sample IDs。
+`pipeline run --scenario examples/demo/mvp.yaml --workspace artifacts/demo-pipeline` 在新目录依次执行 Verification Gate recorded capture → Guard compilation 最小 compile → Scope learning initial/refined fit → Scope-aware Replay refined replay。示例 `.yaml` 内容采用 JSON 形式，当前读取器只接受此子集，使用标准库与现有 Pydantic，不引入通用 YAML 依赖。`pipeline-scenario.v1` 不允许指定新的期待指标或标签；只选择原冻结协议的两份 Guard、两份验证请求和各三个 train sample IDs。
 
 冻结 scope_v1 的 Guard ID、引用路径和 semantic_digest 全部保留。输出目录内的 `w/` 是独立运行 cwd，仅复制显式列举的 protocol/split/context、标注文件、源码/契约、请求/录制响应、场景及必要 package initializer。每个文件保持原始字节并记录 SHA-256；不复制源码仓库中的 artifacts、Git、凭据、缓存、依赖目录或其他文件。新 Gate/Guard/Scope 的同名业务 ID 只存在于新 namespace，与历史产物物理隔离；Guard 执行语义必须再次满足冻结 pin。
 
@@ -80,25 +80,25 @@ manifest 绑定 workspace、场景、两份 Gate/Evidence/Guard、initial/refine
 
 所有新产物写入采用 **240 个 UTF-16 单元**的绝对路径预算，包含最终文件、原子发布临时文件 `.<name>.<32hex>.tmp`、运行配置/日志/JUnit 和 `.pytest_cache/v/cache/lastfailed`。非 BMP 字符按两个单元计数。240 是项目的保守兼容策略；Windows 的传统 MAX_PATH 是 260（含终止字符），启用长路径还依赖系统与应用双方支持，见 [Microsoft 路径限制文档](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation)。不改机器注册表，不依赖本机已经放开限制。
 
-`write_immutable` 在 mkdir 前检查最长临时路径，执行器在创建运行目录/启动 pytest 前检查日志和缓存路径。Replay、Evaluation 和 D10 Gate 进一步预检完整计划布局，避免只写到一半才发现深层路径超限。超过预算返回配置错误，提示缩短输出目录/身份，不自动截断 ID、不重命名历史文件。已有长路径产物可以继续只读审核；这不保证任意未来目录布局都能写入，D10–D14 的代表性布局与真正运行前的预检共同防止回归。
+`write_immutable` 在 mkdir 前检查最长临时路径，执行器在创建运行目录/启动 pytest 前检查日志和缓存路径。Replay、Evaluation 和 Verification Gate 进一步预检完整计划布局，避免只写到一半才发现深层路径超限。超过预算返回配置错误，提示缩短输出目录/身份，不自动截断 ID、不重命名历史文件。已有长路径产物可以继续只读审核；这不保证任意未来目录布局都能写入，Gate、Pipeline、Demo 和冻结报告的代表性布局与真正运行前的预检共同防止回归。
 
-路径保护改变了实际执行代码摘要。D9 两份已发布报告仍保留原文件，绑定 `b883ca3` 的运行源码；在当前源码下进行环境绑定审核会拒绝旧运行代码摘要。若要做新评测，必须用新目录和真实运行；本轮没有重跑留出集、重签旧报告或改冻结协议。新 D10 Evidence 的身份、生成测试、实际时间和日志都是新记录；已有 Guard/Feature/Scope 的输入与记录格式没有因此改变，无需为了新 Gate 重物化。
+路径保护改变了实际执行代码摘要。evaluation 两份已发布报告仍保留原文件，绑定 `b883ca3` 的运行源码；在当前源码下进行环境绑定审核会拒绝旧运行代码摘要。若要做新评测，必须用新目录和真实运行；本轮没有重跑留出集、重签旧报告或改冻结协议。新 Evidence 的身份、生成测试、实际时间和日志都是新记录；已有 Guard/Feature/Scope 的输入与记录格式没有因此改变，无需为了新 Gate 重物化。
 
-## 独立候选与 Verification Gate（D10）
+## 独立候选与 Verification Gate
 
 `verification-request.v1` 由可信调用方提供 `request_id`、契约路径、buggy/fixed 符号、recorded 响应路径和有限正超时。request ID 用语义修订 `_v1` 等，与开发日程无关；同一 ID/输出目录的重复调用只读审核，任何输入改变、同 ID 的其他请求文件或未完成目录都拒绝覆盖。
 
-Provider 接口只接受严格的 `AgentContext`：契约路径/原始摘要/文本，buggy 的 TargetRef/摘要/源码。fixed 实现、benchmark 标签、目标指标和环境变量不在类型白名单里。业务契约的 expected/raises 是授权 oracle，允许进入上下文；fixed 实现和修复答案不能进入。`RecordedModelClient` 只读指定响应文件，不访问网络、不发现凭据；该类型边界不是 Docker 或操作系统沙箱，D10 只支持可信本地目标。
+Provider 接口只接受严格的 `AgentContext`：契约路径/原始摘要/文本，buggy 的 TargetRef/摘要/源码。fixed 实现、benchmark 标签、目标指标和环境变量不在类型白名单里。业务契约的 expected/raises 是授权 oracle，允许进入上下文；fixed 实现和修复答案不能进入。`RecordedModelClient` 只读指定响应文件，不访问网络、不发现凭据；该类型边界不是 Docker 或操作系统沙箱，Verification Gate 只支持可信本地目标。
 
-`candidate-test.v1` 只有契约摘要与已有 case ID 集合，禁止代码、额外 oracle、Evidence、标签与任意解释字段。候选必须完整覆盖原契约：D3 审核全部已知 case，不能用少数 case 冒充完整 capture。case IDs 去重检查后排序，20 次乱序生成相同候选与测试摘要。D4 Compiler 仍然只选择实际失败 case；D10 不改它的最小 Guard 规则。新增输入、shrinking 和新 oracle 要走新的契约审核，不由 Agent 直接决定。
+`candidate-test.v1` 只有契约摘要与已有 case ID 集合，禁止代码、额外 oracle、Evidence、标签与任意解释字段。候选必须完整覆盖原契约：Evidence capture 审核全部已知 case，不能用少数 case 冒充完整 capture。case IDs 去重检查后排序，20 次乱序生成相同候选与测试摘要。Guard compiler 仍然只选择实际失败 case；Verification Gate 不改它的最小 Guard 规则。新增输入、shrinking 和新 oracle 要走新的契约审核，不由 Agent 直接决定。
 
 候选记录保存真实 UTC 时间、上下文摘要、请求/响应引用与摘要、响应大小、已准入的结构或固定拒绝码。原始未可信响应及 Pydantic 的输入回显不写入产物/日志。recorded 输入限 64 KiB，超限属于输入配置错误；响应无效时固定码为 candidate_schema / contract_digest / case_coverage。响应可能包含敏感内容，源文件由调用方保管，Gate 产物只保留指纹和必要的可信 case IDs。
 
-Gate 从已经严格验证的契约生成 `guard-test.v2` 模板测试，调用原 D3 双向 capture。只有 buggy=`test_failed` 且 fixed=`passed`、来源摘要与输入未变化、失败集非空时，才将真实 Evidence 原字节发布到 `<workspace>/evidence/`。两次运行超时、测试收集/导入错误、buggy 未失败或 fixed 未通过时，Gate=`rejected`、`evidence_ref=null`；仅在候选 runtime 目录保留明确的 diagnostic Evidence 与原始日志，不能当作已验证证据消费。Gate 顶层 `rejection_reasons` 保留具体失败原因。
+Gate 从已经严格验证的契约生成 `guard-test.v2` 模板测试，调用原双向 Evidence capture。只有 buggy=`test_failed` 且 fixed=`passed`、来源摘要与输入未变化、失败集非空时，才将真实 Evidence 原字节发布到 `<workspace>/evidence/`。两次运行超时、测试收集/导入错误、buggy 未失败或 fixed 未通过时，Gate=`rejected`、`evidence_ref=null`；仅在候选 runtime 目录保留明确的 diagnostic Evidence 与原始日志，不能当作已验证证据消费。Gate 顶层 `rejection_reasons` 保留具体失败原因。
 
 `verification-gate.v1` 的 `gate.json` 是完成标记，绑定 request、CandidateRecord、fixed pin、可信生成测试、诊断与公开 Evidence。只读 verify 重做候选准入和可信渲染，验证全部引用及双向 Evidence，并从原 JUnit 重建有 exit code 的 outcome/case Results。修改 JSON 后重新算摘要仍不能使其与真实日志矛盾。重复调用不再调用 provider、不启动 pytest、不伪造新的运行时间。退出码：0 verified，2 候选/配置无效，1 未满足双向缺陷条件，3 运行基础设施异常，5 完整性拒绝。
 
-例：D6 的 AST 词汇与 15 个特征值没有改变，但 module_group 来源证明增加，导致 FeatureRecord v2 和独立 audit 必须重建，D7 fit provenance 必须更新。纯规则在相同训练值下可以一致。D8 候选计数字段升级同理：改 learning 记录格式与下游引用，不改变已冻结规则或样本真值。
+例：feature audit 的 AST 词汇与 15 个特征值没有改变，但 module_group 来源证明增加，导致 FeatureRecord v2 和独立 audit 必须重建，Scope learning fit provenance 必须更新。纯规则在相同训练值下可以一致。Scope-aware Replay 候选计数字段升级同理：改 learning 记录格式与下游引用，不改变已冻结规则或样本真值。
 
 ## Guard 的 semantic_digest
 
@@ -131,11 +131,11 @@ Registry / CI 的使用顺序：
 3. Scope 的 `guard_digest` 仍绑定本次实际 Guard 的 `artifact_digest`；新工作区重新捕获后必须重新生成该 Scope。
 4. CI 仍需独立做作用域判断、执行和生命周期检查；不能只比较语义摘要就启用或放行。
 
-增加、删除或改变投影字段必须升级投影规则和协议；不得改 `scope_v1` 的已冻结摘要或 golden 期望来消除失败。当前协议 digest 保持 D5 的 `sha256:1f401186a3f51c17e582dbbdc96f9324e47e128f90fcb91f29594690bc8daa3a`。
+增加、删除或改变投影字段必须升级投影规则和协议；不得改 `scope_v1` 的已冻结摘要或 golden 期望来消除失败。当前协议 digest 保持 protocol freeze 的 `sha256:1f401186a3f51c17e582dbbdc96f9324e47e128f90fcb91f29594690bc8daa3a`。
 
 ## FeatureVector 与 AST token
 
-FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得；`module_group` 从独立、固定摘要的 `benchmarks/context/scope_v1.json` 架构包清单取得；只有 AST 集合从源码生成。目标名称、路径、case、Oracle 和标签均在模型之外。上下文来源及 D6 更正见 `module-context-policy.md`。
+FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得；`module_group` 从独立、固定摘要的 `benchmarks/context/scope_v1.json` 架构包清单取得；只有 AST 集合从源码生成。目标名称、路径、case、Oracle 和标签均在模型之外。上下文来源及 feature audit 更正见 `module-context-policy.md`。
 
 `branch:none` 的历史名称表示 **Python None 身份检查**：`ast.If` 或 `ast.IfExp` 的 test 内，一个正式参数与 `None` 通过 `is` / `is not` 比较，允许左右交换。它不表示缺少分支。
 
@@ -166,9 +166,9 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 ## FeatureRecord 与对账报告
 
-新记录为 `feature-extraction.v2`，外层保存 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、module_context_ref/digest、FeatureVector 和自身摘要。旧 v1 形状与摘要兼容读取，但不能用于 D7 fit。外层身份/来源不传入学习器。没有生成时间字段，相同输入可得到相同字节；同提取器/context/sample ID 的不同输入不能原地覆盖。
+新记录为 `feature-extraction.v2`，外层保存 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、module_context_ref/digest、FeatureVector 和自身摘要。旧 v1 形状与摘要兼容读取，但不能用于 Scope learning fit。外层身份/来源不传入学习器。没有生成时间字段，相同输入可得到相同字节；同提取器/context/sample ID 的不同输入不能原地覆盖。
 
-`feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于对账，不进入 D7 拟合。历史报告与快照追加保留，分歧仲裁见 `feature-adjudication.md`。
+`feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于对账，不进入 Scope learning 拟合。历史报告与快照追加保留，分歧仲裁见 `feature-adjudication.md`。
 
 退出 0 要求所有行 matched；差异返回 1，配置或词汇错误返回 2，提取失败返回 3，不可变资产冲突返回 5。混合失败时优先级为 5、3、2、1。错误和差异都会先写出报告。
 
@@ -193,7 +193,7 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 `count_predictions` 只接受严格 bool 标签与 applicable/inapplicable 两种预测；unknown、执行 verdict 和隐式整数标签被拒绝，不能混入二元混淆矩阵。覆盖率与 unknown 数量另行报告，不暗改冻结实验的分母。
 
-D9 评测层另按冻结计划 §5.3 显式计算：unknown 在主混淆矩阵中属于负预测，同时独立记录 unknown_count、unknown rate 与 decision coverage。原始 Prediction/Replay 仍保留 unknown/skipped_unknown，且 run=null；不把它重命名为 inapplicable，也不调用只接受二元输入的 count_predictions。这个规则是原冻结口径，不是本轮调整标准。
+evaluation 评测层另按冻结计划 §5.3 显式计算：unknown 在主混淆矩阵中属于负预测，同时独立记录 unknown_count、unknown rate 与 decision coverage。原始 Prediction/Replay 仍保留 unknown/skipped_unknown，且 run=null；不把它重命名为 inapplicable，也不调用只接受二元输入的 count_predictions。这个规则是原冻结口径，不是本轮调整标准。
 
 ## 可选作用域反例证书
 
@@ -207,7 +207,7 @@ D9 评测层另按冻结计划 §5.3 显式计算：unknown 在主混淆矩阵�
 
 外层 ScopePredicate 与 `fit-manifest.v1` 另外记录实际创建时间、sample ID、Guard artifact digest、protocol/split/context/audit 摘要。首次创建时间真实记录，重复相同输入验证后复用；不伪造时间来制造确定性。不同干净工作区的物化 Scope 摘要可能不同，纯 learning digest 保持一致。
 
-v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 `fitted/learning-v2/{initial,refined}`，旧 D7 资产不覆盖。新 fit manifest 引用不可变 audit history 文件，不再绑定可被后续审计替换的最新报告副本。
+v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 `fitted/learning-v2/{initial,refined}`，旧 Scope learning 资产不覆盖。新 fit manifest 引用不可变 audit history 文件，不再绑定可被后续审计替换的最新报告副本。
 
 ## ReplayResult 与执行边界
 
@@ -230,7 +230,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 `replay verify` 的退出 0 表示记录及当前输入/日志完整性审核通过，不表示 verdict=pass，也不重新执行 pytest。历史 violation/unknown 可完整审核通过；来源已变化的旧记录会拒绝供当前工作使用。
 
-## EvaluationReport 与指标投影（D9）
+## EvaluationReport 与指标投影（evaluation）
 
 `evaluation-report.v1` 的 manifest 保存 eval_ 身份、真实开始/完成时间和耗时、protocol/split 引用与摘要、两阶段 fit、四方法 Scope 的实际绑定、运行实现的逐文件及集合摘要、Python/pytest/Pydantic/Typer/平台/超时环境、样本/预测/执行计数、文件摘要、验收结果及失败原因。代码摘要来自当前导入的实现，不对临时目标工作区中的空 src 目录签名。
 
@@ -265,7 +265,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 读取/影响分析没有时间字段，不虚构时间换确定性。请求修订字符串、选定提交、配置字节、Git/源码版本均相同时，重读逐字节相同；不同 ref 别名即使解析到同一提交，也作为不同请求进入摘要。dirty tree、原 config 或无关新 refs 不作为代码来源。引用在检查期间变化则 unknown；不声称这是 OS 原子快照或防恶意并发恢复。
 
-输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。W3-A 新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 D9/D14/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
+输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。W3-A 新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 evaluation/MVP freeze/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
 
 JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 W3-B 未关闭项见 [安全模型](security-model.md)。
 

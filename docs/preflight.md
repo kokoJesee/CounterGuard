@@ -16,4 +16,4 @@ uv run counterguard preflight --repo artifacts/pilot/validators-discovery-v1/rep
 
 原生动态 import、运行时依赖、条件插件和项目语义不能被静态文件扫描穷尽。可选 extras 不自动安装；需要额外目标级审核。`src` 布局本身只提示映射待审核，不证明一定需要安装；若项目明确依赖 `pythonpath=src` 或比正式 runner 更高的 pytest，先保守阻断。独立 Guard 是否能脱离仓库测试配置运行，必须由经过审核的契约、调用/导入映射和最小依赖证明，不能因 `--noconftest` / 空配置就自动忽略声明要求。
 
-本批 validators 的 Git/规模通过，但当前 head 声明 pytest≥9，正式 runner 为 8.4.2，并使用 src 导入根。更关键的是当前未形成可准入的 validators 契约/Guard/Scope 来源链。因此本次预检停在执行前。详细 [W3-D 记录](progress/w3d.md) 和 [manifest 设计](../integrations/pilot/design.md) 明确区分“拒绝结果重复”与“执行试点成功”。
+通用 `preflight` 保留基础 runner profile；它不会因某个仓库有专用配置而自动切换版本。validators 的固定试点另用 manifest-v5 明确锁定 pytest 9.0.3、`src` 导入根、head 内的工具方契约和 MAC oracle，并逐次授权 Docker 执行。该试点已通过，但只覆盖固定 B/F/H 提交和 10 个 MAC case；它不表示普通 `preflight` 对任意仓库都会 ready，也不证明项目的其他功能兼容。见[试点设计](../integrations/pilot/design-fork-v1.md)、[最终验收记录](results/w3d-fork-v1/final-acceptance.json)和[剩余限制](known-limitations.md#W3-D-fork-试点的新增边界)。

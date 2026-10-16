@@ -1,4 +1,4 @@
-"""D13 audits one real offline flow and isolated copies of its published records."""
+"""Audit one real offline flow and isolated copies of its published records."""
 
 import json
 import shutil

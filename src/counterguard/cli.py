@@ -256,7 +256,7 @@ def replay_verify(
 def benchmark_replay(
     protocol: Annotated[Path, typer.Option(help="Frozen protocol JSON.")],
     phase: Annotated[str, typer.Option(help="initial or refined.")],
-    split: Annotated[str, typer.Option(help="D8 accepts train only.")] = "train",
+    split: Annotated[str, typer.Option(help="Only training samples may be used here.")] = "train",
     fitted: Annotated[Path | None, typer.Option(help="Fitted bundle directory.")] = None,
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
     artifact_root: Annotated[Path, typer.Option(help="Run reports below cwd.")] = Path("artifacts"),
@@ -378,7 +378,9 @@ def capture(
     request: Annotated[
         Path | None, typer.Option(help="Independent verification request JSON.")
     ] = None,
-    agent_source: Annotated[str | None, typer.Option(help="D10 provider: recorded.")] = None,
+    agent_source: Annotated[
+        str | None, typer.Option(help="Use recorded response providers only.")
+    ] = None,
     workspace: Annotated[Path | None, typer.Option(help="Candidate/Gate output below cwd.")] = None,
     format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
 ) -> None:
@@ -460,7 +462,7 @@ def evidence_inventory(
 @experiment_app.command("verify")
 def experiment_verify(
     protocol: Annotated[Path | None, typer.Option(help="Frozen experiment protocol JSON.")] = None,
-    run: Annotated[Path | None, typer.Option(help="Immutable D9 evaluation directory.")] = None,
+    run: Annotated[Path | None, typer.Option(help="Immutable evaluation output directory.")] = None,
     cwd: Annotated[Path, typer.Option(help="Source workspace.")] = Path("."),
 ) -> None:
     """Audit protocol, split membership, data pins, and complete Guard provenance."""
@@ -502,7 +504,9 @@ def experiment_evaluate(
     protocol: Annotated[Path, typer.Option(help="Frozen scope_v1 protocol JSON.")],
     fitted: Annotated[Path, typer.Option(help="Directory containing initial/refined fit bundles.")],
     output: Annotated[Path, typer.Option(help="New immutable evaluation directory.")],
-    split: Annotated[str, typer.Option(help="D9 accepts holdout only.")] = "holdout",
+    split: Annotated[
+        str, typer.Option(help="Use only the frozen holdout split for evaluation.")
+    ] = "holdout",
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
     timeout: Annotated[float, typer.Option(help="Per-run timeout in seconds.")] = 30.0,
     format: Annotated[OutputFormat | None, typer.Option(help="Versioned report format.")] = None,
@@ -530,7 +534,9 @@ def experiment_evaluate(
 @benchmark_app.command("baselines")
 def benchmark_baselines(
     protocol: Annotated[Path, typer.Option(help="Frozen experiment protocol JSON.")],
-    split: Annotated[str, typer.Option(help="D5 accepts train only.")] = "train",
+    split: Annotated[
+        str, typer.Option(help="Use only the training split.")
+    ] = "train",
     cwd: Annotated[Path, typer.Option(help="Trusted source workspace.")] = Path("."),
     artifact_root: Annotated[Path, typer.Option(help="Report output below cwd.")] = Path(
         "artifacts"
@@ -648,7 +654,7 @@ def _emit_evidence(evidence: Evidence, format: OutputFormat | None = None) -> No
 def _emit_report(operation: str, record, format: OutputFormat | None) -> None:
     payload = record if isinstance(record, dict) else record.model_dump(mode="json")
     if format is None:
-        # Pre-D12 clients keep the original artifact shape and its original digest semantics.
+        # Earlier clients keep the original artifact shape and digest semantics.
         typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
         typer.echo(render_report(command_report(operation, payload), format), nl=False)

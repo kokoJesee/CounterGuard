@@ -216,7 +216,7 @@ def run_train_baselines(
     split: str = "train",
 ) -> dict:
     if split != "train":
-        raise ValueError("D5 accepts train only; holdout evaluation is reserved for D9")
+        raise ValueError("Only training data is accepted here; holdout is reserved for evaluation")
     workspace = Path(cwd).resolve(strict=True)
     protocol, manifest, guards = verify_protocol(path, cwd=workspace)
     root = _path(Path(artifact_root), workspace)

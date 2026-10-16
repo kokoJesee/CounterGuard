@@ -99,7 +99,7 @@ def assess_candidate(
     if candidate.contract_digest != context.contract_digest:
         return None, "contract_digest"
     expected_ids = {case["case_id"] for case in json.loads(context.contract_json)["cases"]}
-    # D3 audits all known contract cases. Subsets cannot masquerade as full capture.
+    # Audit every contract case; a subset cannot masquerade as a full capture.
     if set(candidate.case_ids) != expected_ids:
         return None, "case_coverage"
     return candidate, None

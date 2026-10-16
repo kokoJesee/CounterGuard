@@ -1,6 +1,6 @@
 # W3 安全模型与准入记录
 
-更新：2026-10-16。本地 MVP tag `v0.1.0`（`54b39d9`）保留；W3-A 只读检查、W3-B 独立授权与受限执行、W3-C 本地 Registry 均已有记录。正式 runner 四项攻击与接受镜像字节锁定/恢复在 `1260b45` 通过；validators 在 `c9c8771` 的只读准入被阻断，未执行仓库代码。[攻击面清单](attack-surface-checklist.md) 保留未覆盖事项，本页不是通用沙箱或全面安全认证。
+更新：2026-10-16。W3-A 只读检查、W3-B 独立授权与受限执行、W3-C 本地 Registry 均有记录；validators 固定 manifest-v5 pilot 已完成。正式 runner 的镜像字节锁定和四项攻击结果见[验收记录](results/w3b-formal-v1/runner-receipt.json)及[攻击面清单](attack-surface-checklist.md)。本页不是通用沙箱或全面安全认证。
 
 ## 资产、输入和信任
 
@@ -57,7 +57,7 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 工作区 bind 的宿主来源不是仓库根，而是本次运行中新建的最小目录；它只含授权 pin 的 source/contract/dependency 和 Guard test，并在复制时再次核对摘要。未声明文件、项目配置、`.git`、`conftest.py` 和 `pytest.ini` 不进入 mount；因此它们不只是在 pytest 参数层被忽略，而是在文件系统层不可见。
 
-容器 entrypoint 只接受严格 base64 JSON manifest，自建空 pytest.ini，保持插件自动发现关闭，使用 `--noconftest -p no:cacheprovider --capture=no`，并以进程组终止超时/日志洪泛。Docker PID 1 退出后容器删除；宿主还有独立墙钟与传输上限并尝试 `docker rm -f`。真实 fixture 已在 WSL2/Linux engine 上读取 `/proc` 和 cgroup 值，验证非 root、只读写边界、无网络、CapEff=0、NoNewPrivs=1、CPU/内存/PID限制、宿主秘密不在环境、恶意 conftest/pytest.ini 不加载、超时子孙清理和日志洪泛不成为 pass。详见 [W3-B 记录](progress/w3b.md)。
+容器 entrypoint 只接受严格 base64 JSON manifest，自建空 pytest.ini，保持插件自动发现关闭，使用 `--noconftest -p no:cacheprovider --capture=no`，并以进程组终止超时/日志洪泛。Docker PID 1 退出后容器删除；宿主还有独立墙钟与传输上限并尝试 `docker rm -f`。真实 fixture 已在 WSL2/Linux engine 上读取 `/proc` 和 cgroup 值，验证非 root、只读写边界、无网络、CapEff=0、NoNewPrivs=1、CPU/内存/PID限制、宿主秘密不在环境、恶意 conftest/pytest.ini 不加载、超时子孙清理和日志洪泛不成为 pass。详见 [W3-B 测试记录](results/w3b-v1/docker-tests.txt)。
 
 不支持的合法布局/格式或缺失历史 unknown；越界/链接/损坏对象拒绝（退出 5），不自动修复、拉取或回退到全仓执行。过大仓库或不能通过 strict fsck 的旧对象也可能被保守拒绝，不宣称支持所有 Git 仓库。
 
@@ -70,10 +70,10 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 | W02-C | gitfile、alternates、junction/reparse、Git symlink、gitlink | test_repository.py 真实 Git/Windows junction | 拒绝或 unsupported unknown，不跟随/初始化 |
 | W02-D | 缺提交、浅克隆、packed refs、损坏对象、引用变化 | test_repository.py | 不补历史/网络；损坏拒绝、变化 unknown |
 | W02-E | 输出/时间超额、含凭据 stderr | test_repository_limits.py 的外部进程故障注入 | 固定原因码；不是实际恶意 Git fuzz |
-| W02-F | dirty tree、重复读、三格式 | 真实 CLI；progress/w3a.md、results/w3a-v1 | 仓库字节/mtime 不变，未导入目标 |
-| W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | [正式 runner 四项原 fixture](progress/w3b-formal.md) | 已测，正式镜像与字节锁定/恢复通过；非通用内核/daemon 安全证明 |
-| W03 | 插件/conftest、安装/build hooks、声明配置 | 正式受控执行；[完整提交树预检](preflight.md) | 受控模式已测；validators 的配置、目标/契约不兼容而阻断；显式插件模式未实现 |
-| W04 | Registry 状态/完整性，CI 权限/公开日志 | [本地 Registry 专项与真实 CLI](progress/w3c.md) | 本地子项已测；身份角色、签名/防回滚、生命周期、CI 和公开日志继续开放 |
+| W02-F | dirty tree、重复读、三格式 | 真实 CLI；[W3-A 验收](results/w3a-v1/acceptance.json) | 仓库字节/mtime 不变，未导入目标 |
+| W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | [正式 runner 四项原 fixture](results/w3b-formal-v1/docker-tests.txt) | 已测，正式镜像与字节锁定/恢复通过；非通用内核/daemon 安全证明 |
+| W03 | 插件/conftest、安装/build hooks、声明配置 | [完整提交树预检](preflight.md)；[validators 固定 pilot](results/w3d-fork-v1/final-acceptance.json) | 固定 MAC pilot 已测；任意插件、fixture、安装模式和仓库语义仍需独立审核，通用自动准入未实现 |
+| W04 | Registry 状态/完整性，CI 权限/公开日志 | [本地 Registry 文档与真实 CLI](registry.md) | 本地子项已测；身份角色、签名/防回滚、生命周期、CI 和公开日志继续开放 |
 
 ## 剩余风险与准入
 
@@ -83,4 +83,4 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 W3-B 的 Docker 限制保护宿主，不证明容器内被测代码诚实。目标与 pytest 位于同一解释器，恶意目标可能干扰 pytest/JUnit；严格 envelope 和宿主重建能防止畸形/超限输出被当成通过，却不是远程证明或独立 oracle。Docker daemon、WSL2/内核、runner 基础镜像和宿主控制面仍是可信计算基。Git 检查仍在宿主受限进程中执行，没有迁入容器。
 
-W3-B 正式镜像和 W3-C 的前置准入已通过；[validators](progress/w3d.md) 仍因自身配置/契约/Guard/Scope 缺口停止在执行前，unknown 不算执行试点成功。正式 runner 以后重建必须新锁新验收，tag 不能替代 image ID。W4 继续关闭权限/签名/CI 等剩余项；Docker 不可用或检查失败时，不以本地执行器替代。
+validators 的固定 manifest-v5 试点已在 Docker 中通过；最终记录限定为 B/F/H 的 MAC 10-case 快照，并确认没有学习 Scope，也没有本地执行回退，见[最终验收](results/w3d-fork-v1/final-acceptance.json)。这不代表任意仓库准入。正式 runner 以后重建必须新锁新验收，tag 不能替代 image ID。W4 继续关闭权限/签名/CI 等剩余项；Docker 不可用或检查失败时，不以本地执行器替代。

@@ -4,17 +4,23 @@
 
 ## 两种安装方式
 
-本地 MVP 尚未上传 PyPI，以下使用 [冻结发行物](release.md) 的真实 wheel 路径：
+本仓库未附预构建 wheel。推荐从源码创建隔离环境并运行 Demo：
 
 ```powershell
-# 基础安装：CLI、数据模型与库；不安装 pytest 执行器。
-python -m pip install './dist/v0.1.0-freeze/counterguard-0.1.0-py3-none-any.whl'
-
-# 执行安装：需要运行 Demo、Capture 或 Guard 时选择 runner。
-python -m pip install './dist/v0.1.0-freeze/counterguard-0.1.0-py3-none-any.whl[runner]'
+git clone https://github.com/kokoJesee/CounterGuard.git
+cd CounterGuard
+uv sync --frozen
+uv run counterguard --help
 ```
 
-安装源提供同名包后，对应包名写法分别是 `python -m pip install counterguard` 和 `python -m pip install "counterguard[runner]"`。两者是可选方式，不必先装基础包再装 runner。uv 用户可以使用 `uv pip install` 加相同的 wheel/extra 参数；请安装到实际运行 CLI 的 Python 环境。
+若要测试 wheel 安装，可在仓库根目录构建，再把 wheel 安装到目标 Python 环境：
+
+```powershell
+uv build
+python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
+```
+
+`runner` extra 提供 pytest 执行能力。安装到实际运行 CLI 的 Python 环境；不要只装基础 wheel 后就尝试运行 Demo。
 
 基础安装缺少 pytest 时，新 Demo 返回 **3**，给出 `pytest runner is unavailable` 和安装 `counterguard[runner]` 的提示，不显示 traceback、不启动 pytest、不创建输出目录。CLI 的 version/help 仍可使用。若缺少 Demo 的源码输入，安装 runner 不能替代输入文件；需保留源码分发中的 examples、benchmarks、experiments 和 tests/contract_tests。
 

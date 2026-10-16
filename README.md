@@ -18,8 +18,11 @@ counterexamples.
 ## Install
 
 ```powershell
-uv sync                                      # development
-uv build && pip install "dist/*.whl[runner]" # library + test execution
+uv sync
+uv run counterguard --help
+
+uv build
+python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
 ```
 
 The wheel provides the CLI and library. Executing tests requires the `runner` extra, which

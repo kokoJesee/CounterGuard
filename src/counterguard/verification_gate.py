@@ -153,7 +153,7 @@ def capture_candidate(
     request_digest = digest_file(request_path)
     request = _request(request_path)
     if agent_source != "recorded":
-        raise ValueError("D10 supports agent-source=recorded only")
+        raise ValueError("Only recorded agent sources are supported")
     root = _path(workspace, cwd)
     directory, public_evidence, evidence_id = _layout(root, request)
     if (directory / "gate.json").exists():

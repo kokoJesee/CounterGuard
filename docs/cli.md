@@ -31,7 +31,7 @@ Q1 的可执行只读入口为 `uv run counterguard preflight --repo <repo> --re
 
 上表执行入口支持 `--format text|json|markdown`。显式格式统一为 CommandReport：operation、原始 payload、规范化 replays。原 artifact 的自摘要仍位于 payload 内，包装后的完整 JSON 不能当成 Evidence/Guard/ReplayResult 的原 schema 来加载。Demo 的完整 JSON 为 DemoReport（内含同一 CommandReport、真实创建时间、Pipeline 链接、展示代码摘要、自摘要），对应 `schemas/demo-report.schema.json`。
 
-capture/compile/learn/evaluate 不是“新目标是否通过”的单行 Replay：它们的 replays 为空，不给出虚构 scope_decision。evaluate 的四方法完整事实/指标/Markdown 继续由 D9 不可变结果文件提供，CLI 格式选项仅展示原 EvaluationReport，不把验收摘要冒充逐行执行。
+capture/compile/learn/evaluate 不是“新目标是否通过”的单行 Replay：它们的 replays 为空，不给出虚构 scope_decision。evaluate 的四方法完整事实/指标/Markdown 继续由 evaluation 不可变结果文件提供，CLI 格式选项仅展示原 EvaluationReport，不把验收摘要冒充逐行执行。
 
 ```powershell
 uv run counterguard learn --protocol experiments/scope_v1.json --phase refined --output artifacts/fitted-new/refined --format markdown
@@ -71,7 +71,7 @@ raw_outcome 与 raw_verdict 不丢弃；unknown 保留具体原因，执行违�
 
 既有 audit/verify 命令的 0 仅表示审核成功，不替换原 verdict。`demo --verify-only` 同样只读，并保留原 accepted 的退出语义。格式切换不改变这些规则，不将 stderr 的配置/完整性错误包装为正常结果。
 
-D12 修正了 compile 自检错误分支：旧实现调用 `_emit_run` 时，test_failed 会提前退出 1，使后面的预期退出 3 不可达。现在所有格式都先输出实际自检 Run，再退出 3；这是编译/固定目标自检失败，不是新目标的确认 violation。原直接 `guard run` 的真实断言失败仍退出 1。该兼容差异明确保留，未修改任何原执行记录。
+compile 自检失败时，CLI 会先输出实际 Run，再以 3 退出；这是编译/固定目标自检失败，不是新目标的确认 violation。直接 `guard run` 的真实断言失败仍以 1 退出。
 
 标准 Demo 使用已录制请求和显式 pin 的可信本地源码/契约。它不访问网络，不依赖 API key，不使用仓库旧 artifacts、未记录的 pytest 插件或 conftest。pytest/Python/Pydantic/Typer 版本记录在 Pipeline 中；改变环境后使用新 workspace。任意仓库代码需要独立的隔离与准入，当前受限 Docker 接入见下文。
 

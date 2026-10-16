@@ -67,7 +67,7 @@ def test_d8_holdout_replay_is_rejected_before_any_process(monkeypatch):
     import counterguard.execution as execution
 
     def forbidden(*args, **kwargs):
-        raise AssertionError("Holdout cannot run during D8")
+        raise AssertionError("Holdout cannot run during training")
 
     monkeypatch.setattr(execution.subprocess, "run", forbidden)
     result = CliRunner().invoke(

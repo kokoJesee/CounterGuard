@@ -132,7 +132,7 @@ class EvaluationMetrics(FrozenModel):
 def slice_metrics(rows: tuple[Prediction, ...]) -> SliceMetrics:
     counts = {"tp": 0, "fp": 0, "tn": 0, "fn": 0}
     for row in rows:
-        # Explicit D9 policy: unknown is a negative prediction, not a renamed
+        # Unknown is a negative prediction, not a renamed
         # inapplicable decision. Never pass unknown to binary count_predictions.
         predicted = row.scope_decision == "applicable"
         counts[

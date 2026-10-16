@@ -305,7 +305,7 @@ def run_guard(
     artifact_root: str | Path = "artifacts",
     timeout_seconds: float = 30.0,
 ) -> RunRecord:
-    """Direct trusted smoke replay; Scope decisions are introduced in Day 8."""
+    """Run a fixed target without learning or enforcing a Scope."""
     workspace = Path(cwd).resolve(strict=True)
     guard = load_guard(path, cwd=workspace)
     target_ref, target_digest = parse_target_ref(target, cwd=workspace)

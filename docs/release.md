@@ -1,12 +1,12 @@
 # MVP 0.1.0 安装与发布验收
 
-本页说明本地源码分发、wheel、冻结评测汇总与新 Demo。正式执行记录保存在本地运行产物中，不随仓库发布。这不是 PyPI/GitHub 上传记录；许可证选择与公开发布另行处理。
+本页说明如何从源码运行和构建 wheel。仓库采用 Apache-2.0，见 [LICENSE](../LICENSE)。GitHub 当前没有发行版下载；`docs/results/` 只保留经过筛选的验收记录，不包含所有本机原始运行日志。
 
-本地 `v0.1.0` tag 冻结的是补齐 runner 缺失提示后的提交，验收见 [MVP 冻结补充记录](progress/mvp-freeze-v1.md)。最终包在 `dist/v0.1.0-freeze/`，D14 初版的 `dist/` 文件及报告保留原样；两个目录中的包版本均为尚未公开发布的 0.1.0，以目录和 SHA-256 区分。
+公开仓库没有发布 `v0.1.0` Git tag。本地保留的旧标签属于更名前的 EvidenceGuard 冻结记录，不是 CounterGuard 的发行标签。MVP 验收摘要见 [冻结版检查结果](results/mvp-freeze-v1/final-checks.json)；其中的历史提交号是在隐私清理前记录的，当前 GitHub `main` 已重写历史。
 
 ## 从源码运行
 
-在源码分发或仓库根目录运行；Python 要求 >=3.12。当前实测平台和 Python 版本以 D14 记录为准，未测平台不宣称兼容性已验证。
+在源码分发或仓库根目录运行；Python 要求 >=3.12。当前已验证的平台和 Python 版本见 [冻结版检查结果](results/mvp-freeze-v1/final-checks.json)，未测平台不宣称兼容性已验证。
 
 ```powershell
 uv sync --frozen
@@ -50,6 +50,6 @@ uv run ruff check .
 git diff --check
 ```
 
-完整回归只在交付前运行；日常 `uv run pytest -m 'not slow' -q`。不修改既有 artifacts、样本、冻结协议/split/context。D9 留出结果按原代码只读复验并保留历史限制，不用当前源码重签。
+完整回归只在交付前运行；日常 `uv run pytest -m 'not slow' -q`。不修改既有 artifacts、样本、冻结协议/split/context。evaluation 留出结果按原代码只读复验并保留历史限制，不用当前源码重签。
 
-初版记录保存在 docs/results/day14；tag 对应冻结版的 SHA-256、安装来源、Demo 和完整测试输出保存在 docs/results/mvp-freeze-v1。最终校验文件是本次本地交付记录，不是数字签名；没有做多平台矩阵、外部供应链审计或未知仓库执行验收。
+公开结果按评测、冻结验收和仓库试点用途归档在 `docs/results/`。带本机绝对路径或个人操作标签的原始日志已从公开历史移除；没有把改写过的 JSON 继续当作原始收据。记录中的摘要是完整性校验值，不是数字签名。项目尚未完成多平台矩阵或外部供应链审计；validators 试点范围见 [W3-D 最终验收](results/w3d-fork-v1/final-acceptance.json)。

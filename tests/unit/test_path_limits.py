@@ -54,9 +54,11 @@ def test_overlong_run_rejected_before_mkdir_or_subprocess(tmp_path, monkeypatch)
     assert not root.exists()
 
 
-@pytest.mark.parametrize("day", ["day10", "day11", "day13-smoke", "demo-run"])
-def test_planned_d10_to_d14_layouts_fit_the_portable_budget(day):
-    root = PureWindowsPath("D:/workspace/counterguard/artifacts") / day
+@pytest.mark.parametrize(
+    "scenario", ["verification-gate", "demo-pipeline", "verification-smoke", "demo-run"]
+)
+def test_representative_artifact_layouts_fit_the_portable_budget(scenario):
+    root = PureWindowsPath("D:/workspace/counterguard/artifacts") / scenario
     candidate = root / "candidates" / f"cnd_{PLACEHOLDER_ID}"
     require_publication(candidate / "candidate.json")
     require_publication(candidate / "gate.json")
@@ -65,7 +67,7 @@ def test_planned_d10_to_d14_layouts_fit_the_portable_budget(day):
     require_replay_directory(root / "replays" / f"rpl_{PLACEHOLDER_ID}")
 
 
-def test_actual_d9_layout_includes_cache_and_long_report_filenames():
+def test_evaluation_layout_includes_cache_and_long_report_filenames():
     require_evaluation_directory(
         PureWindowsPath(
             "D:/workspace/counterguard/artifacts/experiments/scope-v1/final-repeat-v1"

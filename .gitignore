@@ -9,3 +9,8 @@ dist/
 build/
 *.egg-info/
 artifacts/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db

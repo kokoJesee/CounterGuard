@@ -684,7 +684,10 @@ def replay_train_benchmark(
     split: str = "train",
 ) -> dict:
     if split != "train" or phase not in {"initial", "refined"}:
-        raise ValueError("D8 accepts initial/refined train only; holdout evaluation is D9")
+        raise ValueError(
+            "Replay accepts initial/refined training scopes only; "
+            "holdout is reserved for evaluation"
+        )
     workspace = Path(cwd).resolve(strict=True)
     protocol, manifest, _ = verify_protocol(path, cwd=workspace)
     fitted_root = _path(Path(fitted), workspace)

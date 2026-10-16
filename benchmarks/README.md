@@ -18,7 +18,7 @@ words such as `buggy`, `fixed`, `v1`, or `legal` and would leak the answer.
 
 `ast_features` is currently a manually confirmed, presence-only summary using the controlled
 vocabulary enforced by the test suite. It is not a serialized AST. Every operation represented by
-the current vocabulary should be listed when it appears in the target. Day 6 now extracts the same
+the current vocabulary should be listed when it appears in the target. The AST feature auditor now extracts the same
 controlled vocabulary automatically and requires exact equality with these frozen annotations.
 It never rewrites them to match the implementation.
 
@@ -39,15 +39,15 @@ within one family. It therefore tests whether version and interface predicates c
 counterexamples. Cross-family negatives require per-guard labels on the same sample and are left
 for a later schema revision.
 
-Day 4 compiles only the source Evidence's failed cases: two discount assertions and the zero-limit
+The Guard compiler selects only the source Evidence's failed cases: two discount assertions and the zero-limit
 rejection. The current independent identities are `grd_discount_member_rate_regression_v2` and
 `grd_query_limit_zero_regression_v2`. An applicable Guard violation is measured by these minimal
 assertions, separately from full-contract compliance. The existing 15 labels retain their values
 after this migration; the integrity tests check the minimal assertions explicitly.
 
-D5 freezes the four method definitions in `experiments/scope_v1.json`, with two-stage training and
+protocol freeze freezes the four method definitions in `experiments/scope_v1.json`, with two-stage training and
 holdout membership in `benchmarks/splits/scope_v1.json`. B1 always runs; B2 reads only
-`interface_kind` and compares it with the frozen Guard interface. The D5 command executes only
+`interface_kind` and compares it with the frozen Guard interface. The protocol freeze command executes only
 training rows and rejects `--split holdout`. Protocol verification may audit holdout metadata and
 source pins; these public fixtures are engineering checks, not a blind evaluation.
 
@@ -58,7 +58,7 @@ The nine-row manual baseline derivation is in
 `docs/results/scope-v1/expected-train-derivation.md`.
 
 `module_group` is independently derived from the reviewed architectural package mapping in
-`context/scope_v1.json`; the frozen group pin is verified before D7 fit. Expected group annotations
+`context/scope_v1.json`; the frozen group pin is verified before Scope learning fit. Expected group annotations
 are compared with this source rather than copied. Changes require a new context/protocol version.
-`docs/module-context-policy.md` records the D6 correction, and `docs/feature-adjudication.md`
+`docs/module-context-policy.md` records the feature audit correction, and `docs/feature-adjudication.md`
 defines how annotation errors are independently reviewed without rewriting frozen results.

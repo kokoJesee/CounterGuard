@@ -19,7 +19,7 @@ from counterguard.evaluation import evaluate_methods, verify_evaluation
 
 @pytest.fixture(scope="module")
 def evaluation_workspace(replay_workspace, tmp_path_factory):
-    # D9 has deeper runtime/report trees. Keep them out of the shared D8 seed
+    # Evaluation has deeper runtime/report trees. Keep them out of the shared fixture seed
     # that later mutation tests copy, and do not copy disposable pytest caches.
     workspace = tmp_path_factory.mktemp("ev")
     shutil.copytree(

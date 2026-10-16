@@ -145,4 +145,4 @@ def test_holdout_execution_is_rejected_before_reading_protocol():
         app, ["benchmark", "baselines", "--protocol", "missing.json", "--split", "holdout"]
     )
     assert result.exit_code == 2
-    assert "D5 accepts train only" in result.output
+    assert "This command accepts only the training split" in result.output

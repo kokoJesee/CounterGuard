@@ -1,77 +1,28 @@
-# 测试分层
+# Tests
 
-日期：2026-10-15。分层前基线为 `300e621` 的 441 项测试。本轮不修改测试断言、运行时源码、benchmark 标注、冻结协议或已发布 artifact。
+CounterGuard uses pytest for unit and integration tests and Ruff for linting. Run these from the repository root after `uv sync`.
 
-## 日常与交付
+```powershell
+uv run pytest -m "not slow" -q
+uv run ruff check .
+```
 
-| 用途 | 命令 | 说明 |
-|---|---|---|
-| 日常迭代 | `uv run pytest -m "not slow" -q` | 295 项快测；纯规则、数据模型、摘要、特征、指标与失败语义等 |
-| 日常静态检查 | `uv run ruff check .` | 保持全部代码规则 |
-| 改到执行链时 | `uv run pytest tests/integration/test_verification_gate.py -q` 或相应文件 | 当前改动涉及 capture/compiler/学习来源/replay/pipeline 时，立即跑相关慢测 |
-| 单独慢测 | `uv run pytest -m slow -q --durations=20` | 146 项集成、端到端、真实进程或重型准备检查 |
-| 交付/阶段验收前 | `uv run pytest -q --durations=20` | 全部 441 项；本命令保持原来的全量标准 |
-| 仅核对集合 | `uv run pytest --collect-only -q` | 不准备 fixture 或执行目标 |
+The quick command selects tests marked for routine feedback. It does not replace the full suite. Before a release or major change, run:
 
-快测是迭代反馈，不是完整验收。一个内部迭代不必在每次编辑后重跑全量；敏感路径变更先定向验证，交付前统一跑一次全量。不能以“快测全绿”宣称 Pipeline 或真实执行链已通过交付。直接指定慢测试文件不需要额外 `-m slow`；marker 只分类，不自动跳过。
+```powershell
+uv run pytest -q --durations=20
+```
 
-默认 `uv run pytest` 与历史文档的 `uv run pytest -q` 都仍然运行全量。本项目没有在 addopts 中隐藏 `not slow`、忽略目录或改变 testpaths。两个子集互斥，合并必须覆盖完整测试集合；参数化实例逐个核对，不能只比测试函数数目。
+Integration and end-to-end tests, tests that depend on expensive pipeline setup, and tests that start real subprocesses are classified as slow. To run that group alone:
 
-## 分类规则
+```powershell
+uv run pytest -m slow -q --durations=20
+```
 
-`tests/conftest.py` 在 `-m` 筛选前确定 marker，规则固定、不依赖本次运行耗时：
+Docker tests require Docker Desktop or a compatible Linux engine and the image profile documented in [Docker execution](docker-execution.md). Run the fixed-runner attack fixtures with:
 
-1. `tests/integration/`、`tests/e2e/` 整体标记 slow。其中一些单项不执行子进程，但准备/审核成本较高；保守归入慢测。
-2. pytest 的传递 fixture 依赖闭包若包含 `replay_workspace` 或 `flow`，也标记 slow。只读/篡改测试若依赖已执行的准备阶段，同样不能伪装成快测。
-3. 位于其他目录且真实启动子进程的用例显式 `@pytest.mark.slow`。当前是受控 pytest 执行器实测和 `python -m counterguard` 入口实测。
-4. 剩余测试标记 fast。fast/slow 同时出现直接报配置错误；`--strict-markers` 防止拼错 marker 静默失效。
+```powershell
+uv run pytest -m docker tests/integration/test_docker_runner.py -q
+```
 
-不支持用 fast 标记覆盖重型目录/fixture 规则。将来新准备 fixture 使用明确 slow 标记或扩充慢 fixture 名称表；不能通过改目录名或偷偷 mock 实际执行来让耗时好看。
-
-`pytest_runtest_protocol` 包装器在快测进入 fixture 准备前阻止真实 `subprocess.Popen`，直到 call/teardown 结束。它覆盖模块/会话级 fixture 的首次准备，避免只在测试函数内部禁止启动而漏掉高作用域准备。模拟 `subprocess.run` 的单位测试继续可用；显式慢测的真实执行不被替换。这是测试调度约束，不是通用 OS 沙箱，也不声称阻断所有第三方启动 API。
-
-一次性探针另外验证：快测函数启动和未标记 module fixture 启动均在执行前失败；显式 slow 允许真实进程；传递 fixture 自动归 slow；冲突标记拒绝。探针运行后移除，不加入正式 441 项，也不留下默认收集的测试文件。
-
-## 耗时怎么读
-
-D11 开发记录为 **503.90 秒 = 8 分 23.90 秒**；2026-10-15 用户复验为 **629.62 秒 = 10 分 29.62 秒**，441 项均通过。后者是用户提供的实测，不能替换成我们没有亲自执行的记录。503.90 秒没有超过 10 分钟。硬件、缓存、负载、文件扫描与运行条件没有统一，当前不能给这 125.72 秒差异指定单一根因。
-
-D11 并非 26 项各独立跑十次子进程：正常 flow 使用 module fixture 共享，篡改测试复制该结果；故障路径有的重新运行部分阶段，有的在执行前拒绝。可以确定执行链/准备/审核有较高成本，不能仅凭测试数推断耗时增长来自 26 × 10 次运行。
-
-本轮最终快测实测 **295 passed、146 deselected / 3.72 秒**（pytest 报告耗时；首次测量 1.40 秒）。这是本机当次结果，不是固定时限或整个 shell 的总耗时承诺。全量保持实际运行并采集 setup/call/teardown 的 `--durations=20`；证据见 `docs/results/test-tiers-v1/`，不靠只计 call 或抑制慢测让数字变小。
-
-本轮唯一一次交付全量为 **441 passed / 1011.20 秒（16 分 51.20 秒）**。分层没有使全量本身更快，这个更慢的数字原样保留。耗时表前几项：D9 评测准备 71.77 秒、D11 共享流程准备 71.14 秒、删除 Replay 的故障路径 67.45 秒、D9 完整复跑 58.84 秒；只读 Pipeline CLI 审核与只读复验也分别占 22.51/14.19 秒。开销同时存在于真实执行、准备和来源审核，不能简单归因于新增子进程数或 marker。未做同环境受控 A/B，当前不确定 1011.20 秒与此前两次耗时的差异中环境因素各占多少。
-
-本轮正式测试仍为 441 项，无删除、改断言或增加“替代慢测”的假用例。完整收集身份与原集合逐项相同；295/146 两份选择清单、五项保护探针结果与完整原始耗时输出均保存为独立审计资料。交付前的全量验收标准保持原值。
-
-## 对已有记录的影响
-
-本轮修改 pytest 配置、测试 marker/调度钩子和文档，不改 `src/` 或 runtime 依赖。已有 Evidence、Guard、Scope、Replay、Evaluation、D11 manifest 不需要重新物化，不重签其摘要。D12 仍按原任务卡推进；其交付前必须跑全量，日常迭代可以使用快测。
-
-## D12 增量验收（2026-10-15）
-
-D12 新增 56 个快速 CLI/报告契约用例和 9 个 Demo 端到端用例。全部保留原 441 个参数化身份，当前完整集合为 **506**，fast/slow 为 **351/155**。集合互斥、并集完整；审计见 `docs/results/day12/test-partition.json`。参数 ID 中的路径字符按原文本保留，不能为统一文件路径而误合并正反斜杠参数。
-
-最终快测 **351 passed / 1.82 秒**，交付前一次未筛选全量 **506 passed / 582.27 秒（9 分 42.27 秒）**。D12 Demo 的正常真实流程只在 module fixture 中运行一次，格式/重复调用用同一完成记录只读审核；篡改测试复制它，不按每种输出格式重跑十次子进程。故障/执行链原测试继续真实运行。
-
-这不构成对上一轮 1011.20 秒的受控优化比例；运行条件并未统一。快测用于日常反馈，完整交付仍保留全部慢测。原分层验收数字和原始记录保留不改。
-
-## D13 增量验收（2026-10-15）
-
-D13 新增 46 项：30 fast、16 slow，原 506 个参数化身份全部保留。当前集合为 **552**，fast/slow 为 **381/171**，互斥且并集完整。四份任务卡文件的专项为 **46 passed / 70.20 秒**；正常完整流程共享 module fixture，篡改复制结果，格式重建不重复跑 Pipeline。
-
-最终快测 **381 passed / 3.17 秒**，交付前一次未筛选全量 **552 passed / 712.34 秒（11 分 52.34 秒）**。原有确定性、真实超时/执行、留出评测复跑和各阶段原始来源检查均保留。新增独立 unknown 使用正式 Guard/Scope，禁止 subprocess.run/Popen 时生成真实 Replay，不增加 pytest 执行。
-
-全量增加的耗时原样记录，不承诺固定十分钟内，也不将 marker 当成全量性能优化。仅以测试数量推断成本仍不成立；完整耗时、测试身份与审计测量见 `docs/results/day13/`。
-
-## MVP 冻结补充（2026-10-15）
-
-缺 runner 提示新增 8 项快测，原 552 项保留。当前 **560 = 389 fast + 171 slow**；快测 389 passed / 3.72 秒，交付前一次未筛选全量 560 passed / 490.68 秒。覆盖包元数据/模块缺失、Demo/Pipeline 安装提示、执行器不启动/不发布、基础 CLI 版本可用；真实基础 wheel 与 runner 安装验收另记在 `docs/results/mvp-freeze-v1/`。这不改变分层规则或既有确定性标准，也不是受控性能改善结论。
-
-## W3-A 增量验收（2026-10-15）
-
-新增 72 项：55 fast、17 slow，保留原 560 项及其断言。当前 **632 = 444 fast + 188 slow**。真实 Git/CLI 用例整体显式标为 slow；路径、配置、纯影响分析及外部进程故障注入为 fast，未用 mock 替代真实仓库验收。
-
-快测 **444 passed、188 deselected / 4.21 秒**；交付前一次未筛选全量 **632 passed / 684.28 秒（11 分 24.28 秒）**，Ruff 通过。专项最后一轮为 71 passed / 29.31 秒，之后新增的 Git symlink tree 实测已进入本次 632 项全量，不将此前专项数字冒充最终 72 项专项结果。
-
-真实 CLI 另外验证 ready / unknown / rejected 三态、重复输出一致、仓库字节/mtime 不变，以及请求的外部命令仅为 Git、没有目标 pytest。全量仍保留学习乱序、摘要、真实执行与历史完整性测试；不重跑正式 scope_v1 留出实验。原始输出和独立验收见 `docs/results/w3a-v1/`，范围与剩余风险见 [W3-A 记录](progress/w3a.md)。
+Pytest does not hide slow tests by default; `uv run pytest -q` runs the full collected suite. The published test-tier records are historical snapshots. See [selected results](results/README.md) for their scope and limits.

@@ -15,8 +15,11 @@ CounterGuard 让每一次修复都变成一条**永久检查**——而且这条
 ## 安装
 
 ```powershell
-uv sync                                      # 开发
-uv build && pip install "dist/*.whl[runner]" # 库 + 测试执行能力
+uv sync
+uv run counterguard --help
+
+uv build
+python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
 ```
 
 wheel 提供 CLI 与库；**要执行测试需安装 `runner` extra**（它声明项目已使用的 pytest 依赖）。缺少 pytest 时，执行会在**创建任何输出之前**退出 `3`，并提示安装 `counterguard[runner]`。

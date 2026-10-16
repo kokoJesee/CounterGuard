@@ -8,15 +8,15 @@
 - mvp.yaml 只接受 JSON 语法这一 YAML 子集；不支持通用 YAML 缩进、注释或锚点。完整内容见 [快速开始](quickstart.md)。
 - 标准 Demo 使用录制候选、固定可信模板和本地 fixture，未接入实时模型或任意新 oracle 生成。
 - pytest 是可选 runner extra；基础安装缺少它时，Demo/Pipeline 和执行器提前拒绝执行并提示安装，退出 3，不把缺依赖当作测试违规。检查元数据/模块存在不保证任意损坏安装的功能正常。
-- v0.1.0 wheel/tag 的执行器仍只面向可信本地代码。源码开发版 W3-B 的正式 Python runner 已完成四项攻击复验、镜像/依赖字节锁定及归档恢复；W3-C 本地 Registry 已验收。validators 自身准入因 pytest9/src、外置契约/位置参数/装饰器/返回类和 Evidence/Scope 缺口被拒，未执行仓库代码。pytest/容器隔离也不是通用 Python 沙箱或结果远程证明。
+- 历史 v0.1.0 本机冻结版仍只面向可信本地代码；它不是本 GitHub 仓库发布的 CounterGuard tag。源码版已完成 W3-B runner、W3-C 本地 Registry，以及 validators 固定 MAC 试点。该试点使用专用 pytest 9.0.3/src 配置，只证明固定 B/F/H 快照上的 10 个 MAC case；pytest/容器隔离不是通用 Python 沙箱或结果远程证明。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
-- Docker 授权 v1 只支持 replay；新未知仓库的 capture/compile 尚未接入 Docker，默认入口仍只可用于可信本地样本。未知代码的新 Guard 来源链必须先完成独立的 Docker 捕获/自检设计，不能调用本地入口绕过本次准入。
+- Docker 授权与 validators pilot 流程仅覆盖已审核的 replay/capture/compile 路径。任意仓库尚无通用的自动准入、完整依赖证明或自动学习 Scope；不能调用 trusted-local 入口绕过 pilot 限制。
 
 W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run，`execution_allowed` 在类型和 Schema 上恒为 false；W3-B 使用另一份来源重建授权，不翻转该字段。普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git、Docker daemon/WSL2、TOCTOU、容器内恶意目标干扰 pytest，以及正式 runner 供应链等剩余风险见 [安全模型](security-model.md)。
 
 ## 证据能证明什么
 
-本地 Registry 的 enabled 仅表示可继续核验候选，不是 Active 或执行授权；每次使用仍重验原工作区来源，移动/损坏即拒绝。缺索引不自动重建，禁用为终态。Registry 身份角色、签名/防回滚、CI 权限与完整生命周期仍未覆盖，见 [Registry](registry.md)；validators 的具体阻塞见 [W3-D](progress/w3d.md)。
+本地 Registry 的 enabled 仅表示可继续核验候选，不是 Active 或执行授权；每次使用仍重验原工作区来源，移动/损坏即拒绝。缺索引不自动重建，禁用为终态。Registry 身份角色、签名/防回滚、CI 权限与完整生命周期仍未覆盖，见 [Registry](registry.md)；validators 固定试点的范围见 [W3-D 记录](results/w3d-fork-v1/final-acceptance.json)。
 
 Evidence 要求 buggy 实际断言失败且 fixed 通过；Guard 只保留这次已失败且修复后通过的 case。验证器对引用文件校验摘要，并从原始 JUnit 重建 case 集、结果和执行分类。pytest exit 1 只有完整且准确的断言失败映射才是 violation；2/3/4/5、收集错误、缺失/矛盾 JUnit、timeout 和 launch error 不能冒充缺陷证据。
 
@@ -30,15 +30,15 @@ scope_v1 只有公开的 15 行示例（9 train / 6 holdout）和两族 Guard。
 
 标准 Demo 的六个训练目标都有完整元数据，因此没有 unknown；独立缺少声明契约的实际 Replay 展示 unknown/not_run/skipped，原因和退出 4 均保留，不加入六行 Demo 或留出分母。unknown 不等于已经确认 inapplicable，也不是通过。
 
-所有历史来源/日志/代码 pin 不可自动刷新；代码或环境变化后的新运行使用新 ID/目录。旧 D9/D11/D12 的代码绑定应在其原提交复验，不通过重签旧 manifest 冒充当前运行。失败/部分目录不会自动恢复。
+所有历史来源/日志/代码 pin 不可自动刷新；代码或环境变化后的新运行使用新 ID/目录。旧评测、管线和报告的代码绑定只能在其原始源码下复验，不通过重签旧 manifest 冒充当前运行。失败/部分目录不会自动恢复。
 
 ## 历史验证结论的边界
 
-**2026-10-15 的 D13 修复提交 `14c9586` 之前（包括 `53788b1` 及更早版本），旧代码下的 verify 成功不提供本次补齐的四类攻击面的完整覆盖**：Evidence 重签失败集/来源身份、Guard 自检与原始 JUnit 矛盾、独立 Replay 执行/trace/身份重签，以及公开诊断回显私有路径或显式凭据。日期只是便于阅读的提示，同日版本以提交边界为准。
+**独立来源校验与诊断保护补齐之前的历史 verify 结果，不覆盖下列四类攻击面**：Evidence 重签失败集/来源身份、Guard 自检与原始 JUnit 矛盾、独立 Replay 执行/trace/身份重签，以及公开诊断回显私有路径或显式凭据。
 
 这是按入口限定的保证：旧 Gate/Evaluation/Pipeline 已有部分原始事实重建，不能据此推断旧的每个独立 verify 都具备同样保护；诊断泄漏则属于输出边界，verify 成功本身并不证明报告可公开。四类修复及具体测试见 [A01–A04](attack-surface-checklist.md)。
 
-历史记录只证明“指定代码和输入下，当时的检查通过”。现行验证器因源码绑定拒绝旧产物，不表示已经发现它们被篡改，也不能通过切回旧代码复验就将其升级为 D13 的保证。目前没有证据表明自己生成的旧产物遭到这些攻击。需要当前保证时，在新 ID/版本目录重新物化可重跑的来源链并记录当前检查；冻结的 holdout 结论保持原版本和覆盖声明，不重跑调参或重签旧 manifest 刷新历史。
+历史记录只证明“指定代码和输入下，当时的检查通过”。现行验证器因源码绑定拒绝旧产物，不表示已经发现它们被篡改，也不能通过切回旧代码复验就将其升级为当前独立验证保证。目前没有证据表明自己生成的旧产物遭到这些攻击。需要当前保证时，在新 ID/版本目录重新物化可重跑的来源链并记录当前检查；冻结的 holdout 结论保持原版本和覆盖声明，不重跑调参或重签旧 manifest 刷新历史。
 
 ## 诊断和公开分享
 
@@ -59,9 +59,7 @@ CLI 自己生成的错误摘要移除显式凭据赋值和绝对路径；启动�
 不是所有旧 MVP 展示/运行入口都支持新仓库格式，不能通过 trusted-local 模式替代专用入口。
 scope_v1 的数据、标签、规则、期望值与发布结论没有被扩展或重算。
 
-H 是用户明确批准的单独本地工具方提交，不是上游维护者的提交，也未推送至 GitHub。
-当前以已固定摘要的 Git bundle 恢复它；W4 若从远程获取 H，需要另行发布该提交或提供受信制品传递。
-没有通过补签、伪装外置契约或在检查器内制造提交来更换执行 head。
+H 是仓库所有者在 fork 中单独添加契约与配置的工具方提交，不是上游维护者提交；manifest 区分了两类文件。当前验收记录显示该 head 当时未从远端取得，W4 若需从远程独立复核，仍需发布该提交或提供受信制品传递。没有通过伪装外置契约或在检查器内制造提交来更换执行 head。
 
 首轮相对 cwd 解释错误导致捕获记录被独立验证器拒绝，未发布 Guard；
 第二轮完成真实自检，但完整来源复核出现二十多分钟的重复开销，因此显式中断，没有宣称整轮通过。

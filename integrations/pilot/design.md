@@ -1,5 +1,7 @@
 # validators 试点准入设计
 
+状态：本文件描述最初直接使用上游仓库的方案，因契约必须位于 head 且配置与 runner 不兼容而停止。当前已通过的 fork 方案以 [design-fork-v1.md](design-fork-v1.md) 和 [最终验收记录](../../docs/results/w3d-fork-v1/final-acceptance.json) 为准；本文件只保留早期决策背景。
+
 2026-10-16，开始 W3-D 只读冻结与预检前确定；后续实测不能修改这份通过标准来迁就仓库。
 
 完整执行试点通过须满足：W3-B 正式镜像四项攻击复验、镜像/依赖字节锁定、W3-C Registry 专项和真实登记/禁用记录；候选普通 Git profile/规模与 fsck 余量通过；配置覆盖所有改动且 Inspection.status=ready；至少一份未禁用、来源重验通过、语义匹配且 Scope applicable 的真实 Guard 经独立 Docker 授权执行。固定提交在新输出目录重复执行，逐 Guard 决策/执行分类计数一致。未决项必须解释，不把未运行当 pass。
