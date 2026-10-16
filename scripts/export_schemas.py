@@ -25,11 +25,13 @@ from counterguard.registry import RegistryEntry, RegistryEvent, RegistryIdentity
 from counterguard.replay import ReplayResult
 from counterguard.report import CommandReport, ReplayPresentation
 from counterguard.repository import RepositorySnapshot
+from counterguard.repository_verify import ReviewedReplayAuthorization
+from counterguard.runner_catalog import RunnerCatalog, RunnerReview
 from counterguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
 from counterguard.verification_gate import GateResult
-from counterguard.verify import VerifyReport
+from counterguard.verify import VerifyReport, VerifyReportV2
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
@@ -72,6 +74,10 @@ MODELS = {
     "registry-event": RegistryEvent,
     "guard-lifecycle-event": LifecycleEvent,
     "verify-report": VerifyReport,
+    "verify-report-v2": VerifyReportV2,
+    "runner-review": RunnerReview,
+    "runner-catalog": RunnerCatalog,
+    "repository-replay-authorization": ReviewedReplayAuthorization,
 }
 
 if __name__ == "__main__":

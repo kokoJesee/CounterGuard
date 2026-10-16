@@ -81,6 +81,12 @@ class VerifiedRegistryGuard:
     evidence: Evidence | RepositoryEvidence
 
 
+@dataclass(frozen=True)
+class ReviewedRegistryGuard(VerifiedRegistryGuard):
+    lifecycle_state: GuardState
+    event_tip_digest: Digest
+
+
 def _signed(model):
     return model.model_copy(update={"artifact_digest": digest_json_artifact(model)})
 
@@ -389,6 +395,23 @@ class Registry:
             if state_from_events(events, guard_id) is GuardState.RETIRED:
                 raise ArtifactIntegrityError("Registry Guard is retired")
             return self._verify_source(entries[guard_id])
+
+    def resolve_for_verification(self, guard_id: str) -> ReviewedRegistryGuard:
+        """Audit provenance and its review state in one Registry transaction."""
+        guard_id = _id(guard_id)
+        with self._transaction() as (_, (_, entries, events, states)):
+            if guard_id not in entries:
+                raise ValueError("Registry Guard ID is not registered")
+            state = state_from_events(events, guard_id)
+            if states[guard_id] != "enabled" or state not in {GuardState.SHADOW, GuardState.ACTIVE}:
+                raise ArtifactIntegrityError("Registry verification requires enabled Shadow/Active")
+            verified = self._verify_source(entries[guard_id])
+            tip = next(
+                event.artifact_digest for event in reversed(events) if event.guard_id == guard_id
+            )
+            return ReviewedRegistryGuard(
+                verified.entry, verified.guard, verified.evidence, state, tip
+            )
 
     def transition(
         self, guard_id: str, *, to: GuardState, reason: str, actor: str = "local-operator"

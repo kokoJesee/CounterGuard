@@ -4,10 +4,11 @@
 
 ```powershell
 uv run counterguard guard transition <guard-id> --to shadow --reason "reviewed source chain" --root <registry>
-uv run counterguard verify --repo <repo> --base <base-sha> --head <head-sha> --config <project-config.json> --registry <registry> --runner docker --image sha256:<reviewed-runner-image-id> --output artifacts/verify/check-v1
+uv run counterguard runner list
+uv run counterguard verify --repo <repo> --base <base-sha> --head <head-sha> --config <project-config.json> --registry <registry> --runner docker --runner-id root-pytest8 --output artifacts/verify/check-v2
 ```
 
-占位符需要替换为同一来源链的实际路径和完整 SHA。镜像必须是已审核 runner 的精确 image ID，不能传浮动 tag。`--image` 是可信宿主选择，不提供镜像签名或身份认证。输出目录必须位于当前工作区内、目标仓库之外，且尚不存在；重新检查使用新输出 ID。
+占位符需要替换为同一来源链的实际路径和完整 SHA。`runner list/show` 提供审核来源与本机可用状态；`--runner-id` 自动绑定精确 image ID，原 `--image` 只接受目录中的已审核 ID，两者二选一，不能传浮动 tag。详见 [runner 发现](runners.md)。输出目录必须位于当前工作区内、目标仓库之外，且尚不存在；重新检查使用新输出 ID。
 
 ## 状态与选择
 
@@ -21,11 +22,13 @@ Registry 的来源损坏、索引与 JSON 不一致，即使发生在 Candidate 
 
 该规则是有限的已审核快照绑定，不是程序等价性证明，也不是 Scope 学习或跨提交泛化。其他源码字节、依赖闭包、导入布局或仓库 Guard 格式均为 unknown。文件影响范围的 unaffected 仅用于筛选，不会被改写为 Scope 的 inapplicable。
 
-冻结 `scope_v1` 的学习器和评测入口保持原样。validators 的 `guard.v2` / `src` / pytest9 profile 继续通过专用 pilot 入口运行；通用 verify 不把它自动降级成根布局，也不把原试点成功结果当作对新 head 的授权。
+冻结 `scope_v1` 的学习器和评测入口保持原样。统一 verify 现在也接入固定 validators 的 `guard.v2` / `src` / pytest9 profile：使用 `--runner-id validators-pytest9`，从登记来源重验 owner manifest、完整提交树、契约与依赖闭包，校验 `pilot-scope.v1`，再在本次输出下创建新运行目录和 `docker-execution-authorization.v3`。仅限原审核的 base/head/config，不把旧试点成功结果当作对其他 head 的授权。
+
+新的 `pilot-manifest.v3` 明确使用现有 owner head 中的历史文件名 `evidenceguard.yaml`；不修改该提交、文件或契约，也不建立新的 owner 提交。旧 manifest、Evidence、Guard 和授权保留原字节；当前实现的来源在新目录重捕获。其他 `src` 项目不因此自动获准，接入前置与估算见 [新项目条件](project-admission.md)。
 
 ## 报告与退出码
 
-新输出包含 `inspection.json`、需要时的 `preflight.json`、`report.json`、`report.md`，以及实际执行行的 `work/<target-id>/authorization.json`、`run.json` 和原始日志。报告逐行保留 Guard/Evidence/登记摘要、生命周期、影响状态、Scope、执行结果、最终判定及未判断原因。原始来源引用相对于登记时的来源工作区；运行日志引用相对于该行的 `run_workspace_ref`。
+新输出包含 `inspection.json`、需要时的 `preflight.json`、`report.json`、`report.md`，以及实际执行行的 `work/<target-id>/authorization.json`、`run.json` 和原始日志。报告使用独立 `verify-report.v2`，增加 runner ID/image/review 摘要及固定仓库 Scope；旧 `verify-report.v1` 模型与 Schema 保留。报告逐行保留 Guard/Evidence/登记摘要、生命周期、影响状态、Scope、执行结果、最终判定及未判断原因。原始来源引用相对于登记时的来源工作区；运行日志引用相对于该行的 `run_workspace_ref`。
 
 | 退出码 | 条件 |
 |---:|---|

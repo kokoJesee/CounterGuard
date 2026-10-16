@@ -19,7 +19,8 @@ from counterguard.registry import Registry
 from counterguard.repository import FilePin
 from counterguard.runners.base import RawExecution
 from counterguard.runners.docker import DockerExecutor
-from counterguard.verify import VerifyReport, VerifyRequest, verify_repository
+from counterguard.verify import VerifyReportV2 as VerifyReport
+from counterguard.verify import VerifyRequest, verify_repository
 from tests.unit.test_integrity import captured  # noqa: F401
 from tests.unit.test_registry import GUARD_ID, registered_inputs  # noqa: F401
 
@@ -29,6 +30,18 @@ IMAGE = "sha256:" + "1" * 64
 
 @pytest.fixture
 def setup_verify(registered_inputs, monkeypatch):  # noqa: F811
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        verify_module,
+        "resolve_runner",
+        lambda **kwargs: SimpleNamespace(
+            runner_id="test-runner",
+            profile="root-pytest8.v1",
+            image_digest=IMAGE,
+            artifact_digest="sha256:" + "2" * 64,
+        ),
+    )
     workspace, path, guard = registered_inputs
     registry = Registry(workspace / "registry")
     registry.add(path, cwd=workspace)
@@ -357,3 +370,15 @@ def test_unsupported_project_profile_is_unknown_without_docker(setup_verify):
     assert report.exit_code == 4
     assert report.rows[0].reason_codes == ("project_profile_requires_review",)
     assert not calls
+
+
+def test_unknown_raw_image_is_rejected_with_a_report_before_selection(setup_verify, monkeypatch):
+    from counterguard.runner_catalog import resolve_runner
+
+    request, _, _, _, calls, _, _ = setup_verify
+    monkeypatch.setattr(verify_module, "resolve_runner", resolve_runner)
+    report = verify_repository(request)
+    assert report.exit_code == 5
+    assert report.runner_review_digest is None
+    assert not report.rows and not calls
+    assert (request.cwd / "result/report.json").is_file()

@@ -148,7 +148,7 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 ## 开发
 
-源码版新增 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。当前仅支持根导入布局的已知源码快照；validators 集成继续使用专用 pilot 入口。
+源码版提供 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。支持根布局已知源码快照及固定 validators 的 src/pytest9 profile；`counterguard runner list` 可查审核镜像与来源，再用 `--runner-id` 选择。其他项目先满足 [接入条件](docs/project-admission.md)。
 
 ```powershell
 uv run pytest -m "not slow" -q      # 快测：秒级

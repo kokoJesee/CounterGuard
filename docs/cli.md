@@ -1,6 +1,6 @@
 # CLI 与报告约定
 
-源码开发版新增 [统一 verify](verify.md) 和 [Guard 生命周期](guard-lifecycle.md)：`verify` 仅使用 Docker，逐行区分状态、Scope、执行与判定；`guard transition/history` 使用独立的追加式事件格式。报告为 `verify-report.v1`，不改变旧 `command-report.v1`。
+源码开发版提供 [统一 verify](verify.md)、[Guard 生命周期](guard-lifecycle.md) 和 [runner 发现](runners.md)：`runner list/show` 只读展示审核来源和本机可用性；`verify --runner-id ...` 绑定已审核镜像，仅使用 Docker。当前报告为 `verify-report.v2`，旧 v1 与 `command-report.v1` 保留原契约。`guard transition/history` 使用独立的追加式事件格式。
 
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。
 

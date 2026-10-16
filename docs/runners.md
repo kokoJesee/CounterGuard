@@ -1,0 +1,33 @@
+# 查找已审核 runner
+
+用户无需从开发记录手抄镜像摘要：
+
+```powershell
+uv run counterguard runner list
+uv run counterguard runner list --format json
+uv run counterguard runner show validators-pytest9
+# 只看发布的审核来源，不连接 Docker
+uv run counterguard runner list --offline
+```
+
+`runner list` 只运行有时间/输出预算的 `docker image inspect`，不运行镜像、不拉取、不构建、不加载镜像，也不执行项目。每项显示稳定 runner ID、profile、完整 image ID、本机可用状态、构建与攻击复验收据及其摘要。JSON 还包含基础 registry digest、pytest 版本、runner 源码摘要、锁摘要和审核时间。
+
+`available` 表示本机确有与审核记录一致的 image ID；只有此时 `usable=true`。镜像缺失或 Docker 不可访问显示 unavailable；没有任一可用项时命令返回 3，但仍输出来源记录。`--offline` 显示 not_checked、usable=false，返回 0 只表示目录读取成功。审核过不等于本机已安装。
+
+## 用稳定 ID 执行
+
+```powershell
+uv run counterguard verify --repo <repo> --base <base-sha> --head <head-sha> --config <config.json> --registry <registry> --runner-id root-pytest8 --output artifacts/verify/check-v2
+```
+
+validators 固定仓库使用 `--runner-id validators-pytest9`。两者属于不同 profile，不能因一个镜像较新就交换使用。
+
+原 `--image sha256:...` 选项保留，但只接受目录中已有审核的精确 ID；未知 ID 被拒绝并写出完整性失败报告。`--runner-id` 和 `--image` 必须二选一，不接受浮动 tag。实际执行前后仍重建原有授权，runner 目录不能替代 Guard/Evidence、状态、契约来源、Scope 或 Docker 隔离检查。
+
+## 审核来源与交付边界
+
+目录是安装包中的 `data/runner-catalog.v1.json`，其完整内容摘要固定在可信宿主代码中；各 review 另有自摘要。只改目录并重算自摘要不能批准新镜像。`verify-report.v2` 记录选中的 runner ID、image ID 和 review digest，各行也绑定同一审核记录。目录只信任当前安装的 CounterGuard；它不是签名服务或用户身份系统。
+
+两项 profile 的来源见 [构建/复验记录](results/runner-catalog-v1/README.md)。本轮没有发布 OCI 仓库或大型镜像归档下载服务。其他机器若没有这些 image ID，会明确显示 unavailable，不把某个同名 tag 当成已安装或已审核。
+
+需要自行重建时，使用现有 Dockerfile（pytest9 通过 `--build-arg PYTEST_VERSION=9.0.3`），在新目录运行 `scripts/record_runner_build.py` 和 `scripts/accept_pilot_runner.py`。新 image ID 只有在锁定、四项攻击实测并经维护者审核后才进入新目录版本；当前没有“信任任意本机镜像”的快捷开关。构建归档与原始日志默认只留本地，不提交到源码 Git 仓库。

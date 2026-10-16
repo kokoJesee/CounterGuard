@@ -55,7 +55,7 @@ CLI 自己生成的错误摘要移除显式凭据赋值和绝对路径；启动�
 其余 25 个新增区域标识符 case、全仓上游测试、pytest 插件、conftest、自定义安装和其他装饰器仍未覆盖。
 元数据 dependencies=[] 不证明所有可选功能和未来执行路径都无需依赖；实际镜像没有安装 crypto extras。
 
-仓库版本通过专用 Docker pilot 入口运行；默认 preflight 仍是原 pytest8.4.2/root profile。
+仓库版本最初通过专用 Docker pilot 入口运行；统一 verify 现支持相同固定 owner head/profile。默认 preflight 仍是原 pytest8.4.2/root profile，不自动推断其他项目的 src/pytest9 能力。
 不是所有旧 MVP 展示/运行入口都支持新仓库格式，不能通过 trusted-local 模式替代专用入口。
 scope_v1 的数据、标签、规则、期望值与发布结论没有被扩展或重算。
 
@@ -77,6 +77,8 @@ daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名
 
 ## 统一 verify 的当前边界
 
-通用入口仅支持 `guard.v1` / `project-config.v1` 的根导入布局与已审核 buggy/fixed 源码字节。同一文件的其他版本、项目依赖闭包、validators 的 `src`/pytest9 仓库 Guard 和通用学习 Scope 绑定仍为 unknown；没有为推进而降低既有 Docker 或契约来源约束。生命周期是本地追加审阅记录，不提供用户身份、角色、签名或防回滚保证，远程 CI 授权仍未实现。
+统一入口支持 `guard.v1` / `project-config.v1` 根布局已审核快照，以及固定 validators owner head 的 `src`/pytest9 profile。同一文件的其他版本、其他项目的依赖闭包和通用学习 Scope 绑定仍为 unknown；没有为推进而降低既有 Docker 或契约来源约束。生命周期是本地追加审阅记录，不提供用户身份、角色、签名或防回滚保证，远程 CI 授权仍未实现。
+
+已审核 runner 的目录随安装包固定摘要，只读发现不会构建、拉取或运行镜像。当前未发布 OCI 镜像仓库或公开离线归档；其他机器仍需取得或重新审核构建产物。没有 Docker/镜像时明确 unavailable，不能用相同 tag 或任意新 ID 代替。
 
 新增实现会改变全包源码绑定。已有 Inspection、Docker 授权和仓库 Evidence/Guard 在当前验证器下可能过期；保留其原字节，在新命名空间重新物化，不重签历史记录。冻结 scope_v1 的数据、算法、标签与期望值没有因此改变。详见 [统一验证](verify.md)。

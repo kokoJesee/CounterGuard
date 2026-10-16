@@ -191,7 +191,10 @@ The source checkout also provides [repository verification](docs/verify.md) and 
 [append-only Guard lifecycle](docs/guard-lifecycle.md). `verify` replays reviewed
 Shadow/Active Guards in Docker, with separate unknown, skipped, and execution-error
 results. Its current scope is known source snapshots under the root-import profile;
-the validators integration retains its dedicated pilot entry point.
+the reviewed validators profile additionally supports src imports and pytest9.
+Use `counterguard runner list` to discover reviewed image IDs and their sources,
+then select a stable `--runner-id`. Other projects must meet the explicit
+[admission conditions](docs/project-admission.md).
 
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds

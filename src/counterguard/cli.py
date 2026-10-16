@@ -41,11 +41,13 @@ from counterguard.replay import (
     verify_replay,
 )
 from counterguard.report import OutputFormat, command_report, render_report
+from counterguard.runner_cli import app as runner_app
 from counterguard.scope import fit_scopes
 from counterguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 app.add_typer(registry_app, name="registry")
+app.add_typer(runner_app, name="runner")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
 guard_app = typer.Typer(no_args_is_help=True, help="Audit and directly smoke-test Guard assets.")
@@ -90,7 +92,12 @@ def verify_command(
     config: Annotated[Path, typer.Option(help="Explicit project configuration.")],
     registry: Annotated[Path, typer.Option(help="Verified local Registry root.")],
     output: Annotated[Path, typer.Option(help="New report directory below cwd, outside repo.")],
-    image: Annotated[str, typer.Option(help="Exact SHA-256 ID of a reviewed Docker runner.")],
+    image: Annotated[
+        str | None, typer.Option(help="Exact ID already present in runner list.")
+    ] = None,
+    runner_id: Annotated[
+        str | None, typer.Option(help="Reviewed ID from counterguard runner list.")
+    ] = None,
     runner: Annotated[str, typer.Option(help="Only docker is supported.")] = "docker",
     format: OutputFormat = OutputFormat.TEXT,
 ) -> None:
@@ -100,7 +107,9 @@ def verify_command(
     if runner != "docker":
         _error("verify requires --runner docker; no local fallback exists", 2)
     try:
-        report = verify_repository(VerifyRequest(repo, base, head, config, registry, output, image))
+        report = verify_repository(
+            VerifyRequest(repo, base, head, config, registry, output, image, runner_id=runner_id)
+        )
     except ArtifactIntegrityError as error:
         _error(str(error), 5)
     except (OSError, ValueError) as error:

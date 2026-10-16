@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+- 新增 `runner list/show`：展示精确 image ID、构建/攻击复验来源与本机可用性；`verify --runner-id` 只使用安装包目录中已审核的镜像，未知原始 ID 不再被接受。
+- `verify-report.v2` 绑定 runner review；固定 validators 的仓库 Guard、src/pytest9 和精确快照 Scope 接入统一入口，采用新运行目录与授权 v3，不修改历史 owner 提交或产物。
+
 - 新增统一 `verify`：提交差异、Registry、审阅状态、已审核快照 Scope、Docker 重放与 JSON/Markdown 报告；unknown、跳过、执行异常和违规分开汇总。
 - 新增追加式 Guard 生命周期及 `guard transition/history`；Candidate 不默认升级，Shadow 违规不阻断，Active 的确认违规返回 1，Retired/disabled 不复活。
-- 当前通用入口限于根导入布局的原始源码快照，不扩展冻结 scope_v1 的学习结论；validators 专用 profile 与远程 CI 权限尚未并入该入口。
+- 当前入口限于根布局快照和固定 validators profile，不扩展冻结 scope_v1 的学习结论；通用依赖、插件与远程 CI 权限尚未实现。
 
 ## 更名说明 — 2026-10-16
 

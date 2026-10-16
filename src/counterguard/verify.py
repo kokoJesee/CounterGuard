@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 import html
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
@@ -34,6 +34,9 @@ from counterguard.preflight import inspect_execution_requirements
 from counterguard.project_config import load_project_config, reject_links
 from counterguard.registry import Registry
 from counterguard.repository import RepositoryProblem, read_committed_files
+from counterguard.repository_models import RepositoryGuard
+from counterguard.repository_verify import UnsupportedRepositoryScope, prepare_repository_replay
+from counterguard.runner_catalog import resolve_runner
 from counterguard.runners.docker import DockerExecutor, authorize_docker_execution
 
 ZERO = "sha256:" + "0" * 64
@@ -47,8 +50,9 @@ class VerifyRequest:
     config: Path
     registry: Path
     output: Path
-    image_digest: str
+    image_digest: str | None = None
     cwd: Path = Path(".")
+    runner_id: str | None = None
 
 
 class VerifyRow(FrozenModel):
@@ -180,6 +184,29 @@ class VerifyReport(FrozenModel):
             self.rows, self.issues, self.counts, self.exit_code
         ):
             raise ValueError("Verification decision digest contradicts its rows/issues")
+        return self
+
+
+class VerifyRowV2(VerifyRow):
+    scope_basis: Literal["verified-evidence-source-snapshot.v1", "pilot-scope.v1"] | None = None
+    runner_review_digest: Digest | None = None
+
+
+class VerifyReportV2(VerifyReport):
+    schema_version: Literal["verify-report.v2"] = "verify-report.v2"
+    rows: tuple[VerifyRowV2, ...]
+    runner_id: str | None
+    runner_image_digest: Digest | None
+    runner_review_digest: Digest | None
+
+    @model_validator(mode="after")
+    def reviewed_execution(self):
+        if any(row.runner_review_digest != self.runner_review_digest for row in self.rows):
+            raise ValueError("Row runner review differs from report selection")
+        if self.counts["executions"] and not (
+            self.runner_id and self.runner_image_digest and self.runner_review_digest
+        ):
+            raise ValueError("Execution requires a pinned runner review")
         return self
 
 
@@ -324,7 +351,7 @@ def render_verify(report: VerifyReport) -> str:
     return "\n".join(lines)
 
 
-def verify_repository(request: VerifyRequest) -> VerifyReport:
+def verify_repository(request: VerifyRequest) -> VerifyReportV2:
     """Write JSON and Markdown before returning any domain failure; never run locally."""
     cwd = request.cwd.resolve(strict=True)
     output = request.output if request.output.is_absolute() else cwd / request.output
@@ -340,9 +367,13 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
     rows, issues = [], []
     inspection = None
     snapshot = None
+    review = None
     try:
         # Validate the image identity's syntax even when every row is skipped.
-        TypeAdapter(Digest).validate_python(request.image_digest)
+        if request.image_digest is not None:
+            TypeAdapter(Digest).validate_python(request.image_digest)
+        review = resolve_runner(runner_id=request.runner_id, image_digest=request.image_digest)
+        request = replace(request, image_digest=review.image_digest)
         config, _ = load_project_config(request.config)
         inspection = inspect_repository(request.repo, request.base, request.head, request.config)
         write_immutable(output / "inspection.json", canonical_json_bytes(inspection))
@@ -371,6 +402,7 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
                 target_id=mapping.target_id if mapping else None,
                 lifecycle_state=state,
                 registry_status=item["status"] if item else None,
+                runner_review_digest=review.artifact_digest,
             )
             if item:
                 values.update(guard_digest=item["guard_digest"], entry_digest=item["entry_digest"])
@@ -388,7 +420,7 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
             def result(verdict, reason, _values=values, **kwargs):
                 payload = _values | kwargs
                 payload["execution_outcome"] = execution_outcome(payload.get("run"))
-                return VerifyRow(
+                return VerifyRowV2(
                     **payload,
                     verdict=verdict,
                     reason_codes=(reason,) if isinstance(reason, str) else tuple(reason or ()),
@@ -439,54 +471,75 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
                     source_evidence_ref=verified.guard.source_evidence_ref,
                     source_evidence_digest=verified.evidence.artifact_digest,
                 )
-                if config.schema_version != "project-config.v1":
+                if isinstance(verified.guard, RepositoryGuard):
+                    scope_digest, run_request, executor = prepare_repository_replay(
+                        request, output, mapping, inspection
+                    )
+                    values.update(
+                        scope_decision="applicable",
+                        scope_basis="pilot-scope.v1",
+                        scope_digest=scope_digest,
+                        run_workspace_ref=f"work/{mapping.target_id}",
+                    )
+                    if _snapshot(registry.list()) != snapshot:
+                        raise ArtifactIntegrityError("Registry changed before Docker execution")
+                    run = executor.execute(run_request)
+                elif config.schema_version != "project-config.v1":
                     rows.append(
                         result(
                             "unknown", "project_profile_requires_review", scope_decision="unknown"
                         )
                     )
                     continue
-                if files is None:
-                    head, files, pins = read_committed_files(request.repo, inspection.head_commit)
-                    if head != inspection.head_commit:
-                        raise ArtifactIntegrityError("Head changed during verification")
-                    head_pins = {pin.path: pin for pin in pins}
-                    if any(
-                        head_pins.get(pin.path) != pin
-                        for pin in inspection.files
-                        if pin.revision == "head"
-                    ):
-                        raise ArtifactIntegrityError("Committed inputs differ from inspection")
-                scope_digest, reason = _scope(verified, mapping, files)
-                if reason:
-                    rows.append(result("unknown", reason, scope_decision="unknown"))
-                    continue
-                preflight = inspect_execution_requirements(files)
-                write_immutable(output / "preflight.json", canonical_json_bytes(preflight))
-                if preflight["status"] != "eligible_candidate" or any(
-                    warning["code"] == "dynamic_code_requires_target_review"
-                    for warning in preflight["warnings"]
-                ):
+                elif review.profile != "root-pytest8.v1":
                     rows.append(
-                        result(
-                            "unknown",
-                            (
-                                "runner_profile_requires_review",
-                                *sorted({finding["code"] for finding in preflight["findings"]}),
-                            ),
-                            scope_decision="unknown",
-                        )
+                        result("unknown", "runner_profile_mismatch", scope_decision="unknown")
                     )
                     continue
-                values.update(
-                    scope_decision="applicable",
-                    scope_basis="verified-evidence-source-snapshot.v1",
-                    scope_digest=scope_digest,
-                    run_workspace_ref=f"work/{mapping.target_id}",
-                )
-                if _snapshot(registry.list()) != snapshot:
-                    raise ArtifactIntegrityError("Registry changed before Docker execution")
-                run = _execute_guard(request, output, inspection, mapping, verified, files)
+                else:
+                    if files is None:
+                        head, files, pins = read_committed_files(
+                            request.repo, inspection.head_commit
+                        )
+                        if head != inspection.head_commit:
+                            raise ArtifactIntegrityError("Head changed during verification")
+                        head_pins = {pin.path: pin for pin in pins}
+                        if any(
+                            head_pins.get(pin.path) != pin
+                            for pin in inspection.files
+                            if pin.revision == "head"
+                        ):
+                            raise ArtifactIntegrityError("Committed inputs differ from inspection")
+                    scope_digest, reason = _scope(verified, mapping, files)
+                    if reason:
+                        rows.append(result("unknown", reason, scope_decision="unknown"))
+                        continue
+                    preflight = inspect_execution_requirements(files)
+                    write_immutable(output / "preflight.json", canonical_json_bytes(preflight))
+                    if preflight["status"] != "eligible_candidate" or any(
+                        warning["code"] == "dynamic_code_requires_target_review"
+                        for warning in preflight["warnings"]
+                    ):
+                        rows.append(
+                            result(
+                                "unknown",
+                                (
+                                    "runner_profile_requires_review",
+                                    *sorted({finding["code"] for finding in preflight["findings"]}),
+                                ),
+                                scope_decision="unknown",
+                            )
+                        )
+                        continue
+                    values.update(
+                        scope_decision="applicable",
+                        scope_basis="verified-evidence-source-snapshot.v1",
+                        scope_digest=scope_digest,
+                        run_workspace_ref=f"work/{mapping.target_id}",
+                    )
+                    if _snapshot(registry.list()) != snapshot:
+                        raise ArtifactIntegrityError("Registry changed before Docker execution")
+                    run = _execute_guard(request, output, inspection, mapping, verified, files)
                 values["run"] = run
                 registry.resolve_for_execution(guard_id)
                 if _snapshot(registry.list()) != snapshot:
@@ -503,6 +556,14 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
                     result(
                         verdict,
                         "runner_" + run.outcome.value if verdict == "execution_error" else None,
+                    )
+                )
+            except UnsupportedRepositoryScope:
+                rows.append(
+                    result(
+                        "unknown",
+                        "repository_profile_outside_reviewed_scope",
+                        scope_decision="unknown",
                     )
                 )
             except GuardReplayIntegrityError as error:
@@ -526,12 +587,15 @@ def verify_repository(request: VerifyRequest) -> VerifyReport:
     except (OSError, ValueError):
         issues.append(VerifyIssue(exit_code=2, reason_code="invalid_or_unavailable_input"))
     code, counts = summarize(rows, issues)
-    report = VerifyReport(
+    report = VerifyReportV2(
         created_at=datetime.now(UTC),
         base_commit=inspection.base_commit if inspection else None,
         head_commit=inspection.head_commit if inspection else None,
         inspection_digest=inspection.artifact_digest if inspection else None,
         registry_snapshot_digest=snapshot,
+        runner_id=review.runner_id if review else None,
+        runner_image_digest=review.image_digest if review else None,
+        runner_review_digest=review.artifact_digest if review else None,
         implementation_digests=inspection_implementation_digests(),
         rows=tuple(rows),
         issues=tuple(issues),

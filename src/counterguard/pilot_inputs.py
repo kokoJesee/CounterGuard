@@ -70,14 +70,21 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
     workspace = workspace.resolve(strict=True)
     manifest_path = resolve_ref(workspace, manifest_path.relative_to(workspace).as_posix())
     manifest = read_fact(manifest_path)
+    config_ref = CONFIG_REF
+    tool_files = TOOL_FILES
+    if manifest.get("schema_version") == "pilot-manifest.v3":
+        if manifest.get("profile") != "validators-existing-owner-head.v1":
+            raise ArtifactIntegrityError("Unknown repository owner-head profile")
+        config_ref = "evidenceguard.yaml"
+        tool_files = (config_ref, CONTRACT_REF, "contracts/provenance.json")
     if (
-        manifest.get("schema_version") != "pilot-manifest.v2"
+        manifest.get("schema_version") not in {"pilot-manifest.v2", "pilot-manifest.v3"}
         or manifest.get("repository_url") != FORK_URL
         or manifest.get("upstream_url") != UPSTREAM_URL
         or manifest.get("base_sha") != BASE
         or manifest.get("fixed_sha") != FIXED
         or not re.fullmatch(r"[0-9a-f]{40}", manifest.get("head_sha", ""))
-        or manifest.get("tool_files") != list(TOOL_FILES)
+        or manifest.get("tool_files") != list(tool_files)
         or manifest.get("unknown_is_execution_success") is not False
     ):
         raise ArtifactIntegrityError("Manifest is not the reviewed fork pilot profile")
@@ -88,7 +95,7 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
         "workspace_root_ref": output_ref + "/ws",
         "registry_root_ref": output_ref + "/registry",
         "scope_ref": output_ref + "/scope.json",
-        "config_ref": manifest["repository_ref"] + "/" + CONFIG_REF,
+        "config_ref": manifest["repository_ref"] + "/" + config_ref,
         "contract_ref": manifest["repository_ref"] + "/" + CONTRACT_REF,
     }
     if any(manifest[key] != expected for key, expected in expected_layout.items()):
@@ -125,7 +132,7 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
         != manifest["owner_bundle_digest"]
     ):
         raise ArtifactIntegrityError("License provenance or owner commit bundle differs")
-    if set(head) - set(fixed) != set(TOOL_FILES) or any(head.get(p) != b for p, b in fixed.items()):
+    if set(head) - set(fixed) != set(tool_files) or any(head.get(p) != b for p, b in fixed.items()):
         raise ArtifactIntegrityError("Tooling commit changed upstream files")
     runtime_refs = tuple(sorted(ref for ref in fixed if ref.startswith("src/validators/")))
     if list(runtime_refs) != manifest["runtime_refs"] or len(runtime_refs) > 64:
@@ -149,8 +156,8 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
         raise ArtifactIntegrityError("Tooling provenance changed")
     origins = {
         ref: {
-            "origin": "tool" if ref in TOOL_FILES else "upstream",
-            "commit": commits["h"] if ref in TOOL_FILES else FIXED,
+            "origin": "tool" if ref in tool_files else "upstream",
+            "commit": commits["h"] if ref in tool_files else FIXED,
             "content_digest": digest_bytes(body),
         }
         for ref, body in sorted(head.items())
@@ -158,7 +165,7 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
     if origins != manifest["file_origins"]:
         raise ArtifactIntegrityError("File origin declaration contradicts committed bytes")
     config_path = resolve_ref(workspace, manifest["config_ref"])
-    if config_path.read_bytes() != head[CONFIG_REF]:
+    if config_path.read_bytes() != head[config_ref]:
         raise ArtifactIntegrityError("Configuration must come from head")
     config, config_digest = load_project_config(config_path)
     contract_path = resolve_ref(workspace, manifest["contract_ref"])
@@ -180,7 +187,7 @@ def load_inputs(manifest_path: Path, workspace: Path) -> dict:
         or target.contract_ref != CONTRACT_REF
         or target.guard_id != GUARD_ID
         or set(target.dependency_refs) != set(runtime_refs) - {SOURCE_REF}
-        or set(config.audit_refs) != {CONFIG_REF, TEST_REF, "contracts/provenance.json"}
+        or set(config.audit_refs) != {config_ref, TEST_REF, "contracts/provenance.json"}
         or config.ignored_paths
     ):
         raise ArtifactIntegrityError("Pilot mapping exceeds the reviewed MAC profile")

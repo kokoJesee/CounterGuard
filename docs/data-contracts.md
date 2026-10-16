@@ -16,6 +16,10 @@ SQLite 逐字节索引规范 JSON，并追加镜像同一事件；每次访问�
 
 ## 依赖与重算规则
 
+后续统一入口使用 `verify-report.v2`，逐行及顶层绑定 runner review；`runner-catalog.v1` 由安装代码中的完整摘要固定，各 `runner-review.v1` 关联实际构建/隔离复验。修改配置文件并重算自摘要不能自行批准新镜像。新 image/profile 使用新审核记录、目录和代码 pin，不能改写旧收据。
+
+固定仓库重放使用 `docker-execution-authorization.v3`，绑定 review、manifest、Inspection、Guard/Evidence、Scope、Registry 登记/状态事件 tip、请求与最小提交输入 pins。`pilot-manifest.v3` 只增加现有 owner head 历史配置名的显式兼容，不放宽契约来自 head。旧 v1/v2 授权与 v1 报告不改字段；新源码绑定要求新目录重新捕获/物化，不重签历史产物。
+
 统一验证新增 `verify-report.v1` 和 `guard-lifecycle-event.v1`，不改变旧 Registry 事件、Guard、Scope 或冻结协议的字节。生命周期事件依赖登记身份、Guard/Evidence 摘要与前驱事件；状态变更只追加事件，不重新捕获 Evidence。未来持久 Scope 绑定需另开事件版本。
 
 verify 报告依赖 inspection、Registry 登记与事件链快照、逐行 Scope 绑定、执行授权、RunRecord/日志及当前实现摘要。上述任一来源变化都需新输出目录；旧报告不重签。`decision_digest` 绑定规范排序的逐行来源/状态/Scope/执行类别和汇总，排除 RunRecord、运行工作目录、时间与运行 ID；完整 `artifact_digest` 仍绑定所有报告字段。两个摘要用途不同，不把重复运行的完整摘要伪造为相同。详见 [verify](verify.md)。

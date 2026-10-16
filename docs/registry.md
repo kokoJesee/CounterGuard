@@ -26,4 +26,6 @@ JSON 是事实来源。SQLite UPDATE/DELETE 触发器拒绝原地改写事实与
 
 登记后仍保留原工作区，不复制、重签或重写任何既有 Evidence/Guard/log。每次 `resolve_for_execution` 都重新调用完整 `verify_guard` 与 `verify_evidence`，核对 Guard/原始 JUnit/源码/契约/来源身份和登记快照；原工作区移动、缺失或变动即拒绝。这是有意的本地实现约束，不是可携带备份格式。调度器必须在执行前调用这个入口，并另行完成 Scope、Inspection 和 Docker 授权；直接调用 LocalTrustedExecutor 不构成 Registry 调度。
 
+统一仓库重放使用 `resolve_for_verification`，在同一事务中核对 Shadow/Active 状态、事件 tip 和来源，减少同次准入内重复读同一来源；不跨执行前后审核复用缓存，也不把状态当成永久来源证书。
+
 操作者是本机审计文本，不认证身份；原登记/禁用事件沿用本机账户名或宿主标签，新生命周期事件默认使用 `local-operator`。单用户工作区权限是信任假设。可以同时改写整个 Registry、全部来源和验证器的本机管理员，或回滚整份目录的攻击，不由本地 hash/SQLite 解决。签名、权限角色、撤销、防回滚、CI 凭据/上传、公开日志和多平台发布仍未关闭。缺失索引始终拒绝，不在正常 list/show 时自动重建。

@@ -38,9 +38,18 @@ def test_states_append_without_rewriting_registration_or_guard(registered_inputs
     registry.add(path, cwd=workspace)
     original = {p: p.read_bytes() for p in (path, registry.root / "events/00000001.json")}
     assert registry.show(GUARD_ID)["lifecycle_state"] == "candidate"
+    with pytest.raises(ArtifactIntegrityError, match="Shadow/Active"):
+        registry.resolve_for_verification(GUARD_ID)
     for state in (GuardState.SHADOW, GuardState.ACTIVE, GuardState.SHADOW, GuardState.RETIRED):
         registry.transition(GUARD_ID, to=state, reason="reviewed", actor="reviewer")
         assert registry.show(GUARD_ID)["lifecycle_state"] == state.value
+        if state is not GuardState.RETIRED:
+            selected = registry.resolve_for_verification(GUARD_ID)
+            assert selected.lifecycle_state is state
+            assert (
+                selected.event_tip_digest
+                == registry.show(GUARD_ID)["events"][-1]["artifact_digest"]
+            )
     assert all(p.read_bytes() == content for p, content in original.items())
     assert len(registry.show(GUARD_ID)["events"]) == 5
     assert registry.show(GUARD_ID)["guard_digest"] == guard.artifact_digest

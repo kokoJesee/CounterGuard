@@ -73,7 +73,7 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 | W02-F | dirty tree、重复读、三格式 | 真实 CLI；[W3-A 验收](results/w3a-v1/acceptance.json) | 仓库字节/mtime 不变，未导入目标 |
 | W01 | 最小输入挂载、文件/网络、CPU/内存/PID、子孙进程隔离 | [正式 runner 四项原 fixture](results/w3b-formal-v1/docker-tests.txt) | 已测，正式镜像与字节锁定/恢复通过；非通用内核/daemon 安全证明 |
 | W03 | 插件/conftest、安装/build hooks、声明配置 | [完整提交树预检](preflight.md)；[validators 固定 pilot](results/w3d-fork-v1/final-acceptance.json) | 固定 MAC pilot 已测；任意插件、fixture、安装模式和仓库语义仍需独立审核，通用自动准入未实现 |
-| W04 | Registry 状态/完整性，CI 权限/公开日志 | [本地 Registry 文档与真实 CLI](registry.md) | 本地子项已测；身份角色、签名/防回滚、生命周期、CI 和公开日志继续开放 |
+| W04 | Registry 状态/完整性，CI 权限/公开日志 | [本地 Registry 文档与真实 CLI](registry.md) | 本地 Registry/生命周期子项已测；身份角色、签名/防回滚、CI 和公开日志继续开放 |
 
 ## 剩余风险与准入
 
