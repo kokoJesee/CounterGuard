@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from evidenceguard.artifacts import write_immutable
 from evidenceguard.compiler import verify_guard
@@ -21,6 +21,7 @@ from evidenceguard.errors import ArtifactIntegrityError
 from evidenceguard.evidence import verify_evidence
 from evidenceguard.models import ArtifactRef, Digest, Evidence, FrozenModel, Guard, UtcDateTime
 from evidenceguard.project_config import reject_links
+from evidenceguard.repository_models import RepositoryEvidence, RepositoryGuard
 from evidenceguard.storage import sqlite
 
 ZERO = "sha256:" + "0" * 64
@@ -37,15 +38,24 @@ class RegistryIdentity(FrozenModel):
 
 
 class RegistryEntry(FrozenModel):
-    schema_version: Literal["registry-entry.v1"] = "registry-entry.v1"
+    schema_version: Literal["registry-entry.v1", "registry-entry.v2"] = "registry-entry.v1"
     registry_id: str
     registered_at: UtcDateTime
     source_workspace: Text
     guard_ref: ArtifactRef
     guard_file_digest: Digest
-    guard: Guard
-    evidence: Evidence
+    guard: Guard | RepositoryGuard
+    evidence: Evidence | RepositoryEvidence
     artifact_digest: Digest
+
+    @model_validator(mode="after")
+    def versioned_source_chain(self):
+        repository_guard = isinstance(self.guard, RepositoryGuard)
+        if repository_guard != isinstance(self.evidence, RepositoryEvidence):
+            raise ValueError("Registry cannot mix legacy and repository provenance")
+        if repository_guard != (self.schema_version == "registry-entry.v2"):
+            raise ValueError("Registry entry version must match its provenance shape")
+        return self
 
 
 class RegistryEvent(FrozenModel):
@@ -231,6 +241,9 @@ class Registry:
                 raise ArtifactIntegrityError("Registry entry limit exceeded")
             entry = _signed(
                 RegistryEntry(
+                    schema_version="registry-entry.v2"
+                    if isinstance(guard, RepositoryGuard)
+                    else "registry-entry.v1",
                     registry_id=identity.registry_id,
                     registered_at=datetime.now(UTC),
                     source_workspace=str(workspace.resolve(strict=True)),

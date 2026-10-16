@@ -183,8 +183,14 @@ def load_evidence(path: str | Path) -> Evidence:
     try:
         # JSON validation preserves strict field checking while decoding the
         # JSON representations of datetime, Enum, and tuple values.
-        evidence = Evidence.model_validate_json(raw)
-    except ValidationError as error:
+        payload = json.loads(raw)
+        if isinstance(payload, dict) and payload.get("schema_version") == "evidence.v3":
+            from evidenceguard.repository_models import RepositoryEvidence
+
+            evidence = RepositoryEvidence.model_validate_json(raw)
+        else:
+            evidence = Evidence.model_validate_json(raw)
+    except (ValidationError, json.JSONDecodeError) as error:
         raise ArtifactIntegrityError(
             f"Evidence schema validation failed: {evidence_path}"
         ) from error
@@ -206,6 +212,10 @@ def verify_evidence(path: str | Path, *, cwd: str | Path) -> Evidence:
         raise ArtifactIntegrityError("Evidence workspace must be a directory")
     evidence_path = _verified_workspace_file(Path(path), workspace, "evidence artifact")
     evidence = load_evidence(evidence_path)
+    if evidence.schema_version == "evidence.v3":
+        from evidenceguard.repository_guard import verify_repository_evidence
+
+        return verify_repository_evidence(evidence_path, cwd=workspace)
     _verify_lineage(evidence, workspace)
 
     if evidence_path.name != "evidence.json" or evidence_path.parent.name != evidence.evidence_id:

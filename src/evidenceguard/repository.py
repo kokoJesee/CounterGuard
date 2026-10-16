@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import threading
 import time
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Literal
 
@@ -19,6 +20,7 @@ GIT_TIMEOUT = 5.0
 OUTPUT_LIMIT = 2 * 1024 * 1024
 BLOB_LIMIT = 1024 * 1024
 METADATA_LIMIT = 16384
+MAX_BATCH_OBJECTS = 4096  # At most 2048 explicit paths in each of base/head.
 _OID = re.compile(r"^[0-9a-f]{40}$")
 _REVISION = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*(?:[~^][0-9]{0,5})*$")
 _REF = re.compile(r"^refs/(?:heads|tags)/[A-Za-z0-9][A-Za-z0-9_./-]*$")
@@ -173,7 +175,12 @@ def _executable() -> str:
 
 
 def _git(
-    gitdir: Path, objects: Path, *args: str, limit: int = OUTPUT_LIMIT, deadline: float
+    gitdir: Path,
+    objects: Path,
+    *args: str,
+    limit: int = OUTPUT_LIMIT,
+    deadline: float,
+    input_data: bytes | None = None,
 ) -> bytes:
     remaining = deadline - time.monotonic()
     if remaining <= 0:
@@ -220,15 +227,25 @@ def _git(
     ]
     buffers = [bytearray(), bytearray()]
     overflow = threading.Event()
-    with subprocess.Popen(
-        argv,
-        cwd=gitdir,
-        env=environment,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=False,
-    ) as process:
+    with ExitStack() as stack:
+        source = subprocess.DEVNULL
+        if input_data is not None:
+            if len(input_data) > MAX_BATCH_OBJECTS * 41:
+                raise RepositoryProblem("repository_budget_exceeded")
+            source = stack.enter_context(tempfile.TemporaryFile())
+            source.write(input_data)
+            source.seek(0)
+        process = stack.enter_context(
+            subprocess.Popen(
+                argv,
+                cwd=gitdir,
+                env=environment,
+                stdin=source,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=False,
+            )
+        )
 
         def consume(stream, index, maximum):
             while chunk := stream.read(8192):
@@ -258,6 +275,65 @@ def _git(
         if process.returncode:
             raise RepositoryProblem("git_read_failed")
     return bytes(buffers[0])
+
+
+def _batch_blobs(gitdir: Path, objects: Path, oids: tuple[str, ...], *, deadline: float) -> dict:
+    """Two bounded Git processes; validate sizes before requesting any blob bodies."""
+    oids = tuple(sorted(set(oids)))
+    if len(oids) > MAX_BATCH_OBJECTS or any(not _OID.fullmatch(oid) for oid in oids):
+        raise RepositoryProblem("repository_budget_exceeded")
+    if not oids:
+        return {}
+    request = ("\n".join(oids) + "\n").encode("ascii")
+    headers = _git(
+        gitdir,
+        objects,
+        "cat-file",
+        "--batch-check",
+        input_data=request,
+        limit=len(oids) * 80,
+        deadline=deadline,
+    ).splitlines()
+    if len(headers) != len(oids):
+        raise RepositoryProblem("invalid_git_output")
+    sizes, total = {}, 0
+    for expected, header in zip(oids, headers, strict=True):
+        try:
+            oid, kind, raw_size = header.decode("ascii").split()
+            if oid != expected or kind != "blob" or not raw_size.isdecimal():
+                raise ValueError("invalid blob header")
+            length = int(raw_size)
+        except (UnicodeError, ValueError) as error:
+            raise RepositoryProblem("invalid_git_output") from error
+        if length > BLOB_LIMIT or total + length > 8 * BLOB_LIMIT:
+            raise RepositoryProblem("blob_budget_exceeded")
+        sizes[oid], total = length, total + length
+    raw = _git(
+        gitdir,
+        objects,
+        "cat-file",
+        "--batch",
+        input_data=request,
+        limit=total + len(oids) * 81,
+        deadline=deadline,
+    )
+    bodies, position = {}, 0
+    for oid in oids:
+        end = raw.find(b"\n", position, position + 80)
+        expected_header = f"{oid} blob {sizes[oid]}".encode("ascii")
+        if end < 0 or raw[position:end] != expected_header:
+            raise RepositoryProblem("invalid_git_output")
+        start, length = end + 1, sizes[oid]
+        body = raw[start : start + length]
+        if len(body) != length or raw[start + length : start + length + 1] != b"\n":
+            raise RepositoryProblem("invalid_git_output")
+        framed = b"blob " + str(length).encode("ascii") + b"\0" + body
+        if hashlib.sha1(framed, usedforsecurity=False).hexdigest() != oid:
+            raise RepositoryProblem("git_object_integrity", rejected=True)
+        bodies[oid], position = body, start + length + 1
+    if position != len(raw):
+        raise RepositoryProblem("invalid_git_output")
+    return bodies
 
 
 def _check_mode(mode: str) -> None:
@@ -368,7 +444,7 @@ def read_repository(
                         new_mode=new_mode,
                     )
                 )
-            pins, cache, size = [], {}, 0
+            pending = []
             for role in ("base", "head"):
                 for start in range(0, len(paths), 32):
                     entries = read_git(
@@ -388,24 +464,15 @@ def read_repository(
                         ref = repository_path(path.decode("utf-8"))
                         if kind != "blob" or ref not in paths or not _OID.fullmatch(oid):
                             raise RepositoryProblem("invalid_git_output")
-                        if oid not in cache:
-                            length = int(read_git("cat-file", "-s", oid))
-                            if length > BLOB_LIMIT or size + length > 8 * BLOB_LIMIT:
-                                raise RepositoryProblem("blob_budget_exceeded")
-                            body = read_git("cat-file", "blob", oid, limit=BLOB_LIMIT)
-                            header = b"blob " + str(len(body)).encode("ascii") + b"\0"
-                            if (
-                                len(body) != length
-                                or hashlib.sha1(header + body, usedforsecurity=False).hexdigest()
-                                != oid
-                            ):
-                                raise RepositoryProblem("git_object_integrity", rejected=True)
-                            cache[oid], size = digest_bytes(body), size + len(body)
-                        pins.append(
-                            FilePin(
-                                revision=role, path=ref, object_id=oid, content_digest=cache[oid]
-                            )
-                        )
+                        pending.append((role, ref, oid))
+            bodies = _batch_blobs(
+                isolated, objects, tuple(item[2] for item in pending), deadline=deadline
+            )
+            cache = {oid: digest_bytes(body) for oid, body in bodies.items()}
+            pins = [
+                FilePin(revision=role, path=ref, object_id=oid, content_digest=cache[oid])
+                for role, ref, oid in pending
+            ]
         if before != _metadata(gitdir):
             raise RepositoryProblem("repository_changed_during_inspection")
         return RepositorySnapshot(
@@ -459,26 +526,28 @@ def read_committed_files(
             snapshot.head_commit,
             deadline=deadline,
         )
+        pending, seen = [], set()
         for entry in entries.split(b"\0"):
             if not entry:
                 continue
-            if len(files) >= 2048:
+            if len(pending) >= 2048:
                 raise RepositoryProblem("repository_budget_exceeded")
             header, raw_ref = entry.split(b"\t", 1)
             mode, kind, oid = header.decode("ascii").split()
             _check_mode(mode)
             ref = repository_path(raw_ref.decode("utf-8"))
-            if kind != "blob" or not _OID.fullmatch(oid) or ref in files:
+            if kind != "blob" or not _OID.fullmatch(oid) or ref in seen:
                 raise RepositoryProblem("invalid_git_output", rejected=True)
-            body = _git(
-                isolated, objects, "cat-file", "blob", oid, deadline=deadline, limit=BLOB_LIMIT
-            )
+            pending.append((ref, oid))
+            seen.add(ref)
+        bodies = _batch_blobs(
+            isolated, objects, tuple(oid for _, oid in pending), deadline=deadline
+        )
+        for ref, oid in pending:
+            body = bodies[oid]
             total += len(body)
             if total > 8 * BLOB_LIMIT:
                 raise RepositoryProblem("blob_budget_exceeded")
-            blob = b"blob " + str(len(body)).encode("ascii") + b"\0" + body
-            if hashlib.sha1(blob, usedforsecurity=False).hexdigest() != oid:
-                raise RepositoryProblem("git_object_integrity", rejected=True)
             files[ref] = body
             pins.append(
                 FilePin(revision="head", path=ref, object_id=oid, content_digest=digest_bytes(body))
@@ -486,3 +555,34 @@ def read_committed_files(
     if before != _metadata(gitdir):
         raise RepositoryProblem("repository_changed_during_inspection")
     return snapshot.head_commit, files, tuple(sorted(pins, key=lambda pin: pin.path))
+
+
+def read_commit_metadata(repo: str | Path, revision: str) -> dict:
+    """Read and hash a commit object through the same isolated Git profile."""
+    snapshot = read_repository(repo, revision, revision)
+    if snapshot.status != "ready":
+        raise RepositoryProblem(snapshot.reason_codes[0], rejected=snapshot.status == "rejected")
+    gitdir = Path(repo).absolute() / ".git"
+    before = _metadata(gitdir)
+    with tempfile.TemporaryDirectory(prefix="eg-commit-") as temporary:
+        isolated = Path(temporary)
+        _prepare_metadata(before, isolated)
+        raw = _git(
+            isolated,
+            gitdir / "objects",
+            "cat-file",
+            "commit",
+            snapshot.head_commit,
+            deadline=time.monotonic() + 30,
+            limit=65536,
+        )
+    framed = b"commit " + str(len(raw)).encode() + b"\0" + raw
+    if hashlib.sha1(framed, usedforsecurity=False).hexdigest() != snapshot.head_commit:
+        raise RepositoryProblem("git_object_integrity", rejected=True)
+    header, message = raw.split(b"\n\n", 1)
+    parents = tuple(
+        line[7:].decode("ascii") for line in header.splitlines() if line.startswith(b"parent ")
+    )
+    if any(not _OID.fullmatch(parent) for parent in parents) or before != _metadata(gitdir):
+        raise RepositoryProblem("repository_changed_during_inspection")
+    return {"commit": snapshot.head_commit, "parents": parents, "message": message.decode("utf-8")}

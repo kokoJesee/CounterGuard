@@ -146,6 +146,8 @@ def authorize_docker_execution(
         raise ValueError("W3-B authorizes replay requests only")
 
     config, config_digest = load_project_config(config_path)
+    if config.schema_version != "project-config.v1":
+        raise ValueError("W3-B v1 requires its original project-config.v1 profile")
     if config_digest != report.config_digest or config.project_id != report.project_id:
         raise ValueError("Project configuration does not match the inspection report")
     mappings = [item for item in config.targets if item.target_id == target_id]
@@ -343,6 +345,11 @@ class _AdmittedDockerProcess:
             "stderr_limit_bytes": policy.stderr_limit_bytes,
             "junit_limit_bytes": policy.junit_limit_bytes,
         }
+        if hasattr(self.executor.authorization, "import_root"):
+            manifest.update(
+                schema_version="docker-runner-request.v2",
+                import_root=self.executor.authorization.import_root,
+            )
         encoded_manifest = base64.urlsafe_b64encode(canonical_json_bytes(manifest)).decode("ascii")
         container_name = _CONTAINER_PREFIX + uuid.uuid4().hex
         mount = f"type=bind,src={sandbox},dst=/workspace,readonly"

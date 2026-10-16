@@ -5,7 +5,7 @@ import unicodedata
 from pathlib import Path, PurePosixPath
 from typing import Annotated, Literal, Self
 
-from pydantic import AfterValidator, Field, StringConstraints, model_validator
+from pydantic import AfterValidator, Field, StringConstraints, model_serializer, model_validator
 
 from evidenceguard.digests import digest_bytes
 from evidenceguard.models import FrozenModel
@@ -79,8 +79,7 @@ def is_explicit_auxiliary_path(value: str) -> bool:
     if len(path.parts) == 1:
         name = path.name.casefold()
         return name in _AUXILIARY_ROOT_FILES or any(
-            name == prefix or name.startswith(prefix + ".")
-            for prefix in _AUXILIARY_ROOT_PREFIXES
+            name == prefix or name.startswith(prefix + ".") for prefix in _AUXILIARY_ROOT_PREFIXES
         )
     if len(path.parts) == 3 and path.parts[:2] == (".github", "workflows"):
         return path.suffix.casefold() in {".yml", ".yaml"}
@@ -99,6 +98,14 @@ class TargetMapping(FrozenModel):
     symbol: Symbol
     contract_ref: RepositoryPath
     dependency_refs: Annotated[tuple[RepositoryPath, ...], Field(max_length=64)] = ()
+    import_root: Literal[".", "src"] = "."
+
+    @model_serializer(mode="wrap")
+    def legacy_root(self, handler):
+        payload = handler(self)
+        if self.import_root == ".":
+            payload.pop("import_root", None)
+        return payload
 
     @model_validator(mode="after")
     def file_types(self) -> Self:
@@ -106,7 +113,13 @@ class TargetMapping(FrozenModel):
             raise ValueError(
                 "Targets require a .py source and an explicit .json contract reference"
             )
-        source_module = self.source_ref.removesuffix(".py").replace("/", ".")
+        source = self.source_ref
+        if self.import_root != ".":
+            prefix = self.import_root + "/"
+            if not source.startswith(prefix):
+                raise ValueError("Source must be below the declared import root")
+            source = source.removeprefix(prefix)
+        source_module = source.removesuffix(".py").replace("/", ".")
         if source_module.endswith(".__init__"):
             source_module = source_module.removesuffix(".__init__")
         if self.module is not None and self.module != source_module:
@@ -120,16 +133,31 @@ class TargetMapping(FrozenModel):
 
 
 class ProjectConfig(FrozenModel):
-    schema_version: Literal["project-config.v1"] = "project-config.v1"
+    schema_version: Literal["project-config.v1", "project-config.v2"] = "project-config.v1"
     project_id: Identifier
     targets: Annotated[tuple[TargetMapping, ...], Field(min_length=1, max_length=128)]
     ignored_paths: Annotated[tuple[RepositoryPath, ...], Field(max_length=128)] = ()
+    audit_refs: Annotated[tuple[RepositoryPath, ...], Field(max_length=64)] = ()
+
+    @model_serializer(mode="wrap")
+    def legacy_audit_refs(self, handler):
+        payload = handler(self)
+        if self.schema_version == "project-config.v1":
+            payload.pop("audit_refs", None)
+        return payload
 
     @model_validator(mode="after")
     def distinct_bindings(self) -> Self:
+        if self.schema_version == "project-config.v1" and (
+            "audit_refs" in self.model_fields_set
+            or any("import_root" in target.model_fields_set for target in self.targets)
+        ):
+            raise ValueError("Import-root and audit declarations require project-config.v2")
+        if len(set(self.audit_refs)) != len(self.audit_refs):
+            raise ValueError("Audit references must be distinct")
         if len({t.target_id for t in self.targets}) != len(self.targets):
             raise ValueError("Target identities must be unique")
-        bound = {p for t in self.targets for p in t.input_refs()}
+        bound = {p for t in self.targets for p in t.input_refs()} | set(self.audit_refs)
         if len(set(self.ignored_paths)) != len(self.ignored_paths) or bound.intersection(
             self.ignored_paths
         ):

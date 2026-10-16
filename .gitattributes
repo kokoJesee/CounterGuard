@@ -12,3 +12,4 @@ containers/python-runner/Dockerfile text eol=lf
 docs/results/w3b-formal-v1/** -text -whitespace
 docs/results/w3c-v1/** -text -whitespace
 docs/results/w3d-v1/** -text -whitespace
+docs/results/w3d-fork-v1/** -text -whitespace

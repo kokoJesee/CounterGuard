@@ -78,7 +78,9 @@ def analyze_changes(
 ) -> tuple[tuple[TargetImpact, ...], tuple[str, ...]]:
     """Exact file/dependency mapping, with uncertainty propagated to every candidate."""
     changed = {row.path for row in snapshot.changes}
-    mapped = {ref for target in config.targets for ref in target.input_refs()}
+    mapped = {ref for target in config.targets for ref in target.input_refs()} | set(
+        config.audit_refs
+    )
     unmapped = tuple(sorted(changed - mapped - set(config.ignored_paths)))
     present = {pin.path for pin in snapshot.files if pin.revision == "head"}
     targets = []
@@ -87,7 +89,9 @@ def analyze_changes(
         reasons = set(snapshot.reason_codes)
         if unmapped:
             reasons.add("unmapped_changed_paths")
-        if snapshot.status == "ready" and not set(target.input_refs()).issubset(present):
+        if snapshot.status == "ready" and not (
+            set(target.input_refs()) | set(config.audit_refs)
+        ).issubset(present):
             reasons.add("missing_declared_head_input")
         impact = (
             "unknown"
@@ -114,7 +118,11 @@ def inspect_repository(
     repo: str | Path, base: str, head: str, config_path: str | Path
 ) -> InspectionReport:
     config, digest = load_project_config(config_path)
-    refs = tuple(sorted({p for target in config.targets for p in target.input_refs()}))
+    refs = tuple(
+        sorted(
+            {p for target in config.targets for p in target.input_refs()} | set(config.audit_refs)
+        )
+    )
     snapshot = read_repository(repo, base, head, refs)
     targets, unmapped = analyze_changes(config, snapshot)
     reasons = tuple(

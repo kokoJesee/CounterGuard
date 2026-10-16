@@ -40,10 +40,16 @@ def _request(encoded: str) -> dict[str, object]:
         value = json.loads(raw)
     except (UnicodeError, ValueError, json.JSONDecodeError) as error:
         raise ValueError("invalid_request_encoding") from error
-    if not isinstance(value, dict) or set(value) != REQUEST_KEYS:
+    if not isinstance(value, dict):
         raise ValueError("invalid_request_fields")
-    if value["schema_version"] != "docker-runner-request.v1":
+    version = value.get("schema_version")
+    keys = REQUEST_KEYS | ({"import_root"} if version == "docker-runner-request.v2" else set())
+    if set(value) != keys:
+        raise ValueError("invalid_request_fields")
+    if version not in {"docker-runner-request.v1", "docker-runner-request.v2"}:
         raise ValueError("unsupported_request_schema")
+    if version == "docker-runner-request.v2" and value["import_root"] not in {".", "src"}:
+        raise ValueError("invalid_import_root")
     for key in ("test_ref", "contract_ref"):
         if not isinstance(value[key], str):
             raise ValueError("invalid_request_path")
@@ -196,7 +202,7 @@ def _run(value: dict[str, object]) -> dict[str, object]:
         "PYTHONDONTWRITEBYTECODE": "1",
         "PYTHONHASHSEED": "0",
         "PYTHONIOENCODING": "utf-8",
-        "PYTHONPATH": "/workspace",
+        "PYTHONPATH": "/workspace/src" if value.get("import_root") == "src" else "/workspace",
         "PYTHONUTF8": "1",
         "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
         "TMPDIR": str(run_dir),

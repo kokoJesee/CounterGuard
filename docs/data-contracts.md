@@ -283,3 +283,47 @@ W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有�
 | artifact_digest | 去自身摘要后的规范化 JSON SHA-256；执行前后仍须从 Inspection、配置、请求和工作区重建，不能只验自摘要 |
 
 任一上游变化都要求重新物化授权：Inspection/工具源码、配置字节、head 输入、Guard 测试、请求字段、policy 或 image ID。执行时只把 input_pins 与 test_ref 的已核对字节物化到新目录并只读挂载，未声明仓库文件不进入容器。RunRecord 保留 v1 形状，Docker 约束和 image ID 进入归一化 argv；授权本身由后续调度/Registry 作为独立来源保存。历史 W3-A 报告没有当前递归源码清单，不能被 W3-B 补签成授权，必须在新 ID/目录重跑 inspect。
+
+## W3-D fork 版本（独立于冻结 scope_v1）
+
+设计与范围见 [fork 设计](../integrations/pilot/design-fork-v1.md)。以下是受限 MAC 试点接口，
+不是对旧版的隐式字段扩展。旧 Evidence/Guard/Registry JSON 继续按原形状序列化。
+
+| 格式 | 新语义与依赖 |
+|---|---|
+| project-config.v2 | target.import_root 为 . 或 src；模块必须由根内 source_ref 唯一推导。audit_refs 固定配置/oracle 来源文件，不冒充运行依赖，不允许靠 ignored_paths 隐藏它们。v1 拒绝新字段 |
+| contract.v2 | 从固定 F 新增测试静态提取 MAC 的全部 10 case；记录上游提交、测试摘要、35→10 的投影。positional_args 为单个字符串；oracle 只有 is_true / validation_error_instance；返回类模块与类名固定 |
+| docker-runner-request.v2 | 仅新增受限 import_root；仍为空 pytest 配置、禁 conftest/插件发现、禁网/只读/非 root/资源上限。响应继续 v1 |
+| docker-execution-authorization.v2 | phase、role、assertion_head、target_revision、workspace_ref 分别绑定。捕获目标 B/F、契约 H；自检和重放均为 H。输入 pins、镜像、固定 policy、请求和当前实现共同决定摘要；执行前后重新构造 |
+| evidence.v3 | 保存 manifest、契约、生成测试、B/F 提交和工作区、两次 RunRecord/授权引用，以及真实失败 case 和双向复现结论。原始 JUnit 决定结果，基础设施错误不是缺陷 |
+| guard.v2 / guard-test.v3 | 只编译 Evidence 实际失败 case；保留位置调用、装饰器以及返回类原语义。绑定 H 自检与原 F 的相同源码字节，独立验证来源和生成测试。旧 trusted-local compile/run 不接受新版仓库 Guard |
+| pilot-scope.v1 | basis=audited_exact_snapshot；绑定 Guard、manifest、H、契约、源码和完整运行闭包；不包含学习标签，不声明 learned scope 或跨提交泛化 |
+| registry-entry.v2 | 嵌入 guard.v2 + evidence.v3，不能与旧嵌套格式混搭。JSON 事实和状态事件不可变，SQLite 仍只索引；禁用终态和来源重验规则不变 |
+| pilot-execution-report.v2 | 逐 Guard 决策/来源/未判断原因及实际 run；其他业务 unknown/disabled 的 run=null。独立审核重建授权、原始 JUnit、Scope 与计数，不能只验自摘要 |
+| pilot-repeatability.v2 | 两份执行报告分别独立验证，要求独立 run ID，比较固定 H 的决策/计数投影；真实时间、UUID 和原始日志不改写 |
+
+RunRecord v1 的 cwd="." 相对于**该记录的授权 workspace_ref**，不是验证器进程的 cwd。
+新验证器重建请求时以工作区引用提供上下文；不把 cwd 偷换成宿主绝对路径。
+授权请求本身绑定本机路径，不能把归档授权冒充另一台机器的新执行授权。
+
+新派生链的重算规则：
+
+| 上游变化 | 必须新建或重算 |
+|---|---|
+| 上游测试、提取规则、oracle 或调用约定 | 新契约/工具方提交/manifest，重新捕获及所有下游 |
+| B/F/H 或任何包依赖字节 | 提交树/Inspection/授权、Evidence、Guard、Scope、Registry 登记、重放与报告 |
+| runner/镜像/隔离协议 | 新镜像字节锁和攻击复验，再重新捕获及所有执行下游 |
+| 工具实现 | 新当前源码绑定、Inspection 和授权；历史报告保留，不补签。新版捕获用新 ID/目录 |
+| Registry 禁用或来源损坏 | 立即拒绝调度；历史报告不覆盖当前状态，不通过索引重建恢复 enabled |
+| 只修复工具验证器且上游未变 | 保留原工具方 H，在新 manifest/产物命名空间重新验收；不用再造一个 owner 提交 |
+
+本次 manifest-v3 / validators-fork-v1 是首轮历史；相对 cwd 解释修正后，正式复验使用
+manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重复来源遍历开销显式中断。
+批读取 Git 专项通过后，最终版本为 manifest-v5 / validators-fork-v3 / evd_validators_mac_complete_v3。
+前驱 manifest 摘要和重捕获原因逐次显式保存，owner H 始终未变。
+实现以递归源码摘要识别；源码 zip 归档同时保存实际 Git 基点和 dirty 状态，
+不把未提交源码伪称为某个历史 commit，也不伪造执行时间。
+
+批输出不是无上限的 stdout：先 batch-check 每个大小与原 8 MiB 总预算，
+再按预检总字节 + 每条受限头部设定输出上限；每条 body 按长度解析并重算 Git SHA-1，
+仍由提交 pins 的 SHA-256 检查内容。空/binary/重复对象、截断、错头、额外字节、错哈希和大小超限均有回归。

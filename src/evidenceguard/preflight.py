@@ -13,8 +13,13 @@ from evidenceguard.digests import digest_json_artifact
 from evidenceguard.repository import RepositoryProblem, read_committed_files
 
 
-def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
+def inspect_execution_requirements(
+    files: dict[str, bytes], *, pytest_version: str = "8.4.2", import_root: str = "."
+) -> dict:
     """Parse metadata/AST only; eligible means candidate, never permission to execute."""
+    if import_root not in {".", "src"} or not re.fullmatch(r"\d+\.\d+\.\d+", pytest_version):
+        raise ValueError("Unsupported static runner profile")
+    runner_version = tuple(int(part) for part in pytest_version.split("."))
     findings, warnings = [], []
     runtime_dependencies = None
     optional_dependencies = {}
@@ -30,7 +35,7 @@ def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
             else:
                 version = tuple(int(x) for x in minimum.split("."))
                 version += (0,) * (3 - len(version))
-                if version > (8, 4, 2):
+                if version > runner_version:
                     finding("declared_pytest_minversion_exceeds_formal_runner", path)
         if config.get("required_plugins"):
             finding("required_pytest_plugins", path)
@@ -40,7 +45,7 @@ def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
             finding("unrecognized_pytest_options", path, unknown=True)
         elif any(x.startswith("-p") for x in options):
             finding("explicit_pytest_plugin", path)
-        if config.get("pythonpath") and config["pythonpath"] not in (["."], "."):
+        if config.get("pythonpath") and config["pythonpath"] not in ([import_root], import_root):
             finding("non_root_import_path", path)
         warnings.append(("repository_pytest_config_is_not_loaded", path))
 
@@ -56,7 +61,8 @@ def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
             try:
                 config = tomllib.loads(body.decode("utf-8")).get("pytest", {})
                 pytest_config(config, ref)
-                finding("native_pytest_toml_requires_newer_runner", ref)
+                if runner_version < (9, 0, 0):
+                    finding("native_pytest_toml_requires_newer_runner", ref)
             except (ValueError, UnicodeError, TypeError, AttributeError):
                 finding("invalid_pytest_toml", ref, unknown=True)
         if name == "pyproject.toml":
@@ -83,7 +89,7 @@ def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
                 if config is not None:
                     pytest_config(config, ref)
                 where = tool.get("setuptools", {}).get("packages", {}).get("find", {})
-                if isinstance(where, dict) and where.get("where", ["."]) != ["."]:
+                if isinstance(where, dict) and where.get("where", ["."]) != [import_root]:
                     finding("package_import_mapping_requires_review", ref, unknown=True)
                 if optional_dependencies:
                     warnings.append(("optional_extras_are_not_installed", ref))
@@ -124,7 +130,7 @@ def inspect_execution_requirements(files: dict[str, bytes]) -> dict:
         "warnings": [dict(zip(("code", "path"), x, strict=True)) for x in sorted(set(warnings))],
         "runtime_dependencies": runtime_dependencies,
         "optional_dependencies": optional_dependencies,
-        "formal_runner_pytest": "8.4.2",
+        "formal_runner_pytest": pytest_version,
         "claim": "static compatibility candidate only; not dependency completeness, "
         "Scope applicability, ready inspection or execution authorization",
     }

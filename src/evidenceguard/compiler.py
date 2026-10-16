@@ -109,6 +109,8 @@ def compile_guard(request: CompileRequest) -> Guard:
     workspace = request.cwd.resolve(strict=True)
     evidence_path = _workspace_path(request.evidence_path, workspace)
     evidence = verify_evidence(evidence_path, cwd=workspace)
+    if evidence.schema_version == "evidence.v3":
+        raise ValueError("Repository Evidence requires the Docker-only pilot compiler")
     if not evidence.reproduced or not evidence.failing_case_ids:
         raise InvalidEvidenceError(
             "Compiler requires reproduced Evidence with a nonempty failure set"
@@ -231,6 +233,15 @@ def load_guard(path: str | Path, *, cwd: str | Path) -> Guard:
 def verify_guard(path: str | Path, *, cwd: str | Path) -> Guard:
     """Audit the Guard, its source chain, embedded assertions, and self-check logs."""
     workspace = Path(cwd).resolve(strict=True)
+    guard_path = _workspace_path(Path(path), workspace)
+    try:
+        header = json.loads(guard_path.read_bytes())
+    except (OSError, ValueError):
+        header = {}
+    if isinstance(header, dict) and header.get("schema_version") == "guard.v2":
+        from evidenceguard.repository_guard import verify_repository_guard
+
+        return verify_repository_guard(guard_path, cwd=workspace)
     guard = load_guard(path, cwd=workspace)
     evidence = verify_evidence(workspace / guard.source_evidence_ref, cwd=workspace)
     if not evidence.reproduced:

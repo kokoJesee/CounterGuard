@@ -73,4 +73,29 @@ raw_outcome 与 raw_verdict 不丢弃；unknown 保留具体原因，执行违�
 
 D12 修正了 compile 自检错误分支：旧实现调用 `_emit_run` 时，test_failed 会提前退出 1，使后面的预期退出 3 不可达。现在所有格式都先输出实际自检 Run，再退出 3；这是编译/固定目标自检失败，不是新目标的确认 violation。原直接 `guard run` 的真实断言失败仍退出 1。该兼容差异明确保留，未修改任何原执行记录。
 
-标准 Demo 使用已录制请求和显式 pin 的可信本地源码/契约。它不访问网络，不依赖 API key，不使用仓库旧 artifacts、未记录的 pytest 插件或 conftest。pytest/Python/Pydantic/Typer 版本记录在 Pipeline 中；改变环境后使用新 workspace。离线复现不是任意代码的网络/进程沙箱，Docker 留在后续阶段。
+标准 Demo 使用已录制请求和显式 pin 的可信本地源码/契约。它不访问网络，不依赖 API key，不使用仓库旧 artifacts、未记录的 pytest 插件或 conftest。pytest/Python/Pydantic/Typer 版本记录在 Pipeline 中；改变环境后使用新 workspace。任意仓库代码需要独立的隔离与准入，当前受限 Docker 接入见下文。
+
+## fork MAC 试点专用入口
+
+当前 `evidenceguard preflight` 的默认命令仍对应正式 v1 的 pytest8.4.2/root-imports，
+不会因为安装了新镜像而自动放宽。pytest9/src 的受限试点使用显式冻结 manifest：
+
+```powershell
+uv run python scripts/run_pilot.py --manifest integrations/pilot/manifest-v5.yaml --phase preflight --output artifacts/pilot/validators-fork-v3/admission-new
+uv run python scripts/run_pilot.py --manifest integrations/pilot/manifest-v5.yaml --phase replay --output artifacts/pilot/validators-fork-v3/replay-new
+```
+
+每个输出目录必须全新。`build-guard` 每个捕获版本只运行一次，不能重复覆盖工作区或旧产物；
+已完成的 Guard 用 replay 重放。新版本仓库 Evidence/Guard 只能经这个 Docker 路径捕获/自检/执行，
+不支持通过原 trusted-local compile/guard run 绕过审核。
+配置 `evidenceguard.yaml` 仍是 **JSON 语法子集**，不是带缩进/注释的通用 YAML。
+
+独立复核并比较两次真实重放：
+
+```powershell
+uv run python scripts/run_pilot.py --manifest integrations/pilot/manifest-v5.yaml --phase compare --first artifacts/pilot/validators-fork-v3/replay-1/report.json --second artifacts/pilot/validators-fork-v3/replay-2/report.json --output artifacts/pilot/validators-fork-v3/compare-new
+```
+
+本入口的失败退出 4，保存具体错误和 next_stage_allowed=false；没有本地回退。
+unknown / disabled 只表示跳过，不能算 pass。完整规则、来源分类和恢复本地 owner 提交见
+[试点设计](../integrations/pilot/design-fork-v1.md)。该入口不声明已经支持任意仓库、插件或作用域学习。
