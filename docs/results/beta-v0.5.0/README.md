@@ -4,6 +4,11 @@
 机器结果见 [acceptance.json](acceptance.json)；发布内容见 [release-notes.md](release-notes.md)。
 该收据不是原 Evidence、授权或签名，也不能代替当前来源链独立核验。
 
+[v0.5.0 Beta Release](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0) 已发布，
+标签对应提交 `54c2f952310c0c470506817e87d4f6c750b72bc2`。
+6 个公开文件经 GitHub API 独立读回，大小和 SHA-256 均与本地一致，见 [delivery.json](delivery.json)。
+交付收据另行追加在 main；不移动发布标签，不回写验收收据或重建已发布文件。
+
 ## 实际检查
 
 - 最终全量 **998 passed，0 失败、0 错误、0 skip，JUnit 记录 1684.71 秒**，包含快慢测试、真实 Docker、根/src 首次接入以及显式启用的 validators Registry/两次重放来源审计；计数与耗时由实际 JUnit 提取（控制台总计 1684.72 秒）。
