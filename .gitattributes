@@ -6,6 +6,7 @@
 *.py text eol=lf
 *.toml text eol=lf
 *.yaml text eol=lf
+requirements/*.txt text eol=lf
 integrations/pilot/LICENSE.validators.txt text eol=lf
 containers/python-runner/Dockerfile text eol=lf
 # Raw captured output is hashed as bytes; preserve native whitespace and line endings.

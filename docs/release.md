@@ -1,6 +1,8 @@
 # MVP 0.1.0 安装与发布验收
 
-本页说明如何从源码运行和构建 wheel。仓库采用 Apache-2.0，见 [LICENSE](../LICENSE)。GitHub 当前没有发行版下载；`docs/results/` 只保留经过筛选的验收记录，不包含所有本机原始运行日志。
+> 本页保留 MVP 冻结时的历史说明；当前版本的安装与发布范围见 [0.5.0 Beta](beta-release.md)。不要把以下历史构建目录当作新版本输出目录。
+
+本页说明 MVP 阶段如何从源码运行和构建 wheel。仓库采用 Apache-2.0，见 [LICENSE](../LICENSE)。MVP 阶段没有 GitHub 发行版下载；当前 Beta 交付见上方链接。`docs/results/` 只保留经过筛选的验收记录，不包含所有本机原始运行日志。
 
 公开仓库没有发布 `v0.1.0` Git tag。本地保留的旧标签属于更名前的 EvidenceGuard 冻结记录，不是 CounterGuard 的发行标签。MVP 验收摘要见 [冻结版检查结果](results/mvp-freeze-v1/final-checks.json)；其中的历史提交号是在隐私清理前记录的，当前 GitHub `main` 已重写历史。
 

@@ -2,9 +2,11 @@
 
 当前版本支持 Python / pytest 和受信本地示例。先选择安装方式，再在源码输入根目录使用一个尚不存在的输出目录。
 
+0.5.0 的受限仓库接入、精确 runner 交付和干净安装要求见 [Beta 说明](beta-release.md)。
+
 ## 两种安装方式
 
-本仓库未附预构建 wheel。推荐从源码创建隔离环境并运行 Demo：
+预构建 wheel 的下载、摘要核对和隔离安装见 [Beta 说明](beta-release.md)。也可从源码创建隔离环境并运行 Demo：
 
 ```powershell
 git clone https://github.com/kokoJesee/CounterGuard.git

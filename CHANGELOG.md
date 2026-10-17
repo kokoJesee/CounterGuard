@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Beta 0.5.0 候选：新增 `bootstrap compile/verify-guard`、最小 B/F Docker 自检、完整闭包快照 Scope、Registry entry v3 和 verify-report.v3；Candidate/Shadow/Active/Retired 仍走明确的追加式审核策略。
+## 0.5.0 Beta — 2026-10-17
+
+- 完成交付全量验收：998 passed、无失败或跳过，JUnit 记录 1684.71 秒，包含真实 Docker 和固定 validators 试点的来源审计。干净 wheel 完成 Demo、独立复验、真实仓库重放和 CI 驱动验收；首次失败和重试分开保留，详见[验收记录](docs/results/beta-v0.5.0/README.md)。
+- 提供 wheel/sdist、哈希锁定的工具依赖清单、已审核 runner 归档及人工触发 CI 模板；模板尚未在 GitHub 托管 runner 实测，远程 Registry 权限和通用原生 pytest 引导不在本版范围。
+- 新增 `bootstrap compile/verify-guard`、最小 B/F Docker 自检、完整闭包快照 Scope、Registry entry v3 和 verify-report.v3；Candidate/Shadow/Active/Retired 仍走明确的追加式审核策略。
 - 新 Guard 只保留真实失败 case，不混合 B/F 依赖快照；运行前后重验来源/状态，unknown 不启动 Docker。单次核验复用刚重建的上游事实，不跨调用缓存有效性。
 - 新增 source-only Docker CI fixture 驱动；项目许可元数据明确为 Apache-2.0。版本更新不增加运行时依赖，不移动既有标签或改写历史产物。
 

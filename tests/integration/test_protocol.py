@@ -140,9 +140,14 @@ def test_baselines_execute_only_applicable_training_rows(prepared_workspace):
     assert len(list((prepared_workspace / "artifacts/scopes/scope-v1").glob("*/*.json"))) == 4
 
 
-def test_holdout_execution_is_rejected_before_reading_protocol():
+def test_holdout_execution_is_rejected_before_reading_protocol(monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Holdout rejection must happen before protocol loading")
+
+    monkeypatch.setattr("counterguard.protocol.verify_protocol", forbidden)
     result = CliRunner().invoke(
         app, ["benchmark", "baselines", "--protocol", "missing.json", "--split", "holdout"]
     )
     assert result.exit_code == 2
-    assert "This command accepts only the training split" in result.output
+    assert "Only training data is accepted here" in result.output
+    assert "holdout is reserved for evaluation" in result.output

@@ -96,7 +96,11 @@ W04 的 CI 展示与上传范围已有[有限字段投影测试](../tests/unit/t
 [本地真实 Docker 驱动专项](../tests/integration/test_ci_fixture.py)。
 Shadow/Active/unknown/异常退出策略、JSON/Markdown 计数同源、公开输出不含任意来源文本已覆盖。
 模板仅人工触发可信 fixture，不在 .github 下启用；实际 GitHub job、可携带来源/Registry、
-远程角色/撤销、公开 runner 交付与宿主供应链仍未关闭。W04 整体保持**部分**，不标为全面已测。
+远程角色/撤销与宿主可信性仍未关闭。Beta 新增[固定交付模板](../examples/github-actions/counterguard-beta.yml)，
+从版本化 Release 核对 wheel、二进制依赖清单和已审核 runner 归档的摘要；
+[模板检查](../tests/unit/test_beta_workflow.py)约束权限、来源 pin 与上传范围。
+本地安装驱动不能替代实际 GitHub job；公开材料是否已发布以 [Beta 交付说明](beta-release.md)及同版验收记录为准。
+W04 整体保持**部分**，不标为全面已测。
 
 ## W3 开工与准入
 

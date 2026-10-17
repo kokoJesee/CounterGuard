@@ -11,6 +11,7 @@
 | H 内通用契约与 B/F 来源绑定 | 已实现受限 contract.v3、准备与独立重建 | 按[来源绑定](standalone-contracts.md)审核并由所有者提交；来源已核实不等于缺陷已复现 |
 | 通用受限 Docker 双向捕获 | 已实现受限 source-only profile | 审核 H 契约/闭包后运行 [bootstrap capture](standalone-capture.md)，独立重建 Evidence；unknown 不可覆盖 |
 | 受限最小 Guard、自检与精确快照 Scope/Shadow | 已实现新 Guard/Scope/Registry 版本 | 按[独立 Guard](standalone-guards.md)编译、自检、登记与显式审核后 verify；其他源码仍 unknown |
+| 0.5.0 Beta 安装与固定 runner 交付 | 受限范围，验收与发布分别记录 | 按 [Beta 说明](beta-release.md)核对下载摘要；[本版验收](results/beta-v0.5.0/README.md)列出实际检查和未覆盖范围 |
 | 真实项目的可携带来源/Registry 与远程 CI 权限 | 未实现 | 不能搬运/改签本机条目；仅有 [受控 CI 示例](github-actions.md) |
 | 上游原生测试的受控 pytest 引导 | **明确的接入前置；未实现** | 运行上游套件前必须审核配置、conftest/hooks、fixture、插件及依赖；不能因运行时零依赖跳过 |
 | 受控依赖安装 | 未实现，目标/插件需镜像外依赖时必需 | 需要时保留阻塞；独立契约能否避开它须重新审核，不能隐藏声明 |
