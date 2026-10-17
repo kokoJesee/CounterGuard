@@ -32,11 +32,19 @@ from counterguard.runners.docker import DockerExecutionAuthorization, DockerPoli
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
 from counterguard.standalone_contracts import StandaloneContract
+from counterguard.standalone_models import (
+    StandaloneAuthorization,
+    StandaloneCapture,
+    StandaloneEvidence,
+)
 from counterguard.verification_gate import GateResult
 from counterguard.verify import VerifyReport, VerifyReportV2
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "standalone-capture": StandaloneCapture,
+    "standalone-authorization": StandaloneAuthorization,
+    "standalone-evidence": StandaloneEvidence,
     "standalone-contract": StandaloneContract,
     "contract-proposal": ContractProposal,
     "evidence": Evidence,

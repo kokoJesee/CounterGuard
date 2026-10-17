@@ -381,11 +381,32 @@ contract.v2 分开。契约 pin B/F、显式导入映射、闭包 refs、F 内�
 H SHA 不放入其自身 blob，避免提交内容自引用。H 的新增契约与未改写的 F 文件由绑定器从对象库独立核对。
 
 `contract-preparation.v1` 保存契约字节摘要、B/F 评估、完整 case/unsupported 覆盖和当前实现，固定需人审/不执行。
-`bootstrap-binding.v1` 摘要覆盖除自身外所有字段：B/F/H 全树 pins、契约原始摘要与解析值、线性父子规则、
+当前 `bootstrap-binding.v2` 摘要覆盖除自身外所有字段：B/F/H 全树 pins、契约原始摘要与解析值、线性父子规则、
 文件来源、每棵树的静态闭包/测试引导观察、完整投影/unsupported、输入状态、固定不执行和 reproduced=null 声明、
 语义/身份限制及逐文件工具源码摘要。没有时间、随机 ID、宿主路径或输出位置进入摘要。
 独立 verify-binding 重读 Git，重新提取并比较完整记录；自摘要或重签不能代替这个过程。
 
 提交、契约、投影规则、闭包或工具实现变化时在新目录重新 prepare/bind；旧产物不补签。
 读取/历史/内容拒绝保存独立 bootstrap-binding-failure.v1，不能被当成已绑定事实。
-本层不证明 buggy 真失败，不能进入旧执行器/Registry；未来实际捕获须使用新的执行来源版本。
+本层不证明 buggy 真失败，不能进入旧执行器/Registry。v2 删除旧 capture_available 提示，以
+capture_entry_point/capture_authority 指向单独的当前来源授权；绑定自身始终不执行，v1 原字节保留且不补签。
+
+## 通用 Docker 双向捕获
+
+[独立捕获](standalone-capture.md)采用新模型/Schema，不复用或扩大旧 Evidence、授权与 Registry 语义。
+
+| 层 / 版本 | 摘要依赖 | 变化后的处理 |
+|---|---|---|
+| standalone-capture.v1 | Evidence ID、真实 UTC、输出/绑定引用、binding digest、完整 runner review、审核理由及本机权限声明、生成器、超时、实现与 policy | 任一变化需新计划与双向捕获；计划摘要不用于跨运行确定性比较 |
+| docker-execution-authorization.v4 | 角色、capture/binding/review/policy/实现摘要、B 或 F 提交、H、精确 image、输入 pins/origins、包根、规范测试摘要、完整请求摘要与 case ID 映射 | 每次执行前后重建；路径/超时/run ID/角色/输入变化不得复用旧授权 |
+| RunRecord v1 与原始日志 | 实际 argv、角色/目标/契约、版本、时间、退出码、case 结果、原始 stdout/stderr/JUnit 及摘要 | 源码不重新执行就不能重新制造；独立重建 JUnit 分类并核对封闭 Docker argv，错配即拒绝 |
+| evidence.v4 | Evidence ID/真实 UTC、capture/binding/contract、两份运行/授权引用、实际失败集、双向复现/拒绝原因 | 发布前独立重建双方；任何上游变化新建 capture，不重签历史 |
+
+契约 case_<hex> 到运行 case-<hex> 是单射传输映射，授权保存原始 ID→运行 ID；Evidence 使用原始契约 ID。
+完整 case 集合必须一致，导入/收集错误不属于 raises oracle，pytest 2/3/4/5、skip/timeout 不能冒充真实失败。
+有效执行但未复现仍是 reproduced=false 的事实记录；完整性/前置失败保存 standalone-capture-failure.v1，
+保留已完成记录，不留下成功 Evidence。仅最终 Evidence 文件是发布标记，独立核验不能省略。
+
+全包 .py 摘要本轮发生变化，当前执行链需要在新命名空间重做 bind/capture；contract.v3 字节、B/F/H、
+Docker policy/入口/审核镜像与 catalog 收据不变时不需改写它们。旧 binding v1 和执行证据保持原样并可能过期。
+冻结 scope_v1 的算法、协议、标签、上下文与已有 artifact 均未修改。新 Evidence 尚无通用 Guard/Scope/Registry 消费路径。

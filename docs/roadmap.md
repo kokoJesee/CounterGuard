@@ -9,7 +9,8 @@
 | 现有测试的机械草案提取 | 已实现受限语法，不可执行 | 运行 [contract draft](contract-drafts.md)，人工审核及记录不支持的断言 |
 | 通用 bootstrap 的输入计划 | 已实现只读模块闭包与测试环境分层 | 运行 [bootstrap plan](bootstrap-plans.md)；它不批准契约、不启动 Docker |
 | H 内通用契约与 B/F 来源绑定 | 已实现受限 contract.v3、准备与独立重建 | 按[来源绑定](standalone-contracts.md)审核并由所有者提交；来源已核实不等于缺陷已复现 |
-| 通用受限 Docker bootstrap | **下一项产品开发；未实现** | 可准备真实 B/F、草案和导入映射；当前用户不能靠配置自己打开它 |
+| 通用受限 Docker 双向捕获 | 已实现受限 source-only profile | 审核 H 契约/闭包后运行 [bootstrap capture](standalone-capture.md)，独立重建 Evidence；unknown 不可覆盖 |
+| 通用最小 Guard、自检与精确快照 Scope/Shadow | **下一项产品开发；未实现** | 首次 Evidence 尚不能加入旧 Registry 或作为日常 verify 输入 |
 | 真实项目的可携带来源/Registry 与远程 CI 权限 | 未实现 | 不能搬运/改签本机条目；仅有 [受控 CI 示例](github-actions.md) |
 | 上游原生测试的受控 pytest 引导 | **明确的接入前置；未实现** | 运行上游套件前必须审核配置、conftest/hooks、fixture、插件及依赖；不能因运行时零依赖跳过 |
 | 受控依赖安装 | 未实现，目标/插件需镜像外依赖时必需 | 需要时保留阻塞；独立契约能否避开它须重新审核，不能隐藏声明 |
@@ -23,12 +24,12 @@
 它需要新的通用契约/来源版本及反篡改验收，保留已有 validators 和 scope_v1 格式/结果；不通过删 Literal 或新增宽松布尔开关实现。
 安装依赖、运行项目测试套件、自动提升 Active、学习跨提交泛化与远程发布都不属于这项最小范围。
 
-通用 bootstrap 按三个可核验环节推进：输入计划（已实现、只读）；所有者 H 内的新通用契约与 B/F 来源绑定（受限版本已实现、只读）；
-受限 Docker 捕获、编译、独立验证与精确 Scope/Shadow（下一环，未实现）。来源绑定不会替所有者制造提交，
+通用 bootstrap 按四个可核验环节推进：输入计划（已实现、只读）；所有者 H 内的新通用契约与 B/F 来源绑定（受限版本已实现、只读）；
+受限 Docker 捕获与 Evidence 独立重建（已实现）；最小 Guard 编译/自检与精确 Scope/Shadow（下一环，未实现）。来源绑定不会替所有者制造提交，
 也不会在未运行 B/F 时把 reproduced 写成 true。
 原生测试兼容路线的②不再作为笼统的低优先级“可选项”；5–10 人日仅是单一受控 profile 的原工程估算，
 任意插件/fixture 的兼容工期不确定，也不保证不需要③。它与独立 Guard 路线的优先顺序不由猜测覆盖比例决定。
 依据见[固定提交研究](research/pytest-project-bootstrap.md)及[计时/阻塞复核](results/onboarding-audit-v1/README.md)。
 
-契约草案与输入计划已补齐只读准备工具；真正决定“能否完成首次接入”的下一道硬门槛仍是通用 Docker bootstrap。
+契约草案、输入计划、来源绑定与首次 Docker Evidence 已实现；真正决定“能否完成首次接入”的下一道硬门槛是通用 Guard/Scope/Shadow。
 优先级依据是[首次实际试走](results/onboarding-boltons-v1/README.md)，不是项目覆盖比例或用户流失率猜测。

@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- 新增 contract.v3 / standalone-literals.v1、`contract prepare`、`bootstrap bind/verify-binding`：从 H 内 Git blob 重建线性 B/F/H、完整来源 pins 与测试投影，保留 unsupported，拒绝篡改与重签结论；不开放通用 Docker 执行。
+- 新增 `bootstrap capture/verify-evidence`：从当前 H 契约与 B/F 绑定生成受限测试，在已审核 Docker 中双向运行；独立重建授权、原始 JUnit、失败集和复现结论，新增 evidence.v4/授权 v4，不改旧格式。发布 Evidence 前核对两次记录，保留真实失败证据。
+- 新增 contract.v3 / standalone-literals.v1、`contract prepare`、`bootstrap bind/verify-binding`：从 H 内 Git blob 重建线性 B/F/H、完整来源 pins 与测试投影，保留 unsupported，拒绝篡改与重签结论。当前绑定 v2 指向另行审核的捕获入口，自身始终 not_run；旧 v1 不补签。
 
 - 新增只读 `bootstrap plan`：模块级候选导入闭包与上游测试环境分层，完整提交 pins、草案未支持项和人工审核要求均保留；不改变旧 strict 预检或授予执行能力。
 - 复核 boltons 收集 hook、配置节与文件级 fixture 待审的真实含义；将受控 pytest 引导明确列为原生测试路线前置，记录旧计时无法完整归因的限制。

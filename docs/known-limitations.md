@@ -10,7 +10,7 @@
 - pytest 是可选 runner extra；基础安装缺少它时，Demo/Pipeline 和执行器提前拒绝执行并提示安装，退出 3，不把缺依赖当作测试违规。检查元数据/模块存在不保证任意损坏安装的功能正常。
 - 历史 v0.1.0 本机冻结版仍只面向可信本地代码；它不是本 GitHub 仓库发布的 CounterGuard tag。源码版已完成 W3-B runner、W3-C 本地 Registry，以及 validators 固定 MAC 试点。该试点使用专用 pytest 9.0.3/src 配置，只证明固定 B/F/H 快照上的 10 个 MAC case；pytest/容器隔离不是通用 Python 沙箱或结果远程证明。
 - 合约/模块 context 是显式确认和审核的元数据，自动 AST 提取不会替代人的语义判断。
-- Docker 授权与 validators pilot 流程仅覆盖已审核的 replay/capture/compile 路径。任意仓库尚无通用的自动准入、完整依赖证明或自动学习 Scope；不能调用 trusted-local 入口绕过 pilot 限制。
+- Docker 授权覆盖已审核 replay/capture/compile 路径，以及新增受限字面量契约的双向捕获。任意仓库尚无通用的自动准入、完整依赖证明或自动学习 Scope；不能调用 trusted-local 入口绕过限制。
 
 W3-A 源码版已支持 [只读仓库检查](repository-inspection.md)，v0.1.0 wheel/tag 保持原样。inspect 的 ready / affected 只表示声明的文件映射结果，不审核依赖完整性、符号存在或契约语义，不等于 Scope 判断和执行许可。所有检查结果均为 not_run，`execution_allowed` 在类型和 Schema 上恒为 false；W3-B 使用另一份来源重建授权，不翻转该字段。普通 SHA-1 Git profile 之外的布局/历史缺失保守 unknown，链接/损坏对象拒绝。宿主 Git、Docker daemon/WSL2、TOCTOU、容器内恶意目标干扰 pytest，以及正式 runner 供应链等剩余风险见 [安全模型](security-model.md)。
 
@@ -82,7 +82,7 @@ daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名
 预检 v2 的工程前置是维护者责任，用户不能自己设置开关获得通用支持；没有承诺 ETA。
 
 [接入清单](onboarding.md)把首次准备拆为六项人工决策；没有用户实测能支持“30 分钟内接入”或项目覆盖比例。
-新 minimal-python 静态检查只分类免安装/免插件候选，不能穷尽动态 Python 行为，也不补齐通用 Guard/Docker bootstrap。
+新 minimal-python 静态检查只分类免安装/免插件候选，不能穷尽动态 Python 行为，也不替代单独的通用 Docker 授权或补齐通用 Guard。
 初次没有合法反例时只有经审核的精确快照边界；新的源码版本仍可能频繁 unknown。
 
 [CI Summary](github-actions.md)是有限字段的展示投影，不是通用脱敏器或执行认证。
@@ -92,5 +92,11 @@ daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名
 统一入口支持 `guard.v1` / `project-config.v1` 根布局已审核快照，以及固定 validators owner head 的 `src`/pytest9 profile。同一文件的其他版本、其他项目的依赖闭包和通用学习 Scope 绑定仍为 unknown；没有为推进而降低既有 Docker 或契约来源约束。生命周期是本地追加审阅记录，不提供用户身份、角色、签名或防回滚保证，远程 CI 授权仍未实现。
 
 已审核 runner 的目录随安装包固定摘要，只读发现不会构建、拉取或运行镜像。当前未发布 OCI 镜像仓库或公开离线归档；其他机器仍需取得或重新审核构建产物。没有 Docker/镜像时明确 unavailable，不能用相同 tag 或任意新 ID 代替。
+
+[通用 Docker 捕获](standalone-capture.md)只支持已审核的 source-only 字面量契约与线性 B/F/H。
+review_reason 是本机审计文本，不认证用户/所有者，也不证明静态闭包穷尽 Python 动态行为。
+它不加载项目 pytest 配置、conftest、插件或原生测试；目标若需要这些能力，不能靠忽略 finding 强行捕获。
+容器内恶意目标仍可能干扰 pytest/JUnit，宿主全链重写没有签名保障。新 evidence.v4 还没有通用 Guard/Scope/Shadow 消费路径；
+工具自有 Docker fixture 的成功不构成第二个外部项目成功或 30 分钟用户接入实测。
 
 新增实现会改变全包源码绑定。已有 Inspection、Docker 授权和仓库 Evidence/Guard 在当前验证器下可能过期；保留其原字节，在新命名空间重新物化，不重签历史记录。冻结 scope_v1 的数据、算法、标签与期望值没有因此改变。详见 [统一验证](verify.md)。

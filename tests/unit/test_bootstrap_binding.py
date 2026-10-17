@@ -104,7 +104,8 @@ def test_preparation_roundtrip_and_head_binding_do_not_claim_runtime_truth(repos
     assert value["binding_status"] == "sources_verified"
     assert value["capture_input_status"] == "review_required"
     assert value["reproduced"] is None and not value["execution_allowed"]
-    assert not value["capture_available"] and value["execution_outcome"] == "not_run"
+    assert value["capture_entry_point"] == "bootstrap capture"
+    assert value["execution_outcome"] == "not_run"
     assert value["projection_coverage"]["source_assertions"] == 2
     assert value["projection_coverage"]["represented_assertions"] == 1
     assert value["projection_coverage"]["unsupported"][0]["assertion_count"] == 1

@@ -1,0 +1,185 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "docker-execution-authorization.v4",
+      "default": "docker-execution-authorization.v4",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile": {
+      "const": "standalone-literals-docker.v1",
+      "default": "standalone-literals-docker.v1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "role": {
+      "enum": [
+        "buggy",
+        "fixed"
+      ],
+      "title": "Role",
+      "type": "string"
+    },
+    "capture_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Capture Digest",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "target_revision": {
+      "title": "Target Revision",
+      "type": "string"
+    },
+    "assertion_head": {
+      "title": "Assertion Head",
+      "type": "string"
+    },
+    "runner_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Runner Review Digest",
+      "type": "string"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Image Digest",
+      "type": "string"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "input_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "title": "Input Pins",
+      "type": "array"
+    },
+    "input_origins": {
+      "additionalProperties": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "propertyNames": {
+        "minLength": 1
+      },
+      "title": "Input Origins",
+      "type": "object"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "test_ref": {
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "known_case_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Known Case Ids",
+      "type": "array"
+    },
+    "case_id_map": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Case Id Map",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "role",
+    "capture_digest",
+    "binding_digest",
+    "target_revision",
+    "assertion_head",
+    "runner_review_digest",
+    "image_digest",
+    "policy_digest",
+    "implementation_digests",
+    "request_digest",
+    "input_pins",
+    "input_origins",
+    "import_root",
+    "test_ref",
+    "test_digest",
+    "known_case_ids",
+    "case_id_map",
+    "artifact_digest"
+  ],
+  "title": "StandaloneAuthorization",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -282,7 +282,7 @@ def rebuild_binding(repo: Path, head: str, contract_ref: str) -> dict:
         else ("unknown" if "unknown" in role_status else "review_required")
     )
     payload = {
-        "schema_version": "bootstrap-binding.v1",
+        "schema_version": "bootstrap-binding.v2",
         "binding_status": "sources_verified",
         "head_commit": head,
         "contract_ref": contract_ref,
@@ -319,14 +319,16 @@ def rebuild_binding(repo: Path, head: str, contract_ref: str) -> dict:
         "capture_input_status": status,
         "projection_coverage": fragments,
         "execution_allowed": False,
-        "capture_available": False,
+        "capture_entry_point": "bootstrap capture",
+        "capture_authority": "separate_current_source_and_runner_authorization_required",
         "execution_outcome": "not_run",
         "reproduced": None,
         "semantic_review_required": True,
         "ownership_authentication": "not_provided_by_git_object_integrity",
         "next_action": "Review source/oracle independence and every runtime finding. "
-        "Generic Docker capture, Evidence/Guard verification and Scope remain unimplemented. "
-        "This binding is not an execution authorization or proof that buggy fails.",
+        "Request bootstrap capture separately with a reviewed runner and an explicit local "
+        "review reason. Generic Guard/Scope admission remains unimplemented. This binding "
+        "is not an execution authorization or proof that buggy fails.",
         "implementation_digests": inspection_implementation_digests(),
     }
     payload["artifact_digest"] = digest_json_artifact(payload)
@@ -368,7 +370,10 @@ def verify_binding(repo: Path, path: Path) -> dict:
         raise ArtifactIntegrityError("Binding must be a bounded unlinked regular file")
     try:
         value = strict_json(path.read_bytes(), limit=BINDING_LIMIT)
-        _require(value.get("schema_version") == "bootstrap-binding.v1", "not_a_source_binding")
+        _require(
+            value.get("schema_version") in {"bootstrap-binding.v1", "bootstrap-binding.v2"},
+            "not_a_source_binding",
+        )
         _require(
             value.get("artifact_digest") == digest_json_artifact(value), "binding_digest_mismatch"
         )

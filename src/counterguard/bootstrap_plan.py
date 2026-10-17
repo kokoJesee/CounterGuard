@@ -344,16 +344,13 @@ def plan_bootstrap(
         "verify_supported": False,
         "execution_outcome": "not_run",
         "upstream_tests_selected_for_execution": False,
-        "missing_capabilities": [
-            "generic_owner_head_contract",
-            "generic_docker_capture",
-            "generic_guard_provenance_and_scope",
-        ],
+        "missing_capabilities": ["generic_guard_provenance_and_scope"],
         "next_action": "Review target/package initializer imports, resources, every projected "
         "oracle and unsupported assertion. A standalone Guard may avoid upstream test bootstrap "
-        "only after separate closure review and implemented isolated Docker capture. "
-        "Do not run upstream tests or register this plan. Final contract must be committed "
-        "by the owner to assertion head; this plan is neither that contract nor authorization.",
+        "only after separate closure review and separately authorized Docker capture. Use "
+        "contract prepare, owner head commit, bootstrap bind and bootstrap capture. "
+        "Do not run upstream tests or register this plan; it is neither a head contract "
+        "nor an execution authorization.",
         "implementation_digests": inspection_implementation_digests(),
     }
     payload["artifact_digest"] = digest_json_artifact(payload)

@@ -1,6 +1,6 @@
 # 独立 Guard 的输入计划
 
-`bootstrap plan` 是通用 Docker bootstrap 的第一个只读准备环节，**尚未实现通用捕获或执行**。
+`bootstrap plan` 是通用 Docker bootstrap 的第一个只读准备环节，本命令不批准捕获或执行。
 它把目标模块的候选输入集与上游测试环境分开记录。仓库里存在 conftest，不等于所选断言使用了 fixture；
 反过来，目标只用标准库也不证明可以忽略其包初始化、动态导入或资源文件。
 
@@ -33,6 +33,6 @@ Git/路径完整性拒绝返回 5；参数/不可读取的草案内容等错误�
 
 用户下一步是审核计划及未支持项，准备真实 B/F 和由所有者提交到 H 的最终契约。
 现在可继续使用[contract prepare 与 bootstrap bind](standalone-contracts.md)准备并重建 H 内契约和 B/F 来源；
-这不提供自动审批。Docker 双向捕获、最小 Guard 独立来源验证及精确快照 Scope 仍在[路线](roadmap.md)中，
+这不提供自动审批；审核后可单独运行 [Docker 双向捕获](standalone-capture.md)。最小 Guard 编译/自检及精确快照 Scope 仍在[路线](roadmap.md)中，
 不能用本地 capture、删 conftest/配置、重签计划或任意布尔开关代替。
 运行上游原生测试套件是另一条路线，先完成配置、conftest/hooks、fixture、插件及其依赖的受控引导。

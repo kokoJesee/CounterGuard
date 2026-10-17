@@ -200,6 +200,74 @@ def bootstrap_verify_binding_command(
         raise typer.Exit(4)
 
 
+@bootstrap_app.command("capture")
+def bootstrap_capture_command(
+    repo: Annotated[
+        Path, typer.Option(help="Committed source repository; never executed locally.")
+    ],
+    binding: Annotated[Path, typer.Option(help="Current independently verified binding.json.")],
+    runner_id: Annotated[str, typer.Option(help="Reviewed root-pytest8 runner ID.")],
+    evidence_id: Annotated[str, typer.Option(help="New evd_ identity; do not reuse history.")],
+    review_reason: Annotated[
+        str, typer.Option(help="Explicit review of sources, resources and oracles.")
+    ],
+    output: Annotated[
+        Path, typer.Option(help="New immutable capture directory outside target repo.")
+    ],
+    timeout: Annotated[
+        float, typer.Option(help="Per-container pytest deadline, at most 30 seconds.")
+    ] = 10.0,
+) -> None:
+    """Capture B/F through Docker only; unresolved inputs have no override or local fallback."""
+    from counterguard.repository import RepositoryProblem
+    from counterguard.standalone_capture import capture_standalone, standalone_capture_exit_code
+
+    try:
+        value = capture_standalone(
+            repo,
+            binding,
+            runner_id=runner_id,
+            evidence_id=evidence_id,
+            review_reason=review_reason,
+            output=output,
+            timeout=timeout,
+        )
+    except RepositoryProblem as error:
+        _error("Committed data unavailable: " + error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(value).decode())
+    code = standalone_capture_exit_code(value)
+    if code:
+        raise typer.Exit(code)
+
+
+@bootstrap_app.command("verify-evidence")
+def bootstrap_verify_evidence_command(
+    path: Annotated[Path, typer.Argument(help="Existing standalone evidence.v4 JSON.")],
+    repo: Annotated[Path, typer.Option(help="Source repository holding pinned B/F/H objects.")],
+) -> None:
+    """Independently rebuild provenance, authorization, raw JUnit and reproduction claims."""
+    from counterguard.repository import RepositoryProblem
+    from counterguard.standalone_capture import (
+        standalone_capture_exit_code,
+        verify_standalone_evidence,
+    )
+
+    try:
+        value = verify_standalone_evidence(repo, path).model_dump(mode="json")
+    except RepositoryProblem as error:
+        _error("Committed data unavailable: " + error.code, 5 if error.rejected else 4)
+    except (ArtifactIntegrityError, OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 5)
+    typer.echo(canonical_json_bytes(value).decode())
+    code = standalone_capture_exit_code(value)
+    if code:
+        raise typer.Exit(code)
+
+
 @bootstrap_app.command("plan")
 def bootstrap_plan_command(
     repo: Annotated[Path, typer.Option(help="Read committed files; never import or execute.")],

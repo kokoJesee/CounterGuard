@@ -175,7 +175,8 @@ NEXT = {
     "reviewed target/contract closure or wait for locked offline dependency installation. "
     "Do not delete declarations to pass this check.",
     "guard": "Supply a source-controlled contract, real buggy/fixed commits, verified Evidence "
-    "and a reviewed exact-snapshot Scope. Generic Docker bootstrap is not implemented.",
+    "and a reviewed exact-snapshot Scope. Restricted standalone Docker capture exists; "
+    "generic Guard/Scope bootstrap is not implemented.",
 }
 
 

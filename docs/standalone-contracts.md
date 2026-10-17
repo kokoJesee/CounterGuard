@@ -1,7 +1,7 @@
 # H 内通用契约与 B/F 来源绑定
 
 本环节提供 `contract.v3` / `standalone-literals.v1`、契约准备和独立来源重建。
-它不再固定 validators 的模块和 oracle，但**仍未提供通用 Docker capture/compile**。
+它不再固定 validators 的模块和 oracle；完成审核后可接续[通用 Docker capture](standalone-capture.md)，通用 Guard 编译仍未实现。
 旧 contract.v1/v2、Guard、Scope、runner 和已发布产物不改写。
 
 ## 准备、由所有者提交、绑定
@@ -54,7 +54,7 @@ H 中没有契约时，写出 `binding-failure.json` 并返回 5，不尝试本�
 
 ## 绑定证明了什么
 
-`bootstrap-binding.v1` 固定三棵完整提交树、契约原始字节、父子关系、H 新增文件的来源、
+当前 `bootstrap-binding.v2` 固定三棵完整提交树、契约原始字节、父子关系、H 新增文件的来源、
 重新提取的 case/unsupported，以及逐角色闭包和配置/hook 的静态观察。每次独立验证都重读 Git 对象，
 不只核对自摘要，也不信任之前的 plan/preparation。所有报告排序、无随机 ID/时间/宿主路径；
 相同提交、实现、参数的重复结果逐字节一致，乱序 20 次稳定。输出使用新目录，不覆盖历史。
@@ -73,14 +73,16 @@ conftest/配置存在与目标是否依赖它分开记录，不因忽略上游�
 | 参数非法 | 2 | 尚未建立有效请求 |
 
 `verify-binding` 对被篡改、重签、源码版本过期的记录返回 5；不替历史记录补签。
-`execution_allowed=false`、`capture_available=false`、`execution_outcome=not_run`、`reproduced=null`。
+绑定仍为 `execution_allowed=false`、`execution_outcome=not_run`、`reproduced=null`。
+v2 以 `capture_entry_point` 和 `capture_authority` 指向另行审核/重建的捕获授权，不翻转绑定本身。
+历史 v1 的 `capture_available=false` 保留原样；当前源码绑定已变化，旧记录不补签，须新目录重新 bind。
 Git 对象完整性不能认证提交者就是仓库所有者；记录不会宣称已提供身份认证。
 即使一个模块实际 import 会抛异常，只读来源核验仍可能成立；这不是可复现缺陷的 Evidence。
 本轮实现只证明来源与受限投影一致，不证明 oracle 语义正确、buggy 真失败或 fixed 真通过。
 
-## 进入 Docker 捕获前还缺什么
+## 进入 Docker 捕获
 
-下一环需要专用的受控执行授权器、可信测试生成器、B/F 双向 RunRecord 与原始 JUnit/日志，
-以及最小 Guard 自检和独立来源验证；继续沿用已审核 runner 与封闭 Docker policy。
-实际证明 buggy 的断言失败、fixed 全通过后才可声明 reproduced，再建立精确快照 Scope/Shadow。
-现有执行器/Registry 不消费 contract.v3 或 binding.json；不能用旧本地 capture、手工重签或配置开关绕过。
+专用授权器、可信测试生成器、B/F 双向 RunRecord、原始 JUnit/日志与独立 Evidence 重建已由
+[`bootstrap capture` / `verify-evidence`](standalone-capture.md)实现，沿用已审核 runner 与封闭 Docker policy。
+只有实际证明 buggy 的断言失败、fixed 全通过才可声明 reproduced。最小 Guard 编译/自检及精确快照 Scope/Shadow 仍未实现。
+旧执行器/Registry 不消费 contract.v3 或 binding.json；不能用旧本地 capture、手工重签或配置开关绕过。

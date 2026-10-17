@@ -213,7 +213,10 @@ authorize execution. Zero runtime dependencies do not imply plugin-free tests.
 
 [contract prepare / bootstrap bind](docs/standalone-contracts.md) prepare literal contracts
 for an owner assertion-head commit and independently reconstruct B/F/H provenance.
-They do not reproduce a defect or enable generic Docker capture.
+Binding itself does not execute code. After explicit local review,
+[bootstrap capture / verify-evidence](docs/standalone-capture.md) run both revisions
+in the reviewed Docker runner and independently reconstruct literal-contract Evidence.
+Generic Guard compilation, Scope and Shadow onboarding remain unimplemented.
 
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds
