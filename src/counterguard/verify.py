@@ -38,6 +38,8 @@ from counterguard.repository_models import RepositoryGuard
 from counterguard.repository_verify import UnsupportedRepositoryScope, prepare_repository_replay
 from counterguard.runner_catalog import resolve_runner
 from counterguard.runners.docker import DockerExecutor, authorize_docker_execution
+from counterguard.standalone_models import StandaloneGuard
+from counterguard.standalone_replay import StandaloneScopeUnknown, prepare_standalone_replay
 
 ZERO = "sha256:" + "0" * 64
 
@@ -210,6 +212,20 @@ class VerifyReportV2(VerifyReport):
         return self
 
 
+class VerifyRowV3(VerifyRowV2):
+    scope_basis: (
+        Literal[
+            "verified-evidence-source-snapshot.v1", "pilot-scope.v1", "standalone-snapshot-scope.v1"
+        ]
+        | None
+    ) = None
+
+
+class VerifyReportV3(VerifyReportV2):
+    schema_version: Literal["verify-report.v3"] = "verify-report.v3"
+    rows: tuple[VerifyRowV3, ...]
+
+
 def _snapshot(rows):
     return digest_json_artifact(
         {
@@ -351,7 +367,7 @@ def render_verify(report: VerifyReport) -> str:
     return "\n".join(lines)
 
 
-def verify_repository(request: VerifyRequest) -> VerifyReportV2:
+def verify_repository(request: VerifyRequest) -> VerifyReportV2 | VerifyReportV3:
     """Write JSON and Markdown before returning any domain failure; never run locally."""
     cwd = request.cwd.resolve(strict=True)
     output = request.output if request.output.is_absolute() else cwd / request.output
@@ -368,6 +384,7 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
     inspection = None
     snapshot = None
     review = None
+    report_type, row_type = VerifyReportV2, VerifyRowV2
     try:
         # Validate the image identity's syntax even when every row is skipped.
         if request.image_digest is not None:
@@ -379,6 +396,8 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
         write_immutable(output / "inspection.json", canonical_json_bytes(inspection))
         registry = Registry(request.registry)
         listed = registry.list()
+        if any(item.get("source_profile") == "standalone-literals-docker.v1" for item in listed):
+            report_type, row_type = VerifyReportV3, VerifyRowV3
         snapshot = _snapshot(listed)
         by_id = {row["guard_id"]: row for row in listed}
         mappings = [(mapping.guard_id, mapping) for mapping in config.targets]
@@ -420,7 +439,7 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
             def result(verdict, reason, _values=values, **kwargs):
                 payload = _values | kwargs
                 payload["execution_outcome"] = execution_outcome(payload.get("run"))
-                return VerifyRowV2(
+                return row_type(
                     **payload,
                     verdict=verdict,
                     reason_codes=(reason,) if isinstance(reason, str) else tuple(reason or ()),
@@ -471,7 +490,20 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
                     source_evidence_ref=verified.guard.source_evidence_ref,
                     source_evidence_digest=verified.evidence.artifact_digest,
                 )
-                if isinstance(verified.guard, RepositoryGuard):
+                if isinstance(verified.guard, StandaloneGuard):
+                    scope_digest, run_request, executor = prepare_standalone_replay(
+                        request, output, mapping, inspection
+                    )
+                    values.update(
+                        scope_decision="applicable",
+                        scope_basis="standalone-snapshot-scope.v1",
+                        scope_digest=scope_digest,
+                        run_workspace_ref=f"work/{mapping.target_id}",
+                    )
+                    if _snapshot(registry.list()) != snapshot:
+                        raise ArtifactIntegrityError("Registry changed before Docker execution")
+                    run = executor.execute(run_request)
+                elif isinstance(verified.guard, RepositoryGuard):
                     scope_digest, run_request, executor = prepare_repository_replay(
                         request, output, mapping, inspection
                     )
@@ -558,6 +590,8 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
                         "runner_" + run.outcome.value if verdict == "execution_error" else None,
                     )
                 )
+            except StandaloneScopeUnknown as error:
+                rows.append(result("unknown", str(error), scope_decision="unknown"))
             except UnsupportedRepositoryScope:
                 rows.append(
                     result(
@@ -587,7 +621,7 @@ def verify_repository(request: VerifyRequest) -> VerifyReportV2:
     except (OSError, ValueError):
         issues.append(VerifyIssue(exit_code=2, reason_code="invalid_or_unavailable_input"))
     code, counts = summarize(rows, issues)
-    report = VerifyReportV2(
+    report = report_type(
         created_at=datetime.now(UTC),
         base_commit=inspection.base_commit if inspection else None,
         head_commit=inspection.head_commit if inspection else None,

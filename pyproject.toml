@@ -4,9 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "counterguard"
-version = "0.1.0"
+version = "0.5.0"
 description = "Turn verified bug evidence into reusable, scope-aware regression guards."
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
   "pydantic>=2.11,<3",

@@ -327,7 +327,7 @@ def rebuild_binding(repo: Path, head: str, contract_ref: str) -> dict:
         "ownership_authentication": "not_provided_by_git_object_integrity",
         "next_action": "Review source/oracle independence and every runtime finding. "
         "Request bootstrap capture separately with a reviewed runner and an explicit local "
-        "review reason. Generic Guard/Scope admission remains unimplemented. This binding "
+        "review reason, then bootstrap compile and explicit Registry/Shadow review. This binding "
         "is not an execution authorization or proof that buggy fails.",
         "implementation_digests": inspection_implementation_digests(),
     }

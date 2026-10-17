@@ -26,6 +26,11 @@ Registry 的来源损坏、索引与 JSON 不一致，即使发生在 Candidate 
 
 新的 `pilot-manifest.v3` 明确使用现有 owner head 中的历史文件名 `evidenceguard.yaml`；不修改该提交、文件或契约，也不建立新的 owner 提交。旧 manifest、Evidence、Guard 和授权保留原字节；当前实现的来源在新目录重捕获。其他 `src` 项目不因此自动获准，接入前置与估算见 [新项目条件](project-admission.md)。
 
+Beta 新增[独立字面量 Guard](standalone-guards.md)：guard.v3、Registry entry v3 和精确 B/F 完整闭包 Scope。
+它支持受审核普通模块/包的根/src 布局，使用 root-pytest8 runner；映射必须精确、契约必须来自 head、依赖闭包不能混合两个快照。
+仅来源核验通过的 Shadow/Active 可调度，执行前后重验 Registry/提交/授权。其他快照保持 unknown/4、run=null。
+含此 profile 的 Registry 产生 verify-report.v3，旧报告 v1/v2 的结构和判定语义保留。
+
 ## 报告与退出码
 
 新输出包含 `inspection.json`、需要时的 `preflight.json`、`report.json`、`report.md`，以及实际执行行的 `work/<target-id>/authorization.json`、`run.json` 和原始日志。报告使用独立 `verify-report.v2`，增加 runner ID/image/review 摘要及固定仓库 Scope；旧 `verify-report.v1` 模型与 Schema 保留。报告逐行保留 Guard/Evidence/登记摘要、生命周期、影响状态、Scope、执行结果、最终判定及未判断原因。原始来源引用相对于登记时的来源工作区；运行日志引用相对于该行的 `run_workspace_ref`。

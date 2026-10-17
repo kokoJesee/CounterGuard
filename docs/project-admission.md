@@ -2,7 +2,7 @@
 
 符合已支持 profile、已有可信契约与双向 Evidence 的新项目可以接入。当前产品不承诺支持任意项目；Python 导入成功、pytest 可以启动，都不足以证明某条 Guard 适用。
 
-这里的接入是 verify 消费已有可信来源。全新仓库已可在受限 source-only profile 中进行[Docker 双向捕获](standalone-capture.md)，通用 Guard 编译/Scope/Registry 仍未闭环。④必须包含这一生成路径，不能改用本地 capture 绕过未审计仓库的隔离要求。缺少可复现修复、契约或 Scope 数据的项目，准备成本不确定，需要先看实际材料。
+这里的接入是 verify 消费已有可信来源。全新仓库已可在受限 source-only profile 中进行[Docker 双向捕获](standalone-capture.md)，再完成[最小 Guard/Scope/Registry](standalone-guards.md)。④包含这一生成路径，不能改用本地 capture 绕过未审计仓库的隔离要求。缺少可复现修复、契约或 Scope 数据的项目，准备成本不确定，需要先看实际材料。
 
 先决条件是仓库所有者提交的契约、真实 buggy/fixed 来源、可独立审核的 Guard，以及目标与 Scope 的可信绑定。新项目尚无这些材料时，verify 不通过猜测接口、运行一次测试或自动升级 Candidate 来补齐授权。具体由谁准备、六项人工决策和日常操作见[首次接入清单](onboarding.md)。
 
@@ -11,7 +11,7 @@
 预检中的 engineering_prerequisites 是工具维护者的工程工作，不是让用户写实现。用户应读取 v2 的 next_step/user_guidance；
 可以通过 [contract draft](contract-drafts.md)准备未审核的测试投影，但当前仍不能自行启用通用 verify。
 现可进一步用 [contract prepare / bootstrap bind](standalone-contracts.md)准备 H 内的受限通用契约并重建 B/F 来源；
-绑定本身不产生 Evidence 或可执行 Guard；单独审核并执行新捕获后才有双向 Evidence，仍不替代语义审核或生成通用 Guard。
+绑定本身不产生 Evidence 或可执行 Guard；单独审核并执行新捕获后才有双向 Evidence，之后还须编译、自检、审核快照边界并进入 Shadow。
 [路线与跟踪落点](roadmap.md)明确未承诺日期。已有一次 [boltons 试走](results/onboarding-boltons-v1/README.md)，
 已记录首次遇阻时间，尚未得到完整接入耗时，不能把原工程人日表转换成用户等待时间。
 

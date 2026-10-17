@@ -175,8 +175,9 @@ NEXT = {
     "reviewed target/contract closure or wait for locked offline dependency installation. "
     "Do not delete declarations to pass this check.",
     "guard": "Supply a source-controlled contract, real buggy/fixed commits, verified Evidence "
-    "and a reviewed exact-snapshot Scope. Restricted standalone Docker capture exists; "
-    "generic Guard/Scope bootstrap is not implemented.",
+    "and a reviewed exact-snapshot Scope. Use the restricted standalone Docker "
+    "prepare/bind/capture/compile workflow, register with --repo, and explicitly review Shadow. "
+    "This static check cannot authorize any of these steps.",
 }
 
 
@@ -467,10 +468,10 @@ def admission_user_guidance(status: str, *, finding_codes=()) -> dict:
         )
     elif status == "eligible_candidate":
         action = (
-            "This is a static candidate, not a supported new-project verify profile. "
-            "Use contract draft to prepare review-only test material. Only use verify if your "
-            "project already satisfies an explicitly supported profile; otherwise wait for "
-            "maintainer implementation and review of generic Docker bootstrap."
+            "This is a static candidate, not execution authorization. Use contract draft/prepare, "
+            "owner H, bootstrap bind/capture/compile and registry add --repo for the restricted "
+            "standalone profile. Review exact snapshots and explicitly enter Shadow before verify. "
+            "Unsupported oracles, dependencies and pytest bootstrap still require tool support."
         )
     elif status == "rejected":
         action = (
@@ -481,16 +482,17 @@ def admission_user_guidance(status: str, *, finding_codes=()) -> dict:
         action = (
             "Read each finding's next_step. Supply missing metadata or an audited target/test "
             "mapping for review; required dependency or fixture support is currently unavailable. "
-            "Even clearing findings does not implement generic bootstrap. Use an already "
-            "supported profile or wait for tool support; choosing a simpler project "
-            "is not a guarantee."
+            "A reviewed independent literal contract may use the standalone bootstrap only if "
+            "all target findings are resolved. Otherwise wait for support; choosing a simpler "
+            "project is not a guarantee."
         )
     return {
-        "current_support": "generic_project_verify_not_supported",
+        "current_support": "restricted_reviewed_standalone_bootstrap_available",
         "user_can_enable_verify": False,
         "next_action": action,
-        "maintainer_action": "Implement and audit import closure plus generic repository "
-        "contract/Guard capture; engineering_prerequisites are internal work, not user steps.",
+        "maintainer_action": "Review project-specific closure, literal oracles, B/F/H and exact "
+        "snapshot Scope. Historical engineering_prerequisites name required components, not "
+        "a remaining task for users. Installation/plugins and remote authority remain separate.",
         "eta": None,
         "tracking_url": "https://github.com/kokoJesee/CounterGuard/blob/main/docs/roadmap.md",
         "notification": "No feature-specific subscription or promised date; GitHub Watch can "

@@ -22,7 +22,7 @@ uv sync
 uv run counterguard --help
 
 uv build
-python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
+python -m pip install "dist/counterguard-0.5.0-py3-none-any.whl[runner]"
 ```
 
 The wheel provides the CLI and library. Executing tests requires the `runner` extra, which
@@ -216,7 +216,9 @@ for an owner assertion-head commit and independently reconstruct B/F/H provenanc
 Binding itself does not execute code. After explicit local review,
 [bootstrap capture / verify-evidence](docs/standalone-capture.md) run both revisions
 in the reviewed Docker runner and independently reconstruct literal-contract Evidence.
-Generic Guard compilation, Scope and Shadow onboarding remain unimplemented.
+[Minimal Guard compilation, exact-snapshot Scope and explicit Shadow onboarding](docs/standalone-guards.md)
+complete this restricted path. New source snapshots remain unknown; native test bootstrap,
+dependency installation and learned cross-revision generalization are outside this profile.
 
 ```powershell
 uv run pytest -m "not slow" -q      # fast tier: seconds

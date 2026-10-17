@@ -1,0 +1,725 @@
+{
+  "$defs": {
+    "CaseOutcome": {
+      "description": "Normalized result for one stable contract case.",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "error"
+      ],
+      "title": "CaseOutcome",
+      "type": "string"
+    },
+    "CaseResult": {
+      "additionalProperties": false,
+      "description": "The result of one case, linked by its stable contract case ID.",
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/CaseOutcome"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        }
+      },
+      "required": [
+        "case_id",
+        "node_id",
+        "outcome"
+      ],
+      "title": "CaseResult",
+      "type": "object"
+    },
+    "GuardState": {
+      "enum": [
+        "candidate",
+        "shadow",
+        "active",
+        "retired"
+      ],
+      "title": "GuardState",
+      "type": "string"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "RunRecord": {
+      "additionalProperties": false,
+      "description": "Immutable, reproducible record of one pytest invocation.",
+      "properties": {
+        "schema_version": {
+          "const": "run-record.v1",
+          "default": "run-record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/RunRole"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Argv",
+          "type": "array"
+        },
+        "cwd": {
+          "minLength": 1,
+          "title": "Cwd",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 30.0,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        },
+        "pytest_exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pytest Exit Code"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        "case_results": {
+          "items": {
+            "$ref": "#/$defs/CaseResult"
+          },
+          "title": "Case Results",
+          "type": "array"
+        },
+        "stdout_ref": {
+          "minLength": 1,
+          "title": "Stdout Ref",
+          "type": "string"
+        },
+        "stdout_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stdout Digest",
+          "type": "string"
+        },
+        "stderr_ref": {
+          "minLength": 1,
+          "title": "Stderr Ref",
+          "type": "string"
+        },
+        "stderr_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stderr Digest",
+          "type": "string"
+        },
+        "junit_ref": {
+          "minLength": 1,
+          "title": "Junit Ref",
+          "type": "string"
+        },
+        "junit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Junit Digest",
+          "type": "string"
+        },
+        "python_version": {
+          "minLength": 1,
+          "title": "Python Version",
+          "type": "string"
+        },
+        "pytest_version": {
+          "minLength": 1,
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "error_detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Detail"
+        }
+      },
+      "required": [
+        "run_id",
+        "role",
+        "contract_id",
+        "contract_digest",
+        "target",
+        "target_digest",
+        "argv",
+        "cwd",
+        "started_at",
+        "duration_ms",
+        "pytest_exit_code",
+        "outcome",
+        "case_results",
+        "stdout_ref",
+        "stdout_digest",
+        "stderr_ref",
+        "stderr_digest",
+        "junit_ref",
+        "junit_digest",
+        "python_version",
+        "pytest_version"
+      ],
+      "title": "RunRecord",
+      "type": "object"
+    },
+    "RunRole": {
+      "description": "The purpose of a captured pytest execution.",
+      "enum": [
+        "buggy",
+        "fixed",
+        "replay"
+      ],
+      "title": "RunRole",
+      "type": "string"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    },
+    "VerifyIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "exit_code": {
+          "enum": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "title": "Exit Code",
+          "type": "integer"
+        },
+        "reason_code": {
+          "pattern": "^[a-z][a-z0-9_]{0,127}$",
+          "title": "Reason Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "exit_code",
+        "reason_code"
+      ],
+      "title": "VerifyIssue",
+      "type": "object"
+    },
+    "VerifyRowV3": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Target Id"
+        },
+        "lifecycle_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GuardState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "registry_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Registry Status"
+        },
+        "guard_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Guard Digest"
+        },
+        "entry_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entry Digest"
+        },
+        "source_evidence_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Evidence Id"
+        },
+        "source_evidence_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Evidence Ref"
+        },
+        "source_evidence_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Evidence Digest"
+        },
+        "impact": {
+          "default": "unknown",
+          "enum": [
+            "affected",
+            "unaffected",
+            "unknown"
+          ],
+          "title": "Impact",
+          "type": "string"
+        },
+        "scope_decision": {
+          "anyOf": [
+            {
+              "enum": [
+                "applicable",
+                "inapplicable",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Decision"
+        },
+        "scope_basis": {
+          "anyOf": [
+            {
+              "enum": [
+                "verified-evidence-source-snapshot.v1",
+                "pilot-scope.v1",
+                "standalone-snapshot-scope.v1"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Basis"
+        },
+        "scope_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Digest"
+        },
+        "execution_outcome": {
+          "default": "not_run",
+          "enum": [
+            "not_run",
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ],
+          "title": "Execution Outcome",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "violation",
+            "skipped",
+            "unknown",
+            "execution_error",
+            "integrity_error"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "run_workspace_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Run Workspace Ref"
+        },
+        "run": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "runner_review_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Runner Review Digest"
+        }
+      },
+      "required": [
+        "guard_id",
+        "target_id",
+        "lifecycle_state",
+        "registry_status",
+        "verdict"
+      ],
+      "title": "VerifyRowV3",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "verify-report.v3",
+      "default": "verify-report.v3",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "agent_enabled": {
+      "const": false,
+      "default": false,
+      "title": "Agent Enabled",
+      "type": "boolean"
+    },
+    "base_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Base Commit"
+    },
+    "head_commit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Head Commit"
+    },
+    "inspection_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Inspection Digest"
+    },
+    "registry_snapshot_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Registry Snapshot Digest"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "rows": {
+      "items": {
+        "$ref": "#/$defs/VerifyRowV3"
+      },
+      "title": "Rows",
+      "type": "array"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/VerifyIssue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Counts",
+      "type": "object"
+    },
+    "exit_code": {
+      "title": "Exit Code",
+      "type": "integer"
+    },
+    "decision_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Decision Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "runner_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Runner Id"
+    },
+    "runner_image_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Runner Image Digest"
+    },
+    "runner_review_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Runner Review Digest"
+    }
+  },
+  "required": [
+    "created_at",
+    "base_commit",
+    "head_commit",
+    "inspection_digest",
+    "registry_snapshot_digest",
+    "implementation_digests",
+    "rows",
+    "issues",
+    "counts",
+    "exit_code",
+    "decision_digest",
+    "artifact_digest",
+    "runner_id",
+    "runner_image_digest",
+    "runner_review_digest"
+  ],
+  "title": "VerifyReportV3",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

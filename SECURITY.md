@@ -50,18 +50,18 @@ scope is more useful than a false guarantee.
 
 | ID | Open item | Blocks |
 |---|---|---|
-| W01 | File / network / CPU / memory / PID / descendant-process isolation for untrusted targets | Running unknown repositories |
-| W02 | Git base/head, shallow clone, submodule and repository-link boundaries | — |
-| W03 | Real-project plugin / conftest / dependency-install handling | Repositories whose tests need fixtures |
-| W04 | Registry permissions and state, CI credentials, public report supply chain | CI integration |
+| W01 | The reviewed Docker profiles have recorded isolation tests; kernel/daemon compromise and arbitrary malicious pytest interference remain outside that evidence | Broader isolation claims |
+| W02 | Bounded committed-object reads and path/history checks exist; comprehensive fuzzing and concurrent filesystem proofs remain open | Unsupported Git layouts |
+| W03 | Independent literal contracts support reviewed source-only closures; native config, fixtures/plugins and target dependency installation remain unsupported | Native test-suite compatibility |
+| W04 | Local immutable state and explicit Shadow/Active policy are implemented; identity, signatures/rollback resistance and remote authority remain open | Automated authorization of external contributions |
 
-Until W01 and W03 are closed with recorded evidence, **untrusted repositories are not executed
-at all** — the tool refuses rather than falling back to local execution.
+Only inputs admitted to a reviewed profile execute, exclusively in Docker. Unknown or
+blocked inputs are refused; there is no local execution fallback for repository code.
 
 ## Supported scope
 
-Current releases are validated on **local Python environments** only. No claim is made about
-cross-platform behavior, malicious-repository isolation, signature-based authentication,
+Recorded checks use local Python tooling and the pinned Linux Docker images. No claim is made about
+an untested cross-platform matrix, general malicious-repository isolation, signature-based authentication,
 general-purpose redaction, live-model stability, or program equivalence.
 
 See [docs/known-limitations.md](docs/known-limitations.md) for the full statement of scope and

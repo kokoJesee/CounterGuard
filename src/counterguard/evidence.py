@@ -742,7 +742,9 @@ def _package_version() -> str:
     try:
         return version("counterguard")
     except PackageNotFoundError:
-        return "0.1.0"
+        from counterguard import __version__
+
+        return __version__
 
 
 __all__ = [

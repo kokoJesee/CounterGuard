@@ -176,7 +176,14 @@ def authorize_standalone(
     repo: Path, workspace: Path, capture_ref: str, request: PytestRunRequest
 ) -> StandaloneAuthorization:
     """Rebuild all authority and request/input bindings for every execution."""
-    plan, binding, contract = _context(repo, workspace, capture_ref)
+    return _authorize_loaded_inputs(
+        repo, workspace, request, _context(repo, workspace, capture_ref)
+    )
+
+
+def _authorize_loaded_inputs(repo, workspace, request, context):
+    """Reuse verified facts within this call only; each execution gate reloads them."""
+    plan, binding, contract = context
     _require(request.role in ROLES, "capture_requires_buggy_or_fixed_role")
     role = ROLES[request.role]
     runtime = workspace / plan.output_ref / DIRECTORIES[request.role]
@@ -420,7 +427,9 @@ def capture_standalone(
         # of both runs. Late changes to B while F runs must not leave a success
         # Evidence file behind alongside a failure marker.
         _verify_evidence_value(repo, workspace, plan.output_ref + "/evidence.json", evidence)
-        write_immutable(output / "evidence.json", canonical_json_bytes(evidence))
+        raw = canonical_json_bytes(evidence)
+        _require(len(raw) <= 4 * 1024 * 1024, "capture_publication_byte_budget_exceeded")
+        write_immutable(output / "evidence.json", raw)
         return evidence.model_dump(mode="json")
     except (ArtifactIntegrityError, RepositoryProblem, OSError) as error:
         if isinstance(error, GuardReplayIntegrityError):
@@ -521,12 +530,18 @@ def _verify_run_envelope(run, request, plan):
 def verify_standalone_evidence(repo: Path, path: Path, *, cwd: Path | None = None):
     workspace = (cwd or Path.cwd()).resolve(strict=True)
     evidence_ref = _ref(path, workspace)
+    return _load_verified_evidence(repo, workspace, evidence_ref)[0]
+
+
+def _load_verified_evidence(repo, workspace, evidence_ref):
     evidence = _model(workspace, evidence_ref, StandaloneEvidence)
-    return _verify_evidence_value(repo, workspace, evidence_ref, evidence)
+    context = _context(repo, workspace, evidence.capture_ref)
+    return _verify_evidence_value(repo, workspace, evidence_ref, evidence, context=context), context
 
 
-def _verify_evidence_value(repo, workspace, evidence_ref, evidence):
-    plan, binding, contract = _context(repo, workspace, evidence.capture_ref)
+def _verify_evidence_value(repo, workspace, evidence_ref, evidence, *, context=None):
+    context = context or _context(repo, workspace, evidence.capture_ref)
+    plan, binding, contract = context
     _require(
         evidence_ref == plan.output_ref + "/evidence.json"
         and evidence.capture_digest == plan.artifact_digest
@@ -547,7 +562,7 @@ def _verify_evidence_value(repo, workspace, evidence_ref, evidence):
         auth = _model(workspace, item.authorization_ref, StandaloneAuthorization)
         request = _request(plan, binding, contract, workspace, role, run_id=item.run.run_id)
         _require(
-            auth == authorize_standalone(repo, workspace, evidence.capture_ref, request),
+            auth == _authorize_loaded_inputs(repo, workspace, request, context),
             "capture_record_authorization_mismatch",
         )
         stored = RunRecord.model_validate_json(_file(workspace, item.record_ref))

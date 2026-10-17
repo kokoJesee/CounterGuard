@@ -22,7 +22,12 @@ from counterguard.module_context import ModuleContext
 from counterguard.pipeline import PipelineFailure, PipelineManifest
 from counterguard.project_config import ProjectConfig
 from counterguard.protocol import ExperimentProtocol, SplitManifest
-from counterguard.registry import RegistryEntry, RegistryEvent, RegistryIdentity
+from counterguard.registry import (
+    RegistryEntry,
+    RegistryEvent,
+    RegistryIdentity,
+    StandaloneRegistryEntry,
+)
 from counterguard.replay import ReplayResult
 from counterguard.report import CommandReport, ReplayPresentation
 from counterguard.repository import RepositorySnapshot
@@ -35,13 +40,23 @@ from counterguard.standalone_contracts import StandaloneContract
 from counterguard.standalone_models import (
     StandaloneAuthorization,
     StandaloneCapture,
+    StandaloneCompilation,
     StandaloneEvidence,
+    StandaloneGuard,
+    StandaloneGuardAuthorization,
+    StandaloneScope,
 )
 from counterguard.verification_gate import GateResult
-from counterguard.verify import VerifyReport, VerifyReportV2
+from counterguard.verify import VerifyReport, VerifyReportV2, VerifyReportV3
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "standalone-compilation": StandaloneCompilation,
+    "standalone-guard": StandaloneGuard,
+    "standalone-guard-authorization": StandaloneGuardAuthorization,
+    "standalone-scope": StandaloneScope,
+    "standalone-registry-entry": StandaloneRegistryEntry,
+    "verify-report-v3": VerifyReportV3,
     "standalone-capture": StandaloneCapture,
     "standalone-authorization": StandaloneAuthorization,
     "standalone-evidence": StandaloneEvidence,

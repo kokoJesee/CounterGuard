@@ -96,7 +96,8 @@ daemon/内核漏洞、Git 原生解析器完整资源隔离、上游身份签名
 [通用 Docker 捕获](standalone-capture.md)只支持已审核的 source-only 字面量契约与线性 B/F/H。
 review_reason 是本机审计文本，不认证用户/所有者，也不证明静态闭包穷尽 Python 动态行为。
 它不加载项目 pytest 配置、conftest、插件或原生测试；目标若需要这些能力，不能靠忽略 finding 强行捕获。
-容器内恶意目标仍可能干扰 pytest/JUnit，宿主全链重写没有签名保障。新 evidence.v4 还没有通用 Guard/Scope/Shadow 消费路径；
+容器内恶意目标仍可能干扰 pytest/JUnit，宿主全链重写没有签名保障。新 evidence.v4 仅通过受限[最小 Guard/Scope/Shadow](standalone-guards.md)消费，
+不扩展到任意 oracle、装饰器、原生测试或跨版本学习；
 工具自有 Docker fixture 的成功不构成第二个外部项目成功或 30 分钟用户接入实测。
 
 新增实现会改变全包源码绑定。已有 Inspection、Docker 授权和仓库 Evidence/Guard 在当前验证器下可能过期；保留其原字节，在新命名空间重新物化，不重签历史记录。冻结 scope_v1 的数据、算法、标签与期望值没有因此改变。详见 [统一验证](verify.md)。

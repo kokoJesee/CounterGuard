@@ -12,7 +12,7 @@ from counterguard.artifacts import write_immutable
 from counterguard.digests import canonical_json_bytes, digest_json_artifact
 from counterguard.errors import ArtifactIntegrityError
 from counterguard.project_config import reject_links
-from counterguard.verify import VerifyReport, VerifyReportV2
+from counterguard.verify import VerifyReport, VerifyReportV2, VerifyReportV3
 
 REPORT_LIMIT = 8 * 1024 * 1024
 REASONS = frozenset(
@@ -40,10 +40,12 @@ REASONS = frozenset(
 )
 
 
-def _validated(value: dict) -> VerifyReport | VerifyReportV2:
-    model = {"verify-report.v1": VerifyReport, "verify-report.v2": VerifyReportV2}.get(
-        value.get("schema_version")
-    )
+def _validated(value: dict) -> VerifyReport | VerifyReportV2 | VerifyReportV3:
+    model = {
+        "verify-report.v1": VerifyReport,
+        "verify-report.v2": VerifyReportV2,
+        "verify-report.v3": VerifyReportV3,
+    }.get(value.get("schema_version"))
     if model is None:
         raise ValueError("Unsupported verification report")
     report = model.model_validate_json(canonical_json_bytes(value))

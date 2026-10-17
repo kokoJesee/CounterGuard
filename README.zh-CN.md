@@ -19,7 +19,7 @@ uv sync
 uv run counterguard --help
 
 uv build
-python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
+python -m pip install "dist/counterguard-0.5.0-py3-none-any.whl[runner]"
 ```
 
 wheel 提供 CLI 与库；**要执行测试需安装 `runner` extra**（它声明项目已使用的 pytest 依赖）。缺少 pytest 时，执行会在**创建任何输出之前**退出 `3`，并提示安装 `counterguard[runner]`。
@@ -156,10 +156,12 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 [bootstrap plan](docs/bootstrap-plans.md)进一步分列目标导入闭包与上游测试环境，保留完整提交来源；计划不授予执行权限。零运行时依赖不代表无需 fixture、hook 或测试插件。
 
-[contract prepare / bootstrap bind](docs/standalone-contracts.md)支持 H 内受限通用契约和 B/F 来源重建；所有者须审核并提交，尚不开放通用 Docker 捕获。
+[contract prepare / bootstrap bind](docs/standalone-contracts.md)支持 H 内受限通用契约和 B/F 来源重建；所有者须审核并提交。
+之后可在已审核 Docker 中[双向捕获](docs/standalone-capture.md)，再[编译最小 Guard、审核快照 Scope 并进入 Shadow](docs/standalone-guards.md)。
+只支持受限独立字面量契约；新源码仍 unknown，不安装依赖、不加载原生 pytest 引导、不自动提升 Active。
 
 ```powershell
-uv run pytest -m "not slow" -q      # 快测：秒级
+uv run pytest -m "not slow" -q      # 快速层：不启动真实子进程
 uv run ruff check .
 uv run pytest -q --durations=20      # 完整套件，交付前跑一次
 ```
@@ -189,7 +191,7 @@ docs/                 架构、数据契约、CLI、安全模型、已知限制
 - **[docs/attack-surface-checklist.md](docs/attack-surface-checklist.md)**——逐项列出「已测 / 部分覆盖 / **完全未覆盖**」
 - **[docs/known-limitations.md](docs/known-limitations.md)**——当前范围声明与历史验证边界
 
-当前版本仅在**本地 Python 环境**验证。不对跨平台行为、恶意仓库隔离、签名认证或程序等价性作任何声明。
+已记录的验证使用本地 Python 工具和固定 Linux Docker 镜像。不把这些记录扩展为跨平台矩阵、任意恶意仓库隔离、签名认证或程序等价性证明。
 
 ## 许可
 

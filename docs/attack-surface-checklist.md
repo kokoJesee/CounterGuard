@@ -40,6 +40,12 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W01/W03/W04 增加[独立最小 Guard 到 Shadow/verify](standalone-guards.md)：新 Guard v3、快照 Scope、
+Registry entry v3 与执行授权 v5。每次最小自检/重放均重新核对来源，完整闭包不能混合 B/F；
+新快照 unknown 不启动 Docker，候选/退休/禁用不调度，篡改来源即使在退休态也显示完整性失败。
+见[单元专项](../tests/unit/test_standalone_guard.py)与[真实 Git/Docker 专项](../tests/integration/test_standalone_bootstrap.py)。
+这不关闭 W04 的身份认证、签名/撤销、防回滚和外部贡献远程授权；本机事件不是远程 Active 权限凭据。
+
 W01/W03 新增[受限通用 Docker 捕获](standalone-capture.md)：角色独立来源重建、可信字面量测试、
 精确镜像/封闭 policy 与最小输入挂载，禁止本地 fallback。运行前后核对授权，发布 Evidence 前重建双向 JUnit/失败集，
 拒绝重签结论、宽松 argv、输入/测试/超时/角色漂移与晚到的宿主输入修改，见[单元测试](../tests/unit/test_standalone_capture.py)。
@@ -47,7 +53,7 @@ W01/W03 新增[受限通用 Docker 捕获](standalone-capture.md)：角色独立
 收集导入错误不算缺陷；同组四项隔离攻击也已复跑，见[本轮记录](results/standalone-capture-v1/README.md)。
 W01 仍仅对已审核镜像/封闭 policy 的列明行为已测，W03 总体仍部分：不兼容任意原生测试/插件/安装。
 人工 review_reason 只是可信本机操作记录，不能认证身份或证明恶意目标未干扰 JUnit；W04 仍部分，
-新 evidence.v4 尚未接入通用 Guard/Scope/Registry，远程权限未关闭。
+新 evidence.v4 已接入上述受限 Guard/Scope/Registry，远程权限未关闭。
 
 W02/W03 增加 [contract.v3 与 B/F/H 来源绑定](standalone-contracts.md)：契约必须读取 H blob，
 F 唯一父提交为 B、H 唯一父提交为 F 且只新增契约；case/测试投影/闭包 refs 和完整源 pins 独立重建。
@@ -55,7 +61,7 @@ F 唯一父提交为 B、H 唯一父提交为 F 且只新增契约；case/测试
 合并/错误父提交、重签执行/复现声明、实现过期、JSON 歧义与发布/读取预算、20 次乱序。
 [真实 Git 专项](../tests/integration/test_bootstrap_binding.py)覆盖根与 src、dirty tree 不替代 H、重复绑定及独立重建；
 目标包、原测试和 conftest 均带拒绝执行哨兵，未运行。来源核对不认证所有者身份、不证明 oracle/缺陷语义，
-来源绑定本身不提供 Docker 捕获或消费旧 Registry 的路径；单独捕获见上。通用 Guard/Scope 与 W04 远程权限均保持未闭环。
+来源绑定本身不提供 Docker 捕获或消费旧 Registry 的路径；单独捕获与编译见上。任意项目兼容与 W04 远程权限仍未闭环。
 
 W02/W03 增加[只读 bootstrap 计划](bootstrap-plans.md)：完整提交树 pins 与模块级候选闭包并列，
 包初始化、相对/子模块/条件导入、冲突/遮蔽、动态与资源访问提示、配置节观察、20 次乱序及输出不覆盖，
@@ -63,7 +69,7 @@ W02/W03 增加[只读 bootstrap 计划](bootstrap-plans.md)：完整提交树 pi
 [真实 Git 专项](../tests/integration/test_bootstrap_plan.py)中 dirty tree 的依赖和删除的 conftest 均不能替换提交事实；
 包/测试/conftest 内的拒绝执行哨兵从未运行。它不是准入授权，不能进入已有 Guard 模型或 Registry，
 固定 execution_allowed=false 且 CLI 总是返回 4。Docker policy、catalog 与旧 strict profile 语义未改变。
-动态别名、任意副作用/资源和 oracle 独立性仍需审核；通用 Guard/Scope 与上游 pytest 引导仍未覆盖，W03 保持部分。
+动态别名、任意副作用/资源和 oracle 独立性仍需审核；任意 Guard/oracle 与上游 pytest 引导仍未覆盖，W03 保持部分。
 
 新增只读契约草案边界见 [contract-drafts.md](contract-drafts.md)。
 [单元测试](../tests/unit/test_contract_draft.py)覆盖提交来源 pin、20 次稳定结果、字面量类型、

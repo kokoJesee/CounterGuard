@@ -20,7 +20,7 @@ trustworthy.
 
 ```powershell
 uv sync
-uv run pytest -m "not slow" -q      # fast tier: seconds
+uv run pytest -m "not slow" -q      # fast tier: no real child processes
 uv run ruff check .
 ```
 

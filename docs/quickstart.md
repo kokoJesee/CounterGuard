@@ -17,7 +17,7 @@ uv run counterguard --help
 
 ```powershell
 uv build
-python -m pip install "dist/counterguard-0.1.0-py3-none-any.whl[runner]"
+python -m pip install "dist/counterguard-0.5.0-py3-none-any.whl[runner]"
 ```
 
 `runner` extra 提供 pytest 执行能力。安装到实际运行 CLI 的 Python 环境；不要只装基础 wheel 后就尝试运行 Demo。

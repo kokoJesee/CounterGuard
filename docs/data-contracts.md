@@ -409,4 +409,22 @@ capture_entry_point/capture_authority 指向单独的当前来源授权；绑定
 
 全包 .py 摘要本轮发生变化，当前执行链需要在新命名空间重做 bind/capture；contract.v3 字节、B/F/H、
 Docker policy/入口/审核镜像与 catalog 收据不变时不需改写它们。旧 binding v1 和执行证据保持原样并可能过期。
-冻结 scope_v1 的算法、协议、标签、上下文与已有 artifact 均未修改。新 Evidence 尚无通用 Guard/Scope/Registry 消费路径。
+冻结 scope_v1 的算法、协议、标签、上下文与已有 artifact 均未修改。新 Evidence 通过下述受限新版本进入 Guard/Scope/Registry。
+
+## 独立最小 Guard、快照 Scope 与统一验证
+
+| 层 / 版本 | 必须重建的来源 | 变化后的处理 |
+|---|---|---|
+| standalone-compilation.v1 | 当前 reproduced Evidence、真实时间、Guard ID、新输出、语义/快照审核理由、实现摘要 | 新源码或 Evidence 变化使用新编译目录，不补签旧计划 |
+| guard.v3 | compilation、Evidence、精确失败 case 集、规范最小测试、两次真实 B/F 自检/授权/原始 JUnit、Scope | 所有保留 case 在 B 都必须失败、在 F 都通过；重建后才发布 Guard |
+| standalone-snapshot-scope.v1 | Guard ID、Evidence/binding、契约字节、目标/包根、B 与 F 各自完整闭包路径/摘要 | 全组精确匹配，不允许按文件混合；新快照 unknown，非学习规则 |
+| Docker authorization v5 | 自检或 Registry replay 目的、角色、当前来源、请求、角色输入 origins/pins、规范测试及 ID 映射、image/review/policy/实现；replay 另绑定 Scope、entry、事件 tip 和 Inspection | 每次执行前后从原始来源重建；自检授权不能用于重放，也不能复用旧 run ID/路径 |
+| registry-entry.v3 | 原工作区/仓库、guard 原始字节、完整 Guard/Evidence 值 | 旧 entry v1/v2 形状不变；v3 重新登记，JSON 为权威、SQLite 仅镜像 |
+| verify-report.v3 | Inspection、Registry 状态快照、逐 Guard 来源/Scope/真实运行/原因、review、实现、汇总策略 | 仅含新 profile 时使用 v3；JSON/Markdown/公开 Summary 同源，决策摘要排除运行时间/ID等，保留原码优先级 |
+
+Scope 绑定 Guard ID 与 Evidence；Guard 反向绑定 Scope 摘要，避免循环摘要。Candidate/Retired/disabled 不执行，
+Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完整性失败分别保留 4/3/5。
+新 schema 不升级旧对象；工具版本 0.5.0 改变全包源码绑定，应在新目录重新物化需要当前结论的执行链。
+
+单次验证内部只重建一次上游来源事实并传递运行时上下文，不把它持久化为新权威、不跨调用缓存。
+每次真正执行前后仍独立加载当前事实，之后的新验证也重新读取；不通过复用旧“已验证”标记省略来源或状态校验。

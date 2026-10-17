@@ -58,4 +58,6 @@ def test_executor_missing_pytest_never_launches_or_publishes(tmp_path, missing_r
 def test_base_install_can_still_show_cli_version(missing_runner):
     result = CliRunner().invoke(app, ["version"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == "0.1.0"
+    from counterguard import __version__
+
+    assert result.stdout.strip() == __version__

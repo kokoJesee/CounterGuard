@@ -2,7 +2,7 @@
 
 `bootstrap capture` 接续 [H 内契约与来源绑定](standalone-contracts.md)，在已审核 Docker runner 中分别执行 B/F。
 支持零运行时依赖、普通模块/包、根目录或 `src` 布局和 `contract.v3` 的受限字面量断言。
-它生成首次 Evidence；通用最小 Guard 编译、精确快照 Scope 和 Shadow 接入仍[未实现](roadmap.md)。
+它生成首次 Evidence；后续[最小 Guard 编译、快照 Scope 和 Shadow 接入](standalone-guards.md)已支持同一受限 profile。
 
 ## 审核与命令
 
@@ -61,7 +61,8 @@ Evidence 失败集映射回原契约 ID。没有修改旧读取器的 case 规�
 ## 边界与重算
 
 新模型和 [Schema](../schemas/standalone-evidence.schema.json)独立于旧 Evidence/Guard/Registry。
-旧 `capture`、`compile`、Registry 和统一 `verify` 不消费这些新记录，不能通过手改版本、重签历史或设置布尔开关绕过。
+新 Evidence 通过 `bootstrap compile` 生成 Guard v3 后才能登记并进入统一 verify；旧 `capture/compile` 不消费新记录，
+不能通过手改版本、重签历史或设置布尔开关绕过。
 源码、B/F/H、契约投影、runner、policy 或输入映射变化时按[重算规则](data-contracts.md)重新 bind/capture，使用新命名空间。
 绑定 v1 和旧执行证据保留原字节，不在当前源码下补签为有效。
 

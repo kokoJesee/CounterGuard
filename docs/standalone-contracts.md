@@ -1,7 +1,7 @@
 # H 内通用契约与 B/F 来源绑定
 
 本环节提供 `contract.v3` / `standalone-literals.v1`、契约准备和独立来源重建。
-它不再固定 validators 的模块和 oracle；完成审核后可接续[通用 Docker capture](standalone-capture.md)，通用 Guard 编译仍未实现。
+它不再固定 validators 的模块和 oracle；完成审核后可接续[通用 Docker capture](standalone-capture.md)和[最小 Guard/Shadow](standalone-guards.md)。
 旧 contract.v1/v2、Guard、Scope、runner 和已发布产物不改写。
 
 ## 准备、由所有者提交、绑定
@@ -84,5 +84,5 @@ Git 对象完整性不能认证提交者就是仓库所有者；记录不会宣�
 
 专用授权器、可信测试生成器、B/F 双向 RunRecord、原始 JUnit/日志与独立 Evidence 重建已由
 [`bootstrap capture` / `verify-evidence`](standalone-capture.md)实现，沿用已审核 runner 与封闭 Docker policy。
-只有实际证明 buggy 的断言失败、fixed 全通过才可声明 reproduced。最小 Guard 编译/自检及精确快照 Scope/Shadow 仍未实现。
+只有实际证明 buggy 的断言失败、fixed 全通过才可声明 reproduced。之后通过独立编译入口生成最小 Guard、自检和精确快照 Scope，显式审核后进入 Shadow。
 旧执行器/Registry 不消费 contract.v3 或 binding.json；不能用旧本地 capture、手工重签或配置开关绕过。

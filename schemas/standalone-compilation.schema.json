@@ -1,0 +1,68 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "standalone-compilation.v1",
+      "default": "standalone-compilation.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "guard_id": {
+      "pattern": "^grd_[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$",
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "output_ref": {
+      "minLength": 1,
+      "title": "Output Ref",
+      "type": "string"
+    },
+    "source_evidence_ref": {
+      "minLength": 1,
+      "title": "Source Evidence Ref",
+      "type": "string"
+    },
+    "source_evidence_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Evidence Digest",
+      "type": "string"
+    },
+    "review_reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Review Reason",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "guard_id",
+    "created_at",
+    "output_ref",
+    "source_evidence_ref",
+    "source_evidence_digest",
+    "review_reason",
+    "implementation_digests",
+    "artifact_digest"
+  ],
+  "title": "StandaloneCompilation",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -46,12 +46,15 @@ def add(
     path: Annotated[Path, typer.Argument(help="Verified guard.json below cwd.")],
     root: Root = Path(".counterguard"),
     cwd: Annotated[Path, typer.Option(help="Source-chain workspace.")] = Path("."),
+    repo: Annotated[
+        Path | None, typer.Option(help="Required Git source repository for guard.v3.")
+    ] = None,
     format: OutputFormat = OutputFormat.JSON,
 ):
     registry = Registry(root)
 
     def register():
-        entry = registry.add(path, cwd=cwd)
+        entry = registry.add(path, cwd=cwd, repo=repo)
         return registry.show(entry.guard.guard_id)
 
     _call(register, format)

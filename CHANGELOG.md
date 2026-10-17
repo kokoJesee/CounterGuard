@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Beta 0.5.0 候选：新增 `bootstrap compile/verify-guard`、最小 B/F Docker 自检、完整闭包快照 Scope、Registry entry v3 和 verify-report.v3；Candidate/Shadow/Active/Retired 仍走明确的追加式审核策略。
+- 新 Guard 只保留真实失败 case，不混合 B/F 依赖快照；运行前后重验来源/状态，unknown 不启动 Docker。单次核验复用刚重建的上游事实，不跨调用缓存有效性。
+- 新增 source-only Docker CI fixture 驱动；项目许可元数据明确为 Apache-2.0。版本更新不增加运行时依赖，不移动既有标签或改写历史产物。
+
 - 新增 `bootstrap capture/verify-evidence`：从当前 H 契约与 B/F 绑定生成受限测试，在已审核 Docker 中双向运行；独立重建授权、原始 JUnit、失败集和复现结论，新增 evidence.v4/授权 v4，不改旧格式。发布 Evidence 前核对两次记录，保留真实失败证据。
 - 新增 contract.v3 / standalone-literals.v1、`contract prepare`、`bootstrap bind/verify-binding`：从 H 内 Git blob 重建线性 B/F/H、完整来源 pins 与测试投影，保留 unsupported，拒绝篡改与重签结论。当前绑定 v2 指向另行审核的捕获入口，自身始终 not_run；旧 v1 不补签。
 

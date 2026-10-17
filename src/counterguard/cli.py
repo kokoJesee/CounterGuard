@@ -50,7 +50,9 @@ app.add_typer(registry_app, name="registry")
 app.add_typer(runner_app, name="runner")
 contract_app = typer.Typer(no_args_is_help=True, help="Prepare review-only contract proposals.")
 app.add_typer(contract_app, name="contract")
-bootstrap_app = typer.Typer(no_args_is_help=True, help="Plan review-only new-project inputs.")
+bootstrap_app = typer.Typer(
+    no_args_is_help=True, help="Review sources and bootstrap isolated literal Guards."
+)
 app.add_typer(bootstrap_app, name="bootstrap")
 evidence_app = typer.Typer(no_args_is_help=True, help="Verify stored Evidence artifacts.")
 app.add_typer(evidence_app, name="evidence")
@@ -266,6 +268,59 @@ def bootstrap_verify_evidence_command(
     code = standalone_capture_exit_code(value)
     if code:
         raise typer.Exit(code)
+
+
+@bootstrap_app.command("compile")
+def bootstrap_compile_command(
+    repo: Annotated[Path, typer.Option(help="Git repository containing B/F/H.")],
+    evidence: Annotated[Path, typer.Option(help="Current reproduced evidence.v4.")],
+    guard_id: Annotated[str, typer.Option(help="New semantic grd_ identity.")],
+    review_reason: Annotated[
+        str, typer.Option(help="Review of oracles, independence and exact snapshot Scope.")
+    ],
+    output: Annotated[Path, typer.Option(help="New immutable compilation directory.")],
+) -> None:
+    """Compile only failed cases and self-check B/F using the reviewed Docker runner."""
+    from counterguard.repository import RepositoryProblem
+    from counterguard.standalone_guard import compile_standalone_guard
+
+    try:
+        guard = compile_standalone_guard(
+            repo, evidence, guard_id=guard_id, review_reason=review_reason, output=output
+        )
+    except InvalidEvidenceError as error:
+        _error(str(error), 1)
+    except GuardSelfCheckError as error:
+        _error(
+            str(error), 1 if error.run.outcome in {RunOutcome.PASSED, RunOutcome.TEST_FAILED} else 3
+        )
+    except RepositoryProblem as error:
+        _error(error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except OSError as error:
+        _error(str(error), 3)
+    except (ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(guard).decode())
+
+
+@bootstrap_app.command("verify-guard")
+def bootstrap_verify_guard_command(
+    path: Annotated[Path, typer.Argument(help="Existing guard.v3 JSON.")],
+    repo: Annotated[Path, typer.Option(help="Original B/F/H Git repository.")],
+) -> None:
+    """Rebuild minimality, exact Scope, B/F authorization and raw self-check results."""
+    from counterguard.repository import RepositoryProblem
+    from counterguard.standalone_guard import verify_standalone_guard
+
+    try:
+        guard = verify_standalone_guard(repo, path)
+    except RepositoryProblem as error:
+        _error(error.code, 5 if error.rejected else 4)
+    except (ArtifactIntegrityError, OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 5)
+    typer.echo(canonical_json_bytes(guard).decode())
 
 
 @bootstrap_app.command("plan")

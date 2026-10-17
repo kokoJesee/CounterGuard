@@ -8,7 +8,7 @@ import re
 import sqlite3
 import uuid
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
@@ -23,7 +23,9 @@ from counterguard.evidence import verify_evidence
 from counterguard.lifecycle import GuardState, LifecycleEvent, require_transition, state_from_events
 from counterguard.models import ArtifactRef, Digest, Evidence, FrozenModel, Guard, UtcDateTime
 from counterguard.project_config import reject_links
+from counterguard.repository import RepositoryProblem
 from counterguard.repository_models import RepositoryEvidence, RepositoryGuard
+from counterguard.standalone_models import StandaloneEvidence, StandaloneGuard
 from counterguard.storage import sqlite
 
 ZERO = "sha256:" + "0" * 64
@@ -60,6 +62,21 @@ class RegistryEntry(FrozenModel):
         return self
 
 
+class StandaloneRegistryEntry(FrozenModel):
+    """New provenance version; legacy entry serialization stays byte-compatible."""
+
+    schema_version: Literal["registry-entry.v3"] = "registry-entry.v3"
+    registry_id: str
+    registered_at: UtcDateTime
+    source_workspace: Text
+    source_repository: Text
+    guard_ref: ArtifactRef
+    guard_file_digest: Digest
+    guard: StandaloneGuard
+    evidence: StandaloneEvidence
+    artifact_digest: Digest
+
+
 class RegistryEvent(FrozenModel):
     schema_version: Literal["registry-event.v1"] = "registry-event.v1"
     registry_id: str
@@ -76,9 +93,10 @@ class RegistryEvent(FrozenModel):
 
 @dataclass(frozen=True)
 class VerifiedRegistryGuard:
-    entry: RegistryEntry
-    guard: Guard | RepositoryGuard
-    evidence: Evidence | RepositoryEvidence
+    entry: RegistryEntry | StandaloneRegistryEntry
+    guard: Guard | RepositoryGuard | StandaloneGuard
+    evidence: Evidence | RepositoryEvidence | StandaloneEvidence
+    source_facts: object = field(default=None, kw_only=True, repr=False, compare=False)
 
 
 @dataclass(frozen=True)
@@ -97,6 +115,8 @@ def _read(path: Path, model):
         if path.stat().st_size > 2 * 1024 * 1024:
             raise ValueError("Registry fact exceeds size limit")
         raw = path.read_bytes()
+        if model is RegistryEntry and json.loads(raw).get("schema_version") == "registry-entry.v3":
+            model = StandaloneRegistryEntry
         if model is RegistryEvent and json.loads(raw).get("schema_version") == (
             "guard-lifecycle-event.v1"
         ):
@@ -244,16 +264,33 @@ class Registry:
         write_immutable(self.root / f"events/{event.sequence:08d}.json", raw)
         connection.execute("INSERT INTO events VALUES (?, ?)", (event.sequence, raw))
 
-    def add(self, guard_path: str | Path, *, cwd: str | Path) -> RegistryEntry:
+    def add(
+        self, guard_path: str | Path, *, cwd: str | Path, repo: Path | None = None
+    ) -> RegistryEntry | StandaloneRegistryEntry:
         workspace = Path(cwd).absolute()
         reject_links(workspace)
         path = Path(guard_path)
         path = path if path.is_absolute() else workspace / path
         reject_links(path)
         path = path.resolve(strict=True)
-        guard = verify_guard(path, cwd=workspace)
+        from counterguard.standalone_capture import _file
+
+        raw = _file(workspace, path.relative_to(workspace.resolve(strict=True)).as_posix())
+        standalone = json.loads(raw).get("schema_version") == "guard.v3"
+        if standalone:
+            if repo is None:
+                raise ValueError("Standalone Guard registration requires --repo for Git provenance")
+            from counterguard.standalone_guard import verify_standalone_guard_chain
+
+            try:
+                guard, source_facts = verify_standalone_guard_chain(repo, path, cwd=workspace)
+            except RepositoryProblem as error:
+                raise ArtifactIntegrityError("Standalone Git provenance unavailable") from error
+            evidence = source_facts[1]
+        else:
+            guard = verify_guard(path, cwd=workspace)
+            evidence = verify_evidence(workspace / guard.source_evidence_ref, cwd=workspace)
         guard_id = _id(guard.guard_id)
-        evidence = verify_evidence(workspace / guard.source_evidence_ref, cwd=workspace)
         self._initialize()
         with self._transaction(writable=True) as (connection, facts):
             identity, entries, events, _ = facts
@@ -265,11 +302,19 @@ class Registry:
                 return entry
             if len(entries) >= MAX_FACTS:
                 raise ArtifactIntegrityError("Registry entry limit exceeded")
-            entry = _signed(
-                RegistryEntry(
-                    schema_version="registry-entry.v2"
+            entry_type = StandaloneRegistryEntry if standalone else RegistryEntry
+            source_version = (
+                {"source_repository": str(repo.resolve(strict=True))}
+                if standalone
+                else {
+                    "schema_version": "registry-entry.v2"
                     if isinstance(guard, RepositoryGuard)
-                    else "registry-entry.v1",
+                    else "registry-entry.v1"
+                }
+            )
+            entry = _signed(
+                entry_type(
+                    **source_version,
                     registry_id=identity.registry_id,
                     registered_at=datetime.now(UTC),
                     source_workspace=str(workspace.resolve(strict=True)),
@@ -282,6 +327,8 @@ class Registry:
             )
             self._verify_source(entry)
             raw = canonical_json_bytes(entry)
+            if len(raw) > 2 * 1024 * 1024:
+                raise ArtifactIntegrityError("Registry entry exceeds its reader byte budget")
             write_immutable(self.root / f"entries/{guard_id}.json", raw)
             connection.execute("INSERT INTO registrations VALUES (?, ?)", (guard_id, raw))
             self._append(
@@ -290,7 +337,7 @@ class Registry:
                 entry,
                 events,
                 "registered",
-                actor=getpass.getuser(),
+                actor="local-operator" if standalone else getpass.getuser(),
                 reason="verified source-chain registration",
             )
             return entry
@@ -300,20 +347,32 @@ class Registry:
         if not workspace.is_absolute():
             raise ArtifactIntegrityError("Registry source workspace must be absolute")
         reject_links(workspace / entry.guard_ref)
+        source_facts = None
         try:
-            guard = verify_guard(workspace / entry.guard_ref, cwd=workspace)
-            evidence = verify_evidence(workspace / guard.source_evidence_ref, cwd=workspace)
+            if isinstance(entry, StandaloneRegistryEntry):
+                from counterguard.standalone_guard import verify_standalone_guard_chain
+
+                repo = Path(entry.source_repository)
+                if not repo.is_absolute():
+                    raise ArtifactIntegrityError("Registry source repository must be absolute")
+                guard, source_facts = verify_standalone_guard_chain(
+                    repo, workspace / entry.guard_ref, cwd=workspace
+                )
+                evidence = source_facts[1]
+            else:
+                guard = verify_guard(workspace / entry.guard_ref, cwd=workspace)
+                evidence = verify_evidence(workspace / guard.source_evidence_ref, cwd=workspace)
             if (
                 guard != entry.guard
                 or evidence != entry.evidence
                 or digest_file(workspace / entry.guard_ref) != entry.guard_file_digest
             ):
                 raise ArtifactIntegrityError("Registry source chain differs from registration")
-        except (OSError, ValueError) as error:
+        except (OSError, ValueError, RepositoryProblem) as error:
             raise ArtifactIntegrityError(
                 "Registry source chain is invalid or unavailable"
             ) from error
-        return VerifiedRegistryGuard(entry, guard, evidence)
+        return VerifiedRegistryGuard(entry, guard, evidence, source_facts=source_facts)
 
     def _view(self, entry, events, state, *, with_evidence=False):
         try:
@@ -348,6 +407,8 @@ class Registry:
                 guard=entry.guard.model_dump(mode="json"),
                 evidence=entry.evidence.model_dump(mode="json"),
             )
+        if isinstance(entry, StandaloneRegistryEntry):
+            value["source_profile"] = "standalone-literals-docker.v1"
         return value
 
     def list(self) -> list[dict]:
@@ -410,7 +471,12 @@ class Registry:
                 event.artifact_digest for event in reversed(events) if event.guard_id == guard_id
             )
             return ReviewedRegistryGuard(
-                verified.entry, verified.guard, verified.evidence, state, tip
+                verified.entry,
+                verified.guard,
+                verified.evidence,
+                state,
+                tip,
+                source_facts=verified.source_facts,
             )
 
     def transition(

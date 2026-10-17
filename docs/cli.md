@@ -7,7 +7,10 @@ unknown/blocked 返回 4，完整性拒绝返回 5；不生成 Evidence 或执�
 新增 [Docker 双向捕获](standalone-capture.md)：`bootstrap capture --repo ... --binding ... --runner-id ... --evidence-id ... --review-reason ... --output ...`。
 `bootstrap verify-evidence <evidence.json> --repo ...` 只读重建来源/授权/日志，不启动 Docker。
 复现通过返回 0，有效测试未复现返回 1，执行故障返回 3，输入未就绪返回 4，完整性拒绝返回 5；
-只用已审核 root-pytest8 镜像，不回退本地。它尚不能生成通用 Guard 或进入旧 Registry。
+只用已审核 root-pytest8 镜像，不回退本地。之后使用[最小编译与接入](standalone-guards.md)：
+`bootstrap compile --repo ... --evidence ... --guard-id ... --review-reason ... --output ...`，
+`bootstrap verify-guard <guard.json> --repo ...`；登记 guard.v3 须 `registry add ... --repo ...`。
+来源与真实自检通过后才生成 Candidate，人工审核进入 Shadow 后可用统一 verify；新快照仍 unknown。
 
 `bootstrap plan` 提供[独立 Guard 输入计划](bootstrap-plans.md)：读取提交树，分别列出目标导入闭包、
 草案覆盖及全仓引导需求。计划始终不可执行并返回 4；它不是通用 verify 或契约批准入口。

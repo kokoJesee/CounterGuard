@@ -33,6 +33,6 @@ Git/路径完整性拒绝返回 5；参数/不可读取的草案内容等错误�
 
 用户下一步是审核计划及未支持项，准备真实 B/F 和由所有者提交到 H 的最终契约。
 现在可继续使用[contract prepare 与 bootstrap bind](standalone-contracts.md)准备并重建 H 内契约和 B/F 来源；
-这不提供自动审批；审核后可单独运行 [Docker 双向捕获](standalone-capture.md)。最小 Guard 编译/自检及精确快照 Scope 仍在[路线](roadmap.md)中，
+这不提供自动审批；审核后可单独运行 [Docker 双向捕获](standalone-capture.md)及[最小 Guard/Scope](standalone-guards.md)，
 不能用本地 capture、删 conftest/配置、重签计划或任意布尔开关代替。
 运行上游原生测试套件是另一条路线，先完成配置、conftest/hooks、fixture、插件及其依赖的受控引导。

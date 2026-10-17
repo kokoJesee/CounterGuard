@@ -1,0 +1,86 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "standalone-snapshot-scope.v1",
+      "default": "standalone-snapshot-scope.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "guard_id": {
+      "pattern": "^grd_[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$",
+      "title": "Guard Id",
+      "type": "string"
+    },
+    "source_evidence_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Evidence Digest",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "target_module": {
+      "title": "Target Module",
+      "type": "string"
+    },
+    "target_symbol": {
+      "title": "Target Symbol",
+      "type": "string"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "snapshots": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "propertyNames": {
+          "minLength": 1
+        },
+        "type": "object"
+      },
+      "title": "Snapshots",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "guard_id",
+    "source_evidence_digest",
+    "binding_digest",
+    "target_module",
+    "target_symbol",
+    "import_root",
+    "contract_ref",
+    "contract_digest",
+    "snapshots",
+    "artifact_digest"
+  ],
+  "title": "StandaloneScope",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

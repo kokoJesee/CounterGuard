@@ -344,7 +344,7 @@ def plan_bootstrap(
         "verify_supported": False,
         "execution_outcome": "not_run",
         "upstream_tests_selected_for_execution": False,
-        "missing_capabilities": ["generic_guard_provenance_and_scope"],
+        "missing_capabilities": [],
         "next_action": "Review target/package initializer imports, resources, every projected "
         "oracle and unsupported assertion. A standalone Guard may avoid upstream test bootstrap "
         "only after separate closure review and separately authorized Docker capture. Use "
