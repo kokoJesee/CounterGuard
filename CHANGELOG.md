@@ -35,12 +35,6 @@
 
 本项目原名 **EvidenceGuard**。开源前做同名冲突检查时发现：
 
-- PyPI 上存在 `Tool Evidence Guard`（定位接近：验证工具输出与结构化断言后再交给 agent 使用）
-- GitHub 上存在 `EvidenceGuard`（LangGraph 的 AI 安全问卷 Copilot，口号 "No Evidence → No Claim"）
-- 另有 `Product Evidence Guard`（商品事实核验）
-
-为避免与上述项目混淆并保持名称唯一，更名为 **CounterGuard** —— 面向 AI 生成代码的缺陷回归防线。
-
 更名范围：
 
 - 包名与 CLI 命令：`evidenceguard` → `counterguard`
