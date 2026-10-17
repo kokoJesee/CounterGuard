@@ -5,6 +5,11 @@ applicability boundaries.
 
 > [中文](README.md) · English
 
+The public release is **[v0.5.0 Beta](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0)**.
+Its GitHub Release includes release notes, a wheel, an sdist, hashed tool dependency lists,
+the reviewed runner archive and SHA256SUMS. See the [Beta installation guide](docs/beta-release.md).
+This project has not published to PyPI.
+
 ## The problem
 
 AI-generated and AI-edited code has a structural gap: **it does not know what you fixed three
@@ -14,6 +19,11 @@ was never a reliable mechanism.
 CounterGuard makes every fix a permanent check — and the check **knows when it should apply**.
 Rules are not global; each guard's applicability boundary is learned from confirmed
 counterexamples.
+
+The learning results below apply to the frozen benchmark. A new project can complete the
+restricted Docker Evidence → minimal Guard → manual review path; its first Scope uses complete
+reviewed B/F source snapshots, without automatic generalization to new code. See the
+[admission boundary and boltons retrial](docs/standalone-guards.md#非固定项目的支持边界).
 
 ## Install
 
@@ -190,8 +200,8 @@ reproduced bug**.
 The source checkout also provides [repository verification](docs/verify.md) and an
 [append-only Guard lifecycle](docs/guard-lifecycle.md). `verify` replays reviewed
 Shadow/Active Guards in Docker, with separate unknown, skipped, and execution-error
-results. Its current scope is known source snapshots under the root-import profile;
-the reviewed validators profile additionally supports src imports and pytest9.
+results. Supported paths include known root-import snapshots, the fixed validators src/pytest9
+profile, and restricted standalone packages under root/src imports.
 Use `counterguard runner list` to discover reviewed image IDs and their sources,
 then select a stable `--runner-id`. Other projects must meet the explicit
 [admission conditions](docs/project-admission.md).

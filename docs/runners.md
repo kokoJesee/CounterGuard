@@ -39,6 +39,8 @@ validators 固定仓库使用 `--runner-id validators-pytest9`。两者属于不
 若攻击者连可信 CounterGuard Python 代码及其 pin 一起替换，本机制不能检测安装包整体失陷。
 镜像身份只是必要边界之一，实际执行仍需来源、Scope、状态和固定 Docker policy 的独立授权。
 
-两项 profile 的来源见 [构建/复验记录](results/runner-catalog-v1/README.md)。本轮没有发布 OCI 仓库或大型镜像归档下载服务。其他机器若没有这些 image ID，会明确显示 unavailable，不把某个同名 tag 当成已安装或已审核。
+两项 profile 的来源见 [构建/复验记录](results/runner-catalog-v1/README.md)。该历史构建轮次没有公开交付镜像；
+之后的 [0.5.0 Beta](beta-release.md#公开发布的范围) 已在 GitHub Release 附带 root runner 的精确归档和摘要，未发布 OCI 镜像仓库。
+validators-pytest9 归档不在这 6 个附件中。其他机器若没有相应 image ID，会明确显示 unavailable，不把同名 tag 当成已安装或已审核。
 
 需要自行重建时，使用现有 Dockerfile（pytest9 通过 `--build-arg PYTEST_VERSION=9.0.3`），在新目录运行 `scripts/record_runner_build.py` 和 `scripts/accept_pilot_runner.py`。新 image ID 只有在锁定、四项攻击实测并经维护者审核后才进入新目录版本；当前没有“信任任意本机镜像”的快捷开关。构建归档与原始日志默认只留本地，不提交到源码 Git 仓库。

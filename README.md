@@ -6,11 +6,18 @@ CounterGuard 把**已验证的缺陷证据**转化为**可复用的回归守卫*
 
 > 中文 · [English](README.en.md)
 
+当前公开版本为 **[v0.5.0 Beta](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0)**。
+GitHub Release 提供发行说明、wheel、源码包、带哈希的工具依赖清单、已审核 runner 归档及 SHA256SUMS；
+安装步骤见 [Beta 说明](docs/beta-release.md)。本项目尚未向 PyPI 发布。
+
 ## 它解决什么问题
 
 AI 生成和修改的代码有一个结构性缺口：**它不知道你三个月前修过什么**。同一个缺陷因此可能被反复引入，而"靠人记得"从来不是可靠的机制。
 
 CounterGuard 让每一次修复都变成一条**永久检查**——而且这条检查**知道自己该在什么时候生效**。规则不是全局的：每条守卫的适用边界，是从**已确认的反例**里学出来的。
+
+反例学习的实测范围是下文冻结基准。新项目首次接入已能走完受限的 Docker Evidence → 最小 Guard → 人工审核链，
+首版 Scope 使用已审核 B/F 的完整闭包快照；它不自动泛化到新源码。具体条件及 boltons 复跑结果见[接入边界](docs/standalone-guards.md#非固定项目的支持边界)。
 
 ## 安装
 
@@ -148,7 +155,7 @@ pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不�
 
 ## 开发
 
-源码版提供 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。支持根布局已知源码快照及固定 validators 的 src/pytest9 profile；`counterguard runner list` 可查审核镜像与来源，再用 `--runner-id` 选择。其他项目先满足 [接入条件](docs/project-admission.md)。
+源码版提供 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。支持既有根布局快照、固定 validators 的 src/pytest9 profile，以及受限 standalone 根/src 普通包；`counterguard runner list` 可查审核镜像与来源，再用 `--runner-id` 选择。其他项目先满足 [接入条件](docs/project-admission.md)。
 
 [首次接入清单](docs/onboarding.md)明确材料、责任和初始 Scope；新项目可以先用 `preflight --profile minimal-python --import-root src` 做只读分类，尚不自动获准执行。[CI 示例与 Summary](docs/github-actions.md)当前仅覆盖工具自带可信 fixture，未宣称任意项目或真实 GitHub 平台已验收。
 

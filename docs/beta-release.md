@@ -8,6 +8,13 @@ Beta 支持 Python 普通模块/包、根或 src 布局、零运行时依赖和�
 已有冻结 scope_v1 的数据、标签、算法及指标保持原样；没有把小样本学习结论自动扩展到新项目。
 新源码快照、未知依赖或未支持 oracle 仍返回 unknown，不会为了接入成功放宽安全边界。
 
+## 公开发布的范围
+
+[v0.5.0](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0) 已创建为 GitHub Release（prerelease、非草稿），
+包含发行说明、wheel、sdist、base/runner 两份哈希依赖清单、已审核 root runner 归档和 SHA256SUMS，共 6 个附件。
+发布时的独立读回见[交付收据](results/beta-v0.5.0/delivery.json)；[后续复核](results/boltons-standalone-retrial-v1/README.md)再次核对了大小与摘要。
+本项目尚未向 PyPI 发布；“GitHub Beta 已发布”只说明上述 GitHub 交付，不表示 PyPI、托管 CI 或任意项目兼容已验收。
+
 ## 安装
 
 GitHub 发布材料使用 counterguard-0.5.0 wheel/sdist、带哈希的基础/runner 依赖清单及已审核 root runner 归档。

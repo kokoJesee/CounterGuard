@@ -4,6 +4,28 @@
 B/F 自检、精确快照 Scope、本地登记与 Shadow/Active 验证；不要求先有合法反例，也不伪造学习结果。
 它仍只支持 source-only 字面量 profile，不加载上游 pytest 配置、conftest、fixture 或插件，不安装目标依赖。
 
+## 非固定项目的支持边界
+
+**非固定项目的受限闭环已实现。** 模块名、目标函数、字面量 case 与导入闭包不再硬编码为 validators。
+满足同一输入规则的新项目，可从真实修复完成 Docker 双向 Evidence、最小 Guard 自检、独立核验、Candidate 登记及人工审核 Shadow。
+这不等于任意 Python 项目都已兼容；“通用”指同一受限格式可用于不同项目。
+
+| 环节与实现提交 | 具体成果 | 尚不能据此声明什么 |
+|---|---|---|
+| plan · `44817d2` | 模块级候选闭包、包初始化、测试投影与上游引导分层，只读且保留 unknown | 计划不是契约或执行授权 |
+| bind · `babefe9` | 准备 contract.v3；独立重建 B→F→H、H 内契约、原测试投影和完整来源 | 来源正确不等于缺陷复现；工具不替所有者制造 H |
+| capture · `6fb236e` | 已审核 Docker 中执行 B/F，保存原始 JUnit，独立重建 evidence.v4 | 导入/收集错误不算缺陷；unknown 不能用审核理由覆盖 |
+| onboard · `fcbf6a8` | Guard v3 最小失败集及 B/F 自检、精确快照 Scope、Registry v3、显式审核与 verify | 首次 Scope 没有学习泛化，也不会自动提升 Shadow/Active |
+
+进入 Docker 前必须同时满足：B/F 线性真实修复、所有者另行提交且只新增契约的 H、受支持的 oracle/调用绑定、
+普通根/src 包、兼容 runner 的 Python 声明、零目标运行时依赖，以及各角色运行闭包均为 review_required、没有 unresolved finding。
+存在 conftest 本身不否决独立 Guard；它不得进入目标闭包或被当作原生测试引导加载。
+缺少 H、闭包仍 unknown 或只有 proposal 时，应停在相应准备环节，不先创建无用的 Registry 状态。
+
+根/src 的全链成功证据来自工具自有真实 Git/Docker fixture；validators 是固定外部缺陷试点。
+[boltons 的当前版本复跑](results/boltons-standalone-retrial-v1/README.md)最远生成 contract.v3，
+因保守调用分类与缺少 owner H 停在执行前，尚无 Evidence/Shadow，不能作为第二个外部项目接入成功的证明。
+
 ## 编译、核验与审核
 
 ```powershell

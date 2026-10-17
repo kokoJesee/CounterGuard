@@ -1,11 +1,16 @@
 # 第一次接入：用户需要做什么
 
 适用对象是零运行时依赖、根目录或 `src/` 中的普通 Python 包、独立断言测试。
-先运行[静态准入](preflight.md#免安装免插件候选检查)。通过只说明它属于优先开发的兼容范围，
+可先运行[静态准入](preflight.md#免安装免插件候选检查)观察全仓情况。该旧 profile 的结果不替代独立 Guard 闭包判断；
+包含 conftest 的仓库仍可单独检查目标是否依赖它。
 当前已交付[受限通用 Docker 捕获](standalone-capture.md)及[最小 Guard/快照 Scope/Shadow](standalone-guards.md)；不能仅凭静态候选分类执行。
 目前真正可执行的仍是[已审核 profile](project-admission.md#最小可接入范围)。
 
 ## 首次准备的责任清单
+
+准备 contract.v3 后，先查看 preparation.json 的 runtime_assessment 与 buggy_runtime_assessment。
+任何一侧仍 unknown/blocked 时，不能只填审核理由继续 capture；先解决具体 finding，不必急着 fork 或提交 H。
+只有 proposal/preparation、不含 H 的本地文件或一次成功 plan，都不能替代完整来源绑定。
 
 | 顺序 | 用户/项目所有者确认什么 | 工具负责什么 | 当前状态 |
 |---|---|---|---|
@@ -43,9 +48,10 @@ Shadow 违规只记录；Active 的适用违规返回 1；执行故障/unknown/�
 
 ## 30 分钟的门槛
 
-已有[一次开发代理亲自试走](results/onboarding-boltons-v1/README.md)：真实 boltons 修复，六步逐项记录。
+已有[原开发代理试走](results/onboarding-boltons-v1/README.md)及[standalone 交付后的复跑](results/boltons-standalone-retrial-v1/README.md)：同一真实 boltons 修复，逐项保留遇阻与未执行状态。
 首轮约 7 分 48 秒后因读取环境阻塞停止，随后正常权限复核确认项目本身也不满足当前执行前置；
-没有完成首次 Evidence/Shadow。它不是外部用户研究，也不是“8 分钟完成接入”。
+没有完成首次 Evidence/Shadow。新版最远生成 contract.v3，调用分类仍 unknown，且没有 owner H；
+它们都不是外部用户研究或“几秒/几分钟完成接入”的证明。
 完整接入耗时与流失情况仍**不确定**，不能承诺首次接入在 30 分钟内，也不能把工程人日当作用户操作时间。
 
 产品验收应单独记录：首次准入命令耗时、准备六项材料的人工时间、每项阻塞及是否需要维护者帮助。
