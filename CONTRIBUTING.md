@@ -1,104 +1,86 @@
-# Contributing to CounterGuard
+# 参与 CounterGuard
 
-Thanks for your interest. This document covers what contributions are welcome, the
-development workflow, and the **project-specific rules** that keep the evidence chain
-trustworthy.
+感谢你有兴趣参与。这份文档说明：欢迎什么、开发流程，以及**这个项目特有的规矩**——它们是为了保住「证据链可信」。
 
-## What is welcome
+## 欢迎什么
 
-| Type | Notes |
+| 类型 | 说明 |
 |---|---|
-| Bug reports | Always welcome — please include reproduction steps |
-| Documentation fixes | Always welcome |
-| New benchmark scenarios | Welcome — see "evidence requirements" below |
-| Cross-platform / packaging fixes | Welcome |
-| New runtime dependencies | ⚠️ Open an issue first |
-| Changes to core protocols | ⚠️ Open an issue first |
-| Changes to frozen benchmark data or evaluation criteria | ❌ Not accepted in place — see rule 1 |
+| Bug 报告 | 随时欢迎——请带复现步骤 |
+| 文档修错 | 随时欢迎 |
+| 新的基准场景 | 欢迎——先看下面的「证据要求」 |
+| 跨平台 / 打包修复 | 欢迎 |
+| 新增运行时依赖 | ⚠️ 先开 issue 商量 |
+| 改核心协议 | ⚠️ 先开 issue 商量 |
+| 改冻结基准数据或评测口径 | ❌ 不原地改——见规矩 1 |
 
-## Development setup
+## 开发环境
 
 ```powershell
 uv sync
-uv run pytest -m "not slow" -q      # fast tier: no real child processes
+uv run pytest -m "not slow" -q      # 快速层：秒级
 uv run ruff check .
 ```
 
-Before opening a pull request, run the complete suite once:
+提 PR 前，跑一次完整套件：
 
 ```powershell
 uv run pytest -q --durations=20
 ```
 
-**Test tiers**: integration/e2e tests, heavy prepared fixtures and real child processes are
-marked `slow`. The fast tier *rejects* unmarked real process launches during fixture setup,
-execution and teardown — so every new test that spawns a process must declare itself `slow`.
-Definitions and timing evidence are in [docs/testing.md](docs/testing.md).
+**测试分层**：集成/e2e、重型 fixture、真实子进程都标 `slow`。**快测会在准备、执行、清理三个阶段拒绝没标记的真实进程**——所以新测试只要起进程，就得声明自己是 `slow`。见 [testing.md](docs/testing.md)。
 
-## Project-specific rules
+## 这个项目特有的规矩
 
-These are not generic guidelines. They come from how this project actually works, and they
-exist because the value of the project is the trustworthiness of its evidence.
+这些不是通用建议，是从「这个项目怎么保证可信」里长出来的。
 
-### 1. Frozen assets are never edited in place
+### 1. 冻结资产永远不原地改
 
-These files define the current experiment. They must not be modified to make results look
-better:
+这些文件定义当前实验，不能为了「让结果好看」去改：
 
 - `experiments/scope_v1.json`
 - `benchmarks/splits/scope_v1.json`
 - `benchmarks/context/scope_v1.json`
-- the labeled samples under `benchmarks/`
+- `benchmarks/` 下的标注样本
 
-To change the criteria, create a **new protocol version** (e.g. `scope_v2`) in a new
-directory. The original stays intact.
+要改口径，就建一个**新的协议版本**（比如 `scope_v2`），放进新目录，原版不动。
 
-### 2. Semantic changes require a new version, never an in-place overwrite
+### 2. 语义变了就上版本号，绝不原地覆盖
 
-If a stored artifact's meaning changes, publish a new `schema_version` or a new versioned
-directory. Historical records keep their bytes and digests. New runs of the same input are
-read-only audits.
+产物的含义变了，就发新的 `schema_version` 或新的版本目录。历史记录保留原字节和原 digest。同一输入重复跑是只读审计。
 
-### 3. Failures must be preserved and explained
+### 3. 失败也要留，还要说清楚
 
-If an experiment fails, keep the raw result, package it, and explain it. Do not re-run until
-it looks better, and do not delete failing artifacts. A reported failure with its evidence is
-more valuable than a silent success.
+实验失败了，保留原始结果、打包、解释原因。不要「重跑到好看为止」，也不要删失败的产物。**一份带着证据的失败，比一个静默的成功更有价值。**
 
-### 4. Every claim needs a reproducible check
+### 4. 每个结论都要能复现
 
-A change in behavior must state how to verify it — a command, a test, or an artifact
-comparison. "It works now" is not verifiable.
+改行为，就得说清怎么验证——一条命令、一个测试、或一次产物比对。「现在能跑了」不算可验证。
 
-### 5. Do not overwrite published artifacts
+### 5. 别覆盖已发布的产物
 
-New runs use new IDs and new output directories. Do not modify or re-sign historical
-manifests to match a newer code state; use a new workspace instead.
+新的运行用新的 ID 和新的输出目录。别为了对齐新代码去改历史 manifest，用新工作区。
 
-## Pull request checklist
+## PR 检查清单
 
-- [ ] **Purpose** — what problem does this solve?
-- [ ] **Impact** — which artifact layers must be re-materialized?
-      (contract / evidence / guard / feature / scope / replay / evaluation)
-- [ ] **Verification** — which commands or tests prove it works?
-- [ ] **Not done** — what was deliberately left out, and why?
-- [ ] Frozen assets untouched, or a new version was created
-- [ ] `uv run ruff check .` passes
+- [ ] **目的**——解决什么问题？
+- [ ] **影响**——哪几层产物要重新物化？（contract / evidence / guard / feature / scope / replay / evaluation）
+- [ ] **验证**——哪些命令或测试能证明？
+- [ ] **没做**——故意留了什么，为什么？
+- [ ] 冻结资产没动（或建了新版本）
+- [ ] `uv run ruff check .` 通过
 
-## Reporting issues
+## 报告问题
 
-Please include:
+请带上：
 
-1. **Reproduction** — the exact commands you ran
-2. **Expected** — what you expected to happen
-3. **Actual** — what happened instead, including the exit code
-   (see the exit-code table in [README.md](README.md))
-4. **Environment** — OS, Python version, and whether Docker is available
+1. **复现**——你跑的确切命令
+2. **期望**——你以为会发生什么
+3. **实际**——发生了什么，包括退出码（见 [README](README.md) 的退出码表）
+4. **环境**——系统、Python 版本、有没有 Docker
 
-If the report involves a security issue, follow [SECURITY.md](SECURITY.md) instead of
-opening a public issue.
+如果涉及安全问题，走 [SECURITY.md](SECURITY.md)，别开公开 issue。
 
-## License
+## 许可
 
-By contributing, you agree that your contributions are licensed under
-[Apache-2.0](LICENSE).
+参与即代表你同意贡献以 [Apache-2.0](LICENSE) 发布。

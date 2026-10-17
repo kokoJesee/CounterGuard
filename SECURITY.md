@@ -1,68 +1,50 @@
-# Security Policy
+# 安全策略
 
-## Reporting a vulnerability
+## 报告漏洞
 
-**Please do not open a public issue for security problems.**
+**安全问题不要开公开 issue。**
 
-Preferred channel: GitHub's **Private vulnerability reporting / Security Advisory** on this
-repository. If that is unavailable, open a *minimal* public issue that only asks the
-maintainer for a private channel — do not include the details in it.
+首选：用 GitHub 的**私密漏洞上报 / Security Advisory**。如果不行，开一个**最小化**的公开 issue，只向维护者要一个私密渠道，别在里面写细节。
 
-Please do not publish, before the maintainer has had reasonable time to investigate:
+在维护者有合理时间调查之前，请不要公开：
 
-- customer files or reproduced source text
-- credentials, access tokens, private paths or machine identifiers
-- details that are directly exploitable
+- 客户文件或复制的来源正文
+- 凭据、token、私密路径或机器标识
+- 能直接利用的细节
 
-**There is currently no public security response SLA.**
+**目前没有公开的安全响应 SLA。**
 
-## What this project does
+## 这个项目做什么
 
-CounterGuard verifies that previously fixed defects have not regressed. It runs real tests
-against declared contracts and produces evidence artifacts with content digests.
+CounterGuard 验证「修过的缺陷有没有回来」。它会真的跑测试、读仓库、产出带 digest 的证据。
 
-Because it **executes code** and **reads repositories**, its own security posture matters.
-The full detail lives in two documents — this file is only the entry point:
+因为它**执行代码**、**读仓库**，所以它自己的安全姿态很重要。完整细节在两份文档里——这里只是入口：
 
-- **[docs/security-model.md](docs/security-model.md)** — assets, trust assumptions, and the
-  concrete controls and limits for repository inspection (W3-A) and container execution (W3-B)
-- **[docs/attack-surface-checklist.md](docs/attack-surface-checklist.md)** — a per-item list of
-  what has been tested, what is partially covered, and **what is not covered at all**
-  (A01–A11), plus the still-open requirements for untrusted repositories (W01–W04)
+- **[security-model.md](docs/security-model.md)**——资产、信任假设、仓库检查（W3-A）和容器执行（W3-B）的具体控制与限额
+- **[attack-surface-checklist.md](docs/attack-surface-checklist.md)**——逐项列出「已测 / 部分覆盖 / 完全没覆盖」（A01–A11），以及不可信仓库还没补上的要求（W01–W04）
 
-## Threat model (summary)
+## 威胁模型（摘要）
 
-- **Assumed attacker capability**: can modify the record copies that are being verified.
-- **Not assumed**: can simultaneously control the trusted source, all raw logs, the verifier
-  itself, and its runtime environment.
-- **Digests are not signatures.** They provide consistency and provenance linking. They are
-  not author authentication, and they do not independently prove creation time or host
-  identity. An attacker who can rewrite the source, the raw logs, all associated records *and*
-  their digests is outside the current trust boundary.
-- **Documented limits are not an OS sandbox.** The Docker runner applies non-root execution,
-  read-only mounts, network isolation, capability removal and resource/log limits — but these
-  are deliberate, documented limits, not a general-purpose sandbox for arbitrary Python.
+- **假设攻击者能做什么**：能改被校验的记录副本。
+- **假设不能做什么**：不能同时控制可信来源、所有原始日志、验证器本身和它的运行环境。
+- **摘要不是签名**：digest 提供一致性和来源关联，不是作者认证，也不能独立证明创建时间或主机身份。能重写来源、日志、全部记录和它们 digest 的攻击者，在信任边界之外。
+- **写清楚的限额不是 OS 沙箱**：Docker 执行器有非 root、只读挂载、禁网、去能力、资源/日志限额——但这些是**写清楚的限额**，不是给任意 Python 的通用沙箱。
 
-## Currently open items
+## 还没补上的项
 
-These are known, documented gaps. They are listed here rather than omitted, because an honest
-scope is more useful than a false guarantee.
+这些是已知的、记录在案的缺口。列在这里而不是藏起来，因为诚实的边界比假的保证有用。
 
-| ID | Open item | Blocks |
+| ID | 缺什么 | 卡住什么 |
 |---|---|---|
-| W01 | The reviewed Docker profiles have recorded isolation tests; kernel/daemon compromise and arbitrary malicious pytest interference remain outside that evidence | Broader isolation claims |
-| W02 | Bounded committed-object reads and path/history checks exist; comprehensive fuzzing and concurrent filesystem proofs remain open | Unsupported Git layouts |
-| W03 | Independent literal contracts support reviewed source-only closures; native config, fixtures/plugins and target dependency installation remain unsupported | Native test-suite compatibility |
-| W04 | Local immutable state and explicit Shadow/Active policy are implemented; identity, signatures/rollback resistance and remote authority remain open | Automated authorization of external contributions |
+| W01 | 不可信目标的文件/网络/CPU/内存/PID/子孙进程隔离 | 跑未知仓库 |
+| W02 | Git base/head、浅克隆、子模块、仓库链接边界 | — |
+| W03 | 真实项目的插件 / conftest / 依赖安装 | 需要 fixture 的仓库 |
+| W04 | Registry 权限与状态、CI 凭据、公开报告供应链 | CI 集成 |
 
-Only inputs admitted to a reviewed profile execute, exclusively in Docker. Unknown or
-blocked inputs are refused; there is no local execution fallback for repository code.
+在 W01 和 W03 补上并留下记录之前，**不可信仓库一律不执行**——工具宁可拒绝，也不回退到本地跑。
 
-## Supported scope
+## 支持范围
 
-Recorded checks use local Python tooling and the pinned Linux Docker images. No claim is made about
-an untested cross-platform matrix, general malicious-repository isolation, signature-based authentication,
-general-purpose redaction, live-model stability, or program equivalence.
+当前版本只在**本地 Python 环境**验证。不承诺跨平台行为、恶意仓库隔离、签名认证、通用脱敏、实时模型稳定或程序等价性。
 
-See [docs/known-limitations.md](docs/known-limitations.md) for the full statement of scope and
-the [historical verification boundary](docs/known-limitations.md).
+完整范围见 [known-limitations.md](docs/known-limitations.md)。

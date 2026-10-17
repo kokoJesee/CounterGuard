@@ -1,64 +1,36 @@
-# Benchmark data contract
+# 基准数据契约
 
-Each sample keeps scope classification separate from contract execution.
+每个样本都把「作用域分类」和「契约执行」分开。
 
-- `features` is the complete and only feature input allowed for scope learning.
-- `guard_applicable` is provided separately as a supervised target; it is never a feature.
-- `contract_ref` and `target` are execution and traceability metadata.
-- `labels.guard_applicable` says whether the named guard may run in the sample context.
-- `labels.guard_violation` is `true` or `false` only when the guard applies; otherwise it is
-  `null`.
-- `labels.contract_compliant` describes the target against its own declared contract. It is an
-  evaluation label and must never be passed to the Scope Learner.
-- `labels.basis` records the human-readable reason for the confirmed label.
+- `features` 是作用域学习**唯一允许**的完整特征输入。
+- `guard_applicable` 作为监督目标单独提供，**永远不会是特征**。
+- `contract_ref` 和 `target` 是执行与溯源元数据。
+- `labels.guard_applicable` 表示该 guard 是否可在样本上下文运行。
+- `labels.guard_violation` 只在 guard 适用时才是 `true`/`false`，否则是 `null`。
+- `labels.contract_compliant` 描述目标相对于**它自己声明的契约**是否符合。它是评测标签，**绝不能传给作用域学习器**。
+- `labels.basis` 记录已确认标签的可读理由。
 
-The Scope Learner must not receive sample IDs, paths, module or symbol names, contract IDs,
-contract examples, expected outputs, violation/compliance labels, or basis text. Several of those fields contain
-words such as `buggy`, `fixed`, `v1`, or `legal` and would leak the answer.
+作用域学习器**不得**拿到样本 ID、路径、模块/符号名、契约 ID、契约示例、期望输出、违规/合规标签、或 basis 文本。这些字段里有 `buggy`、`fixed`、`v1`、`legal` 之类的词，会泄露答案。
 
-`ast_features` is currently a manually confirmed, presence-only summary using the controlled
-vocabulary enforced by the test suite. It is not a serialized AST. Every operation represented by
-the current vocabulary should be listed when it appears in the target. The AST feature auditor now extracts the same
-controlled vocabulary automatically and requires exact equality with these frozen annotations.
-It never rewrites them to match the implementation.
+`ast_features` 目前是**人工确认、仅记录存在性**的摘要，用测试套件强制受控词表。它不是序列化的 AST。词表里每个操作只要在目标里出现就应该列出。AST 特征审计器现在自动提取同一受控词表，并要求与冻结标注**完全一致**；它绝不改写标注去迁就实现。
 
-The benchmark intentionally includes all four meaningful combinations that can exist:
+基准**故意包含**四种有意义的组合：
 
-| Guard applicable | Target compliant with own contract | Guard violation |
+| Guard 适用 | 目标符合自己契约 | Guard 违规 |
 |---|---|---|
-| yes | yes | false |
-| yes | no | true |
-| no | yes | null |
-| no | no | null |
+| 是 | 是 | false |
+| 是 | 否 | true |
+| 否 | 是 | null |
+| 否 | 否 | null |
 
-Training and holdout files are separate. Holdout samples may be used for evaluation only; they
-must not participate in predicate generation, selection, tie-breaking, or threshold tuning.
+训练和留出文件分开。留出样本只能用于评测，**不得**参与谓词生成、选择、平手裁决或阈值调优。
 
-The current benchmark treats `contract_family` as a trusted prefilter and learns the boundary
-within one family. It therefore tests whether version and interface predicates can separate legal
-counterexamples. Cross-family negatives require per-guard labels on the same sample and are left
-for a later schema revision.
+当前基准把 `contract_family` 当作可信预筛，并在**一个族内**学边界。所以它测的是 version 和 interface 谓词能否区分合法反例。跨族负样本需要同一批样本上的 per-guard 标签，留给后续 schema 修订。
 
-The Guard compiler selects only the source Evidence's failed cases: two discount assertions and the zero-limit
-rejection. The current independent identities are `grd_discount_member_rate_regression_v2` and
-`grd_query_limit_zero_regression_v2`. An applicable Guard violation is measured by these minimal
-assertions, separately from full-contract compliance. The existing 15 labels retain their values
-after this migration; the integrity tests check the minimal assertions explicitly.
+Guard 编译器只选源 Evidence 里失败的 case：两条折扣断言 + 零值拒绝。当前独立身份是 `grd_discount_member_rate_regression_v2` 和 `grd_query_limit_zero_regression_v2`。适用 Guard 的违规由这些最小断言度量，与完整契约合规分开。迁移后 15 个标签值不变；完整性测试显式检查最小断言。
 
-protocol freeze freezes the four method definitions in `experiments/scope_v1.json`, with two-stage training and
-holdout membership in `benchmarks/splits/scope_v1.json`. B1 always runs; B2 reads only
-`interface_kind` and compares it with the frozen Guard interface. The protocol freeze command executes only
-training rows and rejects `--split holdout`. Protocol verification may audit holdout metadata and
-source pins; these public fixtures are engineering checks, not a blind evaluation.
+协议冻结把四个方法定义冻结在 `experiments/scope_v1.json`，两阶段训练和留出成员关系在 `benchmarks/splits/scope_v1.json`。B1 总是跑；B2 只读 `interface_kind` 并与冻结的 Guard 接口比较。协议冻结命令只执行训练行，拒绝 `--split holdout`。协议验证可以审计留出元数据和来源 pin；这些公开 fixture 是工程检查，不是盲测。
 
-`branch:none` is the historical token name for an If/IfExp condition that compares a formal
-parameter with Python `None` using `is` or `is not`. No qualifying condition means no such token;
-it is never a fallback for the absence of branches. Full boundaries are in `docs/data-contracts.md`.
-The nine-row manual baseline derivation is in
-`docs/results/scope-v1/expected-train-derivation.md`.
+`branch:none` 是历史 token 名，指「用 `is` / `is not` 把形参与 Python `None` 比较的 If/IfExp 条件」。没有符合条件的条件就是没有这个 token；它从来不是「没有分支」的回退。完整边界在 `docs/data-contracts.md`。九行手工基线推导在 `docs/results/scope-v1/expected-train-derivation.md`。
 
-`module_group` is independently derived from the reviewed architectural package mapping in
-`context/scope_v1.json`; the frozen group pin is verified before Scope learning fit. Expected group annotations
-are compared with this source rather than copied. Changes require a new context/protocol version.
-`docs/module-context-policy.md` records the feature audit correction, and `docs/feature-adjudication.md`
-defines how annotation errors are independently reviewed without rewriting frozen results.
+`module_group` 独立地从 `context/scope_v1.json` 里已审核的架构包映射派生；冻结的 group pin 在作用域学习拟合前被验证。期望的 group 标注与这个来源比对，而不是复制。改动需要新的 context/protocol 版本。`docs/module-context-policy.md` 记录了特征审计修正，`docs/feature-adjudication.md` 定义如何在不改写冻结结果的前提下独立审核标注错误。
