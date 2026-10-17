@@ -1,21 +1,18 @@
 # CounterGuard
 
-CounterGuard turns verified bug evidence into reusable regression guards with explicit
-applicability boundaries.
+**面向 AI 生成代码的缺陷回归防线。**
 
-> English · [中文](README.zh-CN.md)
+CounterGuard 把**已验证的缺陷证据**转化为**可复用的回归守卫**，并为每条守卫给出**显式的适用边界**。
 
-## The problem
+> 中文 · [English](README.en.md)
 
-AI-generated and AI-edited code has a structural gap: **it does not know what you fixed three
-months ago.** The same defect can therefore be reintroduced repeatedly, and "someone remembers"
-was never a reliable mechanism.
+## 它解决什么问题
 
-CounterGuard makes every fix a permanent check — and the check **knows when it should apply**.
-Rules are not global; each guard's applicability boundary is learned from confirmed
-counterexamples.
+AI 生成和修改的代码有一个结构性缺口：**它不知道你三个月前修过什么**。同一个缺陷因此可能被反复引入，而"靠人记得"从来不是可靠的机制。
 
-## Install
+CounterGuard 让每一次修复都变成一条**永久检查**——而且这条检查**知道自己该在什么时候生效**。规则不是全局的：每条守卫的适用边界，是从**已确认的反例**里学出来的。
+
+## 安装
 
 ```powershell
 uv sync
@@ -25,241 +22,177 @@ uv build
 python -m pip install "dist/counterguard-0.5.0-py3-none-any.whl[runner]"
 ```
 
-The wheel provides the CLI and library. Executing tests requires the `runner` extra, which
-declares the pytest dependency. Without pytest, execution fails **before creating any output**
-with exit `3` and a `counterguard[runner]` installation hint.
+wheel 提供 CLI 与库；**要执行测试需安装 `runner` extra**（它声明项目已使用的 pytest 依赖）。缺少 pytest 时，执行会在**创建任何输出之前**退出 `3`，并提示安装 `counterguard[runner]`。
 
-The offline Demo additionally needs the source distribution's `examples/`, `benchmarks/`,
-`experiments/` and contract tests — these are not bundled in the library wheel.
+离线 Demo 还需要源码分发包里的 `examples/`、`benchmarks/`、`experiments/` 与契约测试——**这些不打包进库 wheel**。
 
-## Quick start
+## 快速开始
 
 ```powershell
 uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
 ```
 
-One command runs the full pipeline from clean inputs and writes `report.json` and `report.md`.
-Repeating it performs a read-only audit and re-renders existing records.
+一条命令从干净输入跑通全流程，并写出 `report.json` 与 `report.md`。重复执行只做只读审核与重新渲染。
 
 ```powershell
 uv run counterguard demo --workspace artifacts/quickstart-v1 --format markdown
 uv run counterguard demo --workspace artifacts/quickstart-v1 --verify-only
 ```
 
-**Note**: although the scenario is named `mvp.yaml`, it currently requires **JSON syntax**.
-YAML indentation, comments and anchors are unsupported. The
-[quickstart](docs/quickstart.md) includes valid input plus a real missing-contract `unknown`
-replay.
+⚠️ **注意**：场景文件虽然叫 `mvp.yaml`，但**当前只支持 JSON 语法**（YAML 的缩进、注释、锚点均不支持）。[快速开始文档](docs/quickstart.md)里给了合法输入，以及一个真实的"缺少契约 → unknown"回放。
 
-The default Demo uses recorded proposals and trusted local fixtures — no network, no live
-model. **It is not a sandbox for arbitrary Python.**
+默认 Demo 使用**录制候选**与**可信本地 fixture**，不依赖网络与实时模型。**它不为任意 Python 提供沙箱。**
 
-## Three states are kept separate
+## 三个状态必须分开
 
-This is the core design: **applicability, execution outcome and final verdict are three
-independent quantities.**
+这是整个项目的核心设计：**「适用性」「执行结果」「最终判定」是三个独立的量。**
 
-| Dimension | Values |
+| 维度 | 取值 |
 |---|---|
 | `scope_decision` | `applicable` / `inapplicable` / `unknown` |
 | `execution_outcome` | `not_run` / `pass` / `fail` / `error` / `timeout` |
 | `final_verdict` | `pass` / `violation` / `skipped` / `inconclusive` |
 
-**Inapplicable and unknown never start pytest** — they produce `not_run` + `skipped`.
-Infrastructure failures produce `inconclusive`. A skipped target never becomes a pass.
+**不适用与信息不足都不启动 pytest**——输出 `not_run` + `skipped`；基础设施故障输出 `inconclusive`。**跳过的目标永远不会变成"通过"。**
 
-Reports also show the minimal failed cases, the initial/refined rules, per-clause comparison
-results, and source links. See [the CLI contract](docs/cli.md).
+报告同时给出最小失败用例、initial/refined 规则、逐条 clause 的比对结果与来源链接。详见 [CLI 契约](docs/cli.md)。
 
-## How it works
+## 工作机制
 
-Four steps, each of which produces a versioned, digest-bound artifact:
+四个步骤，每一步都产出带版本与摘要的产物：
 
-1. **Capture** — only a real buggy failure followed by a fixed pass counts as reproducible
-   Evidence. Contract, test and target digests, structured case results and raw logs are all
-   recorded.
-2. **Compile** — the failed cases become an independent minimal Guard, self-checked against the
-   fixed target before publication.
-3. **Learn the boundary** — the guard's applicability is fitted from confirmed counterexamples.
-   The solver receives only a `FeatureVector` plus a strict applicability bool; provenance,
-   identity fields and leaking subclasses are rejected.
-4. **Replay** — applicability is decided **before** pytest starts. Skipped rows keep `run=null`.
+1. **捕获**——只有「真实 buggy 失败 + 修复后通过」才算可复现 Evidence；契约/测试/目标摘要、结构化 case 结果与原始日志全部记录
+2. **编译**——失败 case 变成独立的**最小 Guard**，并在 fixed 目标上自检后才发布
+3. **学边界**——守卫的适用性从**已确认的反例**拟合而来。纯求解器只接受 `FeatureVector` + 严格适用性 bool；来源、身份字段与泄漏子类都会被拒绝
+4. **重放**——**先判定适用性，再决定是否启动 pytest**；跳过的行保留 `run=null`
 
-## Frozen benchmark
+## 冻结基准
 
-15 labeled scenarios: **9 training + 6 holdout**. Each guard has applicable and inapplicable
-examples in both splits, and the holdout implementations use code shapes absent from training.
+15 个有标注的场景：**9 个训练 + 6 个留出**。每条守卫在两个拆分里都有适用与不适用样本，且留出实现使用了训练中不存在的代码形态。
 
-Scope features deliberately exclude contract IDs, paths, module names, target names, expected
-outputs and oracle values — a rule cannot work by memorizing answers. One target is
-**inapplicable while violating its own contract**, proving applicability cannot be inferred
-from target correctness.
+作用域特征**刻意排除**契约 ID、路径、模块名、目标名、期望输出与 oracle 值——规则不能靠"记住答案"工作。其中有一个**不适用但违反自身契约**的目标，证明**适用性无法从"目标是否正确"推断**。
 
-### Membership discount guard
+### 会员折扣守卫
 
-Source contract: `membership_discount` final-price at version `v1`.
+源契约：`membership_discount` 的 `v1` final-price。
 
-- members pay 80% of the original amount; non-members pay the original amount
-- two decimal places, **half-up rounding**; negative amounts rejected
+- 会员按原价 80% 支付；非会员按原价支付
+- 保留两位小数、**四舍五入（half-up）**；负数金额被拒绝
 
-The compiled Guard retains **only the two member-price cases that failed on the source bug**.
+编译出的 Guard **只保留在源缺陷上失败的那两个会员价用例**。
 
-### Query-limit validation guard
+### 查询上限校验守卫
 
-Source contract: default 20, accepting only ASCII decimal digit strings from 1 through 100.
-Signed, padded, Unicode-digit, malformed and out-of-range input is rejected.
+源契约默认 20，只接受 1–100 的 ASCII 十进制数字串；带符号、补零、Unicode 数字、畸形与超范围输入一律拒绝。
 
-The compiled Guard retains **only the zero-rejection assertion**.
+编译出的 Guard **只保留"拒绝 0"这一条断言**。
 
-## Scope learning
+## 作用域学习
 
 ```powershell
 uv run counterguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/.../initial
 uv run counterguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/.../refined
 ```
 
-Both **initial** rules learn `contract_version == v1`. Adding the two frozen legal
-counterexamples and refitting produces **version AND interface** rules:
-`final_price` for discount, `query_parameter` for input-limit.
+两个 **initial** 规则都学出 `contract_version == v1`；**加入两个冻结的合法反例后完整重训**，学出 **version AND interface** 规则（discount 为 `final_price`，input-limit 为 `query_parameter`）。
 
-On all nine training rows:
+在全部 9 个训练行上：
 
-| Phase | TP | FP | TN | FN |
+| 阶段 | TP | FP | TN | FN |
 |---|---:|---:|---:|---:|
 | initial | 4 | 2 | 3 | 0 |
 | **refined** | **4** | **0** | **5** | **0** |
 
-Search space is recorded as `predicate_count` / `combination_count` — 8/92 for discount,
-10/175 for input-limit. Twenty input permutations preserve the learned rule and digest.
-**Holdout never enters fitting.**
+搜索空间记录为 `predicate_count` / `combination_count`：discount **8/92**，input-limit **10/175**。输入随机打乱 20 次后，学出的规则与 digest 保持一致。**留出样本永不进入拟合。**
 
-## Replay and evaluation
+## 重放与评测
 
 ```powershell
 uv run counterguard benchmark replay --protocol experiments/scope_v1.json --phase refined --split train
 uv run counterguard experiment evaluate --protocol experiments/scope_v1.json --split holdout --fitted artifacts/experiments/scope-v1/fitted --output artifacts/experiments/scope-v1/final
 ```
 
-Training replay expects exit `1` because two applicable targets really violate their guards:
-**2 pass, 2 violation, 5 skipped**, with exactly **4 pytest processes started**. Every skipped
-row has `run=null`.
+训练重放预期退出码 `1`（因为有两条适用目标真的违反了守卫）：**2 通过、2 违规、5 跳过**，且**实际只启动 4 次 pytest 进程**。每一行跳过都是 `run=null`。
 
-Four methods on the frozen holdout:
+留出集上的四方法结果：
 
-| Method | TP / FP / TN / FN | False-application rate | Bug recall |
+| 方法 | TP / FP / TN / FN | 错误应用率 | Bug Recall |
 |---|---|---:|---:|
 | always | 2 / 4 / 0 / 0 | 1.0 | 1/1 |
 | fixed interface | 2 / 2 / 2 / 0 | 0.5 | 1/1 |
 | learned initial | 2 / 2 / 2 / 0 | 0.5 | 1/1 |
 | **learned refined** | **2 / 0 / 4 / 0** | **0.0** | **1/1** |
 
-**Refined corrected 2 false applications, retained 2 applicable cases, and added no FP/FN.**
-The query guard has no held-out bug, so its Bug recall is reported as `null` rather than 100%.
+**refined 修正了 2 次错误应用、保留了 2 个适用样本、没有新增 FP/FN。** query 守卫没有留出缺陷，因此其 Bug Recall 报告为 `null`，而不是 100%。
 
-The frozen confusion policy counts unknown as a negative prediction while also reporting its
-rate and decision coverage. Raw results retain unknown.
+冻结的混淆口径把 unknown 计为负预测，**同时单独报告其比率与决策覆盖率**；原始结果保留 unknown。
 
-> `evaluate` exiting 0 means **the experiment met its frozen acceptance**, not that every guard
-> passed. These six labels are already public, so this is engineering validation rather than a
-> blind benchmark.
+> `evaluate` 退出 0 表示**实验满足冻结验收**，不表示每条守卫都通过。这 6 个标签已经公开，所以这是**工程验证，不是盲测**。
 
-`replay verify` audits current inputs **without executing pytest**. A successful audit means the
-record is complete — **not that the recorded verdict was pass**.
+`replay verify` 在不执行 pytest 的前提下审核当前输入。**审核成功只表示记录完整，不表示记录的 verdict 是 pass。**
 
-## CLI and exit codes
+## CLI 与退出码
 
-`capture`, `compile`, `learn`, `replay run` and `evaluate` accept
-`--format text|json|markdown`. Explicit formats wrap the original payload in
-`command-report.v1`; without `--format` the original JSON shape is preserved. Formatting does
-not change exit codes.
+`capture`、`compile`、`learn`、`replay run`、`evaluate` 都支持 `--format text|json|markdown`。显式格式把原始 payload 包装进 `command-report.v1`；不传 `--format` 时保留原有 JSON 形状。**格式化不改变退出码。**
 
-| Code | Meaning |
+| 码 | 含义 |
 |---|---|
-| `0` | reproduced Evidence / acceptance met |
-| `1` | completed but not reproduced; or an applicable guard confirmed a violation |
-| `2` | invalid input |
-| `3` | execution failure (including missing pytest metadata) |
-| `4` | insufficient information (`unknown`); or learning refused to generalize |
-| `5` | artifact integrity failure |
+| `0` | 可复现 Evidence / 验收通过 |
+| `1` | 已完成但未复现；或适用守卫确认违规 |
+| `2` | 输入非法 |
+| `3` | 执行故障（含缺 pytest 元数据） |
+| `4` | 信息不足（unknown）；或学习拒绝泛化 |
+| `5` | 产物完整性失败 |
 
-Pytest exit codes 2–5, missing or ambiguous case results, and timeouts **cannot count as a
-reproduced bug**.
+pytest 自身的 2–5、缺失或歧义的 case 结果、超时——**都不能算作可复现缺陷**。
 
-## Development
+## 开发
 
-The source checkout also provides [repository verification](docs/verify.md) and an
-[append-only Guard lifecycle](docs/guard-lifecycle.md). `verify` replays reviewed
-Shadow/Active Guards in Docker, with separate unknown, skipped, and execution-error
-results. Its current scope is known source snapshots under the root-import profile;
-the reviewed validators profile additionally supports src imports and pytest9.
-Use `counterguard runner list` to discover reviewed image IDs and their sources,
-then select a stable `--runner-id`. Other projects must meet the explicit
-[admission conditions](docs/project-admission.md).
+源码版提供 [统一仓库验证](docs/verify.md) 和 [追加式 Guard 生命周期](docs/guard-lifecycle.md)。`verify` 在 Docker 中重放已审核的 Shadow/Active Guard，分别报告 unknown、跳过和执行异常。支持根布局已知源码快照及固定 validators 的 src/pytest9 profile；`counterguard runner list` 可查审核镜像与来源，再用 `--runner-id` 选择。其他项目先满足 [接入条件](docs/project-admission.md)。
 
-The [onboarding checklist](docs/onboarding.md) assigns responsibility for contracts,
-bug/fix sources and initial Scope. `preflight --profile minimal-python --import-root src`
-classifies static no-install/no-plugin candidates without authorizing execution.
-The [CI example and Summary export](docs/github-actions.md) currently cover trusted tool
-fixtures; generic project onboarding and live GitHub platform acceptance remain open.
+[首次接入清单](docs/onboarding.md)明确材料、责任和初始 Scope；新项目可以先用 `preflight --profile minimal-python --import-root src` 做只读分类，尚不自动获准执行。[CI 示例与 Summary](docs/github-actions.md)当前仅覆盖工具自带可信 fixture，未宣称任意项目或真实 GitHub 平台已验收。
 
-Use [contract draft](docs/contract-drafts.md) to prepare review-only proposals from a
-restricted grammar of existing tests. Unsupported assertions remain explicit; proposals
-cannot execute or enter the Registry. The [onboarding trial](docs/results/onboarding-boltons-v1/README.md)
-records a real blocked attempt, while the [roadmap](docs/roadmap.md) identifies remaining support.
+已有回归测试可用 [contract draft](docs/contract-drafts.md)机械起草受限契约提案，逐项保留不支持的断言；提案不可执行，仍需人审。[实际试走](docs/results/onboarding-boltons-v1/README.md)和[接入路线](docs/roadmap.md)分别记录遇阻数据与尚缺能力。
 
-[bootstrap plan](docs/bootstrap-plans.md) separates proposed target imports from upstream
-test bootstrap requirements, retaining the full committed-tree provenance. It does not
-authorize execution. Zero runtime dependencies do not imply plugin-free tests.
+[bootstrap plan](docs/bootstrap-plans.md)进一步分列目标导入闭包与上游测试环境，保留完整提交来源；计划不授予执行权限。零运行时依赖不代表无需 fixture、hook 或测试插件。
 
-[contract prepare / bootstrap bind](docs/standalone-contracts.md) prepare literal contracts
-for an owner assertion-head commit and independently reconstruct B/F/H provenance.
-Binding itself does not execute code. After explicit local review,
-[bootstrap capture / verify-evidence](docs/standalone-capture.md) run both revisions
-in the reviewed Docker runner and independently reconstruct literal-contract Evidence.
-[Minimal Guard compilation, exact-snapshot Scope and explicit Shadow onboarding](docs/standalone-guards.md)
-complete this restricted path. New source snapshots remain unknown; native test bootstrap,
-dependency installation and learned cross-revision generalization are outside this profile.
+[contract prepare / bootstrap bind](docs/standalone-contracts.md)支持 H 内受限通用契约和 B/F 来源重建；所有者须审核并提交。
+之后可在已审核 Docker 中[双向捕获](docs/standalone-capture.md)，再[编译最小 Guard、审核快照 Scope 并进入 Shadow](docs/standalone-guards.md)。
+只支持受限独立字面量契约；新源码仍 unknown，不安装依赖、不加载原生 pytest 引导、不自动提升 Active。
 
 ```powershell
-uv run pytest -m "not slow" -q      # fast tier: seconds
+uv run pytest -m "not slow" -q      # 快速层：不启动真实子进程
 uv run ruff check .
-uv run pytest -q --durations=20      # complete suite, once before delivery
+uv run pytest -q --durations=20      # 完整套件，交付前跑一次
 ```
 
-Integration/e2e tests, heavy fixtures and real child processes are marked `slow`. **The fast
-tier rejects unmarked real process launches during fixture setup, execution and teardown** — so
-any new test that spawns a process must declare itself `slow`. See [testing.md](docs/testing.md).
+集成/e2e 测试、重型 fixture 与真实子进程标记为 `slow`。**快测会在 fixture 准备、执行与清理阶段拒绝未标记的真实进程启动**——因此任何会起进程的新测试都必须声明自己是 `slow`。详见 [testing.md](docs/testing.md)。
 
-## Project layout
+## 项目结构
 
 ```text
-src/counterguard/     implementation and CLI
-tests/                unit, integration and e2e suites
-schemas/              JSON Schema for every artifact
-benchmarks/           frozen labeled samples, splits and module context
-examples/             demo scenario, contracts and implementations
-experiments/          frozen experiment protocol
-containers/           restricted Docker runner
-docs/                 architecture, data contracts, CLI, security model, known limits
+src/counterguard/     实现与 CLI
+tests/                单元、集成与端到端测试
+schemas/              每个产物的 JSON Schema
+benchmarks/           冻结的标注样本、拆分与模块上下文
+examples/             Demo 场景、契约与实现
+experiments/          冻结的实验协议
+containers/           受限 Docker 执行器
+docs/                 架构、数据契约、CLI、安全模型、已知限制
 ```
 
-Runtime artifacts under `artifacts/` and distributions under `dist/` are excluded from Git.
+运行期产物 `artifacts/` 与发行物 `dist/` 已排除出 Git。
 
-## Security and limitations
+## 安全与限制
 
-Because CounterGuard executes code and reads repositories, its own security posture matters:
+因为 CounterGuard 会**执行代码**并**读取仓库**，它自身的安全姿态很重要：
 
-- **[docs/security-model.md](docs/security-model.md)** — assets, trust assumptions, and the
-  concrete controls for repository inspection and container execution
-- **[docs/attack-surface-checklist.md](docs/attack-surface-checklist.md)** — per-item status of
-  what is tested, partially covered, and **not covered at all**
-- **[docs/known-limitations.md](docs/known-limitations.md)** — the current scope statement and
-  the historical verification boundary
+- **[docs/security-model.md](docs/security-model.md)**——资产、信任假设，以及仓库检查与容器执行的具体控制
+- **[docs/attack-surface-checklist.md](docs/attack-surface-checklist.md)**——逐项列出「已测 / 部分覆盖 / **完全未覆盖**」
+- **[docs/known-limitations.md](docs/known-limitations.md)**——当前范围声明与历史验证边界
 
-Current releases are validated on local Python environments only. No claim is made about
-cross-platform behavior, malicious-repository isolation, signature-based authentication or
-program equivalence.
+已记录的验证使用本地 Python 工具和固定 Linux Docker 镜像。不把这些记录扩展为跨平台矩阵、任意恶意仓库隔离、签名认证或程序等价性证明。
 
-## License
+## 许可
 
 [Apache-2.0](LICENSE)
