@@ -1,11 +1,12 @@
 """Export the public persistence contracts from their authoritative models."""
 
+import argparse
 import json
 from pathlib import Path
 
 from counterguard.baselines import FeatureVector, ScopePredicate
 from counterguard.change_analysis import InspectionReport
-from counterguard.contract_draft_models import ContractProposal
+from counterguard.contract_draft_models import ContractProposal, ContractProposalV2
 from counterguard.demo import DemoReport
 from counterguard.evaluation import EvaluationReport
 from counterguard.evaluation_metrics import EvaluationMetrics, Prediction
@@ -27,6 +28,7 @@ from counterguard.registry import (
     RegistryEvent,
     RegistryIdentity,
     StandaloneRegistryEntry,
+    StandaloneRegistryEntryV4,
 )
 from counterguard.replay import ReplayResult
 from counterguard.report import CommandReport, ReplayPresentation
@@ -36,14 +38,16 @@ from counterguard.runner_catalog import RunnerCatalog, RunnerReview
 from counterguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
-from counterguard.standalone_contracts import StandaloneContract
+from counterguard.standalone_contracts import StandaloneContract, StandaloneContractV4
 from counterguard.standalone_models import (
     StandaloneAuthorization,
     StandaloneCapture,
+    StandaloneCaptureV2,
     StandaloneCompilation,
     StandaloneEvidence,
     StandaloneGuard,
     StandaloneGuardAuthorization,
+    StandaloneGuardV4,
     StandaloneScope,
 )
 from counterguard.verification_gate import GateResult
@@ -51,6 +55,11 @@ from counterguard.verify import VerifyReport, VerifyReportV2, VerifyReportV3
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "contract-proposal-v2": ContractProposalV2,
+    "standalone-contract-v4": StandaloneContractV4,
+    "standalone-capture-v2": StandaloneCaptureV2,
+    "standalone-guard-v4": StandaloneGuardV4,
+    "standalone-registry-entry-v4": StandaloneRegistryEntryV4,
     "standalone-compilation": StandaloneCompilation,
     "standalone-guard": StandaloneGuard,
     "standalone-guard-authorization": StandaloneGuardAuthorization,
@@ -108,9 +117,13 @@ MODELS = {
 }
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--only", nargs="+", choices=sorted(MODELS))
+    selected = parser.parse_args().only or MODELS
     root = Path(__file__).resolve().parents[1] / "schemas"
     root.mkdir(exist_ok=True)
-    for name, model in MODELS.items():
+    for name in selected:
+        model = MODELS[name]
         schema = model.model_json_schema()
         schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
         (root / f"{name}.schema.json").write_text(

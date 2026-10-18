@@ -11,6 +11,7 @@ from typer.testing import CliRunner
 from counterguard.cli import app
 from counterguard.digests import canonical_json_bytes, digest_json_artifact
 from counterguard.errors import ArtifactIntegrityError
+from counterguard.registry import Registry
 from counterguard.runner_catalog import resolve_runner
 from counterguard.runners.local import LocalTrustedExecutor
 from counterguard.standalone_capture import (
@@ -18,9 +19,50 @@ from counterguard.standalone_capture import (
     standalone_capture_exit_code,
     verify_standalone_evidence,
 )
+from counterguard.standalone_guard import compile_standalone_guard, verify_standalone_guard
 from tests.standalone_support import standalone_history
 
 pytestmark = [pytest.mark.slow, pytest.mark.docker]
+
+
+def test_real_docker_message_only_regression_preserves_minimal_oracle_and_registry(
+    tmp_path, monkeypatch, runner_and_no_local_execution
+):
+    monkeypatch.chdir(tmp_path)
+    repo = standalone_history(tmp_path, message_match=True)
+    evidence = capture_standalone(
+        repo,
+        Path("bind/binding.json"),
+        runner_id="root-pytest8",
+        evidence_id="evd_literal_message_v1",
+        review_reason="tool-owned message-only regression",
+        output=Path("matched-capture"),
+    )
+    assert evidence["reproduced"] and len(evidence["failing_case_ids"]) == 1
+    assert evidence["buggy"]["run"]["pytest_exit_code"] == 1
+    assert evidence["fixed"]["run"]["pytest_exit_code"] == 0
+    assert verify_standalone_evidence(repo, Path("matched-capture/evidence.json")).reproduced
+    assert (
+        json.loads(Path("matched-capture/capture.json").read_bytes())["generator_version"]
+        == "standalone-test.v2"
+    )
+    guard = compile_standalone_guard(
+        repo,
+        Path("matched-capture/evidence.json"),
+        guard_id="grd_literal_message_v1",
+        review_reason="retain only the actually failing message oracle",
+        output=Path("matched-guard"),
+    )
+    assert guard.schema_version == "guard.v4"
+    assert guard.generator_version == "standalone-guard-test.v2"
+    assert guard.case_ids == tuple(evidence["failing_case_ids"])
+    assert b"exception_match" in Path("matched-guard/test_guard.py").read_bytes()
+    assert verify_standalone_guard(repo, Path("matched-guard/guard.json")) == guard
+    registry = Registry(tmp_path / "matched-registry")
+    entry = registry.add(Path("matched-guard/guard.json"), cwd=tmp_path, repo=repo)
+    assert entry.schema_version == "registry-entry.v4"
+    assert registry.add(Path("matched-guard/guard.json"), cwd=tmp_path, repo=repo) == entry
+    assert not registry.show(guard.guard_id)["verification_schedulable"]
 
 
 @pytest.fixture

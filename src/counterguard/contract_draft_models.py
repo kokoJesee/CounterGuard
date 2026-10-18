@@ -7,6 +7,7 @@ from pydantic import Field, JsonValue, model_validator
 
 from counterguard.contracts import ExceptionName
 from counterguard.digests import digest_json_artifact
+from counterguard.literal_match import validate_literal_match
 from counterguard.models import Digest, FrozenModel
 from counterguard.project_config import Module, RepositoryPath, Symbol
 
@@ -79,6 +80,19 @@ class DraftUnsupported(FrozenModel):
     assertion_count: Annotated[int, Field(ge=0)] = 0
 
 
+class DraftMatchCase(DraftCase):
+    """New case shape; old DraftCase continues to reject this extra field."""
+
+    exception_match: Annotated[str, Field(max_length=4096)]
+
+    @model_validator(mode="after")
+    def coherent_match(self):
+        if self.oracle != "raises":
+            raise ValueError("Message match requires an exception oracle")
+        validate_literal_match(self.exception_match)
+        return self
+
+
 class ContractProposal(FrozenModel):
     schema_version: Literal["contract-proposal.v1"] = "contract-proposal.v1"
     extractor_version: Literal["literal-test-projection.v1"] = "literal-test-projection.v1"
@@ -121,3 +135,9 @@ class ContractProposal(FrozenModel):
         if self.status != expected or self.artifact_digest != digest_json_artifact(self):
             raise ValueError("Draft status or digest mismatch")
         return self
+
+
+class ContractProposalV2(ContractProposal):
+    schema_version: Literal["contract-proposal.v2"] = "contract-proposal.v2"
+    extractor_version: Literal["literal-test-projection.v2"] = "literal-test-projection.v2"
+    cases: Annotated[tuple[DraftMatchCase | DraftCase, ...], Field(max_length=256)]

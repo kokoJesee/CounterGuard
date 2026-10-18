@@ -1,5 +1,7 @@
 # 从首次 Evidence 到日常 verify
 
+[受限消息断言](literal-message-oracles.md)采用 guard.v4 / Registry entry v4，最小失败集仍保留原 match 与异常类型，两次 Docker 自检和快照 Scope 要求不变。原 guard.v3 与 entry v3 保留。
+
 本页接续[通用 Docker 捕获](standalone-capture.md)。受限独立契约现在可以完成最小 Guard 编译、
 B/F 自检、精确快照 Scope、本地登记与 Shadow/Active 验证；不要求先有合法反例，也不伪造学习结果。
 它仍只支持 source-only 字面量 profile，不加载上游 pytest 配置、conftest、fixture 或插件，不安装目标依赖。

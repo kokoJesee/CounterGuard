@@ -376,6 +376,16 @@ manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重
 
 ## 通用契约与 B/F/H 绑定
 
+受限 `pytest.raises(..., match=...)` 的新增类型、字段与原版拒绝规则见[消息 oracle](literal-message-oracles.md)。不带 match 的已支持输入保持原契约/生成字节；新字段进入 case ID、projection digest、contract digest，并由当前绑定重建验证。
+
+| 新版本 | 新增依赖与重算范围 |
+|---|---|
+| contract-proposal.v2 / contract.v4 | 完整字面量 exception_match、原 AST 与新提取器版本；模式改动需新草案/所有者 H/绑定 |
+| standalone-capture.v2 | contract.v4 来源与 standalone-test.v2；当前实现改变需新 capture，旧计划不补签 |
+| guard.v4 / registry-entry.v4 | Evidence 的实际失败消息 case、standalone-guard-test.v2 及双向自检；重新 compile/register，不覆写历史 |
+
+Docker policy、runner review、RunRecord、Evidence 的来源摘要字段和精确 Scope 算法未扩张；新语义由完整上游契约摘要及新版生成器绑定。源码摘要变化使旧通用链不能借历史“已验证”状态调度，按新 ID 重建所需下游。
+
 `contract.v3` / `standalone-literals.v1` 的[字段与流程](standalone-contracts.md)与固定 validators 的
 contract.v2 分开。契约 pin B/F、显式导入映射、闭包 refs、F 内测试 blob/字节/完整投影以及受支持 case；
 H SHA 不放入其自身 blob，避免提交内容自引用。H 的新增契约与未改写的 F 文件由绑定器从对象库独立核对。

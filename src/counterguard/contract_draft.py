@@ -10,14 +10,17 @@ from counterguard.artifacts import write_immutable
 from counterguard.change_analysis import inspection_implementation_digests
 from counterguard.contract_draft_models import (
     ContractProposal,
+    ContractProposalV2,
     DraftCase,
     DraftKeyword,
     DraftLiteral,
+    DraftMatchCase,
     DraftUnsupported,
 )
 from counterguard.contracts import EXCEPTION_TYPES
 from counterguard.digests import canonical_json_bytes, digest_bytes, digest_json_artifact
 from counterguard.errors import ArtifactIntegrityError
+from counterguard.literal_match import validate_literal_match
 from counterguard.project_config import Module, RepositoryPath, Symbol, reject_links
 from counterguard.repository import read_committed_files
 
@@ -181,7 +184,8 @@ def _assertion(statement, bindings, parameters, target):
             or not isinstance(call, ast.Call)
             or _resolve(call.func, bindings) != "pytest.raises"
             or len(call.args) != 1
-            or call.keywords
+            or any(keyword.arg != "match" for keyword in call.keywords)
+            or len(call.keywords) > 1
             or not isinstance(call.args[0], ast.Name)
             or call.args[0].id not in EXCEPTION_TYPES
             or call.args[0].id in bindings
@@ -189,10 +193,19 @@ def _assertion(statement, bindings, parameters, target):
             or not isinstance(statement.body[0], ast.Expr)
         ):
             raise Unsupported("unsupported_exception_assertion")
-        return _call(statement.body[0].value, bindings, parameters, target) | {
+        result = _call(statement.body[0].value, bindings, parameters, target) | {
             "oracle": "raises",
             "exception": call.args[0].id,
         }
+        if call.keywords:
+            pattern = call.keywords[0].value
+            if not isinstance(pattern, ast.Constant) or not isinstance(pattern.value, str):
+                raise Unsupported("exception_match_literal_required")
+            try:
+                result["exception_match"] = validate_literal_match(pattern.value)
+            except ValueError as error:
+                raise Unsupported(str(error)) from error
+        return result
     raise Unsupported("unsupported_assertion")
 
 
@@ -335,7 +348,7 @@ def project_test(
                         }
                     )
                     candidates.append(
-                        DraftCase(
+                        (DraftMatchCase if "exception_match" in fragment else DraftCase)(
                             case_id="case_" + identity[7:31],
                             source_line=statement.lineno,
                             assertion_index=ordinal,
@@ -420,16 +433,18 @@ def draft_contract(
         "contract and supported Docker bootstrap are still required.",
         "implementation_digests": inspection_implementation_digests(),
     }
+    matched = any(isinstance(case, DraftMatchCase) for case in fragments["cases"])
+    version = "v2" if matched else "v1"
     value["artifact_digest"] = digest_json_artifact(
         value
         | {
-            "schema_version": "contract-proposal.v1",
-            "extractor_version": "literal-test-projection.v1",
+            "schema_version": f"contract-proposal.{version}",
+            "extractor_version": f"literal-test-projection.{version}",
             "human_review_required": True,
             "execution_allowed": False,
             "binding_trust": "syntactic_only_requires_owner_review",
         }
     )
-    proposal = ContractProposal.model_validate(value)
+    proposal = (ContractProposalV2 if matched else ContractProposal).model_validate(value)
     write_immutable(output / "proposal.json", canonical_json_bytes(proposal))
     return proposal

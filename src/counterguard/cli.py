@@ -121,7 +121,7 @@ def contract_prepare_command(
     test_function: Annotated[str, typer.Option(help="One top-level test_* function.")],
     output: Annotated[Path, typer.Option(help="New preparation directory outside target repo.")],
 ) -> None:
-    """Prepare contract.v3 for owner review and a separate head commit; never execute."""
+    """Prepare a versioned literal contract for owner review; never execute."""
     from counterguard.bootstrap_binding import prepare_contract
     from counterguard.repository import RepositoryProblem
 

@@ -121,7 +121,7 @@ def test_price():
     assert data["cases"][0].oracle == "raises" and data["cases"][0].exception == "ValueError"
     for source in (
         good.replace("ValueError", "RuntimeError"),
-        good.replace("pytest.raises(ValueError)", "pytest.raises(ValueError, match='x')"),
+        good.replace("pytest.raises(ValueError)", "pytest.raises(ValueError, match='x.*')"),
         "class ValueError(Exception): pass\n" + good,
     ):
         result = project(source)

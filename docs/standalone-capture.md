@@ -1,5 +1,7 @@
 # 从通用契约捕获双向 Evidence
 
+含[受限异常消息断言](literal-message-oracles.md)的 contract.v4 使用 standalone-capture.v2 / standalone-test.v2，原捕获计划与模板保留。消息不符归为测试失败；异常类型相同本身不能使该 case 通过。
+
 `bootstrap capture` 接续 [H 内契约与来源绑定](standalone-contracts.md)，在已审核 Docker runner 中分别执行 B/F。
 支持零运行时依赖、普通模块/包、根目录或 `src` 布局和 `contract.v3` 的受限字面量断言。
 它生成首次 Evidence；后续[最小 Guard 编译、快照 Scope 和 Shadow 接入](standalone-guards.md)已支持同一受限 profile。

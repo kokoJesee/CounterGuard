@@ -6,7 +6,9 @@ from counterguard.bootstrap_binding import bind_contract, prepare_contract
 from tests.repository_support import git
 
 
-def standalone_history(workspace: Path, *, import_root=".", import_failure=False):
+def standalone_history(
+    workspace: Path, *, import_root=".", import_failure=False, message_match=False
+):
     repo = workspace / "repo"
     repo.mkdir()
     git(repo, "init", "-b", "main")
@@ -23,8 +25,13 @@ def standalone_history(workspace: Path, *, import_root=".", import_failure=False
     buggy_source = guard + (
         "raise ImportError('fixture import failure')\n" if import_failure else ""
     )
+    buggy_function = (
+        "def price(x):\n if x == 1: raise ValueError('old message')\n return x+1\n"
+        if message_match
+        else "def price(x): return x+1 if x == 0 else x\n"
+    )
     (package / "core.py").write_text(
-        buggy_source + "def price(x): return x+1 if x == 0 else x\n",
+        buggy_source + buggy_function,
         encoding="utf-8",
     )
     tests = repo / "tests"
@@ -38,10 +45,21 @@ def standalone_history(workspace: Path, *, import_root=".", import_failure=False
     git(repo, "add", ".")
     git(repo, "commit", "-m", "tool-owned buggy fixture")
     buggy = git(repo, "rev-parse", "HEAD")
-    (package / "core.py").write_text(guard + "def price(x): return x+1\n", encoding="utf-8")
+    fixed_function = (
+        "def price(x):\n if x == 1: raise ValueError('expected message')\n return x+1\n"
+        if message_match
+        else "def price(x): return x+1\n"
+    )
+    (package / "core.py").write_text(guard + fixed_function, encoding="utf-8")
+    regression = (
+        "import pytest\ndef test_price():\n assert price(0) == 1\n"
+        " with pytest.raises(ValueError, match='expected message'): price(1)\n"
+        if message_match
+        else "def test_price():\n assert price(0) == 1\n assert price(1) == 2\n"
+    )
     (tests / "test_price.py").write_text(
         "raise RuntimeError('upstream test module must not load')\nfrom sample.core import price\n"
-        "def test_price():\n assert price(0) == 1\n assert price(1) == 2\n",
+        + regression,
         encoding="utf-8",
     )
     git(repo, "add", ".")

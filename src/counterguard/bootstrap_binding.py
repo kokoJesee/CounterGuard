@@ -12,6 +12,7 @@ from counterguard.artifacts import write_immutable
 from counterguard.bootstrap_plan import describe_bootstrap_files, inspect_target_closure
 from counterguard.change_analysis import inspection_implementation_digests
 from counterguard.contract_draft import project_test
+from counterguard.contract_draft_models import DraftMatchCase
 from counterguard.digests import canonical_json_bytes, digest_bytes, digest_json_artifact
 from counterguard.errors import ArtifactIntegrityError
 from counterguard.project_config import Module, RepositoryPath, Symbol, reject_links
@@ -21,7 +22,9 @@ from counterguard.standalone_contracts import (
     CommitId,
     ContractId,
     StandaloneContract,
+    StandaloneContractV4,
     StandaloneTestOrigin,
+    StandaloneTestOriginV2,
     read_standalone_contract,
     strict_json,
 )
@@ -75,7 +78,12 @@ def _projection(files, pins, *, test_ref, test_function, module, symbol):
     except (ValueError, UnicodeError, RecursionError) as error:
         raise BindingProblem("fixed_test_projection_unavailable") from error
     _require(bool(fragments["cases"]), "fixed_test_has_no_supported_cases")
-    origin = StandaloneTestOrigin(
+    origin_type = (
+        StandaloneTestOriginV2
+        if any(isinstance(case, DraftMatchCase) for case in fragments["cases"])
+        else StandaloneTestOrigin
+    )
+    origin = origin_type(
         test_ref=test_ref,
         test_function=test_function,
         test_object_id=next(pin.object_id for pin in pins if pin.path == test_ref),
@@ -189,7 +197,10 @@ def prepare_contract(
     stem = prefix + module.replace(".", "/")
     candidates = [ref for ref in (stem + ".py", stem + "/__init__.py") if ref in files]
     _require(len(candidates) == 1, "target_source_is_ambiguous")
-    contract = StandaloneContract(
+    contract_type = (
+        StandaloneContractV4 if isinstance(origin, StandaloneTestOriginV2) else StandaloneContract
+    )
+    contract = contract_type(
         contract_id=contract_id,
         buggy_commit=buggy,
         fixed_commit=fixed,

@@ -60,6 +60,11 @@ class StandaloneAuthorization(FrozenModel):
     artifact_digest: Digest
 
 
+class StandaloneCaptureV2(StandaloneCapture):
+    schema_version: Literal["standalone-capture.v2"] = "standalone-capture.v2"
+    generator_version: Literal["standalone-test.v2"] = "standalone-test.v2"
+
+
 class StandaloneExecution(FrozenModel):
     workspace_ref: ArtifactRef
     authorization_ref: ArtifactRef
@@ -169,3 +174,8 @@ class StandaloneGuard(FrozenModel):
     buggy_check: StandaloneExecution
     fixed_check: StandaloneExecution
     artifact_digest: Digest
+
+
+class StandaloneGuardV4(StandaloneGuard):
+    schema_version: Literal["guard.v4"] = "guard.v4"
+    generator_version: Literal["standalone-guard-test.v2"] = "standalone-guard-test.v2"

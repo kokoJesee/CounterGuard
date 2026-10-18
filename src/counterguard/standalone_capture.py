@@ -28,15 +28,22 @@ from counterguard.runners.docker import (
     _docker_executable,
     _require_image_identity,
 )
-from counterguard.standalone_contracts import StandaloneContract, strict_json
+from counterguard.standalone_contracts import (
+    StandaloneContractV4,
+    read_standalone_contract,
+    strict_json,
+)
 from counterguard.standalone_models import (
     CaptureTimeout,
     EvidenceId,
     ReviewReason,
     StandaloneAuthorization,
     StandaloneCapture,
+    StandaloneCaptureV2,
     StandaloneEvidence,
     StandaloneExecution,
+    StandaloneGuard,
+    StandaloneGuardV4,
 )
 from counterguard.standalone_test import (
     CONTRACT_REF,
@@ -93,6 +100,10 @@ def _model(workspace, ref, model):
         value.get("artifact_digest") == digest_json_artifact(value),
         "capture_artifact_digest_mismatch",
     )
+    if model is StandaloneCapture and value.get("schema_version") == "standalone-capture.v2":
+        model = StandaloneCaptureV2
+    if model is StandaloneGuard and value.get("schema_version") == "guard.v4":
+        model = StandaloneGuardV4
     return model.model_validate_json(raw)
 
 
@@ -100,7 +111,7 @@ def _binding(repo, path):
     value = verify_binding(repo, path)
     if value["capture_input_status"] != "review_required":
         raise CaptureNotReady("capture_inputs_require_resolution")
-    contract = StandaloneContract.model_validate_json(canonical_json_bytes(value["contract"]))
+    contract = read_standalone_contract(canonical_json_bytes(value["contract"]))
     for ref in contract.runtime_refs:
         relative = ref.removeprefix("src/") if contract.import_root == "src" else ref
         if relative.split("/")[0] in {CONTROL, "sitecustomize.py", "usercustomize.py"}:
@@ -150,6 +161,10 @@ def _context(repo, workspace, capture_ref):
     )
     binding, contract = _binding(repo, workspace / plan.binding_ref)
     _require(binding["artifact_digest"] == plan.binding_digest, "capture_binding_mismatch")
+    _require(
+        isinstance(plan, StandaloneCaptureV2) == isinstance(contract, StandaloneContractV4),
+        "capture_generator_contract_version_mismatch",
+    )
     return plan, binding, contract
 
 
@@ -361,7 +376,11 @@ def capture_standalone(
             raise CaptureNotReady("capture_runner_profile_not_supported")
         trees = {role: _tree(repo, binding, role) for role in ("buggy", "fixed", "head")}
         plan = _seal(
-            StandaloneCapture(
+            (
+                StandaloneCaptureV2
+                if isinstance(contract, StandaloneContractV4)
+                else StandaloneCapture
+            )(
                 evidence_id=evidence_id,
                 created_at=datetime.now(UTC),
                 output_ref=output.relative_to(workspace).as_posix(),
@@ -465,7 +484,7 @@ def capture_standalone(
 
 def _verify_run_envelope(run, request, plan):
     policy = DockerPolicyV1()
-    contract = StandaloneContract.model_validate_json(_file(request.cwd, CONTRACT_REF))
+    contract = read_standalone_contract(_file(request.cwd, CONTRACT_REF))
     manifest = {
         "schema_version": "docker-runner-request.v2",
         "test_ref": TEST_REF,

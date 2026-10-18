@@ -17,7 +17,7 @@ counterguard contract draft --repo <repo> --revision <full-sha> --test-ref tests
 - 普通 import / from-import 与前置的目标函数别名；这只是语法绑定，不证明运行时对象身份。
 - 直接 `assert target(literals) ==/!= literal`；`is/is not` 只接受 None、True、False。
 - `assert target(...)` 和 `assert not target(...)` 保留 truthy/falsey，不改写成 `is True/False`。
-- 单语句 `with pytest.raises(ValueError/TypeError/OverflowError): target(...)`，不接收 match、as 或用户异常类。
+- 单语句 `with pytest.raises(ValueError/TypeError/OverflowError): target(...)`；可带[受限字面量 match](literal-message-oracles.md)，不接收 as 或用户异常类。
 - 标量、有限浮点、bytes 和有界 list/tuple/dict；类型带标签保留，tuple 不变成 list，bytes 以十六进制记录。
 
 固定预算为测试 1 MiB、AST 50000 节点、最多 256 case；字面量嵌套最多 8 层、容器最多 128 项、整数最多 256 bit。
@@ -40,7 +40,7 @@ fixture、任意 setup/赋值、控制流、异步、间接参数化、未知装
 草案绑定 commit、测试路径、Git blob ID、原字节摘要、原行号、断言 AST 摘要和实际工具源码摘要。
 同输入同实现不使用时间/UUID，结果可逐字节复现；case ID 不依赖原行号，增加注释只改变来源记录。
 `source_assertions` 统计 assert 及 pytest.raises 上下文；表示数与未表示数必须对账。
-Schema 为独立 [contract-proposal.v1](../schemas/contract-proposal.schema.json)，不冒充已有 contract.v1/v2。
+无 match 时 Schema 仍为独立 [contract-proposal.v1](../schemas/contract-proposal.schema.json)；有受支持 match 时使用 [contract-proposal.v2](../schemas/contract-proposal-v2.schema.json)，保留完整消息 oracle，不冒充已有 contract.v1/v2。
 
 `human_review_required=true`、`execution_allowed=false` 均为强制字段。
 Registry、compile 和 verify 不消费这种草案；没有“改一个 approved=true 就执行”的通道。

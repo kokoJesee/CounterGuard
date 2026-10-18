@@ -104,6 +104,8 @@ W04 整体保持**部分**，不标为全面已测。
 
 ## W3 开工与准入
 
+异常消息 oracle 的补充边界见[受限语法](literal-message-oracles.md)与[专项测试](../tests/unit/test_exception_match.py)：扫描不执行模式表达式或编译任意 regex；复杂模式明确 unsupported，旧模型不能忽略消息字段。新捕获/Guard/Registry 版本绑定原始 H 投影，消息修改后重签仍不能调度。该项不扩大 legacy、插件、依赖或 CI 权限支持，W01/W03/W04 的其余未覆盖项保持原状态。
+
 runner 与固定仓库统一入口补充：[两类镜像各四项复验](results/runner-catalog-v1/README.md)，[目录与错误镜像拒绝测试](../tests/unit/test_runner_catalog.py)，[新运行目录授权 v3 测试](../tests/unit/test_repository_verify.py)。新目录由代码 pin，发现仅 inspect、不执行镜像；跨未经审核仓库/布局仍 unknown。真实重复重放的独立来源审核由 [显式 opt-in 专项](../tests/integration/test_repository_verify_live.py) 覆盖，只有提供实际 manifest/两份报告时才运行。
 
 本次 [统一试点验收](results/repository-verify-v1/README.md) 实际提供了新 manifest 与两份真实报告：两次计数/决策摘要一致且 run ID 不同，独立审核 1 passed；完整快速层 605 passed。该实测不把 opt-in 专项升级为默认 CI 保证。

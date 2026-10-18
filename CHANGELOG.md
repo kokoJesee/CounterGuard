@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 契约提取与 Docker 生成测试支持受限的 `pytest.raises(..., match=...)` 字面量消息断言；复杂正则和动态表达式明确 unsupported。新增 proposal v2、contract v4、capture v2、Guard v4 与 Registry entry v4，旧格式不接受新字段，既有产物不改写。范围与重算规则见[消息 oracle](docs/literal-message-oracles.md)。
+
 ## 0.5.0 Beta — 2026-10-17
 
 - 完成交付全量验收：998 passed、无失败或跳过，JUnit 记录 1684.71 秒，包含真实 Docker 和固定 validators 试点的来源审计。干净 wheel 完成 Demo、独立复验、真实仓库重放和 CI 驱动验收；首次失败和重试分开保留，详见[验收记录](docs/results/beta-v0.5.0/README.md)。

@@ -25,7 +25,7 @@ from counterguard.models import ArtifactRef, Digest, Evidence, FrozenModel, Guar
 from counterguard.project_config import reject_links
 from counterguard.repository import RepositoryProblem
 from counterguard.repository_models import RepositoryEvidence, RepositoryGuard
-from counterguard.standalone_models import StandaloneEvidence, StandaloneGuard
+from counterguard.standalone_models import StandaloneEvidence, StandaloneGuard, StandaloneGuardV4
 from counterguard.storage import sqlite
 
 ZERO = "sha256:" + "0" * 64
@@ -91,6 +91,11 @@ class RegistryEvent(FrozenModel):
     artifact_digest: Digest
 
 
+class StandaloneRegistryEntryV4(StandaloneRegistryEntry):
+    schema_version: Literal["registry-entry.v4"] = "registry-entry.v4"
+    guard: StandaloneGuardV4
+
+
 @dataclass(frozen=True)
 class VerifiedRegistryGuard:
     entry: RegistryEntry | StandaloneRegistryEntry
@@ -115,8 +120,11 @@ def _read(path: Path, model):
         if path.stat().st_size > 2 * 1024 * 1024:
             raise ValueError("Registry fact exceeds size limit")
         raw = path.read_bytes()
-        if model is RegistryEntry and json.loads(raw).get("schema_version") == "registry-entry.v3":
-            model = StandaloneRegistryEntry
+        if model is RegistryEntry:
+            model = {
+                "registry-entry.v3": StandaloneRegistryEntry,
+                "registry-entry.v4": StandaloneRegistryEntryV4,
+            }.get(json.loads(raw).get("schema_version"), model)
         if model is RegistryEvent and json.loads(raw).get("schema_version") == (
             "guard-lifecycle-event.v1"
         ):
@@ -276,7 +284,7 @@ class Registry:
         from counterguard.standalone_capture import _file
 
         raw = _file(workspace, path.relative_to(workspace.resolve(strict=True)).as_posix())
-        standalone = json.loads(raw).get("schema_version") == "guard.v3"
+        standalone = json.loads(raw).get("schema_version") in {"guard.v3", "guard.v4"}
         if standalone:
             if repo is None:
                 raise ValueError("Standalone Guard registration requires --repo for Git provenance")
@@ -302,7 +310,13 @@ class Registry:
                 return entry
             if len(entries) >= MAX_FACTS:
                 raise ArtifactIntegrityError("Registry entry limit exceeded")
-            entry_type = StandaloneRegistryEntry if standalone else RegistryEntry
+            entry_type = (
+                StandaloneRegistryEntryV4
+                if isinstance(guard, StandaloneGuardV4)
+                else StandaloneRegistryEntry
+                if standalone
+                else RegistryEntry
+            )
             source_version = (
                 {"source_repository": str(repo.resolve(strict=True))}
                 if standalone

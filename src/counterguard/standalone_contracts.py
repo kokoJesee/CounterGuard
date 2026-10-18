@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, StringConstraints, model_validator
 
-from counterguard.contract_draft_models import DraftCase, DraftLiteral
+from counterguard.contract_draft_models import DraftCase, DraftLiteral, DraftMatchCase
 from counterguard.models import Digest, FrozenModel
 from counterguard.project_config import Module, RepositoryPath, Symbol
 
@@ -44,6 +44,10 @@ class StandaloneContract(FrozenModel):
 
     @model_validator(mode="after")
     def coherent_contract(self):
+        if self.schema_version == "contract.v3" and any(
+            isinstance(case, DraftMatchCase) for case in self.cases
+        ):
+            raise ValueError("Message cases require contract.v4")
         if self.buggy_commit == self.fixed_commit:
             raise ValueError("Buggy and fixed commits must differ")
         if self.runtime_refs != tuple(sorted(set(self.runtime_refs))):
@@ -85,6 +89,17 @@ class StandaloneContract(FrozenModel):
         return self
 
 
+class StandaloneTestOriginV2(StandaloneTestOrigin):
+    extractor_version: Literal["literal-test-projection.v2"] = "literal-test-projection.v2"
+
+
+class StandaloneContractV4(StandaloneContract):
+    schema_version: Literal["contract.v4"] = "contract.v4"
+    profile: Literal["standalone-literals-match.v1"] = "standalone-literals-match.v1"
+    test_origin: StandaloneTestOriginV2
+    cases: Annotated[tuple[DraftMatchCase | DraftCase, ...], Field(min_length=1, max_length=256)]
+
+
 def _hashable_literal(value: DraftLiteral) -> bool:
     return value.kind not in {"list", "dict"} and (
         value.kind != "tuple" or all(_hashable_literal(item) for item in value.items)
@@ -114,5 +129,8 @@ def strict_json(raw: bytes, *, limit: int) -> dict:
 
 
 def read_standalone_contract(raw: bytes) -> StandaloneContract:
-    strict_json(raw, limit=CONTRACT_LIMIT)
-    return StandaloneContract.model_validate_json(raw)
+    value = strict_json(raw, limit=CONTRACT_LIMIT)
+    model = (
+        StandaloneContractV4 if value.get("schema_version") == "contract.v4" else StandaloneContract
+    )
+    return model.model_validate_json(raw)
