@@ -23,6 +23,7 @@ from tests.unit.test_bootstrap_binding import repository as repository
 from tests.unit.test_exception_match import matched_contract as matched_contract
 
 
+@pytest.mark.parametrize("matched_contract", ["direct", "reexport"], indirect=True)
 def test_versioned_match_chain_independent_rebuild_minimal_guard_and_registry(
     matched_contract, monkeypatch, tmp_path
 ):
@@ -54,7 +55,8 @@ def test_versioned_match_chain_independent_rebuild_minimal_guard_and_registry(
         )
         cases = json.loads(ast.literal_eval(assignment.value.args[0]))
         assert cases[0]["exception_match"] == "invalid value"
-        buggy = (sandbox / contract.source_ref).read_bytes() == trees[B][contract.source_ref]
+        source_ref = getattr(contract, "definition_ref", contract.source_ref)
+        buggy = (sandbox / source_ref).read_bytes() == trees[B][source_ref]
         suite = ET.Element("testsuite")
         for case in cases:
             item = ET.SubElement(

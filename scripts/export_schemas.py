@@ -38,7 +38,11 @@ from counterguard.runner_catalog import RunnerCatalog, RunnerReview
 from counterguard.runners.docker import DockerExecutionAuthorization, DockerPolicyV1
 from counterguard.scope import FitManifest, ScopeLearningResult, TrainingExample
 from counterguard.scope_explanations import ScopeExplanation
-from counterguard.standalone_contracts import StandaloneContract, StandaloneContractV4
+from counterguard.standalone_contracts import (
+    StandaloneContract,
+    StandaloneContractV4,
+    StandaloneContractV5,
+)
 from counterguard.standalone_models import (
     StandaloneAuthorization,
     StandaloneCapture,
@@ -55,6 +59,7 @@ from counterguard.verify import VerifyReport, VerifyReportV2, VerifyReportV3
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "standalone-contract-v5": StandaloneContractV5,
     "contract-proposal-v2": ContractProposalV2,
     "standalone-contract-v4": StandaloneContractV4,
     "standalone-capture-v2": StandaloneCaptureV2,

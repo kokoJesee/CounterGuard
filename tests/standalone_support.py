@@ -1,13 +1,14 @@
 """Build only tool-owned Git histories; never import their Python on the host."""
 
 from pathlib import Path
+from textwrap import indent
 
 from counterguard.bootstrap_binding import bind_contract, prepare_contract
 from tests.repository_support import git
 
 
 def standalone_history(
-    workspace: Path, *, import_root=".", import_failure=False, message_match=False
+    workspace: Path, *, import_root=".", import_failure=False, message_match=False, reexport=False
 ):
     repo = workspace / "repo"
     repo.mkdir()
@@ -17,6 +18,9 @@ def standalone_history(
     package = repo / ("sample" if import_root == "." else "src/sample")
     package.mkdir(parents=True)
     (package / "__init__.py").write_text("# Tool-owned Docker fixture\n", encoding="utf-8")
+    if reexport:
+        assert message_match and not import_failure
+        (package / "__init__.py").write_text("from .core import price\n", encoding="utf-8")
     guard = (
         "import os\n"
         "if os.environ.get('COUNTERGUARD_CONTRACT') != 'cg_control/contract.json':\n"
@@ -30,6 +34,11 @@ def standalone_history(
         if message_match
         else "def price(x): return x+1 if x == 0 else x\n"
     )
+    if reexport:
+        buggy_source = ""
+        buggy_function = buggy_function.replace(
+            "def price(x):\n", "def price(x):\n" + indent(guard, " ")
+        )
     (package / "core.py").write_text(
         buggy_source + buggy_function,
         encoding="utf-8",
@@ -50,7 +59,11 @@ def standalone_history(
         if message_match
         else "def price(x): return x+1\n"
     )
-    (package / "core.py").write_text(guard + fixed_function, encoding="utf-8")
+    if reexport:
+        fixed_function = fixed_function.replace(
+            "def price(x):\n", "def price(x):\n" + indent(guard, " ")
+        )
+    (package / "core.py").write_text(("" if reexport else guard) + fixed_function, encoding="utf-8")
     regression = (
         "import pytest\ndef test_price():\n assert price(0) == 1\n"
         " with pytest.raises(ValueError, match='expected message'): price(1)\n"
@@ -58,7 +71,8 @@ def standalone_history(
         else "def test_price():\n assert price(0) == 1\n assert price(1) == 2\n"
     )
     (tests / "test_price.py").write_text(
-        "raise RuntimeError('upstream test module must not load')\nfrom sample.core import price\n"
+        "raise RuntimeError('upstream test module must not load')\n"
+        + ("from sample import price\n" if reexport else "from sample.core import price\n")
         + regression,
         encoding="utf-8",
     )
@@ -70,7 +84,7 @@ def standalone_history(
         buggy=buggy,
         fixed=fixed,
         contract_id="price.v1",
-        target="sample.core:price",
+        target="sample:price" if reexport else "sample.core:price",
         import_root=import_root,
         test_ref="tests/test_price.py",
         test_function="test_price",

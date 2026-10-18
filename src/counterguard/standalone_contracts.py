@@ -100,6 +100,33 @@ class StandaloneContractV4(StandaloneContract):
     cases: Annotated[tuple[DraftMatchCase | DraftCase, ...], Field(min_length=1, max_length=256)]
 
 
+class StandaloneContractV5(StandaloneContractV4):
+    schema_version: Literal["contract.v5"] = "contract.v5"
+    profile: Literal["standalone-static-reexport.v1"] = "standalone-static-reexport.v1"
+    test_origin: StandaloneTestOriginV2 | StandaloneTestOrigin
+    definition_module: Module
+    definition_symbol: Symbol
+    definition_ref: RepositoryPath
+
+    @model_validator(mode="after")
+    def coherent_export(self):
+        prefix = "" if self.import_root == "." else "src/"
+        if (
+            "." in self.target_module
+            or self.source_ref != prefix + self.target_module + "/__init__.py"
+            or not self.definition_module.startswith(self.target_module + ".")
+            or len(self.definition_module.split(".")) != 2
+            or self.definition_ref != prefix + self.definition_module.replace(".", "/") + ".py"
+            or self.definition_ref not in self.runtime_refs
+        ):
+            raise ValueError("Static export mapping must name one direct child definition")
+        if any(isinstance(case, DraftMatchCase) for case in self.cases) and not isinstance(
+            self.test_origin, StandaloneTestOriginV2
+        ):
+            raise ValueError("Message cases require projection.v2")
+        return self
+
+
 def _hashable_literal(value: DraftLiteral) -> bool:
     return value.kind not in {"list", "dict"} and (
         value.kind != "tuple" or all(_hashable_literal(item) for item in value.items)
@@ -130,7 +157,8 @@ def strict_json(raw: bytes, *, limit: int) -> dict:
 
 def read_standalone_contract(raw: bytes) -> StandaloneContract:
     value = strict_json(raw, limit=CONTRACT_LIMIT)
-    model = (
-        StandaloneContractV4 if value.get("schema_version") == "contract.v4" else StandaloneContract
-    )
+    model = {
+        "contract.v4": StandaloneContractV4,
+        "contract.v5": StandaloneContractV5,
+    }.get(value.get("schema_version"), StandaloneContract)
     return model.model_validate_json(raw)

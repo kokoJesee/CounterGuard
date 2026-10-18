@@ -23,11 +23,13 @@ from counterguard.standalone_contracts import (
     ContractId,
     StandaloneContract,
     StandaloneContractV4,
+    StandaloneContractV5,
     StandaloneTestOrigin,
     StandaloneTestOriginV2,
     read_standalone_contract,
     strict_json,
 )
+from counterguard.static_exports import ExportProblem, resolve_static_reexport
 
 BINDING_LIMIT = 4 * 1024 * 1024
 
@@ -129,6 +131,37 @@ def _runtime_assessment(files, contract):
                 add("legacy_runtime_dependencies_require_review", "setup.cfg")
         except (configparser.Error, UnicodeError, ValueError):
             add("legacy_metadata_requires_review", "setup.cfg")
+    if isinstance(contract, StandaloneContractV5):
+        try:
+            export = resolve_static_reexport(
+                files,
+                module=contract.target_module,
+                symbol=contract.target_symbol,
+                import_root=contract.import_root,
+            )
+            closure["static_export"] = export
+            if any(
+                export[field] != getattr(contract, field)
+                for field in ("definition_module", "definition_symbol", "definition_ref")
+            ):
+                add("export_definition_mismatch", contract.source_ref)
+        except ExportProblem as error:
+            add(str(error), contract.source_ref)
+    else:
+        _assess_direct_function(files, contract, add)
+    closure["findings"] = sorted(
+        findings,
+        key=lambda item: (item["code"], item["path"], item["detail"], item["severity"]),
+    )
+    closure["status"] = (
+        "blocked"
+        if any(x["severity"] == "blocked" for x in findings)
+        else ("unknown" if findings else "review_required")
+    )
+    return closure
+
+
+def _assess_direct_function(files, contract, add):
     try:
         tree = ast.parse(files[contract.source_ref])
         declarations = [
@@ -142,21 +175,6 @@ def _runtime_assessment(files, contract):
             add("target_decorators_require_review", contract.source_ref)
     except (KeyError, SyntaxError, UnicodeError, ValueError, RecursionError):
         add("target_binding_requires_review", contract.source_ref)
-    closure["findings"] = sorted(
-        findings,
-        key=lambda item: (
-            item["code"],
-            item["path"],
-            item["detail"],
-            item["severity"],
-        ),
-    )
-    closure["status"] = (
-        "blocked"
-        if any(x["severity"] == "blocked" for x in findings)
-        else ("unknown" if findings else "review_required")
-    )
-    return closure
 
 
 def prepare_contract(
@@ -200,6 +218,19 @@ def prepare_contract(
     contract_type = (
         StandaloneContractV4 if isinstance(origin, StandaloneTestOriginV2) else StandaloneContract
     )
+    export_fields = {}
+    try:
+        export = resolve_static_reexport(
+            files, module=module, symbol=symbol, import_root=import_root
+        )
+    except ExportProblem:
+        pass  # Unsupported declarations retain the old, non-executable assessment.
+    else:
+        contract_type = StandaloneContractV5
+        export_fields = {
+            field: export[field]
+            for field in ("definition_module", "definition_symbol", "definition_ref")
+        }
     contract = contract_type(
         contract_id=contract_id,
         buggy_commit=buggy,
@@ -213,6 +244,7 @@ def prepare_contract(
         ),
         test_origin=origin,
         cases=tuple(sorted(fragments["cases"], key=lambda case: case.case_id)),
+        **export_fields,
     )
     contract_raw = canonical_json_bytes(contract)
     _require(len(contract_raw) <= CONTRACT_LIMIT, "prepared_contract_byte_budget_exceeded")
@@ -293,7 +325,9 @@ def rebuild_binding(repo: Path, head: str, contract_ref: str) -> dict:
         else ("unknown" if "unknown" in role_status else "review_required")
     )
     payload = {
-        "schema_version": "bootstrap-binding.v2",
+        "schema_version": "bootstrap-binding.v3"
+        if isinstance(contract, StandaloneContractV5)
+        else "bootstrap-binding.v2",
         "binding_status": "sources_verified",
         "head_commit": head,
         "contract_ref": contract_ref,
@@ -382,7 +416,8 @@ def verify_binding(repo: Path, path: Path) -> dict:
     try:
         value = strict_json(path.read_bytes(), limit=BINDING_LIMIT)
         _require(
-            value.get("schema_version") in {"bootstrap-binding.v1", "bootstrap-binding.v2"},
+            value.get("schema_version")
+            in {"bootstrap-binding.v1", "bootstrap-binding.v2", "bootstrap-binding.v3"},
             "not_a_source_binding",
         )
         _require(

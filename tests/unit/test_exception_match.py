@@ -155,15 +155,20 @@ def test_price(x):
 
 
 @pytest.fixture
-def matched_contract(repository):
+def matched_contract(repository, request):
     repo, trees, metadata = repository
     trees[F]["tests/test_price.py"] = source()
+    exported = getattr(request, "param", "direct") == "reexport"
+    if exported:
+        for revision in (B, F):
+            trees[revision]["sample/__init__.py"] = b"from .core import price\n"
+        trees[F]["tests/test_price.py"] = source().replace(b"from sample.core", b"from sample")
     report = prepare_contract(
         repo,
         buggy=B,
         fixed=F,
         contract_id="price.match.v1",
-        target="sample.core:price",
+        target="sample:price" if exported else "sample.core:price",
         import_root=".",
         test_ref="tests/test_price.py",
         test_function="test_price",

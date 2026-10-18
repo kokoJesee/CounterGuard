@@ -8,7 +8,8 @@
 
 ## 首次准备的责任清单
 
-准备 contract.v3 后，先查看 preparation.json 的 runtime_assessment 与 buggy_runtime_assessment。
+准备[独立契约](standalone-contracts.md)后，先查看 preparation.json 的 runtime_assessment 与 buggy_runtime_assessment。
+普通字面量用 v3、消息断言用 v4、受限根包重导出用 v5；版本由 prepare 判定，不手工改写版本绕过 finding。
 任何一侧仍 unknown/blocked 时，不能只填审核理由继续 capture；先解决具体 finding，不必急着 fork 或提交 H。
 只有 proposal/preparation、不含 H 的本地文件或一次成功 plan，都不能替代完整来源绑定。
 

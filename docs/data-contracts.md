@@ -376,6 +376,11 @@ manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重
 
 ## 通用契约与 B/F/H 绑定
 
+受限根包导出另用 [contract.v5 / bootstrap-binding.v3](static-reexports.md)：新增 definition_module、
+definition_symbol、definition_ref，根包与定义路径/内容由 B/F/H 分角色重建。公开入口和完整 runtime_refs 保留；
+导出声明、任一角色源码或实现变化需新绑定与下游执行链。旧 v3/v4 契约不扩大接受范围，既有产物不补签。
+v5 复用 capture.v2 / Guard v4 的完整契约摘要、生成器 v2 和当前实现约束，不改变执行格式、Scope 算法或冻结协议。
+
 受限 `pytest.raises(..., match=...)` 的新增类型、字段与原版拒绝规则见[消息 oracle](literal-message-oracles.md)。不带 match 的已支持输入保持原契约/生成字节；新字段进入 case ID、projection digest、contract digest，并由当前绑定重建验证。
 
 | 新版本 | 新增依赖与重算范围 |

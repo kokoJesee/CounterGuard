@@ -4,7 +4,9 @@
 它不再固定 validators 的模块和 oracle；完成审核后可接续[通用 Docker capture](standalone-capture.md)和[最小 Guard/Shadow](standalone-guards.md)。
 旧 contract.v1/v2、Guard、Scope、runner 和已发布产物不改写。
 
-含[受限消息断言](literal-message-oracles.md)时，prepare 自动生成独立 contract.v4；原 contract.v3 保留原字段与字节语义。相同的 B/F/H、源码闭包、人审和 Docker 要求仍适用，未增加 legacy profile 或重导出解析能力。
+含[受限消息断言](literal-message-oracles.md)时，prepare 自动生成独立 contract.v4；原 contract.v3 保留原字段与字节语义。
+[受限根包重导出](static-reexports.md)使用独立 contract.v5，仍按原公开入口生成测试，B/F/H 分别重建定义声明。
+相同的源码闭包、人审和 Docker 要求仍适用；legacy profile 未增加。
 
 ## 准备、由所有者提交、绑定
 

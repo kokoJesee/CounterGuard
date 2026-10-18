@@ -40,6 +40,11 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W02/W03 增加[受限根包导出声明](static-reexports.md)：新 contract.v5 与 binding.v3，原公开入口保持不变，
+B/F/H 分角色重建根包/定义摘要。静态专项拒绝条件/动态/重复绑定、定义漂移、未知装饰器和重签输入状态，
+确认 unknown 在运输层之前停止、20 次乱序稳定；原版契约不自动获得新接受范围。
+真实执行的覆盖范围以本功能验收记录为准；这不关闭任意 Python 效果、所有者身份、插件/安装或远程权限缺口。
+
 W01/W03/W04 增加[独立最小 Guard 到 Shadow/verify](standalone-guards.md)：新 Guard v3、快照 Scope、
 Registry entry v3 与执行授权 v5。每次最小自检/重放均重新核对来源，完整闭包不能混合 B/F；
 新快照 unknown 不启动 Docker，候选/退休/禁用不调度，篡改来源即使在退休态也显示完整性失败。

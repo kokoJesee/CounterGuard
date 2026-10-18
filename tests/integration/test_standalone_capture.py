@@ -25,11 +25,19 @@ from tests.standalone_support import standalone_history
 pytestmark = [pytest.mark.slow, pytest.mark.docker]
 
 
+@pytest.mark.parametrize("reexport", [False, True], ids=["direct", "root-reexport"])
 def test_real_docker_message_only_regression_preserves_minimal_oracle_and_registry(
-    tmp_path, monkeypatch, runner_and_no_local_execution
+    tmp_path, monkeypatch, runner_and_no_local_execution, reexport
 ):
     monkeypatch.chdir(tmp_path)
-    repo = standalone_history(tmp_path, message_match=True)
+    repo = standalone_history(
+        tmp_path, import_root="src" if reexport else ".", message_match=True, reexport=reexport
+    )
+    if reexport:
+        binding = json.loads(Path("bind/binding.json").read_bytes())
+        assert binding["schema_version"] == "bootstrap-binding.v3"
+        assert binding["contract"]["schema_version"] == "contract.v5"
+        assert binding["contract"]["target_module"] == "sample"
     evidence = capture_standalone(
         repo,
         Path("bind/binding.json"),
@@ -56,6 +64,11 @@ def test_real_docker_message_only_regression_preserves_minimal_oracle_and_regist
     assert guard.schema_version == "guard.v4"
     assert guard.generator_version == "standalone-guard-test.v2"
     assert guard.case_ids == tuple(evidence["failing_case_ids"])
+    if reexport:
+        assert (
+            b"MODULE = 'sample'\nSYMBOL = 'price'"
+            in Path("matched-guard/test_guard.py").read_bytes()
+        )
     assert b"exception_match" in Path("matched-guard/test_guard.py").read_bytes()
     assert verify_standalone_guard(repo, Path("matched-guard/guard.json")) == guard
     registry = Registry(tmp_path / "matched-registry")

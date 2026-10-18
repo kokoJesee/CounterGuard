@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 新增受限根包具名重导出声明核验：独立 contract.v5 / binding.v3，B/F/H 分别核对公开入口到普通函数定义的路径与摘要，生成测试保留原根包调用。动态绑定/一般导出链保持待审，旧契约及产物不改写；详见[范围与重算规则](docs/static-reexports.md)。
 - 契约提取与 Docker 生成测试支持受限的 `pytest.raises(..., match=...)` 字面量消息断言；复杂正则和动态表达式明确 unsupported。新增 proposal v2、contract v4、capture v2、Guard v4 与 Registry entry v4，旧格式不接受新字段，既有产物不改写。范围与重算规则见[消息 oracle](docs/literal-message-oracles.md)。
 
 ## 0.5.0 Beta — 2026-10-17
