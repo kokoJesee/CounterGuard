@@ -60,6 +60,9 @@ uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 
 契约以真实回归测试/规范为依据，必须由所有者按支持 profile 的要求提交到 H。上游文件与工具方添加逐项区分。工具不能补造 H 或向上游发 PR 来代替所有者动作。机械提取草案不等于 oracle 已获审核。
 
+上段的 B/F/H 来源链针对**来源 Guard**。独立比较目标不要求再拥有一个真实修复 B/F 或另建来源 Evidence/Guard；其要求是固定快照、许可和谱系依据、自身行为规范、可审核调用映射及完整安全准入。
+原有来源契约来自 H 的约束保持不变，现有 standalone capture 路径也不增加外置契约例外。未来研究目标输入须另行版本化和审核，不能通过替换生产 Guard 的仓库/入口或放宽 snapshot Scope 来实现跨项目执行。
+
 ## 分组与留出隔离
 
 主轨 `scope_v2` 计划按独立上游项目分组；镜像、复制代码、模板与修复谱系的相连组整体划分。来源 Guard 的 B/F 项目属于 source/train，不同时进入主轨 holdout。

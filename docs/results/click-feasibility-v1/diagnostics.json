@@ -1,0 +1,2441 @@
+{
+  "approved_target_count": 0,
+  "artifact_digest": "sha256:c17be4ddd145b091a38493d6b23df054c07e14547bfc9c9c623909404e003c21",
+  "claim": "Static syntax locations and current checker results only; no reachability proof, contract preparation, role approval or target execution.",
+  "execution_allowed": false,
+  "external_target_execution_count": 0,
+  "implementation_commit": "443d88f7e01724876a7e6029e2247b7057cbef01",
+  "implementation_digests": {
+    "__init__.py": "sha256:fecb55fff62248f26e02bc52e198fc90b1b41de1c4ce15df1e9ac1f0b0397fe3",
+    "__main__.py": "sha256:936465eb668739cb02ef796e4a0843bef239129822136722bbeb10edcd045d47",
+    "admission.py": "sha256:3969139ec8af06a14a8b51401198cda5af777d0be2eab2c22900a158acc3de6c",
+    "artifacts.py": "sha256:245b6fc206f6e89b67dc2a03a7521c8f0948f27efc422e6eb36727ab8d93d1b7",
+    "baselines.py": "sha256:aee5e86734dafc4c2d9993367101be4227ca60977e0121e588d9162a48b84784",
+    "bootstrap_binding.py": "sha256:3fb41b4f3211582a9e51288f860fcff68227960d6b47ba6dd7e75d768a5ed0c9",
+    "bootstrap_plan.py": "sha256:ebccfca12dc7cfdaf4cbcf6f1548044dd1df55545dc8fa82f01f2110e91fb3b3",
+    "change_analysis.py": "sha256:95eeee5978906399a00a7d37ab97e0f787dee6f7ae8618901586055fa2dc9b03",
+    "cli.py": "sha256:83e3462c2b73bd664572ee1986deef4fc2c2f3e4b2a0bbcca583bb7eaf5ee0b9",
+    "compiler.py": "sha256:b4d56b8f9b62d507a87522f173ba19187928892779595a613e6b3f3928ebba26",
+    "contract_draft.py": "sha256:f4b74f9d065a4cd15b0547f45d6bd74091c82ebb24a5cf8518090899e37fd495",
+    "contract_draft_models.py": "sha256:08e47a890250b9c87887eb94ec695dbbb6d961a0ad80490a8d071a1ddc070011",
+    "contracts.py": "sha256:37e46fc6f9c68ef13f12784ef7b178f142aea29cb5b01e18db05ea297cbd7b89",
+    "demo.py": "sha256:a68f4df8ef45ff8097c937ec0a15736be40428f3b6e997c9a56be8273ce8c043",
+    "diagnostics.py": "sha256:4664d57cc47f2f5e116f01a9fa395586ecba64dccb83f251a0d8e50c4268d3ff",
+    "digests.py": "sha256:6a1f19d75fc5487efdc46e276fabc685b6cd48d7b8bc174d133c1262a0256ec0",
+    "errors.py": "sha256:794413b8ab1c71a6483627979689db544aea1ca98c890cbbf0438e7521b9ef14",
+    "evaluation.py": "sha256:f7c94001e0ce505f9574c04669aad62860795271703ae6c9ab7b402e9a3b5115",
+    "evaluation_metrics.py": "sha256:3768ced3a1b6e5ac9cf55cfa94763655e0c439c6071ac654e5bf85c9347e1969",
+    "evidence.py": "sha256:a7f91a2843fdde70c88752a895b1e09b169f0694ee1c117e1b4e3910044a46a9",
+    "execution.py": "sha256:ce4034ca8e3ec97501dca29115d4115e6cc9a958fde948dae9aab87469d430d1",
+    "features.py": "sha256:4c49ad73cb5069f0a007110374b8a556eaca0d27234e094d6cf6d9bddb1423fc",
+    "github_report.py": "sha256:1893a1def25302e365de2b1b7564fd84d1bb60f6cb2af19d36d3209b897c8dbb",
+    "independent_verifier.py": "sha256:969211604b658b447fd3f1e6ed7e1c5aa44432851f26264d2e2154f46ecc666a",
+    "lifecycle.py": "sha256:a8849019a3c9acca569fc7a4148b9802e01bf7a1d906221251650968498fc5a6",
+    "literal_match.py": "sha256:770853820f8d5366d201eebeece13065ae91299daac4d699e4925af02570752d",
+    "model_client.py": "sha256:54733902ed2995f1491c25c9acbf08658063e9a69a58dbd0d9fdc7dda311c793",
+    "models.py": "sha256:487ccab38ce4f66926a01eba3368af58875c2698225fbe0f8f20184a5c4afa1d",
+    "module_context.py": "sha256:1d7224052ef634c7d29477a69b9965ad11376f1528ed9e410b3ff63dee798222",
+    "path_limits.py": "sha256:3af867c41b49b705fce59e83f911c4a4340291661b0e27277ff14bed46de8a33",
+    "pilot.py": "sha256:50c000a40f70120d13e4efe141b86941eeff2f92a6d636532a8a16d9f0705b98",
+    "pilot_inputs.py": "sha256:066fa5555e613103f2dd02bec51a208ebc11c5195adc8d2d0b46a605721ba8ed",
+    "pipeline.py": "sha256:63b83b5796e9bd94edb44aa4259090f6d3ebfc93a10dbce1156196d248ded0e4",
+    "predicates.py": "sha256:aa46289e1f3ce98c908e9e11e87729d54c7e05472d5c67a0589c4080ebade375",
+    "preflight.py": "sha256:0bd7e9ca34ffaf3d8a66e206e41575d274ffb5f857a6e1f456b77be3c294c332",
+    "project_config.py": "sha256:9be8e900f3a898232c2a10cd14bc0d1e6c0e8a8900a8ccaa6463c79d2c7e4aea",
+    "protocol.py": "sha256:fbfdbc6f916a10deaf8c252d146e868f9f1d700bdbe33c9ff57250b9316ad8c3",
+    "registry.py": "sha256:6bb6d6620f36c00ffcf7e88d2711a349c1bdea3250f895e140c6aa3d58787a1a",
+    "registry_cli.py": "sha256:1e5c2f1ec732c5d64e27124d3640c302046d4bde48cbe27e97ec05f2d1d64c15",
+    "replay.py": "sha256:940f928ba54347f953fd94989a776323d4f37e501202b301970fed62ea46731c",
+    "report.py": "sha256:5deb5c3fcdfe9243436596df706c5b644c7bd32c5e5b65d5a5744b0f7c49214e",
+    "repository.py": "sha256:ebeac3af47872dbf1e24cb6405c80752e86a2b3379722f9faa046e9fef6ba66d",
+    "repository_contracts.py": "sha256:e204a339f100dae7a73ba7dbc186aa3f765bbaf89e2dc89084494a37c59ff68c",
+    "repository_guard.py": "sha256:565626a3ccf76da005c3c6cf78ddb13e6f18c7fe247e7635744dc7eb6117bfa3",
+    "repository_models.py": "sha256:88ec9066e1ebb454d58212c63344a631cd9f5377c1360a0df175147c42e63304",
+    "repository_verify.py": "sha256:ba9b5601de6ebe205ffde7e42006a7374b1ab26e1c01ec2792f65cd5d474a3b7",
+    "runner_catalog.py": "sha256:e02550c033ff1f239e968426218cdfad9660991b486566e88e232b5882c9a517",
+    "runner_cli.py": "sha256:8a36f8f07df8f60ebdbdbd39f99b78fe7869bbb2ccca21a7f929f57b76b7ce7a",
+    "runners/__init__.py": "sha256:317e2c0be9774e9633d5aca344f89b8b9277f54d4d16427eb2eb0f4ecbe32ccc",
+    "runners/base.py": "sha256:80b8db677f68bdeb70a22a9f808b3513137f80ecbf34f3abe7ac13fe8b6f1af7",
+    "runners/docker.py": "sha256:c8c78855ee3b15fdff1d36a1d72e269bbc0f99112b76e9be90e5eae8aadab6e2",
+    "runners/local.py": "sha256:01a9af7e700ee23a9a37f75d171d8a4c8deefc3bec9c0f4480a010c2c523cce4",
+    "runners/repository.py": "sha256:7c7703fe823d48b62344650d4903551e1e361f86f9d46388f5808467c0532f10",
+    "scope.py": "sha256:b0627bf87f31427477f8125f1cf0ea30fc17948740ee010c40a8f81b9229fa47",
+    "scope_explanations.py": "sha256:d65b989f951304331f5c9733795785e88d62dae75f0675f8b44e61bf54b510ad",
+    "standalone_capture.py": "sha256:1ef8e12bb74a013e8863590f040c8de5faf567a73676faa4af1e273d609d15ae",
+    "standalone_contracts.py": "sha256:5d53703dfeac4580101b0c0f163e5f88ffcab04015c97e2cf5e2703f47253570",
+    "standalone_guard.py": "sha256:2e940d7ccdb5b86a8bd0873a2f2d2d21628a59b33b6677068adea244bb4d03d2",
+    "standalone_models.py": "sha256:7833bd622f1b88c2507555858f0d910e6aca4b81e83334cc26ff47b1a767c9bc",
+    "standalone_replay.py": "sha256:ff3c63b2230afb52f203f4dfd9ac6e1ca32fc7939f231b03eff8a73782564881",
+    "standalone_test.py": "sha256:90eb5c203efe4806c01e766e0d5afbb035e04d2d937b209bd26cdbbc6faa88cc",
+    "static_exports.py": "sha256:5571bc0cff0d5b81b67af9cec4b1ec145af714023505726e0bf2b289121c0fda",
+    "storage/__init__.py": "sha256:9c3be0d8330aaff6c3915c832d2eb8644b6ca5cab36528cec8227f735c632acc",
+    "storage/sqlite.py": "sha256:583e123c038c1c2c291bdc215bbe3436dfc3843459f5ee05bffc52b47b8f5cd9",
+    "verification_gate.py": "sha256:a518d986501dd393ec6749cd0099cec8f637f30653eb2f7c9c9112efffc15a6d",
+    "verify.py": "sha256:dfafe8c474fb50464af053b93eb0ca44f493941fbdfdb9a8522de8c26f7e58b2",
+    "workspace.py": "sha256:13f81d66026b1a9429ce4205fb6ca267e3b1116bfda65779f7047cadd0056813"
+  },
+  "labels_assigned": false,
+  "public_target_bootstrap_plan": {
+    "artifact_digest": "sha256:6c7200e893d5a913993ad280ab5b0ef46e362fb913026b9b9dbd8924443b3342",
+    "commit": "07c909f23f0f83b5ca137c167b9a134d66201f67",
+    "execution_allowed": false,
+    "execution_outcome": "not_run",
+    "exit_code": 4,
+    "full_plan_content_digest": "sha256:4ac4807993968237aba61809f01637109fa890c579bec06ee128a2beac2b8a14",
+    "import_root": "src",
+    "raw_stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw_stdout_digest": "sha256:15a23489ca1aa4a6cdf306d51ae0de5f05d9b0afdb77a0e7882eb98a1103097f",
+    "schema_version": "bootstrap-plan.v1",
+    "seconds": 5.7073605,
+    "status": "blocked",
+    "target": "click:style",
+    "target_closure_file_count": 16,
+    "target_closure_status": "unknown",
+    "test_function": "test_styling_invalid_color",
+    "test_projection_case_count": 0,
+    "test_projection_represented_assertions": 0,
+    "test_projection_source_assertions": 1,
+    "test_projection_unsupported": [
+      {
+        "assertion_count": 1,
+        "reason_code": "argument_expansion_requires_review",
+        "source_line": 106
+      }
+    ],
+    "test_ref": "tests/test_utils/test_style.py",
+    "upstream_tests_selected_for_execution": false,
+    "verify_supported": false
+  },
+  "records": [
+    {
+      "assessment": {
+        "algorithm": "module-import-closure.v1",
+        "claim": "Proposed module input set, not proof of dependency completeness or safety. All imports in visited modules are considered, including conditional/function imports. Dynamic aliases, arbitrary Python effects and resource use require human review.",
+        "files": [
+          {
+            "content_digest": "sha256:4455f99fa47aca1a60c3e8e072cf91a07cb55a83caa5d556ea4dc98a819698c6",
+            "path": "src/click/__init__.py"
+          },
+          {
+            "content_digest": "sha256:c20ed67f0dc4d77c0dbc92da0f748a71b76c5ed131d7e7a6640a18e042984ee2",
+            "path": "src/click/_compat.py"
+          },
+          {
+            "content_digest": "sha256:086760db801e5e28de192cdbbb467bc7773869a6a15458d506911b6e3850e4ae",
+            "path": "src/click/_termui_impl.py"
+          },
+          {
+            "content_digest": "sha256:ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+            "path": "src/click/_textwrap.py"
+          },
+          {
+            "content_digest": "sha256:782642b7026db180f941892435627c318ffc001223cbc31cce030cc95637dab4",
+            "path": "src/click/_utils.py"
+          },
+          {
+            "content_digest": "sha256:292c5f35b3256116ba18e26e08b82c8363dbddd56480934fa8b24f69ef8f6b5d",
+            "path": "src/click/_winconsole.py"
+          },
+          {
+            "content_digest": "sha256:6ce6ad79d4f89e700cbd3b2dff2eb98a0526978bdda25f6cde551f10c152e662",
+            "path": "src/click/core.py"
+          },
+          {
+            "content_digest": "sha256:16069357615691fcdfc9c794bb515f6009eb35aad6f7a76c017bdce06dae8d55",
+            "path": "src/click/decorators.py"
+          },
+          {
+            "content_digest": "sha256:1ef498df81b86ae8ff6d8451f3e4fc094f09c2aff5f8e72c454e1ecdfa337849",
+            "path": "src/click/exceptions.py"
+          },
+          {
+            "content_digest": "sha256:f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b",
+            "path": "src/click/formatting.py"
+          },
+          {
+            "content_digest": "sha256:80cf8d87a0383341c1fd2824685e4ce2770618c0c773f7e51d7bbdfe88781845",
+            "path": "src/click/globals.py"
+          },
+          {
+            "content_digest": "sha256:a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+            "path": "src/click/parser.py"
+          },
+          {
+            "content_digest": "sha256:41c352c33254e53d938864c9129867fa7252d599bb423d7dc450f8334e6517b6",
+            "path": "src/click/shell_completion.py"
+          },
+          {
+            "content_digest": "sha256:c0b4ef4f752163308e65aa7c4e688a8ca2f50efe94c950ed969d8824a500bf5d",
+            "path": "src/click/termui.py"
+          },
+          {
+            "content_digest": "sha256:d47837f5fe6839d0527524419a7128cfa0db417794171e454e3e9f71d6febba3",
+            "path": "src/click/types.py"
+          },
+          {
+            "content_digest": "sha256:a0ecf3298a515efdd687d4c5af4eed348c271c49b0bcb7a2d9ec7d09aaa6e138",
+            "path": "src/click/utils.py"
+          }
+        ],
+        "findings": [
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_import_framework_requires_review",
+            "detail": "",
+            "path": "src/click/__init__.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_import_framework_requires_review",
+            "detail": "",
+            "path": "src/click/decorators.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/types.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/__init__.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/parser.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/shell_completion.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "msvcrt",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "termios",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "msvcrt",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/decorators.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/shell_completion.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/types.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          }
+        ],
+        "import_edges": [
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.decorators"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.formatting"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.termui"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/_compat.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_compat.py",
+            "to_module": "click._winconsole"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/_textwrap.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_textwrap.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/_utils.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_winconsole.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_winconsole.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click._utils"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.decorators"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.formatting"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.termui"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click._textwrap"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/globals.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/globals.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click._utils"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click._termui_impl"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click.globals"
+          }
+        ],
+        "status": "unknown",
+        "stdlib_imports": [
+          "__future__",
+          "abc",
+          "codecs",
+          "collections",
+          "collections.abc",
+          "contextlib",
+          "ctypes",
+          "ctypes.wintypes",
+          "datetime",
+          "difflib",
+          "enum",
+          "errno",
+          "functools",
+          "getpass",
+          "gettext",
+          "glob",
+          "importlib.metadata",
+          "inspect",
+          "io",
+          "itertools",
+          "locale",
+          "math",
+          "operator",
+          "os",
+          "pathlib",
+          "random",
+          "re",
+          "shlex",
+          "shutil",
+          "stat",
+          "subprocess",
+          "sys",
+          "tempfile",
+          "textwrap",
+          "threading",
+          "time",
+          "tty",
+          "types",
+          "typing",
+          "urllib.parse",
+          "uuid",
+          "warnings",
+          "weakref",
+          "webbrowser"
+        ]
+      },
+      "closure_size": {
+        "ast_nodes": 44496,
+        "physical_lines": 11470,
+        "python_bytes": 398787
+      },
+      "definition_target": "click.termui:style",
+      "feature_diagnostic": [
+        {
+          "status": "extracted",
+          "symbol": "style",
+          "tokens": [
+            "branch:none"
+          ]
+        },
+        {
+          "reason": "Unsupported control flow or nested scope in ast-features.v1",
+          "status": "unsupported",
+          "symbol": "_interpret_color"
+        }
+      ],
+      "fixed_test_projection": {
+        "cases": [],
+        "represented_assertions": 0,
+        "source_assertions": 1,
+        "unsupported": [
+          {
+            "assertion_count": 1,
+            "reason_code": "argument_expansion_requires_review",
+            "source_line": 106
+          }
+        ]
+      },
+      "matched_finding_category_counts": {
+        "dynamic_code_or_lookup_requires_review": 5,
+        "dynamic_import_framework_requires_review": 2,
+        "import_state_mutation_requires_review": 4,
+        "module_lookup_hook_requires_review": 7,
+        "resource_or_native_access_requires_review": 3,
+        "unresolved_or_external_import": 9
+      },
+      "name": "click-fixed",
+      "parametrization_shape_advisory": [
+        {
+          "name": "param",
+          "row_count": 2
+        },
+        {
+          "name": "value",
+          "row_count": 18
+        }
+      ],
+      "pins": [
+        {
+          "content_digest": "sha256:9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d",
+          "object_id": "d12a849186982399c537c5b9a8fd77bf2edd5eab",
+          "path": "LICENSE.txt",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:87bf078e2c9357d8121391441d97737332190d2fcbd608853f7b70347a94bd1e",
+          "object_id": "0156d5e8ac07342d892d1fbe6b4a42b5bd034b74",
+          "path": "pyproject.toml",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:4455f99fa47aca1a60c3e8e072cf91a07cb55a83caa5d556ea4dc98a819698c6",
+          "object_id": "2d9918bced6c1bb709efbf53fbf0e310fe5215f3",
+          "path": "src/click/__init__.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:c20ed67f0dc4d77c0dbc92da0f748a71b76c5ed131d7e7a6640a18e042984ee2",
+          "object_id": "90e328bbd9f4975e14b1bb6d8dc77860f6b753f5",
+          "path": "src/click/_compat.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:086760db801e5e28de192cdbbb467bc7773869a6a15458d506911b6e3850e4ae",
+          "object_id": "fadae940625f8275fed17833d527c19e2422ef4e",
+          "path": "src/click/_termui_impl.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+          "object_id": "82840f2dff3ce627712c0ece2752382a0f7dab8b",
+          "path": "src/click/_textwrap.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:782642b7026db180f941892435627c318ffc001223cbc31cce030cc95637dab4",
+          "object_id": "05ee2e99757adb19882664e1fc0377ac29c92f80",
+          "path": "src/click/_utils.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:292c5f35b3256116ba18e26e08b82c8363dbddd56480934fa8b24f69ef8f6b5d",
+          "object_id": "d25178d66ff7a9c8a1da52e61379da240be625b6",
+          "path": "src/click/_winconsole.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:6ce6ad79d4f89e700cbd3b2dff2eb98a0526978bdda25f6cde551f10c152e662",
+          "object_id": "6de421687b6d4b27e7266d023ef630bf53f27dc5",
+          "path": "src/click/core.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:16069357615691fcdfc9c794bb515f6009eb35aad6f7a76c017bdce06dae8d55",
+          "object_id": "cc42e5d42c48e7bddca9346bc4dd4f240a30c2e3",
+          "path": "src/click/decorators.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:1ef498df81b86ae8ff6d8451f3e4fc094f09c2aff5f8e72c454e1ecdfa337849",
+          "object_id": "6272c38a448d57241d9a6bff4191897f4a9bb7d6",
+          "path": "src/click/exceptions.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b",
+          "object_id": "c4aa2de571a1eb17bfeb1853e315d28bc968e74c",
+          "path": "src/click/formatting.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:80cf8d87a0383341c1fd2824685e4ce2770618c0c773f7e51d7bbdfe88781845",
+          "object_id": "a2f91723d21cefdf658be327174e1f8ccdc20fcd",
+          "path": "src/click/globals.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+          "object_id": "4fcbf7caa83a474cee2d3ea25da56b0399dd893a",
+          "path": "src/click/parser.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:41c352c33254e53d938864c9129867fa7252d599bb423d7dc450f8334e6517b6",
+          "object_id": "5652214b017edc98c184677ae9d34fc7d2d15ff5",
+          "path": "src/click/shell_completion.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:c0b4ef4f752163308e65aa7c4e688a8ca2f50efe94c950ed969d8824a500bf5d",
+          "object_id": "4bd74ed19ac1852557259706ea21d0e697b9f5b5",
+          "path": "src/click/termui.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:d47837f5fe6839d0527524419a7128cfa0db417794171e454e3e9f71d6febba3",
+          "object_id": "a27983b3a2431de9e221cbcfdd780a7b6f236956",
+          "path": "src/click/types.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:a0ecf3298a515efdd687d4c5af4eed348c271c49b0bcb7a2d9ec7d09aaa6e138",
+          "object_id": "4d4d52ac3be0b90a8087a465901bb698e5150664",
+          "path": "src/click/utils.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:59533374beb7e4ab04d26a778400c2141804a164098d4efdbd7aca6e96e68885",
+          "object_id": "9830493237de2d0ef45a655fda181bb4c4c11c72",
+          "path": "tests/test_utils/test_style.py",
+          "revision": "head"
+        }
+      ],
+      "public_target": "click:style",
+      "revision": "07c909f23f0f83b5ca137c167b9a134d66201f67",
+      "root_export_check": {
+        "reason_code": "export_root_statement_unsupported",
+        "status": "unsupported"
+      },
+      "syntax_trigger_occurrences": [
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 78,
+          "path": "src/click/__init__.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_import_framework_requires_review",
+          "expression": "importlib.metadata",
+          "line": 115,
+          "path": "src/click/__init__.py",
+          "scope": "__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "re.compile",
+          "line": 15,
+          "path": "src/click/_compat.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 49,
+          "path": "src/click/_compat.py",
+          "scope": "get_best_encoding"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 101,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 102,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 105,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.read1"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 115,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.readable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 127,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.writable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 140,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.seekable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 180,
+          "path": "src/click/_compat.py",
+          "scope": "_find_binary_reader"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 198,
+          "path": "src/click/_compat.py",
+          "scope": "_find_binary_writer"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 214,
+          "path": "src/click/_compat.py",
+          "scope": "_stream_is_misconfigured"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 222,
+          "path": "src/click/_compat.py",
+          "scope": "_is_compat_stream_attr"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 365,
+          "path": "src/click/_compat.py",
+          "scope": "_wrap_io_open"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 367,
+          "path": "src/click/_compat.py",
+          "scope": "_wrap_io_open"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 423,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 426,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "os.open",
+          "line": 431,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 447,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 469,
+          "path": "src/click/_compat.py",
+          "scope": "_AtomicFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 470,
+          "path": "src/click/_compat.py",
+          "scope": "_AtomicFile.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 524,
+          "path": "src/click/_compat.py",
+          "scope": "_get_argv_encoding"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 46,
+          "path": "src/click/_termui_impl.py",
+          "scope": "_has_binary_buffer"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 754,
+          "path": "src/click/_termui_impl.py",
+          "scope": "Editor.edit"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 761,
+          "path": "src/click/_termui_impl.py",
+          "scope": "Editor.edit"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 790,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 812,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 826,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "webbrowser.open",
+          "line": 837,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 916,
+          "path": "src/click/_termui_impl.py",
+          "scope": "raw_terminal"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 217,
+          "path": "src/click/_winconsole.py",
+          "scope": "ConsoleStream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 218,
+          "path": "src/click/_winconsole.py",
+          "scope": "ConsoleStream.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 292,
+          "path": "src/click/_winconsole.py",
+          "scope": "_get_windows_console_stream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 379,
+          "path": "src/click/core.py",
+          "scope": "Context.__init__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 3660,
+          "path": "src/click/core.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_import_framework_requires_review",
+          "expression": "importlib.metadata",
+          "line": 513,
+          "path": "src/click/decorators.py",
+          "scope": "version_option.callback"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 503,
+          "path": "src/click/parser.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 100,
+          "path": "src/click/shell_completion.py",
+          "scope": "CompletionItem"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 888,
+          "path": "src/click/types.py",
+          "scope": "File"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 1034,
+          "path": "src/click/types.py",
+          "scope": "Path"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 1112,
+          "path": "src/click/types.py",
+          "scope": "Path.convert"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 148,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__init__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 152,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 153,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__getattr__"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "self.open",
+          "line": 153,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__getattr__"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "self.open",
+          "line": 202,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__iter__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 224,
+          "path": "src/click/utils.py",
+          "scope": "KeepOpenFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 225,
+          "path": "src/click/utils.py",
+          "scope": "KeepOpenFile.__getattr__"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 452,
+          "path": "src/click/utils.py",
+          "scope": "format_filename"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 501,
+          "path": "src/click/utils.py",
+          "scope": "get_app_dir"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 538,
+          "path": "src/click/utils.py",
+          "scope": "PacifyFlushWrapper"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 539,
+          "path": "src/click/utils.py",
+          "scope": "PacifyFlushWrapper.__getattr__"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "sys.modules",
+          "line": 566,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 575,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 588,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 631,
+          "path": "src/click/utils.py",
+          "scope": "_expand_args"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 634,
+          "path": "src/click/utils.py",
+          "scope": "_expand_args"
+        }
+      ]
+    },
+    {
+      "assessment": {
+        "algorithm": "module-import-closure.v1",
+        "claim": "Proposed module input set, not proof of dependency completeness or safety. All imports in visited modules are considered, including conditional/function imports. Dynamic aliases, arbitrary Python effects and resource use require human review.",
+        "files": [
+          {
+            "content_digest": "sha256:4455f99fa47aca1a60c3e8e072cf91a07cb55a83caa5d556ea4dc98a819698c6",
+            "path": "src/click/__init__.py"
+          },
+          {
+            "content_digest": "sha256:c20ed67f0dc4d77c0dbc92da0f748a71b76c5ed131d7e7a6640a18e042984ee2",
+            "path": "src/click/_compat.py"
+          },
+          {
+            "content_digest": "sha256:086760db801e5e28de192cdbbb467bc7773869a6a15458d506911b6e3850e4ae",
+            "path": "src/click/_termui_impl.py"
+          },
+          {
+            "content_digest": "sha256:ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+            "path": "src/click/_textwrap.py"
+          },
+          {
+            "content_digest": "sha256:782642b7026db180f941892435627c318ffc001223cbc31cce030cc95637dab4",
+            "path": "src/click/_utils.py"
+          },
+          {
+            "content_digest": "sha256:292c5f35b3256116ba18e26e08b82c8363dbddd56480934fa8b24f69ef8f6b5d",
+            "path": "src/click/_winconsole.py"
+          },
+          {
+            "content_digest": "sha256:6ce6ad79d4f89e700cbd3b2dff2eb98a0526978bdda25f6cde551f10c152e662",
+            "path": "src/click/core.py"
+          },
+          {
+            "content_digest": "sha256:16069357615691fcdfc9c794bb515f6009eb35aad6f7a76c017bdce06dae8d55",
+            "path": "src/click/decorators.py"
+          },
+          {
+            "content_digest": "sha256:1ef498df81b86ae8ff6d8451f3e4fc094f09c2aff5f8e72c454e1ecdfa337849",
+            "path": "src/click/exceptions.py"
+          },
+          {
+            "content_digest": "sha256:f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b",
+            "path": "src/click/formatting.py"
+          },
+          {
+            "content_digest": "sha256:80cf8d87a0383341c1fd2824685e4ce2770618c0c773f7e51d7bbdfe88781845",
+            "path": "src/click/globals.py"
+          },
+          {
+            "content_digest": "sha256:a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+            "path": "src/click/parser.py"
+          },
+          {
+            "content_digest": "sha256:41c352c33254e53d938864c9129867fa7252d599bb423d7dc450f8334e6517b6",
+            "path": "src/click/shell_completion.py"
+          },
+          {
+            "content_digest": "sha256:8ec38801ce71df0f2d87b7b0531f04ed8805da8b91af40559879d945458918bf",
+            "path": "src/click/termui.py"
+          },
+          {
+            "content_digest": "sha256:d47837f5fe6839d0527524419a7128cfa0db417794171e454e3e9f71d6febba3",
+            "path": "src/click/types.py"
+          },
+          {
+            "content_digest": "sha256:a0ecf3298a515efdd687d4c5af4eed348c271c49b0bcb7a2d9ec7d09aaa6e138",
+            "path": "src/click/utils.py"
+          }
+        ],
+        "findings": [
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_code_or_lookup_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_import_framework_requires_review",
+            "detail": "",
+            "path": "src/click/__init__.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "dynamic_import_framework_requires_review",
+            "detail": "",
+            "path": "src/click/decorators.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/types.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "import_state_mutation_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/__init__.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/parser.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/shell_completion.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "module_lookup_hook_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/_compat.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "resource_or_native_access_requires_review",
+            "detail": "",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "msvcrt",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "termios",
+            "path": "src/click/_termui_impl.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "msvcrt",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/_winconsole.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/core.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/decorators.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/shell_completion.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/types.py",
+            "severity": "unknown"
+          },
+          {
+            "code": "unresolved_or_external_import",
+            "detail": "typing_extensions",
+            "path": "src/click/utils.py",
+            "severity": "unknown"
+          }
+        ],
+        "import_edges": [
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.decorators"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.formatting"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.termui"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/__init__.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/_compat.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_compat.py",
+            "to_module": "click._winconsole"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/_termui_impl.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/_textwrap.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_textwrap.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/_utils.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_winconsole.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/_winconsole.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click._utils"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.decorators"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.formatting"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.termui"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/core.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/decorators.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/exceptions.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click._textwrap"
+          },
+          {
+            "from_ref": "src/click/formatting.py",
+            "to_module": "click.parser"
+          },
+          {
+            "from_ref": "src/click/globals.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/globals.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click._utils"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/parser.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/shell_completion.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click._termui_impl"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.globals"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.types"
+          },
+          {
+            "from_ref": "src/click/termui.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.core"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.shell_completion"
+          },
+          {
+            "from_ref": "src/click/types.py",
+            "to_module": "click.utils"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click._compat"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click.exceptions"
+          },
+          {
+            "from_ref": "src/click/utils.py",
+            "to_module": "click.globals"
+          }
+        ],
+        "status": "unknown",
+        "stdlib_imports": [
+          "__future__",
+          "abc",
+          "codecs",
+          "collections",
+          "collections.abc",
+          "contextlib",
+          "ctypes",
+          "ctypes.wintypes",
+          "datetime",
+          "difflib",
+          "enum",
+          "errno",
+          "functools",
+          "getpass",
+          "gettext",
+          "glob",
+          "importlib.metadata",
+          "inspect",
+          "io",
+          "itertools",
+          "locale",
+          "math",
+          "operator",
+          "os",
+          "pathlib",
+          "random",
+          "re",
+          "shlex",
+          "shutil",
+          "stat",
+          "subprocess",
+          "sys",
+          "tempfile",
+          "textwrap",
+          "threading",
+          "time",
+          "tty",
+          "types",
+          "typing",
+          "urllib.parse",
+          "uuid",
+          "warnings",
+          "weakref",
+          "webbrowser"
+        ]
+      },
+      "closure_size": {
+        "ast_nodes": 44433,
+        "physical_lines": 11458,
+        "python_bytes": 398304
+      },
+      "definition_target": "click.termui:style",
+      "feature_diagnostic": [
+        {
+          "reason": "Unsupported control flow or nested scope in ast-features.v1",
+          "status": "unsupported",
+          "symbol": "style"
+        },
+        {
+          "status": "extracted",
+          "symbol": "_interpret_color",
+          "tokens": []
+        }
+      ],
+      "fixed_test_projection": {
+        "cases": [],
+        "status": "selected_regression_not_present_in_buggy_tree"
+      },
+      "matched_finding_category_counts": {
+        "dynamic_code_or_lookup_requires_review": 5,
+        "dynamic_import_framework_requires_review": 2,
+        "import_state_mutation_requires_review": 4,
+        "module_lookup_hook_requires_review": 7,
+        "resource_or_native_access_requires_review": 3,
+        "unresolved_or_external_import": 9
+      },
+      "name": "click-buggy-diagnostic-only",
+      "parametrization_shape_advisory": [],
+      "pins": [
+        {
+          "content_digest": "sha256:9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d",
+          "object_id": "d12a849186982399c537c5b9a8fd77bf2edd5eab",
+          "path": "LICENSE.txt",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:87bf078e2c9357d8121391441d97737332190d2fcbd608853f7b70347a94bd1e",
+          "object_id": "0156d5e8ac07342d892d1fbe6b4a42b5bd034b74",
+          "path": "pyproject.toml",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:4455f99fa47aca1a60c3e8e072cf91a07cb55a83caa5d556ea4dc98a819698c6",
+          "object_id": "2d9918bced6c1bb709efbf53fbf0e310fe5215f3",
+          "path": "src/click/__init__.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:c20ed67f0dc4d77c0dbc92da0f748a71b76c5ed131d7e7a6640a18e042984ee2",
+          "object_id": "90e328bbd9f4975e14b1bb6d8dc77860f6b753f5",
+          "path": "src/click/_compat.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:086760db801e5e28de192cdbbb467bc7773869a6a15458d506911b6e3850e4ae",
+          "object_id": "fadae940625f8275fed17833d527c19e2422ef4e",
+          "path": "src/click/_termui_impl.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+          "object_id": "82840f2dff3ce627712c0ece2752382a0f7dab8b",
+          "path": "src/click/_textwrap.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:782642b7026db180f941892435627c318ffc001223cbc31cce030cc95637dab4",
+          "object_id": "05ee2e99757adb19882664e1fc0377ac29c92f80",
+          "path": "src/click/_utils.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:292c5f35b3256116ba18e26e08b82c8363dbddd56480934fa8b24f69ef8f6b5d",
+          "object_id": "d25178d66ff7a9c8a1da52e61379da240be625b6",
+          "path": "src/click/_winconsole.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:6ce6ad79d4f89e700cbd3b2dff2eb98a0526978bdda25f6cde551f10c152e662",
+          "object_id": "6de421687b6d4b27e7266d023ef630bf53f27dc5",
+          "path": "src/click/core.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:16069357615691fcdfc9c794bb515f6009eb35aad6f7a76c017bdce06dae8d55",
+          "object_id": "cc42e5d42c48e7bddca9346bc4dd4f240a30c2e3",
+          "path": "src/click/decorators.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:1ef498df81b86ae8ff6d8451f3e4fc094f09c2aff5f8e72c454e1ecdfa337849",
+          "object_id": "6272c38a448d57241d9a6bff4191897f4a9bb7d6",
+          "path": "src/click/exceptions.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b",
+          "object_id": "c4aa2de571a1eb17bfeb1853e315d28bc968e74c",
+          "path": "src/click/formatting.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:80cf8d87a0383341c1fd2824685e4ce2770618c0c773f7e51d7bbdfe88781845",
+          "object_id": "a2f91723d21cefdf658be327174e1f8ccdc20fcd",
+          "path": "src/click/globals.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:a09f9f53fde6bf1ba022e36d1da0804d9e7a9601261d18208c9892a84818ae30",
+          "object_id": "4fcbf7caa83a474cee2d3ea25da56b0399dd893a",
+          "path": "src/click/parser.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:41c352c33254e53d938864c9129867fa7252d599bb423d7dc450f8334e6517b6",
+          "object_id": "5652214b017edc98c184677ae9d34fc7d2d15ff5",
+          "path": "src/click/shell_completion.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:8ec38801ce71df0f2d87b7b0531f04ed8805da8b91af40559879d945458918bf",
+          "object_id": "5bf48d0d9a2b24f28e11fb51eed628472ef7f56d",
+          "path": "src/click/termui.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:d47837f5fe6839d0527524419a7128cfa0db417794171e454e3e9f71d6febba3",
+          "object_id": "a27983b3a2431de9e221cbcfdd780a7b6f236956",
+          "path": "src/click/types.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:a0ecf3298a515efdd687d4c5af4eed348c271c49b0bcb7a2d9ec7d09aaa6e138",
+          "object_id": "4d4d52ac3be0b90a8087a465901bb698e5150664",
+          "path": "src/click/utils.py",
+          "revision": "head"
+        },
+        {
+          "content_digest": "sha256:f04e88a068582d2593905c120b6875913226c1e1c04217bd94a7e4f87bd9278b",
+          "object_id": "85e27f5665ab9e8d55f7efb4817ee5e6e24aafcc",
+          "path": "tests/test_utils/test_style.py",
+          "revision": "head"
+        }
+      ],
+      "public_target": "click:style",
+      "revision": "7925a3410d7098c28cfca3b2baa6c852666bbd14",
+      "root_export_check": {
+        "reason_code": "export_root_statement_unsupported",
+        "status": "unsupported"
+      },
+      "syntax_trigger_occurrences": [
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 78,
+          "path": "src/click/__init__.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_import_framework_requires_review",
+          "expression": "importlib.metadata",
+          "line": 115,
+          "path": "src/click/__init__.py",
+          "scope": "__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "re.compile",
+          "line": 15,
+          "path": "src/click/_compat.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 49,
+          "path": "src/click/_compat.py",
+          "scope": "get_best_encoding"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 101,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 102,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 105,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.read1"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 115,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.readable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 127,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.writable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 140,
+          "path": "src/click/_compat.py",
+          "scope": "_FixupStream.seekable"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 180,
+          "path": "src/click/_compat.py",
+          "scope": "_find_binary_reader"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 198,
+          "path": "src/click/_compat.py",
+          "scope": "_find_binary_writer"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 214,
+          "path": "src/click/_compat.py",
+          "scope": "_stream_is_misconfigured"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 222,
+          "path": "src/click/_compat.py",
+          "scope": "_is_compat_stream_attr"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 365,
+          "path": "src/click/_compat.py",
+          "scope": "_wrap_io_open"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 367,
+          "path": "src/click/_compat.py",
+          "scope": "_wrap_io_open"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 423,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 426,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "os.open",
+          "line": 431,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 447,
+          "path": "src/click/_compat.py",
+          "scope": "open_stream"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 469,
+          "path": "src/click/_compat.py",
+          "scope": "_AtomicFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 470,
+          "path": "src/click/_compat.py",
+          "scope": "_AtomicFile.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 524,
+          "path": "src/click/_compat.py",
+          "scope": "_get_argv_encoding"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 46,
+          "path": "src/click/_termui_impl.py",
+          "scope": "_has_binary_buffer"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 754,
+          "path": "src/click/_termui_impl.py",
+          "scope": "Editor.edit"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 761,
+          "path": "src/click/_termui_impl.py",
+          "scope": "Editor.edit"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 790,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 812,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 826,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "webbrowser.open",
+          "line": 837,
+          "path": "src/click/_termui_impl.py",
+          "scope": "open_url"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 916,
+          "path": "src/click/_termui_impl.py",
+          "scope": "raw_terminal"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 217,
+          "path": "src/click/_winconsole.py",
+          "scope": "ConsoleStream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 218,
+          "path": "src/click/_winconsole.py",
+          "scope": "ConsoleStream.__getattr__"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 292,
+          "path": "src/click/_winconsole.py",
+          "scope": "_get_windows_console_stream"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 379,
+          "path": "src/click/core.py",
+          "scope": "Context.__init__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 3660,
+          "path": "src/click/core.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "dynamic_import_framework_requires_review",
+          "expression": "importlib.metadata",
+          "line": 513,
+          "path": "src/click/decorators.py",
+          "scope": "version_option.callback"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 503,
+          "path": "src/click/parser.py",
+          "scope": "<module>"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 100,
+          "path": "src/click/shell_completion.py",
+          "scope": "CompletionItem"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 888,
+          "path": "src/click/types.py",
+          "scope": "File"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 1034,
+          "path": "src/click/types.py",
+          "scope": "Path"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 1112,
+          "path": "src/click/types.py",
+          "scope": "Path.convert"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "open",
+          "line": 148,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__init__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 152,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 153,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__getattr__"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "self.open",
+          "line": 153,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__getattr__"
+        },
+        {
+          "code": "resource_or_native_access_requires_review",
+          "expression": "self.open",
+          "line": 202,
+          "path": "src/click/utils.py",
+          "scope": "LazyFile.__iter__"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 224,
+          "path": "src/click/utils.py",
+          "scope": "KeepOpenFile"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 225,
+          "path": "src/click/utils.py",
+          "scope": "KeepOpenFile.__getattr__"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 452,
+          "path": "src/click/utils.py",
+          "scope": "format_filename"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 501,
+          "path": "src/click/utils.py",
+          "scope": "get_app_dir"
+        },
+        {
+          "code": "module_lookup_hook_requires_review",
+          "expression": "__getattr__",
+          "line": 538,
+          "path": "src/click/utils.py",
+          "scope": "PacifyFlushWrapper"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 539,
+          "path": "src/click/utils.py",
+          "scope": "PacifyFlushWrapper.__getattr__"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "sys.modules",
+          "line": 566,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "dynamic_code_or_lookup_requires_review",
+          "expression": "getattr",
+          "line": 575,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 588,
+          "path": "src/click/utils.py",
+          "scope": "_detect_program_name"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 631,
+          "path": "src/click/utils.py",
+          "scope": "_expand_args"
+        },
+        {
+          "code": "import_state_mutation_requires_review",
+          "expression": "os.path",
+          "line": 634,
+          "path": "src/click/utils.py",
+          "scope": "_expand_args"
+        }
+      ]
+    }
+  ],
+  "schema_version": "click-feasibility-diagnostics.v1",
+  "source_execution_count": 0,
+  "termcolor_source_feature_diagnostic": {
+    "reason": "Unsupported control flow or nested scope in ast-features.v1",
+    "status": "unsupported"
+  },
+  "termcolor_source_feature_input": {
+    "content_digest": "sha256:6aabc21ec489805528305099fb6973a3f54a21a6f3e7be6a2bc7ec4f5ad5874b",
+    "repository": "https://github.com/termcolor/termcolor",
+    "revision": "520facb24e5310a6f48736dddfe86164057a322c",
+    "source_ref": "src/termcolor/termcolor.py",
+    "symbol": "colored"
+  }
+}

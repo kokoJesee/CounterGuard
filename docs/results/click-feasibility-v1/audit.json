@@ -1,0 +1,58 @@
+{
+  "artifact_digest": "sha256:5c8bc596acd647c2163ce1a4eaeeb5207d3b0e04cf9d43f00a991ae316b05317",
+  "baseline_commit": "443d88f7e01724876a7e6029e2247b7057cbef01",
+  "bootstrap_plan_exit_code": 4,
+  "cost_estimates_are_engineering_judgment_not_measurements": true,
+  "current_extractor_source_or_target_symbol_checks": 5,
+  "definition_role_diagnostic_count": 2,
+  "docker_tests": "not_run_no_candidate_execution",
+  "existing_artifact_write_operations": 0,
+  "existing_artifacts_hashed_by_this_audit": false,
+  "external_target_execution_count": 0,
+  "labels_assigned": false,
+  "local_document_links_checked": 36,
+  "manual_review_seconds": null,
+  "new_admitted_target_count": 0,
+  "new_owner_heads": 0,
+  "new_profiles": false,
+  "new_runtime_dependencies": false,
+  "overall_onboarding_seconds": null,
+  "plan_raw_stream_digests_verified": true,
+  "primary_source_link_objects_verified": 15,
+  "privacy_scan": "passed",
+  "private_diagnostic_harness_failures_preserved": [
+    "unhandled_FeatureExtractionError_then_private_exception_handler_fixed",
+    "buggy_tree_lacks_fixed_new_test_then_recorded_as_absent_not_a_target_gate"
+  ],
+  "product_implementation_commit": "c1a2d24bc271e8d482644f61c1c338e4a41e9b2a",
+  "product_implementation_digests_unchanged": true,
+  "protected_working_file_count": 279,
+  "protected_working_file_digests_unchanged": true,
+  "public_file_digests": {
+    "docs/experiments/scope-v2/data-card.md": "sha256:8439a512d824285215ad015fdd78e2bc07c752df1c9ace5c917bc9a9f6be5f4f",
+    "docs/experiments/scope-v2/design.md": "sha256:1b566775a8b5b58c97011ac6d882b13ee7e3fa55d7c28b44b8bc186fe8864d80",
+    "docs/research/click-rgb-contract-comparability.md": "sha256:d687cf1914a816ba5f84f216f498ccabc580258d85728bde203d54de0ab0f20e",
+    "docs/results/click-feasibility-v1/README.md": "sha256:0b8a5decb776f3624e96efd211ece2c6e55331d14ddb18fa02bdbea33413dc4f",
+    "docs/results/click-feasibility-v1/diagnostics.json": "sha256:a94c45de8bceac28ff2ccc33244b4d37a73787fef1ebc8ac7d0bac65c64635a8"
+  },
+  "public_target": "click:style",
+  "pytest": "not_run_documentation_and_read_only_diagnostics_only",
+  "ruff": {
+    "command": "uv run ruff check .",
+    "exit_code": 0,
+    "result": "All checks passed!"
+  },
+  "schema_version": "click-feasibility-audit.v1",
+  "source_execution_count": 0,
+  "source_file_pins_verified": 38,
+  "tags": {
+    "v0.1.0": "49a1209de532f07724d5253a7184535eeb45b4e3",
+    "v0.5.0": "625bdf6588310bbe54ef2ae30ecfe0614dcbd38f"
+  },
+  "target_fixed_closure_modules": 16,
+  "target_fixed_findings": 30,
+  "target_fixed_syntax_trigger_occurrences": 58,
+  "total_cross_project_scenario_count": 0,
+  "total_verified_source_fix_count": 1,
+  "unrelated_document_move_excluded": true
+}

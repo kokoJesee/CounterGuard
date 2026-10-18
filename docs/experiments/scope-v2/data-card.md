@@ -84,3 +84,16 @@ luhncheck 的现成字母回归样例是异常 → False，不是原先接受非
 
 Click 是更接近 termcolor 的 RGB 共同域候选，但参数展开投影、完整闭包和调用/oracle 审核仍有阻塞。
 消息差异是否构成合法反例尚未裁决，不删除 match 来制造可比性。validators 不再用于本轮，pytimeparse 按维护者要求排除；legacy profile 继续不做。
+
+## Click 的有界可行性评审
+
+[定点评审](../../results/click-feasibility-v1/README.md)已完成：正式 bootstrap plan 退出 4；固定 F 的完整闭包有 16 模块、30 条保守 finding，并定位对应语法，而非宣称发现 30 个漏洞。
+原测试有 2×18 个理论调用，当前投影 0/1 条；公开根包导出另报 export_root_statement_unsupported。
+作为比较目标并不必须把这 36 个调用转换成新来源契约，也不要求新的 B/F/H 来源捕获链。
+
+自然 RGB 共同域与谱系支持依据见[语义调查](../../research/click-rgb-contract-comparability.md)；完整来源消息策略仍保留，Click 消息不同是待审合法反例假设，不是已裁决标签。
+当前 AST 提取对 Click F style 仅得到 branch:none，对其 RGB helper 和 termcolor F colored 均拒绝，研究桥接/特征支持还需独立设计。
+本轮没有修改产品或执行外部目标；已验证来源仍为 1，已接纳比较目标/完整跨项目场景仍为 0。
+
+Click 准入不是一项参数展开小补丁，本轮暂停其执行接入，不扩张 profile。下一轮限定最多 5 个较小独立 RGB/范围校验目标，先检查固定元数据、普通函数、根包和闭包，再查共同域；不要求目标自带新修复。
+该批仍无合格目标时停止扩搜，提交研究范围/通用准入投入的选择，不自动降低标准或改轨。
