@@ -6,4 +6,6 @@
 
 每行区分来源 revision 与 preflight_revision；例如 Luhn 的历史 B/F 提案与 HEAD 预检不是同一次检查，不能混用状态。所有 `guard_transfer_compatibility` 仍为 unconfirmed。
 
+消息 oracle 支持后的复筛另存于 [rechecks/literal-match-v1.jsonl](rechecks/literal-match-v1.jsonl)，不覆写旧行；[复筛报告](../../docs/results/literal-match-rescreen-v1/README.md)区分提取层解锁和完整接纳数仍为 0。
+
 来源依据、可重复命令和下一步见[数据卡](../../docs/experiments/scope-v2/data-card.md)，实际观测见[首批](../../docs/results/scope-study-feasibility-v1/README.md)、[第二批](../../docs/results/scope-study-feasibility-v2/README.md)与[第三批回执](../../docs/results/scope-study-feasibility-v3/README.md)。冻结的 v1 数据和口径保留原样。

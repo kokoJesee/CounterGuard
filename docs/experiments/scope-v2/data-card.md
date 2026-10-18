@@ -46,7 +46,9 @@ luhncheck 的 1 条参数化断言展开为 9 个 case。textcase 的 HEAD 有 6
 
 ## 进度判定与下一步
 
-维护者选择继续保持现有 profile 后，又核对 termcolor、base45、egcd，详情见[第三批回执](../../results/scope-study-feasibility-v3/README.md)。termcolor 的真实 B/F 两侧普通函数角色评估均无 finding，但 raises 的 match 断言与根包重导出尚不支持；base45 的历史 B/F 仍是旧 Poetry 元数据，egcd 的运行模块导入 doctest 被明确判 unknown。均未执行，没有把工程缺口变成成功样本。
+消息 oracle 扩展后已[复筛全部 13 个候选](../../results/literal-match-rescreen-v1/README.md)：termcolor 从 0/2 条变为 2/2 条、8 case，真实 draft 与 prepare 已产出新版本文件；但根包重导出入口仍 unknown，完整接纳场景仍为 0。其余候选没有因本语法扩展消除其他阻塞。复筛独立保存，不覆盖历史行；30–50 个场景仍未取得，不以工具 fixture 或 case 数替代。
+
+消息扩展前的第三批核对了 termcolor、base45、egcd，详情见[历史回执](../../results/scope-study-feasibility-v3/README.md)。当时 termcolor 的真实 B/F 两侧直接模块角色评估均无 finding，但 raises 的 match 断言与根包重导出尚不支持；base45 的历史 B/F 仍是旧 Poetry 元数据，egcd 的运行模块导入 doctest 被明确判 unknown。该批均未执行，没有把工程缺口变成成功样本。
 
 这轮完成了研究规格、独立历史核对，以及首批来源/阻塞探测；**尚未完成候选可行性准入**，因此没有进入研究执行适配、数据冻结或训练。
 
