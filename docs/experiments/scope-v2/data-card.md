@@ -46,7 +46,13 @@ luhncheck 的 1 条参数化断言展开为 9 个 case。textcase 的 HEAD 有 6
 
 ## 进度判定与下一步
 
-消息 oracle 扩展后已[复筛全部 13 个候选](../../results/literal-match-rescreen-v1/README.md)：termcolor 从 0/2 条变为 2/2 条、8 case，真实 draft 与 prepare 已产出新版本文件；但根包重导出入口仍 unknown，完整接纳场景仍为 0。其余候选没有因本语法扩展消除其他阻塞。复筛独立保存，不覆盖历史行；30–50 个场景仍未取得，不以工具 fixture 或 case 数替代。
+最新[受限重导出重查](../../results/static-reexport-v1/README.md)将 termcolor 原根入口的 B/F 角色评估均推进到
+review_required、无 finding；真实 prepare 已生成独立 contract.v5，仍保留原 2 条消息断言、8 case。
+本次只重查该候选，未重复声称完整筛查 13 个。owner H、实际外部双向 Evidence、自然独立比较目标仍未取得，
+完整接纳场景保持 0；工具自有 Docker fixture 的通过不计研究样本。下一步先审阅已准备契约和所有者提交路径，
+不制造 H、不借直接模块入口替换根包投影。legacy profile 继续不做。
+
+此前消息 oracle 扩展后已[复筛全部 13 个候选](../../results/literal-match-rescreen-v1/README.md)：termcolor 从 0/2 条变为 2/2 条、8 case，当时根包重导出入口仍 unknown，完整接纳场景为 0。其余候选没有因消息语法扩展消除其他阻塞。复筛独立保存，不覆盖历史行；30–50 个场景仍未取得，不以工具 fixture 或 case 数替代。
 
 消息扩展前的第三批核对了 termcolor、base45、egcd，详情见[历史回执](../../results/scope-study-feasibility-v3/README.md)。当时 termcolor 的真实 B/F 两侧直接模块角色评估均无 finding，但 raises 的 match 断言与根包重导出尚不支持；base45 的历史 B/F 仍是旧 Poetry 元数据，egcd 的运行模块导入 doctest 被明确判 unknown。该批均未执行，没有把工程缺口变成成功样本。
 
