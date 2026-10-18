@@ -13,10 +13,12 @@
 | learned initial | 2 / 2 / 2 / 0 | 4 | 1 / 5 | 1 / 1 |
 | learned refined | 2 / 0 / 4 / 0 | 2 | 0 / 5 | 1 / 1 |
 
-Scope 的 FP 指错误应用，不要求 Guard 实际报错。`false_alert_rate = 合规目标上实际 violation 数 / 全部合规目标数`，分母为 5，包含未执行的合规目标。`bug_recall` 分母是适用且有缺陷的目标，合并只有 1；input-limit 一族的留出缺陷分母为 0，所以该族为 null，不能写成 100%。原报告还提供 per-Guard / macro、unknown、执行有效性和零分母原因，不能用表中 micro 代替全部指标。
+Scope 的 FP 指错误应用，不要求 Guard 实际报错。冻结公式为 `false_alert_rate = count(alert and not true_bug) / count(not true_bug)`，其中 `true_bug = guard_applicable and guard_violation`；本留出集的 5 个非 true_bug 目标恰好都合规，分母包含未执行的目标。不能把这一巧合推广为“所有数据都按合规目标计分母”：不适用但违反自身契约的目标仍属于 not true_bug。`bug_recall` 分母是适用且有缺陷的目标，合并只有 1；input-limit 一族的留出缺陷分母为 0，所以该族为 null，不能写成 100%。原报告还提供 per-Guard / macro、unknown、执行有效性和零分母原因，不能用表中 micro 代替全部指标。
 
 initial → refined 修正 2 个错误应用，保留 2 个真实适用样本，没有新增 FP/FN。四方法实际执行共 16 次，来源缺陷另复检 4 次；后四次不进入 holdout 分母。标准六行 Demo 则得到 2 pass / 2 violation / 2 skipped_inapplicable、实际 Replay 4 次，它和留出评测是不同数据路径。
 
 发布汇总 [Markdown](results/mvp-evaluation.md) 引用冻结的原始评测数据与摘要，并附历史版本只读复验说明。发布冻结不会重跑留出集以生成“当前版本新结果”。现行代码拒绝旧 manifest 的源码绑定是预期行为；切回原提交验证通过也只继承旧版本的检查范围，见 [历史验证边界](known-limitations.md#历史验证结论的边界)。
 
 15 行全部公开、两个契约族、手工确认元数据和受控本地执行，仅支持机制与工程一致性的结论；不支持任意仓库、程序等价、安全执行未知代码或真实模型稳定性的主张。
+
+准备新研究时，可运行[公开结果独立盘点](experiments/scope-v2/design.md#独立盘点入口)。它只重算历史事实，不执行目标、不重新宣称旧链在当前实现下通过，也不实现 scope_v2 评测。
