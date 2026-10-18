@@ -8,7 +8,7 @@
 
 首批按两类有公开描述的 Python 实现探测：Base58 编码及 Luhn 校验。共享算法名称只说明检索方向，不能证明接口、oracle、边界行为或来源独立性相同。B/F 的形成、许可和分组仍需逐场景审核；没有按算法名称宣布 cohort 成立。
 
-独立修复、固定目标、Guard/样本行分别计数。当前两批共 10 个仓库候选 **不等于 10 个已复现修复**；已接纳场景 0、已捕获 Evidence 0、已编译新 Guard 0、目标执行 0。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
+独立修复、固定目标、Guard/样本行分别计数。当前三批共 13 个仓库候选 **不等于 13 个已复现修复**；已接纳场景 0、已捕获 Evidence 0、已编译新 Guard 0、目标执行 0。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
 
 ## 实际发现
 
@@ -45,6 +45,8 @@ luhncheck 的 1 条参数化断言展开为 9 个 case。textcase 的 HEAD 有 6
 另从已有 Luhn 修复提取 `test_valid` 的布尔 verify 契约，1/1 条断言；它与 luhncheck 的共同非空 ASCII 十进制域形成了更具体的比较提案，仍需规范、源码谱系、owner H 和执行准入审核。它复用同一修复，不增加独立 scenario。整数 checksum 与布尔 is_luhn 不能直接当作相同 oracle。
 
 ## 进度判定与下一步
+
+维护者选择继续保持现有 profile 后，又核对 termcolor、base45、egcd，详情见[第三批回执](../../results/scope-study-feasibility-v3/README.md)。termcolor 的真实 B/F 两侧普通函数角色评估均无 finding，但 raises 的 match 断言与根包重导出尚不支持；base45 的历史 B/F 仍是旧 Poetry 元数据，egcd 的运行模块导入 doctest 被明确判 unknown。均未执行，没有把工程缺口变成成功样本。
 
 这轮完成了研究规格、独立历史核对，以及首批来源/阻塞探测；**尚未完成候选可行性准入**，因此没有进入研究执行适配、数据冻结或训练。
 
