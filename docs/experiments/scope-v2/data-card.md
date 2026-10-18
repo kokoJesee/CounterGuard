@@ -70,3 +70,17 @@ review_required、无 finding；真实 prepare 已生成独立 contract.v5，仍
 如果要优先用上述旧项目，须先另行设计并审查旧式源码元数据的受控 profile，或受限 Hamcrest/unittest/消息断言投影；它们不是给一个“审核理由”就能开启的开关，也不包含在现有能力声明内。已给出[旧式源码支持提案](legacy-source-proposal.md)，维护者已选择继续按现有 profile 筛选，该提案暂不实施。不得静默放宽生产默认 profile、删除安装元数据检查或借本地执行取得结果。
 
 若后续仍找不到自然跨项目可比的数据，应回到[研究规格](design.md)的范围决策：明确减少主张或提出独立的同项目探索轨，而不是宣称跨项目实验已经跑通。
+
+## 输入校验方向的继续核查
+
+[本轮核查](../../results/input-validation-search-v1/README.md)优先重查 textcase / luhncheck，再按 pathvalidate、semver、isodate、luhn、base58 顺序进行，并补查 Click 的 RGB 校验修复。
+8 次 preflight、18 次 HEAD/B/F 直接定义诊断和 4 次固定测试 AST 投影均已记录；没有目标执行、新 H、标签或数据冻结。
+pathvalidate、semver、isodate、Click 有明确漏拒绝补丁线索，但新增可接纳来源/比较目标均为 0。
+已有 termcolor 来源闭环仍为 1，完整跨项目场景仍为 0；不把补丁数或回归 case 数当成已复现场景。
+
+此前 Luhn verify ↔ luhncheck 的提案有一项新限制：较早核心代码明显相似，是否借用或有共同来源不确定，独立性未通过。
+luhncheck 的现成字母回归样例是异常 → False，不是原先接受非法值；空串漏拒绝仅有源码线索，没有受检固定 F 回归断言。
+详见[谱系与回归核查](../../research/luhncheck-input-validation.md)。这些更正不覆盖或删除前面的历史发现。
+
+Click 是更接近 termcolor 的 RGB 共同域候选，但参数展开投影、完整闭包和调用/oracle 审核仍有阻塞。
+消息差异是否构成合法反例尚未裁决，不删除 match 来制造可比性。validators 不再用于本轮，pytimeparse 按维护者要求排除；legacy profile 继续不做。
