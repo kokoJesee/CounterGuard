@@ -1,6 +1,6 @@
-# 候选来源与首批可行性
+# 候选来源与可行性
 
-状态：开发期来源探测，尚无纳入 scope_v2 的场景。候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[探测回执](../../results/scope-study-feasibility-v1/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
+状态：开发期来源探测，尚无纳入 scope_v2 的场景。候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[首批](../../results/scope-study-feasibility-v1/README.md)和[第二批回执](../../results/scope-study-feasibility-v2/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
 
 ## 采集原则
 
@@ -8,7 +8,7 @@
 
 首批按两类有公开描述的 Python 实现探测：Base58 编码及 Luhn 校验。共享算法名称只说明检索方向，不能证明接口、oracle、边界行为或来源独立性相同。B/F 的形成、许可和分组仍需逐场景审核；没有按算法名称宣布 cohort 成立。
 
-独立修复、固定目标、Guard/样本行分别计数。当前 5 个仓库候选 **不等于 5 个已复现修复**；已接纳场景 0、已捕获 Evidence 0、已编译新 Guard 0、目标执行 0。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
+独立修复、固定目标、Guard/样本行分别计数。当前两批共 10 个仓库候选 **不等于 10 个已复现修复**；已接纳场景 0、已捕获 Evidence 0、已编译新 Guard 0、目标执行 0。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
 
 ## 实际发现
 
@@ -36,12 +36,20 @@ counterguard contract prepare --repo <luhn-clone> --buggy b64d5682b2f2e0655b8854
 
 预期退出 4不是“已可执行”：本次报告有 contract.v3 与 1 个 case，B/F runtime assessment 均 unknown，execution_allowed=false。换工具版本时须读新报告，不沿用这里的状态。
 
+## 第二批与更具体的比较提案
+
+第二批依次读取 textcase、caseutil、casefy、case-conversion，再沿既有校验算法方向加入 luhncheck；逐项结果和固定提交见[第二批回执](../../results/scope-study-feasibility-v2/README.md)。其中 textcase 与 luhncheck 的严格 preflight 退出 0，但只有后者同时具有普通函数入口、无 finding 的 source-only 角色评估和支持的测试投影。
+
+luhncheck 的 1 条参数化断言展开为 9 个 case。textcase 的 HEAD 有 6 条 snake 断言可投影；其历史真实修复另以 upper 为目标准备，投影 2/5 条断言，B/F 都因 callable-object 入口 unknown。caseutil/case-conversion 的动态查找，casefy 的测试控制流/重导出等边界均保留；没有通过修改上游测试消除它们。
+
+另从已有 Luhn 修复提取 `test_valid` 的布尔 verify 契约，1/1 条断言；它与 luhncheck 的共同非空 ASCII 十进制域形成了更具体的比较提案，仍需规范、源码谱系、owner H 和执行准入审核。它复用同一修复，不增加独立 scenario。整数 checksum 与布尔 is_luhn 不能直接当作相同 oracle。
+
 ## 进度判定与下一步
 
 这轮完成了研究规格、独立历史核对，以及首批来源/阻塞探测；**尚未完成候选可行性准入**，因此没有进入研究执行适配、数据冻结或训练。
 
 继续采集的优先项是：有明确静态项目元数据、直接字面量回归断言、完整真实 B/F 和所有者 H 路径的现代小型项目，并另找自然可比目标。所有候选仍留在登记中，不把未通过记录删掉。
 
-如果要优先用上述旧项目，须先另行设计并审查旧式源码元数据的受控 profile，或受限 Hamcrest/unittest/消息断言投影；它们不是给一个“审核理由”就能开启的开关，也不包含在现有能力声明内。不得静默放宽生产默认 profile、删除安装元数据检查或借本地执行取得结果。
+如果要优先用上述旧项目，须先另行设计并审查旧式源码元数据的受控 profile，或受限 Hamcrest/unittest/消息断言投影；它们不是给一个“审核理由”就能开启的开关，也不包含在现有能力声明内。已给出[旧式源码支持提案](legacy-source-proposal.md)，维护者已选择继续按现有 profile 筛选，该提案暂不实施。不得静默放宽生产默认 profile、删除安装元数据检查或借本地执行取得结果。
 
 若后续仍找不到自然跨项目可比的数据，应回到[研究规格](design.md)的范围决策：明确减少主张或提出独立的同项目探索轨，而不是宣称跨项目实验已经跑通。
