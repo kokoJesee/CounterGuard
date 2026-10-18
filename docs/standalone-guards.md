@@ -28,6 +28,8 @@ B/F 自检、精确快照 Scope、本地登记与 Shadow/Active 验证；不要�
 缺少 H、闭包仍 unknown 或只有 proposal 时，应停在相应准备环节，不先创建无用的 Registry 状态。
 
 根/src 的全链成功证据来自工具自有真实 Git/Docker fixture；validators 是固定外部缺陷试点。
+另有 [termcolor 真实来源验收](results/termcolor-source-v1/README.md)：非固定根包入口、获批 owner H、两轮 Docker 捕获、
+最小 Guard 自检及本地 Candidate 已通过；未提升 Shadow，也不宣称跨项目学习完成。
 [boltons 的当前版本复跑](results/boltons-standalone-retrial-v1/README.md)最远生成 contract.v3，
 因保守调用分类与缺少 owner H 停在执行前，尚无 Evidence/Shadow，不能作为第二个外部项目接入成功的证明。
 

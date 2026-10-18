@@ -47,6 +47,10 @@ B/F/H 分角色重建根包/定义摘要。静态专项拒绝条件/动态/重�
 后者只执行工具自有 src 根包 fixture，覆盖双向捕获、最小自检和 Registry 来源核验，未执行 termcolor。
 这不关闭任意 Python 效果、所有者身份、插件/安装或远程权限缺口。
 
+随后[termcolor 真实来源验收](results/termcolor-source-v1/README.md)以明确获批契约和真实 owner H 通过三角色绑定、
+两轮独立 Docker 捕获、最小 B/F 自检及 Registry 幂等来源核验；外部目标共 6 次 Docker 执行，Candidate 不调度。
+它补充 W02/W03/W04 的一个受限外部实例，不扩大原生 pytest、通用导出/依赖、身份或远程 CI 的覆盖声明。
+
 W01/W03/W04 增加[独立最小 Guard 到 Shadow/verify](standalone-guards.md)：新 Guard v3、快照 Scope、
 Registry entry v3 与执行授权 v5。每次最小自检/重放均重新核对来源，完整闭包不能混合 B/F；
 新快照 unknown 不启动 Docker，候选/退休/禁用不调度，篡改来源即使在退休态也显示完整性失败。

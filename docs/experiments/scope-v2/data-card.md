@@ -8,7 +8,8 @@
 
 首批按两类有公开描述的 Python 实现探测：Base58 编码及 Luhn 校验。共享算法名称只说明检索方向，不能证明接口、oracle、边界行为或来源独立性相同。B/F 的形成、许可和分组仍需逐场景审核；没有按算法名称宣布 cohort 成立。
 
-独立修复、固定目标、Guard/样本行分别计数。当前三批共 13 个仓库候选 **不等于 13 个已复现修复**；已接纳场景 0、已捕获 Evidence 0、已编译新 Guard 0、目标执行 0。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
+独立修复、固定目标、Guard/样本行分别计数。三批共 13 个仓库候选 **不等于 13 个已复现修复**；最初只读探测时，已接纳场景、Evidence、新 Guard 和目标执行均为 0。
+后续 termcolor 的真实来源闭环见文末；它不改变独立跨项目研究场景仍为 0 的结论。没有冻结 split/context/protocol，也没有训练或读取 scope_v2 最终标签。
 
 ## 实际发现
 
@@ -46,10 +47,16 @@ luhncheck 的 1 条参数化断言展开为 9 个 case。textcase 的 HEAD 有 6
 
 ## 进度判定与下一步
 
+维护者随后批准契约及 fork/H/Docker 操作，已完成 [termcolor 真实来源闭环](../../results/termcolor-source-v1/README.md)：
+所有者 fork 的 H 只新增契约；两轮完整 capture 均为 B 8 failed、F 8 passed，失败集与 case 结果一致、run ID 不同；
+Evidence/Guard 独立核验通过，Guard 保留 8 个实际失败 case 并完成 B/F 自检，本地登记为不可调度的 Candidate。
+**已验证来源修复数为 1，完整跨项目研究场景仍为 0**；新记录独立追加，前面的“0”是对应轮次的历史结果。
+自然独立比较目标未确认，研究桥接/学习/冻结未启动；下一步先核对可比性，不把 8 case 当成 8 个场景。
+
 最新[受限重导出重查](../../results/static-reexport-v1/README.md)将 termcolor 原根入口的 B/F 角色评估均推进到
 review_required、无 finding；真实 prepare 已生成独立 contract.v5，仍保留原 2 条消息断言、8 case。
-本次只重查该候选，未重复声称完整筛查 13 个。owner H、实际外部双向 Evidence、自然独立比较目标仍未取得，
-完整接纳场景保持 0；工具自有 Docker fixture 的通过不计研究样本。下一步先审阅已准备契约和所有者提交路径，
+该次只重查该候选，未重复声称完整筛查 13 个。当时 owner H、实际外部双向 Evidence、自然独立比较目标尚未取得，
+完整接纳场景为 0；工具自有 Docker fixture 的通过不计研究样本。当时先审阅已准备契约和所有者提交路径，
 不制造 H、不借直接模块入口替换根包投影。legacy profile 继续不做。
 
 此前消息 oracle 扩展后已[复筛全部 13 个候选](../../results/literal-match-rescreen-v1/README.md)：termcolor 从 0/2 条变为 2/2 条、8 case，当时根包重导出入口仍 unknown，完整接纳场景为 0。其余候选没有因消息语法扩展消除其他阻塞。复筛独立保存，不覆盖历史行；30–50 个场景仍未取得，不以工具 fixture 或 case 数替代。
