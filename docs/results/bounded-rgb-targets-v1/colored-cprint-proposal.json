@@ -1,0 +1,1013 @@
+{
+  "artifact_digest": "sha256:494bf9dece65a3dd8c2fb9780726b7b8cdf9373e49e38ee8073d1e692e760881",
+  "definition_role_diagnostic": {
+    "algorithm": "module-import-closure.v1",
+    "claim": "Proposed module input set, not proof of dependency completeness or safety. All imports in visited modules are considered, including conditional/function imports. Dynamic aliases, arbitrary Python effects and resource use require human review.",
+    "files": [
+      {
+        "content_digest": "sha256:675f176f661e68026284738b944a1c62912ea446674dc37757d75e817eb8897a",
+        "path": "colored/__init__.py"
+      },
+      {
+        "content_digest": "sha256:1fcdffd70bde90ad0c41e7c842867757656e03d794bd467755051162f6d60aef",
+        "path": "colored/attributes.py"
+      },
+      {
+        "content_digest": "sha256:711e7167a78db2ea9f96b16bd09a50ae4dce3b143f1491d2e14a7fbec23f27b4",
+        "path": "colored/background.py"
+      },
+      {
+        "content_digest": "sha256:274cfdd4ff3cbc693a9e362ef9f67620c6aaa699ce7cddb3e2dfaa0ecaf599ff",
+        "path": "colored/colored.py"
+      },
+      {
+        "content_digest": "sha256:226623d14d225123e5b878aa03558fcaeaa199df063a3cd97a00fd91c2365c81",
+        "path": "colored/controls.py"
+      },
+      {
+        "content_digest": "sha256:a36b58f08a57633493f0ecc033a759cdbb5614508b4b812d3c626c49996c37e4",
+        "path": "colored/convert.py"
+      },
+      {
+        "content_digest": "sha256:fc145f7a0629cb288d0fe2e68fccff1c935edbd9c82275336386208b9f378bc8",
+        "path": "colored/cprint.py"
+      },
+      {
+        "content_digest": "sha256:649ce6427c1fbf00db0962b51b9459a9218a9f4578bd6b7e8592f7bfeb6e06bb",
+        "path": "colored/exceptions.py"
+      },
+      {
+        "content_digest": "sha256:d92b2b673c568dc0a053a1c35e588e4c991c6df0b197785eab691319e958fa6e",
+        "path": "colored/foreground.py"
+      },
+      {
+        "content_digest": "sha256:035b8baf9a0fd788030e219b2831938ddfea088086f09ecd471ff55895dcef84",
+        "path": "colored/hexadecimal.py"
+      },
+      {
+        "content_digest": "sha256:772abdb7f01a80453cdd57c709e490d41527b46a927f3a3cb4e3911b8df8c5f4",
+        "path": "colored/library.py"
+      },
+      {
+        "content_digest": "sha256:a4601177ad92205c3ec7f2e259f888d49c871131687ecd72738cad46498fab7d",
+        "path": "colored/utilities.py"
+      }
+    ],
+    "findings": [
+      {
+        "code": "module_lookup_hook_requires_review",
+        "detail": "",
+        "path": "colored/attributes.py",
+        "severity": "unknown"
+      },
+      {
+        "code": "module_lookup_hook_requires_review",
+        "detail": "",
+        "path": "colored/background.py",
+        "severity": "unknown"
+      },
+      {
+        "code": "module_lookup_hook_requires_review",
+        "detail": "",
+        "path": "colored/foreground.py",
+        "severity": "unknown"
+      }
+    ],
+    "import_edges": [
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.attributes"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.background"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.colored"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.controls"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.convert"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.cprint"
+      },
+      {
+        "from_ref": "colored/__init__.py",
+        "to_module": "colored.foreground"
+      },
+      {
+        "from_ref": "colored/attributes.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/attributes.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/attributes.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/attributes.py",
+        "to_module": "colored.utilities"
+      },
+      {
+        "from_ref": "colored/background.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/background.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/background.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/background.py",
+        "to_module": "colored.utilities"
+      },
+      {
+        "from_ref": "colored/colored.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/colored.py",
+        "to_module": "colored.hexadecimal"
+      },
+      {
+        "from_ref": "colored/colored.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/colored.py",
+        "to_module": "colored.utilities"
+      },
+      {
+        "from_ref": "colored/controls.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/controls.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/controls.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/controls.py",
+        "to_module": "colored.utilities"
+      },
+      {
+        "from_ref": "colored/convert.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/convert.py",
+        "to_module": "colored.colored"
+      },
+      {
+        "from_ref": "colored/convert.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/cprint.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/cprint.py",
+        "to_module": "colored.colored"
+      },
+      {
+        "from_ref": "colored/exceptions.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/foreground.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/foreground.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/foreground.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/foreground.py",
+        "to_module": "colored.utilities"
+      },
+      {
+        "from_ref": "colored/hexadecimal.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/hexadecimal.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/hexadecimal.py",
+        "to_module": "colored.library"
+      },
+      {
+        "from_ref": "colored/library.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/utilities.py",
+        "to_module": "colored"
+      },
+      {
+        "from_ref": "colored/utilities.py",
+        "to_module": "colored.exceptions"
+      },
+      {
+        "from_ref": "colored/utilities.py",
+        "to_module": "colored.library"
+      }
+    ],
+    "status": "unknown",
+    "stdlib_imports": [
+      "__future__",
+      "ctypes",
+      "os",
+      "platform",
+      "sys",
+      "typing"
+    ]
+  },
+  "definition_target": "colored.cprint:cprint",
+  "execution_allowed": false,
+  "external_target_execution_count": 0,
+  "hook_scope_observations": [
+    {
+      "class": "MetaStyle",
+      "line": 15,
+      "node_type": "class_or_metaclass_method_not_module_hook",
+      "path": "colored/attributes.py"
+    },
+    {
+      "class": "MetaBack",
+      "line": 15,
+      "node_type": "class_or_metaclass_method_not_module_hook",
+      "path": "colored/background.py"
+    },
+    {
+      "class": "MetaFore",
+      "line": 15,
+      "node_type": "class_or_metaclass_method_not_module_hook",
+      "path": "colored/foreground.py"
+    }
+  ],
+  "initial_fore_rgb_diagnostic_preserved": true,
+  "labels_assigned": false,
+  "mapping_is_an_executable_contract": false,
+  "mapping_semantics_approved": false,
+  "mapping_worksheet": [
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "fore_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": -1
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:488a72202c5008152d90e703b8a581cae7d4ba135787aa8e50f0d0b820b979fd",
+      "source_case_id": "case_41b224478eaf760e8144b1f6",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": -1
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "back_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": -1
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:df7c6994a9521e003a829b4c8b6c59f6b93abc810c8bd9d281482da945e37ba2",
+      "source_case_id": "case_50104f69f284b5628d90b029",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "on_color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": -1
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "back_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 256
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:df7c6994a9521e003a829b4c8b6c59f6b93abc810c8bd9d281482da945e37ba2",
+      "source_case_id": "case_51e2ff6bc9802a1803fc55c9",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "on_color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 256
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "back_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:df7c6994a9521e003a829b4c8b6c59f6b93abc810c8bd9d281482da945e37ba2",
+      "source_case_id": "case_942019cec8bae1dea1bc3460",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "on_color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "fore_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:488a72202c5008152d90e703b8a581cae7d4ba135787aa8e50f0d0b820b979fd",
+      "source_case_id": "case_a49a01cfad8d0af1e6973391",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "fore_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:488a72202c5008152d90e703b8a581cae7d4ba135787aa8e50f0d0b820b979fd",
+      "source_case_id": "case_c231f71510e8045580409a5e",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "fore_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 256
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:488a72202c5008152d90e703b8a581cae7d4ba135787aa8e50f0d0b820b979fd",
+      "source_case_id": "case_dcf911ff197a239a703abe4d",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 256
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    },
+    {
+      "adapter_tuple_unpacking": false,
+      "execution_outcome": "not_run",
+      "label": "unassigned",
+      "preserved_exception_match": "Expected a tuple of 3 ints in range 0-255",
+      "proposed_target_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "proposed_target_rgb_keyword": "back_rgb",
+      "proposed_target_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      },
+      "source_assertion_digest": "sha256:df7c6994a9521e003a829b4c8b6c59f6b93abc810c8bd9d281482da945e37ba2",
+      "source_case_id": "case_f16a157710addc6257cec33e",
+      "source_exception": "ValueError",
+      "source_force_color_handling": "source_only_colorization_control_not_a_colored_parameter",
+      "source_positional_args": [
+        {
+          "entries": [],
+          "items": [],
+          "kind": "string",
+          "value": "text"
+        }
+      ],
+      "source_rgb_keyword": "on_color",
+      "source_rgb_literal": {
+        "entries": [],
+        "items": [
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          },
+          {
+            "entries": [],
+            "items": [],
+            "kind": "integer",
+            "value": 0
+          }
+        ],
+        "kind": "tuple",
+        "value": null
+      }
+    }
+  ],
+  "proposed_literal_payload_mapping_count": 8,
+  "public_target": "colored:cprint",
+  "repository": "https://gitlab.com/dslackw/colored.git",
+  "revision": "f3d799873a7cde62f3c43d74ed6ffc258240d956",
+  "root_export_check": {
+    "reason_code": "export_root_statement_unsupported",
+    "status": "unsupported"
+  },
+  "schema_version": "colored-cprint-followup-proposal.v1",
+  "selected_pins": [
+    {
+      "content_digest": "sha256:145e1b6cdc833d762ac576389fb708d6f0f7e3f32cf9fd6fbc0e8bb37c4a6707",
+      "object_id": "0e0bfb5fa1ce4b6199c2778873467372c9e071b1",
+      "path": "LICENSE.txt",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:675f176f661e68026284738b944a1c62912ea446674dc37757d75e817eb8897a",
+      "object_id": "886053787acffb399451d98f595063195b030088",
+      "path": "colored/__init__.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:1fcdffd70bde90ad0c41e7c842867757656e03d794bd467755051162f6d60aef",
+      "object_id": "a8f12970a6a95c1217d4437ac0d9f703f9c6494d",
+      "path": "colored/attributes.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:711e7167a78db2ea9f96b16bd09a50ae4dce3b143f1491d2e14a7fbec23f27b4",
+      "object_id": "9295992f6034a1de43252fe4b808b40b97abb32f",
+      "path": "colored/background.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:274cfdd4ff3cbc693a9e362ef9f67620c6aaa699ce7cddb3e2dfaa0ecaf599ff",
+      "object_id": "24c522a5599c9931950ce6980dd1fdffc92e079b",
+      "path": "colored/colored.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:226623d14d225123e5b878aa03558fcaeaa199df063a3cd97a00fd91c2365c81",
+      "object_id": "40ee8f85326c53fb9e2035b637874333c5d1c95a",
+      "path": "colored/controls.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:a36b58f08a57633493f0ecc033a759cdbb5614508b4b812d3c626c49996c37e4",
+      "object_id": "30b99d6da23ea43e72240b96f8ea4e87ca67cf31",
+      "path": "colored/convert.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:fc145f7a0629cb288d0fe2e68fccff1c935edbd9c82275336386208b9f378bc8",
+      "object_id": "63aedde4ce9d06c1aa1f7a419eae997e4d958ded",
+      "path": "colored/cprint.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:649ce6427c1fbf00db0962b51b9459a9218a9f4578bd6b7e8592f7bfeb6e06bb",
+      "object_id": "f894e2ff9b350e61980e01ad4da556f487d2fef4",
+      "path": "colored/exceptions.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:d92b2b673c568dc0a053a1c35e588e4c991c6df0b197785eab691319e958fa6e",
+      "object_id": "8b7faf983d96d15b5e6db4e10718e2bdda4c39bd",
+      "path": "colored/foreground.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:035b8baf9a0fd788030e219b2831938ddfea088086f09ecd471ff55895dcef84",
+      "object_id": "51ed2349bdff917ecd064db734596a0b36b581de",
+      "path": "colored/hexadecimal.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:772abdb7f01a80453cdd57c709e490d41527b46a927f3a3cb4e3911b8df8c5f4",
+      "object_id": "9b51dbac5de366bf6cc6cd0e709346e5e5399f41",
+      "path": "colored/library.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:a4601177ad92205c3ec7f2e259f888d49c871131687ecd72738cad46498fab7d",
+      "object_id": "40544500f61caa7b046e8c24126c6397e03d6ab3",
+      "path": "colored/utilities.py",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:122f0c632191f357b53c760cec7f8f4d460702b8e9a36db8a8fd605ac189802f",
+      "object_id": "838168c57bfbb6462428b1388033776958181488",
+      "path": "pyproject.toml",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:98bbc1e8cabb43e37d2a3f71ef60cd11aa2825e5f91f2533f4236576f5bfe41b",
+      "object_id": "7948a1be4d5e8ed710d3f9a598101e8abe169ab9",
+      "path": "setup.cfg",
+      "revision": "head"
+    },
+    {
+      "content_digest": "sha256:00eaa7511166aa49a862b18eea0acc0be52cc7267d150eff3c8e599480c081e6",
+      "object_id": "cfbe8021a0f00b522642817e1f542cd074740c4b",
+      "path": "tests_pytest/test_colored.py",
+      "revision": "head"
+    }
+  ],
+  "selection_reason": "Public tuple-taking foreground/background signature found before execution; preserves all source case payloads without adapter unpacking. Not selected from execution outcomes.",
+  "source_case_count": 8,
+  "source_contract_digest": "sha256:5f6cf46635476a74668d61c1ea7f5cf99c6601bc3fde705001eb394bde76c180",
+  "source_contract_ref": "docs/results/static-reexport-v1/termcolor-contract.json",
+  "status": "proposal_only_not_admitted"
+}
