@@ -40,6 +40,15 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W02/W03 增加[显式 static-reexport-v2](static-reexports-v2.md)：contract.v6 / binding.v4 与 closure.v2，
+默认 v1 接受范围保留。多个根导出和有限 raise 类钩子必须逐角色独立重建；观察项绑定类与异常定义源码，
+模块/条件/别名钩子、危险构造、转发和来源重签仍拒绝或 unknown。
+[本次验收](results/static-reexport-v2/README.md)为快速层 976 passed、Git 专项 3 passed、
+工具自有 Docker 专项 1 passed（无 skip），覆盖 v6 捕获、最小自检和 Registry 核验。
+只读 `inspect-target` 不能成为契约或来源授权；固定 colored 的 12 文件闭包与 3 个钩子为 review_required，
+未执行、未分配标签、不计为研究样本。W01 隔离策略未变，未重跑原四项攻击；W04 仍只有原受限来源链覆盖，
+没有新增远程权限或跨仓库调度能力。任意 Python 效果、动态改写、完整人工源审与研究桥接仍未关闭。
+
 W02/W03 增加[受限根包导出声明](static-reexports.md)：新 contract.v5 与 binding.v3，原公开入口保持不变，
 B/F/H 分角色重建根包/定义摘要。静态专项拒绝条件/动态/重复绑定、定义漂移、未知装饰器和重签输入状态，
 确认 unknown 在运输层之前停止、20 次乱序稳定；原版契约不自动获得新接受范围。

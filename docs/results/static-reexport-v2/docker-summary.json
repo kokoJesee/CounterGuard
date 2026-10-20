@@ -1,0 +1,41 @@
+{
+  "fixture": "tool-owned src package; not colored or a research sample",
+  "contract_schema": "contract.v6",
+  "binding_schema": "bootstrap-binding.v4",
+  "roles": {
+    "buggy": {
+      "closure_files": 4,
+      "hook_observations": 1,
+      "status": "review_required"
+    },
+    "fixed": {
+      "closure_files": 4,
+      "hook_observations": 1,
+      "status": "review_required"
+    },
+    "head": {
+      "closure_files": 4,
+      "hook_observations": 1,
+      "status": "review_required"
+    }
+  },
+  "capture_schema": "standalone-capture.v2",
+  "generator_version": "standalone-test.v2",
+  "image_digest": "sha256:561d706ee4938783c17e92efda0058ce4ebcc04e021981292a16b0a12ecd0d16",
+  "policy_digest": "sha256:cfa525edada1e94321271c46c7d1c0bf3cd9b9dd54ac297de6d92bc3b92c3555",
+  "reproduced": true,
+  "failing_case_ids": [
+    "case_164a1ca73af42ff620a2d54b"
+  ],
+  "buggy_pytest_exit_code": 1,
+  "fixed_pytest_exit_code": 0,
+  "buggy_case_count": 2,
+  "fixed_case_count": 2,
+  "guard_schema": "guard.v4",
+  "guard_case_ids": [
+    "case_164a1ca73af42ff620a2d54b"
+  ],
+  "capture_digest": "sha256:e953b538a5dcdc153f6feca298a08f9e825b4c9066ca67438d84d7a5fe0b9338",
+  "evidence_digest": "sha256:1a18d1422f701cf1e0313087328b53a7cd6e66d1af4f00bd1e89e7ceaa9e7730",
+  "guard_digest": "sha256:7c5d427474c95377c2eae926e6d72d617892c583a6826dc3d8e45579d1ad615a"
+}
