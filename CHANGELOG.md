@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- 新增工具自有 fixture 的四方法纯指标汇总与算术重算 CLI：复用冻结公式，按项目、Guard 和总体报告，保留 unknown、零分母和配对变化；不执行目标、审核标签或代替正式 evaluate。详见[接口与边界](docs/study-metrics.md)。
+- colored 的受限真实观察后补查独立固定文档与历史；错误长度的异常/消息规范仍未确定，该 pair 保留探索用途，不进入正式 refinement。详见[一手依据](docs/research/colored-arity-policy.md)。
+
 - 新增显式 static-reexport-v2：contract.v6 / binding.v4、多个静态根导出、带源码 pin 的有限 raise 类钩子观察；旧 profile 保留原 grammar。比较目标可用 `bootstrap inspect-target` 生成不可执行的完整提交回执，无需虚构 B/F/H；跨项目执行仍需独立研究映射与授权桥接。详见[版本与边界](docs/static-reexports-v2.md)。
 
 - 新增受限根包具名重导出声明核验：独立 contract.v5 / binding.v3，B/F/H 分别核对公开入口到普通函数定义的路径与摘要，生成测试保留原根包调用。动态绑定/一般导出链保持待审，旧契约及产物不改写；详见[范围与重算规则](docs/static-reexports.md)。

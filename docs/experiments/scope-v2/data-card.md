@@ -1,8 +1,8 @@
 # 候选来源与可行性
 
 状态：开发期来源探测，尚无纳入 scope_v2 的场景。[研究重放工程](../../research-fitted-replay.md)已限工具自有 fixture 验收；
-最新[colored 只读复核](../../results/colored-readiness-v1/README.md)补充当前闭包、环境与规范边界。
-随后获批的受限外部观察仍待独立版本实现与验收，尚未执行，整行语义未裁决。
+已完成[colored 受限外部观察](../../results/colored-observation-v1/README.md)：完整 Guard 两次各8failed，
+独立 stdout 子集两次各4passed；整行语义未裁决，不计正式研究场景。
 候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[首批](../../results/scope-study-feasibility-v1/README.md)和[第二批回执](../../results/scope-study-feasibility-v2/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
 
 ## 采集原则
@@ -169,3 +169,8 @@ RGB 路径无需开放颜色环境，独立 non-TTY 见证不应附加 reset；�
 **真实来源修复 1，实际外部观察 pair 1，正式跨项目研究场景 0**；8 case 不算 8 个独立场景。
 此前各轮的 0 是对应时间的历史事实，保留原回执。下一道门槛仍是语义裁决、外部元数据/特征对账及独立数据，
 不能把执行链已通当成正式四方法对照实验已具备数据。
+
+随后[有界规范调查](../../research/colored-arity-policy.md)找到独立固定的上游三通道参数文档，
+仍未找到四个长度错误输入的异常/消息承诺。该 pair 保留为探索观察，不进入正式 refinement；
+未删 case、自动贴标、追加外部执行或扩搜其他目标。三通道文档不是完整契约合规证明。
+四方法[纯指标汇总](../../study-metrics.md)另用自有算术 fixture 推进工程，不能计入真实研究数据。

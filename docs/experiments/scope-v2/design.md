@@ -20,6 +20,7 @@
 | Evidence / Guard | 受限 contract.v3–v6 → Docker evidence.v4 → 最小 guard.v3/v4、自检和独立重建 | 每个真实来源仍需完整 B/F、H 内契约、闭包与人工审核；版本按 oracle/profile 选择，不适用则停 | [standalone capture](../../standalone-capture.md)、[Guard](../../standalone-guards.md)、[v2 导出](../../static-reexports-v2.md) |
 | Scope / replay | 生产 standalone 使用精确 B/F 快照；研究 v2 对自有 fixture 支持四方法、fit 来源重建与三态决定，旧 v1 行为不变 | 不能放宽生产 snapshot Scope、执行未获准外部目标或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[学习规则重放](../../research-fitted-replay.md) |
 | Metrics / evaluation | 既有分子/分母、配对变化与报告逻辑 | v1 外层绑定类型与硬编码期望不能直接用于新 Guard/真实仓库 | [evaluation.py](../../../src/counterguard/evaluation.py)、[metrics](../../../src/counterguard/evaluation_metrics.py) |
+| 纯研究指标汇总 | 自有 fixture N×4、按项目汇总、配对与差值、确定性及算术独立重建 | 不核验原始 Run/标签来源、不打开 holdout、不执行目标；不是正式 evaluate | [study-metrics](../../study-metrics.md) |
 | 独立历史事实盘点 | 只读标准库脚本，核对公开预测/标签/计数/pin | 不检查旧 Docker 授权或完整运行来源，不批准 scope_v2 | [研究入口](../../../scripts/run_scope_study.py) |
 
 删掉 Literal、预期计数或来源 pin 并不构成新研究支持。新数据先做可行性探测，再独立定义版本化的研究模型和 Docker 适配。不能提前制造一个“通过”的 scope_v2 protocol。
@@ -36,6 +37,7 @@ uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 `inventory` 分支只读历史事实，不 import 仓库目标，不调用生产 learner/evaluator，不启动 Git/Docker/pytest 子进程。测试也拦截真实子进程启动。
 同一脚本另有自有 fixture 的 `audit/replay/verify`，见[研究重放](../../research-replay.md)。
 训练专用 `fit/verify` 由独立 [fit_scope_study.py](../../../scripts/fit_scope_study.py) 提供；聚合入口尚未路由 fit，`evaluate/compare/report/export` 尚未实现。
+独立[纯指标命令](../../study-metrics.md)已补齐 fixture 矩阵的算术层，不消费外部观察或替代这些完整编排命令。
 独立的静态特征命令见[研究特征](../../study-features.md)，自有 fixture 的 learned replay
 另见[研究重放 v2](../../research-fitted-replay.md)；正式外部评测未接通。
 
@@ -104,7 +106,8 @@ unknown 在主混淆矩阵中是负预测，另列 coverage 和配对转移；�
 
 ## 下一道准入
 
-最新材料是[colored 源码/调用审计](../../results/colored-review-v1/README.md)及[研究重放接口](../../research-replay.md)。
+最新真实材料是[colored 固定观察](../../results/colored-observation-v1/README.md)及[长度政策补查](../../research/colored-arity-policy.md)。
+工具自有链另有[学习重放](../../research-fitted-replay.md)和[纯指标汇总](../../study-metrics.md)，不能替外部数据分配标签。
 静态 profile 扩展不批准外部跨项目执行；研究通道的自有 fixture 验收也不代替外部源审与语义裁决。
 字面量 8/8 不等于 8 个合法反例，也不等于有足够的独立训练/留出数据。
 
