@@ -96,8 +96,8 @@ uv run pytest tests/unit/test_study_features.py -q
 复用原 `learn_scope` 的 `conjunction.v1`：至少 2 个正样本与 1 个负样本、1–3 条合取的 eager 搜索、
 训练零误差、每条保留 clause 有反例见证。没有负样本仍拒绝；20 次乱序的规则与学习摘要一致。
 
-这只是纯 learner 的输入接缝。当前没有研究 protocol/split/fit/scope 的完整授权链，
-也没有把裸学习结果传给 Docker 的入口。C1 plan/admission v1 与 authorization v6 不接收这些新字段，
+研究 protocol/split/fit/Scope 的训练绑定现由[独立拟合接口](study-fit.md)核验；执行授权链尚未接通，
+没有把裸学习结果传给 Docker 的入口。C1 plan/admission v1 与 authorization v6 不接收这些新字段，
 研究 learned replay 继续返回 `study_fit_interface_not_implemented`，`run=null`。
 fixture 学习成功不会增加真实研究样本数，也不会产生任何自动标签或正式研究结论。
 

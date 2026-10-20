@@ -476,3 +476,14 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 上述静态记录没有 Git/来源执行事实或标签审核权限；它们不能代替 fit/Scope/研究授权。
 纯学习仍复用精确 `TrainingExample(FeatureVector, bool)` 与 `conjunction.v1`，不扩大冻结 v1 接受集合。
+
+研究训练专用链见 [study-fit.md](study-fit.md)，新 Schema 独立存于 `schemas/study-fit-v1/`。
+
+| 层 / 版本 | 摘要依赖 | 上游变化与重算 |
+|---|---|---|
+| study-sample / study-label-review v1 | 固定 StudyTarget、context/audit pins；独立 source/Guard、sample/target、人工标签及提交内规范依据 | 改目标/特征/标签须新样本或审核，重建实际字节，重新冻结成员；不自动裁决语义 |
+| study-split / study-fit-protocol v1 | 规范成员、阶段、组/仓库身份/逻辑目标键、留出承诺、source/Guard、算法与预算 | 改任何成员或前置须新 split/protocol 与独立可信 fit review；不读取留出标签 |
+| study-fit-review.v1 | protocol/split/source、真实审核事件与全包实现、可选前序事件 | 修改或撤回需新事件/可信 anchor；旧审核不自动适用于新输入/实现 |
+| study-fit / study-learned-scope v1 | 实际消费 pins、phase、source/Guard/protocol/split/review、纯学习及 clause 见证、实现 | 改上游须新拟合并独立重建；拒绝结果保留且 Scope 为空；不同结果不覆盖 |
+
+这些记录的 execution_allowed 固定 false，不构成新 Docker 授权或正式外部 scope_v2 冻结。

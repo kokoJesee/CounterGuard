@@ -135,3 +135,7 @@ colored 固定提交的 50 文件、12 文件闭包和 3 个钩子均已记录�
 工具自有 fixture 的[独立静态特征接口](../../study-features.md)现已实现 For/GeneratorExp、审核 context pin、
 行见证和人工对账，并可投影到原纯 learner；[有限验收](../../results/study-features-v1/README.md)不计外部研究样本。
 外部分类/协议仍未冻结，完整 fit/split/Scope 授权链未接通，learned replay 继续 unknown。
+
+随后实现[训练专用 fixture 链](../../study-fit.md)：独立协议/分组与阶段承诺、人工标签、固定 Git/context/对账、
+完整 source 重建、initial/refined 拟合、拒绝回执和独立 verify。留出只保存承诺、不打开内容。
+这补齐训练侧的数据链，尚未接入研究执行授权；自有样本不增加真实研究计数，外部准入和语义裁决仍保留。

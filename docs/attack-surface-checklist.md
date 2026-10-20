@@ -166,3 +166,11 @@ For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立�
 静态命令不执行目标代码；手工标注不一致保留双方，不自动改数据。
 这不证明可信审核元数据或标签语义、不提供 Git 来源认证、不吸收 helper、不做动态/流敏感分析，
 也没有让 learned replay 获得执行权限。W01/W03/W04 的执行、插件和远程权限状态未因此升级。
+
+[训练专用研究链](study-fit.md)新增[纯检查](../tests/unit/test_study_fit.py)、
+[完整来源替身专项](../tests/unit/test_study_fit_provenance.py)及[真实 Git 专项](../tests/integration/test_study_fit.py)：
+成员/逻辑目标/组和仓库的训练—留出分离、来源组排除、初始不读未来成员、holdout 无文件引用、
+原始 source/target/context/audit/规范依据重建、静态导出实际定义、重签一致假学习链拒绝、
+无负例的可核验 refusal、20 次乱序、追加撤回、输出限制和旧 parser 拒绝均有自有 fixture 覆盖。
+人工分组/标签语义与 own-contract 确认仍是可信审核输入，不提供远程身份、原子快照或外部数据结论。
+这不是新的 Docker 攻击实测；没有扩大 C1 或生产执行权限，W01/W03/W04 状态不因此升级。

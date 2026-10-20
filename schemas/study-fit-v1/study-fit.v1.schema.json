@@ -1,0 +1,670 @@
+{
+  "$defs": {
+    "ClauseWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "clause": {
+          "$ref": "#/$defs/ScopeClause"
+        },
+        "counterexample_features": {
+          "items": {
+            "$ref": "#/$defs/FeatureVector"
+          },
+          "minItems": 1,
+          "title": "Counterexample Features",
+          "type": "array"
+        }
+      },
+      "required": [
+        "clause",
+        "counterexample_features"
+      ],
+      "title": "ClauseWitness",
+      "type": "object"
+    },
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "FeatureVector": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "ast_features": {
+          "items": {
+            "enum": [
+              "branch:is_member",
+              "branch:none",
+              "decimal:multiply",
+              "decimal:subtract",
+              "int:parse",
+              "regex:ascii_digits",
+              "range:check",
+              "round:half_up",
+              "str:isascii",
+              "str:isdecimal"
+            ],
+            "type": "string"
+          },
+          "title": "Ast Features",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature",
+        "module_group",
+        "ast_features"
+      ],
+      "title": "FeatureVector",
+      "type": "object"
+    },
+    "ScopeClause": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "anyOf": [
+            {
+              "enum": [
+                "contract_family",
+                "contract_version",
+                "interface_kind",
+                "symbol_signature",
+                "module_group"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "ast_features",
+              "type": "string"
+            }
+          ],
+          "title": "Field"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "contains"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "title": "ScopeClause",
+      "type": "object"
+    },
+    "ScopeExplanation": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "scope-explanation.v1",
+          "default": "scope-explanation.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "learner_version": {
+          "const": "conjunction.v1",
+          "default": "conjunction.v1",
+          "title": "Learner Version",
+          "type": "string"
+        },
+        "label_basis": {
+          "const": "supplied_training_labels",
+          "default": "supplied_training_labels",
+          "title": "Label Basis",
+          "type": "string"
+        },
+        "learning_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Learning Digest",
+          "type": "string"
+        },
+        "training_dataset_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Training Dataset Digest",
+          "type": "string"
+        },
+        "positive_count": {
+          "minimum": 2,
+          "title": "Positive Count",
+          "type": "integer"
+        },
+        "negative_count": {
+          "minimum": 1,
+          "title": "Negative Count",
+          "type": "integer"
+        },
+        "clause_witnesses": {
+          "items": {
+            "$ref": "#/$defs/ClauseWitness"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Clause Witnesses",
+          "type": "array"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "learning_digest",
+        "training_dataset_digest",
+        "positive_count",
+        "negative_count",
+        "clause_witnesses",
+        "artifact_digest"
+      ],
+      "title": "ScopeExplanation",
+      "type": "object"
+    },
+    "ScopeLearningResult": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "scope-learning.v2",
+          "enum": [
+            "scope-learning.v1",
+            "scope-learning.v2"
+          ],
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "learner_version": {
+          "const": "conjunction.v1",
+          "default": "conjunction.v1",
+          "title": "Learner Version",
+          "type": "string"
+        },
+        "clauses": {
+          "items": {
+            "$ref": "#/$defs/ScopeClause"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Clauses",
+          "type": "array"
+        },
+        "training_dataset_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Training Dataset Digest",
+          "type": "string"
+        },
+        "training_confusion": {
+          "$ref": "#/$defs/ConfusionCounts"
+        },
+        "candidate_count": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Count"
+        },
+        "predicate_count": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Predicate Count"
+        },
+        "combination_count": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Combination Count"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "clauses",
+        "training_dataset_digest",
+        "training_confusion",
+        "artifact_digest"
+      ],
+      "title": "ScopeLearningResult",
+      "type": "object"
+    },
+    "StudyFitInput": {
+      "additionalProperties": false,
+      "properties": {
+        "member": {
+          "$ref": "#/$defs/StudyTrainMember"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "context_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Context Digest",
+          "type": "string"
+        },
+        "audit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Audit Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "member",
+        "target_digest",
+        "context_digest",
+        "audit_digest"
+      ],
+      "title": "StudyFitInput",
+      "type": "object"
+    },
+    "StudyLearnedScope": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "study-learned-scope.v1",
+          "default": "study-learned-scope.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "tool_owned_research_fixture_only",
+          "default": "tool_owned_research_fixture_only",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "protocol_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Protocol Digest",
+          "type": "string"
+        },
+        "split_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Split Digest",
+          "type": "string"
+        },
+        "source_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Digest",
+          "type": "string"
+        },
+        "guard_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Guard Digest",
+          "type": "string"
+        },
+        "review_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Review Digest",
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "initial",
+            "refined"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "training_binding_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Training Binding Digest",
+          "type": "string"
+        },
+        "learning_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Learning Digest",
+          "type": "string"
+        },
+        "explanation_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Explanation Digest",
+          "type": "string"
+        },
+        "clauses": {
+          "items": {
+            "$ref": "#/$defs/ScopeClause"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Clauses",
+          "type": "array"
+        },
+        "execution_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Execution Allowed",
+          "type": "boolean"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_digest",
+        "split_digest",
+        "source_digest",
+        "guard_digest",
+        "review_digest",
+        "phase",
+        "training_binding_digest",
+        "learning_digest",
+        "explanation_digest",
+        "clauses",
+        "artifact_digest"
+      ],
+      "title": "StudyLearnedScope",
+      "type": "object"
+    },
+    "StudyTrainMember": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "project_group": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Project Group",
+          "type": "string"
+        },
+        "repository_identity_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Repository Identity Digest",
+          "type": "string"
+        },
+        "target_key": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "sample_ref": {
+          "minLength": 1,
+          "title": "Sample Ref",
+          "type": "string"
+        },
+        "sample_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Sample Digest",
+          "type": "string"
+        },
+        "label_ref": {
+          "minLength": 1,
+          "title": "Label Ref",
+          "type": "string"
+        },
+        "label_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Label Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "project_group",
+        "repository_identity_digest",
+        "target_key",
+        "sample_ref",
+        "sample_digest",
+        "label_ref",
+        "label_digest"
+      ],
+      "title": "StudyTrainMember",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-fit.v1",
+      "default": "study-fit.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "protocol_ref": {
+      "minLength": 1,
+      "title": "Protocol Ref",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "review_ref": {
+      "minLength": 1,
+      "title": "Review Ref",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "phase": {
+      "enum": [
+        "initial",
+        "refined"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "#/$defs/StudyFitInput"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Inputs",
+      "type": "array"
+    },
+    "training_binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Training Binding Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "fitted",
+        "refused"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "refusal_code": {
+      "anyOf": [
+        {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Refusal Code"
+    },
+    "learning": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScopeLearningResult"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "explanation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScopeExplanation"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "scope": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StudyLearnedScope"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol_ref",
+    "protocol_digest",
+    "split_digest",
+    "source_digest",
+    "guard_digest",
+    "review_ref",
+    "review_digest",
+    "phase",
+    "inputs",
+    "training_binding_digest",
+    "implementation_digests",
+    "status",
+    "refusal_code",
+    "learning",
+    "explanation",
+    "scope",
+    "artifact_digest"
+  ],
+  "title": "StudyFit",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "StudyBasisPin": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "content_digest"
+      ],
+      "title": "StudyBasisPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-label-review.v1",
+      "default": "study-label-review.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "operator": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "sample_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Sample Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "guard_applicable": {
+      "title": "Guard Applicable",
+      "type": "boolean"
+    },
+    "confirmed_legal_counterexample": {
+      "title": "Confirmed Legal Counterexample",
+      "type": "boolean"
+    },
+    "own_contract_confirmation": {
+      "const": "trusted_manual_fixture_review",
+      "default": "trusted_manual_fixture_review",
+      "title": "Own Contract Confirmation",
+      "type": "string"
+    },
+    "basis_pins": {
+      "items": {
+        "$ref": "#/$defs/StudyBasisPin"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Basis Pins",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "operator",
+    "reason",
+    "sample_digest",
+    "target_digest",
+    "source_digest",
+    "guard_digest",
+    "guard_applicable",
+    "confirmed_legal_counterexample",
+    "basis_pins",
+    "artifact_digest"
+  ],
+  "title": "StudyLabelReview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

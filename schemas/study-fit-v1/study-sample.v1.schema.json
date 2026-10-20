@@ -1,0 +1,76 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-sample.v1",
+      "default": "study-sample.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "sample_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Sample Id",
+      "type": "string"
+    },
+    "project_group": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Project Group",
+      "type": "string"
+    },
+    "target_ref": {
+      "minLength": 1,
+      "title": "Target Ref",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "context_ref": {
+      "minLength": 1,
+      "title": "Context Ref",
+      "type": "string"
+    },
+    "context_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Context Digest",
+      "type": "string"
+    },
+    "audit_ref": {
+      "minLength": 1,
+      "title": "Audit Ref",
+      "type": "string"
+    },
+    "audit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Audit Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "sample_id",
+    "project_group",
+    "target_ref",
+    "target_digest",
+    "context_ref",
+    "context_digest",
+    "audit_ref",
+    "audit_digest",
+    "artifact_digest"
+  ],
+  "title": "StudySample",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

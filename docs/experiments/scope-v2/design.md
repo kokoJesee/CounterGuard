@@ -14,8 +14,8 @@
 
 | 接口 | 可复用部分 | 新研究缺少什么 | 实现依据 |
 |---|---|---|---|
-| Protocol / split | 严格模型、冻结 pin、来源核验 | v1 固定 study ID、两份 Guard、接口枚举、训练期望；不能直接传 scope_v2 | [protocol.py](../../../src/counterguard/protocol.py) |
-| 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证 | 外层 fit 编排仍绑定 v1 protocol/context；新数据需要独立适配 | [scope.py](../../../src/counterguard/scope.py) |
+| Protocol / split | 冻结 v1；独立 fixture protocol/split/人工标签审核与实际来源重建 | 外部 scope_v2 的分组、标签、协议仍未冻结；fixture 不增加真实场景 | [研究拟合](../../study-fit.md) |
+| 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证；独立 fixture fit/Scope 与核验 | 新 fit 尚未绑定研究执行授权，不开放外部标签 | [scope.py](../../../src/counterguard/scope.py)、[研究拟合](../../study-fit.md) |
 | Feature / context | 冻结 v1 提取与对账；独立研究 fixture 版本支持 For/GeneratorExp、行见证和精确 learner 投影 | 外部接口类别、研究 context 与正式 fit/split 尚未冻结；静态记录不提供执行权限 | [研究特征](../../study-features.md)、[context 政策](../../module-context-policy.md) |
 | Evidence / Guard | 受限 contract.v3–v6 → Docker evidence.v4 → 最小 guard.v3/v4、自检和独立重建 | 每个真实来源仍需完整 B/F、H 内契约、闭包与人工审核；版本按 oracle/profile 选择，不适用则停 | [standalone capture](../../standalone-capture.md)、[Guard](../../standalone-guards.md)、[v2 导出](../../static-reexports-v2.md) |
 | Scope / replay | 生产 standalone 使用精确 B/F 快照；独立研究 fixture 通道支持获审 b1/b2 与 stdout 见证 | learned fit 尚未接入，返回 unknown；不能放宽生产 snapshot Scope 或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[研究重放](../../research-replay.md) |
@@ -34,7 +34,8 @@ uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 ```
 
 `inventory` 分支只读历史事实，不 import 仓库目标，不调用生产 learner/evaluator，不启动 Git/Docker/pytest 子进程。测试也拦截真实子进程启动。
-同一脚本另有自有 fixture 的 `audit/replay/verify`，见[研究重放](../../research-replay.md)；`fit/evaluate/compare/report/export` 尚未实现，传入会被拒绝。
+同一脚本另有自有 fixture 的 `audit/replay/verify`，见[研究重放](../../research-replay.md)。
+训练专用 `fit/verify` 由独立 [fit_scope_study.py](../../../scripts/fit_scope_study.py) 提供；聚合入口尚未路由 fit，`evaluate/compare/report/export` 尚未实现。
 独立的静态特征命令见[研究特征](../../study-features.md)，尚未接通 learned replay。
 
 该命令只读固定路径的 v1 protocol/split、9 个训练样本、6 个公开留出样本、原始 24 份预测和已发布汇总。它独立计算 B1/B2 训练计数、四方法留出混淆矩阵、false alert/bug recall 分母、执行数与配对变化，并比较原始数据和历史发布 pin。重复/缺失行、标签错配、文件篡改、重新签名的不同历史 manifest、重复 JSON key 和非有限数字会拒绝。
