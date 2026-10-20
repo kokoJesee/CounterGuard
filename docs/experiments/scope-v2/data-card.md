@@ -174,3 +174,10 @@ RGB 路径无需开放颜色环境，独立 non-TTY 见证不应附加 reset；�
 仍未找到四个长度错误输入的异常/消息承诺。该 pair 保留为探索观察，不进入正式 refinement；
 未删 case、自动贴标、追加外部执行或扩搜其他目标。三通道文档不是完整契约合规证明。
 四方法[纯指标汇总](../../study-metrics.md)另用自有算术 fixture 推进工程，不能计入真实研究数据。
+
+维护者随后要求继续找数据，[新一批调查](../../results/input-validation-search-v2/README.md)核查 12 个新仓库，
+另复查既有 base45 历史。找到 TerminalTextEffects 两条、Tomli-W 一条真实输入拒绝修复线索，
+来自 2 个项目谱系，尚未 Docker 捕获；前者完整树超过现有预算，后者根导出语法仍 unknown。
+新增可准入来源/比较目标和正式跨项目场景均为 0；已有来源保持 1，正式场景保持 0。
+TTE 原测试另有 pytest.param 投影边界，不能概括成“只补这一项就能解锁”；
+没有删 case、抬高预算、执行目标或冻结数据，当前结论仍为 insufficient_data。
