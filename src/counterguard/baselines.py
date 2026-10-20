@@ -135,8 +135,15 @@ def make_baseline(
 
 def decide_scope(scope: ScopePredicate, features: Mapping[str, object]) -> ScopeDecision:
     """Only the clauses determine which features can be read; IDs/labels stay outside."""
+    return evaluate_clauses(scope.clauses, features)
+
+
+def evaluate_clauses(
+    clauses: tuple[ScopeClause, ...], features: Mapping[str, object]
+) -> ScopeDecision:
+    """Pure three-way predicate evaluation shared by separately authorized consumers."""
     trace = []
-    for clause in scope.clauses:
+    for clause in clauses:
         actual = features.get(clause.field)
         if clause.op == "eq":
             valid = isinstance(actual, str) and bool(actual)

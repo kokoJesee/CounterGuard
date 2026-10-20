@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import ClassVar
 from uuid import uuid4
 
 from pydantic import TypeAdapter
@@ -69,6 +70,9 @@ class StudySession:
     target_repo: Path
     workspace: Path
     review_anchor: str
+    _plan_model: ClassVar[type] = StudyReplayPlan
+    _result_model: ClassVar[type] = StudyReplay
+    _authorization_model: ClassVar[type] = StudyAuthorization
 
     def __post_init__(self):
         TypeAdapter(Digest).validate_python(self.review_anchor)
@@ -79,12 +83,19 @@ class StudySession:
             reject_links(path)
             object.__setattr__(self, field, path.resolve(strict=True))
 
-    def _load(self, plan):
-        plan = StudyReplayPlan.model_validate_json(canonical_json_bytes(plan))
+    def _checked_plan(self, plan):
+        plan = self._plan_model.model_validate_json(canonical_json_bytes(plan))
         _require(plan.artifact_digest == digest_json_artifact(plan), "study_plan_digest_mismatch")
+        return plan
+
+    def _review(self, plan):
+        return load_review(self.workspace, plan.review_ref, self.review_anchor)
+
+    def _load(self, plan):
+        plan = self._checked_plan(plan)
         loaded = load_facts(self.source_repo, self.target_repo, self.workspace, plan)
         source, target, mapping, witness, _, facts, _, _ = loaded
-        review = load_review(self.workspace, plan.review_ref, self.review_anchor)
+        review = self._review(plan)
         _require(
             (review.source_digest, review.target_digest, review.map_digest, review.witness_digest)
             == (
@@ -108,6 +119,10 @@ class StudySession:
         _require(
             plan.timeout_seconds <= facts[2].timeout_seconds, "study_timeout_exceeds_source_budget"
         )
+        return self._decide(plan, loaded, review), loaded, review
+
+    def _decide(self, plan, loaded, review):
+        source, target, mapping, witness, _, _, _, _ = loaded
         decision, reason = "applicable", "study_unscoped_method"
         if review.action != "approve":
             decision, reason = "unknown", "study_review_withdrawn"
@@ -134,7 +149,16 @@ class StudySession:
                 artifact_digest=ZERO,
             )
         )
-        return admission, loaded, review
+        return admission
+
+    def _make_authorization(self, plan, admission, **payload):
+        return _seal(self._authorization_model(**payload))
+
+    def _make_result(self, **payload):
+        return _seal(self._result_model(**payload))
+
+    def _check_result_anchors(self, result):
+        _require(result.review_anchor == self.review_anchor, "study_result_review_anchor_changed")
 
     def audit(self, plan):
         """No Docker discovery or target execution, including genuine unknown inputs."""
@@ -210,30 +234,30 @@ class StudySession:
                 digest_bytes(_file(runtime, pin.path)) == pin.content_digest,
                 "study_materialized_input_changed",
             )
-        return _seal(
-            StudyAuthorization(
-                source_head=source.assertion_head,
-                target_revision=target.revision,
-                source_digest=source.artifact_digest,
-                target_digest=target.artifact_digest,
-                map_digest=mapping.artifact_digest,
-                review_digest=review.artifact_digest,
-                witness_digest=witness.artifact_digest if witness else None,
-                admission_digest=admission.artifact_digest,
-                plan_digest=plan.artifact_digest,
-                image_digest=review.runner.image_digest,
-                runner_review_digest=review.runner.artifact_digest,
-                policy_digest=review.policy_digest,
-                implementation_digests=review.implementation_digests,
-                request_digest=_request_digest(request),
-                input_pins=tuple(sorted(pins, key=lambda p: p.path)),
-                input_origins=tuple(sorted(origins, key=lambda p: p.path)),
-                import_root=target.import_root,
-                test_ref=TEST_REF,
-                test_digest=digest_bytes(test),
-                known_case_ids=request.known_case_ids,
-                artifact_digest=ZERO,
-            )
+        return self._make_authorization(
+            plan,
+            admission,
+            source_head=source.assertion_head,
+            target_revision=target.revision,
+            source_digest=source.artifact_digest,
+            target_digest=target.artifact_digest,
+            map_digest=mapping.artifact_digest,
+            review_digest=review.artifact_digest,
+            witness_digest=witness.artifact_digest if witness else None,
+            admission_digest=admission.artifact_digest,
+            plan_digest=plan.artifact_digest,
+            image_digest=review.runner.image_digest,
+            runner_review_digest=review.runner.artifact_digest,
+            policy_digest=review.policy_digest,
+            implementation_digests=review.implementation_digests,
+            request_digest=_request_digest(request),
+            input_pins=tuple(sorted(pins, key=lambda p: p.path)),
+            input_origins=tuple(sorted(origins, key=lambda p: p.path)),
+            import_root=target.import_root,
+            test_ref=TEST_REF,
+            test_digest=digest_bytes(test),
+            known_case_ids=request.known_case_ids,
+            artifact_digest=ZERO,
         )
 
     def replay(self, plan, output):
@@ -243,8 +267,7 @@ class StudySession:
             require_publication(output / name)
         plan_ref = (output / "plan.json").relative_to(self.workspace).as_posix()
         # Revalidate model_copy or directly constructed caller data before persisting a plan.
-        plan = StudyReplayPlan.model_validate_json(canonical_json_bytes(plan))
-        _require(plan.artifact_digest == digest_json_artifact(plan), "study_plan_digest_mismatch")
+        plan = self._checked_plan(plan)
         persist(output / "plan.json", plan)
         admission, run, auth_ref, record_ref = None, None, None, None
         integrity = "current"
@@ -300,31 +323,29 @@ class StudySession:
             integrity, outcome, reason = "invalid", "integrity_error", "study_inputs_invalid"
         if run is None:
             record_ref = None
-        result = _seal(
-            StudyReplay(
-                created_at=datetime.now(UTC),
-                plan_ref=plan_ref,
-                plan_digest=plan.artifact_digest,
-                review_anchor=self.review_anchor,
-                admission=admission,
-                integrity=integrity,
-                outcome=outcome,
-                reason_code=reason,
-                run=run,
-                authorization_ref=auth_ref,
-                record_ref=record_ref,
-                artifact_digest=ZERO,
-            )
+        result = self._make_result(
+            created_at=datetime.now(UTC),
+            plan_ref=plan_ref,
+            plan_digest=plan.artifact_digest,
+            review_anchor=self.review_anchor,
+            admission=admission,
+            integrity=integrity,
+            outcome=outcome,
+            reason_code=reason,
+            run=run,
+            authorization_ref=auth_ref,
+            record_ref=record_ref,
+            artifact_digest=ZERO,
         )
         return persist(output / "result.json", result)
 
     def verify(self, path):
         ref = _ref(path, self.workspace)
-        result = _model(self.workspace, ref, StudyReplay)
-        _require(result.review_anchor == self.review_anchor, "study_result_review_anchor_changed")
+        result = _model(self.workspace, ref, self._result_model)
+        self._check_result_anchors(result)
         folder = Path(ref).parent.as_posix()
         _require(result.plan_ref == folder + "/plan.json", "study_result_plan_layout_changed")
-        plan = _model(self.workspace, result.plan_ref, StudyReplayPlan)
+        plan = _model(self.workspace, result.plan_ref, self._plan_model)
         _require(plan.artifact_digest == result.plan_digest, "study_result_plan_changed")
         admission, loaded, _ = self._load(plan)
         _require(
@@ -349,7 +370,7 @@ class StudySession:
             "study_result_execution_layout_changed",
         )
         request = self._request(plan, runtime, loaded, result.run.run_id)
-        auth = _model(self.workspace, result.authorization_ref, StudyAuthorization)
+        auth = _model(self.workspace, result.authorization_ref, self._authorization_model)
         _require(auth == self._authorize(plan, runtime, request), "study_authorization_not_rebuilt")
         stored = RunRecord.model_validate_json(_file(self.workspace, result.record_ref))
         _require(stored == result.run, "study_run_record_changed")

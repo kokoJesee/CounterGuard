@@ -15,10 +15,10 @@
 | 接口 | 可复用部分 | 新研究缺少什么 | 实现依据 |
 |---|---|---|---|
 | Protocol / split | 冻结 v1；独立 fixture protocol/split/人工标签审核与实际来源重建 | 外部 scope_v2 的分组、标签、协议仍未冻结；fixture 不增加真实场景 | [研究拟合](../../study-fit.md) |
-| 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证；独立 fixture fit/Scope 与核验 | 新 fit 尚未绑定研究执行授权，不开放外部标签 | [scope.py](../../../src/counterguard/scope.py)、[研究拟合](../../study-fit.md) |
+| 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证；独立 fixture fit/Scope 与核验 | 外部数据与标签不开放；自有 fixture 另经两条可信审核锚接入研究重放 v2 | [scope.py](../../../src/counterguard/scope.py)、[研究拟合](../../study-fit.md) |
 | Feature / context | 冻结 v1 提取与对账；独立研究 fixture 版本支持 For/GeneratorExp、行见证和精确 learner 投影 | 外部接口类别、研究 context 与正式 fit/split 尚未冻结；静态记录不提供执行权限 | [研究特征](../../study-features.md)、[context 政策](../../module-context-policy.md) |
 | Evidence / Guard | 受限 contract.v3–v6 → Docker evidence.v4 → 最小 guard.v3/v4、自检和独立重建 | 每个真实来源仍需完整 B/F、H 内契约、闭包与人工审核；版本按 oracle/profile 选择，不适用则停 | [standalone capture](../../standalone-capture.md)、[Guard](../../standalone-guards.md)、[v2 导出](../../static-reexports-v2.md) |
-| Scope / replay | 生产 standalone 使用精确 B/F 快照；独立研究 fixture 通道支持获审 b1/b2 与 stdout 见证 | learned fit 尚未接入，返回 unknown；不能放宽生产 snapshot Scope 或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[研究重放](../../research-replay.md) |
+| Scope / replay | 生产 standalone 使用精确 B/F 快照；研究 v2 对自有 fixture 支持四方法、fit 来源重建与三态决定，旧 v1 行为不变 | 不能放宽生产 snapshot Scope、执行未获准外部目标或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[学习规则重放](../../research-fitted-replay.md) |
 | Metrics / evaluation | 既有分子/分母、配对变化与报告逻辑 | v1 外层绑定类型与硬编码期望不能直接用于新 Guard/真实仓库 | [evaluation.py](../../../src/counterguard/evaluation.py)、[metrics](../../../src/counterguard/evaluation_metrics.py) |
 | 独立历史事实盘点 | 只读标准库脚本，核对公开预测/标签/计数/pin | 不检查旧 Docker 授权或完整运行来源，不批准 scope_v2 | [研究入口](../../../scripts/run_scope_study.py) |
 
@@ -36,7 +36,8 @@ uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 `inventory` 分支只读历史事实，不 import 仓库目标，不调用生产 learner/evaluator，不启动 Git/Docker/pytest 子进程。测试也拦截真实子进程启动。
 同一脚本另有自有 fixture 的 `audit/replay/verify`，见[研究重放](../../research-replay.md)。
 训练专用 `fit/verify` 由独立 [fit_scope_study.py](../../../scripts/fit_scope_study.py) 提供；聚合入口尚未路由 fit，`evaluate/compare/report/export` 尚未实现。
-独立的静态特征命令见[研究特征](../../study-features.md)，尚未接通 learned replay。
+独立的静态特征命令见[研究特征](../../study-features.md)，自有 fixture 的 learned replay
+另见[研究重放 v2](../../research-fitted-replay.md)；正式外部评测未接通。
 
 该命令只读固定路径的 v1 protocol/split、9 个训练样本、6 个公开留出样本、原始 24 份预测和已发布汇总。它独立计算 B1/B2 训练计数、四方法留出混淆矩阵、false alert/bug recall 分母、执行数与配对变化，并比较原始数据和历史发布 pin。重复/缺失行、标签错配、文件篡改、重新签名的不同历史 manifest、重复 JSON key 和非有限数字会拒绝。
 

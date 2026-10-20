@@ -100,7 +100,9 @@ CLI：拟合成功返回 0，证据不足的已保存 refusal 返回 4；verify 
 ## 执行与历史边界
 
 protocol、fit、scope 都固定 `execution_allowed=false`；本接口没有目标执行器或本地 fallback。
-尚未将 fit/scope 接入新研究 plan/admission/authorization，C1 learned replay 仍 unknown / run=null。
+获审 fit/scope 可通过独立的[研究重放 v2](research-fitted-replay.md)与 v7 授权消费，
+须另有可信执行审核和 query context/audit；本拟合接口自身仍不授予执行权限。
+旧 C1 v1/v6 不变，learned replay 仍 unknown / run=null。
 训练通过不提升 Candidate/Shadow/Active 权限，也不计为真实外部研究场景或最终研究结论。
 
 新包源码改变全包实现指纹；消费当前实现时，旧 binding/capture/Guard/review 等须用新 ID 完整重建，

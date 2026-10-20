@@ -1,4 +1,4 @@
-# 研究重放（实验接口）
+# 研究重放 v1（实验接口）
 
 这个接口用于工具自有 fixture 的工程验证。它把来源 Guard 与另一个固定目标的调用映射分开，
 共同复用已审核 Docker runner，不改变生产 standalone 的精确 B/F 快照 Scope。
@@ -92,5 +92,7 @@ verify 的 0 不把负结果改成正结论；stale 结果不会通过当前来�
 独立的[研究特征提取与对账](study-features.md)已提供 For/GeneratorExp 的静态处理和纯 learner 输入投影。
 它没有扩写本页的 v1 plan/admission 或 v6 authorization；缺少 fit/scope/协议绑定时 learned 方法仍然 unknown。
 
-[研究训练拟合](study-fit.md)已提供独立 protocol/split/sample/审核/fit/Scope 与来源重建，
-但尚未绑定本页执行授权。其 `execution_allowed=false`，C1 learned replay 仍明确 unknown，不能直接传入新 fit 获得执行。
+[研究训练拟合](study-fit.md)提供独立 protocol/split/sample/审核/fit/Scope 与来源重建，
+其 `execution_allowed=false`，不能直接传给本页的旧执行授权。
+另有[研究重放 v2](research-fitted-replay.md)通过独立拟合锚、执行审核和 v7 授权接入学习规则；
+本页 v1/v6 的 learned 行为保持 unknown，没有静默升级。

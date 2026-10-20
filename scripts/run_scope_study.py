@@ -311,6 +311,10 @@ def main(argv=None) -> int:
         research.add_argument("--target-repo", type=Path, required=True)
         research.add_argument("--review-digest", required=True)
         research.add_argument(
+            "--fit-review-digest", help="Independent fit trust anchor for v2 only."
+        )
+        research.add_argument("--training-repository", type=Path, action="append", default=[])
+        research.add_argument(
             "--result" if name == "verify" else "--plan", type=Path, required=True
         )
         if name == "replay":

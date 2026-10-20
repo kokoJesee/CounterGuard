@@ -1,0 +1,322 @@
+{
+  "$defs": {
+    "RunnerReview": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "runner-review.v1",
+          "default": "runner-review.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "runner_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+          "title": "Runner Id",
+          "type": "string"
+        },
+        "profile": {
+          "enum": [
+            "root-pytest8.v1",
+            "validators-src-pytest9.v1"
+          ],
+          "title": "Profile",
+          "type": "string"
+        },
+        "image_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Image Digest",
+          "type": "string"
+        },
+        "pytest_version": {
+          "enum": [
+            "8.4.2",
+            "9.0.3"
+          ],
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "base_registry_digests": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Base Registry Digests",
+          "type": "array"
+        },
+        "build_receipt_ref": {
+          "minLength": 1,
+          "title": "Build Receipt Ref",
+          "type": "string"
+        },
+        "build_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Build Receipt Digest",
+          "type": "string"
+        },
+        "lock_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Lock Digest",
+          "type": "string"
+        },
+        "container_source_digests": {
+          "additionalProperties": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "minLength": 1
+          },
+          "title": "Container Source Digests",
+          "type": "object"
+        },
+        "attack_receipt_ref": {
+          "minLength": 1,
+          "title": "Attack Receipt Ref",
+          "type": "string"
+        },
+        "attack_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Receipt Digest",
+          "type": "string"
+        },
+        "attack_log_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Log Digest",
+          "type": "string"
+        },
+        "attacks_passed": {
+          "const": 4,
+          "default": 4,
+          "title": "Attacks Passed",
+          "type": "integer"
+        },
+        "reviewed_at": {
+          "format": "date-time",
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runner_id",
+        "profile",
+        "image_digest",
+        "pytest_version",
+        "base_registry_digests",
+        "build_receipt_ref",
+        "build_receipt_digest",
+        "lock_digest",
+        "container_source_digests",
+        "attack_receipt_ref",
+        "attack_receipt_digest",
+        "attack_log_digest",
+        "reviewed_at",
+        "artifact_digest"
+      ],
+      "title": "RunnerReview",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-review.v2",
+      "default": "study-review.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "review_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Review Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "operator": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "action": {
+      "default": "approve",
+      "enum": [
+        "approve",
+        "withdraw"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Witness Digest"
+    },
+    "interface_vocabulary": {
+      "const": "tool-fixture-interface.v1",
+      "default": "tool-fixture-interface.v1",
+      "title": "Interface Vocabulary",
+      "type": "string"
+    },
+    "source_interface": {
+      "enum": [
+        "value_return",
+        "stdout_write"
+      ],
+      "title": "Source Interface",
+      "type": "string"
+    },
+    "target_interface": {
+      "enum": [
+        "value_return",
+        "stdout_write"
+      ],
+      "title": "Target Interface",
+      "type": "string"
+    },
+    "runner": {
+      "$ref": "#/$defs/RunnerReview"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "previous_review_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Previous Review Ref"
+    },
+    "previous_review_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Previous Review Digest"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "fit_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Fit Review Digest",
+      "type": "string"
+    },
+    "initial_fit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Initial Fit Digest",
+      "type": "string"
+    },
+    "refined_fit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Refined Fit Digest",
+      "type": "string"
+    },
+    "context_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Context Digest",
+      "type": "string"
+    },
+    "audit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Audit Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "review_id",
+    "created_at",
+    "operator",
+    "reason",
+    "source_digest",
+    "target_digest",
+    "map_digest",
+    "source_interface",
+    "target_interface",
+    "runner",
+    "policy_digest",
+    "implementation_digests",
+    "artifact_digest",
+    "fit_review_digest",
+    "initial_fit_digest",
+    "refined_fit_digest",
+    "context_digest",
+    "audit_digest"
+  ],
+  "title": "StudyFittedReview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

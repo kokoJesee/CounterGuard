@@ -487,3 +487,16 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 | study-fit / study-learned-scope v1 | 实际消费 pins、phase、source/Guard/protocol/split/review、纯学习及 clause 见证、实现 | 改上游须新拟合并独立重建；拒绝结果保留且 Scope 为空；不同结果不覆盖 |
 
 这些记录的 execution_allowed 固定 false，不构成新 Docker 授权或正式外部 scope_v2 冻结。
+
+学习规则的[研究重放 v2](research-fitted-replay.md)采用独立新格式，旧 v1/v6 不接受它。
+
+| 层 / 版本 | 摘要依赖与重建 | 上游变化后的处理 |
+|---|---|---|
+| study-replay-plan.v2 | 原 source/target/map/见证/审核/方法/限额引用，另列 initial/refined fit 与 query context/audit 引用；无标签或许可字段 | 新输入使用新 plan 与输出，不能把旧 plan 改为 v2 |
+| study-review.v2 | 原来源/接口/runner/policy/实现/事件链，加独立拟合审核摘要、两份 fit、query context/audit | 新审核事件及调用方独立保存的执行锚；拟合锚不能自行批准执行 |
+| study-admission.v2 | 重建同一协议/来源的两阶段 fit、查询真实定义和对账、两个可信锚；所选 Scope、三态原始 trace/原因 | 任一输入变化重新准入；refusal 为 unknown，不制造空 Scope；查询不消费适用性标签 |
+| Docker authorization v7 | 原 v6 的实际执行输入/角色/来源，加拟合审核、两份 fit、context/audit 与所选 Scope 摘要 | 每次运行前后重建全部授权，旧生产/v6 parser 拒绝；inapplicable/unknown 不启动 |
+| study-replay.v2 | 原 Run/授权/JUnit、真实运行时间，加新 admission 和独立 fit-review anchor | 新目录保存；独立 verify 重建两个锚与原始运行；运行后漂移保留 Run 并 stale |
+
+本批共享静态定义核验、纯条款 evaluator 和 Docker 重放实现，没有改变 conjunction.v1 或 scope_v1。
+全包源码变化令需要当前结论的旧来源/特征/fit/review 链过期，须使用新 ID 重建各层下游；历史字节不改。

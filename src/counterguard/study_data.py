@@ -222,7 +222,12 @@ def load_facts(source_repo, target_repo, workspace, plan):
 
 
 def load_review(workspace, ref, anchor):
-    review = _model(workspace, ref, StudyReview)
+    return load_review_model(workspace, ref, anchor, StudyReview)
+
+
+def load_review_model(workspace, ref, anchor, model):
+    """Version-specific readers share event-chain checks, never a permissive parser."""
+    review = _model(workspace, ref, model)
     _require(review.artifact_digest == anchor, "study_review_anchor_mismatch")
     current, seen = review, {ref}
     for _ in range(32):
@@ -230,7 +235,7 @@ def load_review(workspace, ref, anchor):
             return review
         _require(current.previous_review_ref not in seen, "study_review_chain_cycle")
         seen.add(current.previous_review_ref)
-        previous = _model(workspace, current.previous_review_ref, StudyReview)
+        previous = _model(workspace, current.previous_review_ref, model)
         _require(
             previous.artifact_digest == current.previous_review_digest,
             "study_review_predecessor_changed",

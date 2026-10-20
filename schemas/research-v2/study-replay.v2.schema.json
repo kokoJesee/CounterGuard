@@ -1,0 +1,646 @@
+{
+  "$defs": {
+    "CaseOutcome": {
+      "description": "Normalized result for one stable contract case.",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "error"
+      ],
+      "title": "CaseOutcome",
+      "type": "string"
+    },
+    "CaseResult": {
+      "additionalProperties": false,
+      "description": "The result of one case, linked by its stable contract case ID.",
+      "properties": {
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/CaseOutcome"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        }
+      },
+      "required": [
+        "case_id",
+        "node_id",
+        "outcome"
+      ],
+      "title": "CaseResult",
+      "type": "object"
+    },
+    "ClauseTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "op": {
+          "title": "Op",
+          "type": "string"
+        },
+        "expected": {
+          "title": "Expected",
+          "type": "string"
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actual"
+        },
+        "matched": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Matched"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "expected",
+        "actual",
+        "matched"
+      ],
+      "title": "ClauseTrace",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "RunRecord": {
+      "additionalProperties": false,
+      "description": "Immutable, reproducible record of one pytest invocation.",
+      "properties": {
+        "schema_version": {
+          "const": "run-record.v1",
+          "default": "run-record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^run_[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/RunRole"
+        },
+        "contract_id": {
+          "minLength": 1,
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "contract_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Contract Digest",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetRef"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Argv",
+          "type": "array"
+        },
+        "cwd": {
+          "minLength": 1,
+          "title": "Cwd",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": 30.0,
+          "exclusiveMinimum": 0,
+          "title": "Timeout Seconds",
+          "type": "number"
+        },
+        "pytest_exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pytest Exit Code"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        "case_results": {
+          "items": {
+            "$ref": "#/$defs/CaseResult"
+          },
+          "title": "Case Results",
+          "type": "array"
+        },
+        "stdout_ref": {
+          "minLength": 1,
+          "title": "Stdout Ref",
+          "type": "string"
+        },
+        "stdout_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stdout Digest",
+          "type": "string"
+        },
+        "stderr_ref": {
+          "minLength": 1,
+          "title": "Stderr Ref",
+          "type": "string"
+        },
+        "stderr_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Stderr Digest",
+          "type": "string"
+        },
+        "junit_ref": {
+          "minLength": 1,
+          "title": "Junit Ref",
+          "type": "string"
+        },
+        "junit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Junit Digest",
+          "type": "string"
+        },
+        "python_version": {
+          "minLength": 1,
+          "title": "Python Version",
+          "type": "string"
+        },
+        "pytest_version": {
+          "minLength": 1,
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "error_detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Detail"
+        }
+      },
+      "required": [
+        "run_id",
+        "role",
+        "contract_id",
+        "contract_digest",
+        "target",
+        "target_digest",
+        "argv",
+        "cwd",
+        "started_at",
+        "duration_ms",
+        "pytest_exit_code",
+        "outcome",
+        "case_results",
+        "stdout_ref",
+        "stdout_digest",
+        "stderr_ref",
+        "stderr_digest",
+        "junit_ref",
+        "junit_digest",
+        "python_version",
+        "pytest_version"
+      ],
+      "title": "RunRecord",
+      "type": "object"
+    },
+    "RunRole": {
+      "description": "The purpose of a captured pytest execution.",
+      "enum": [
+        "buggy",
+        "fixed",
+        "replay"
+      ],
+      "title": "RunRole",
+      "type": "string"
+    },
+    "ScopeDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "trace": {
+          "items": {
+            "$ref": "#/$defs/ClauseTrace"
+          },
+          "title": "Trace",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "trace"
+      ],
+      "title": "ScopeDecision",
+      "type": "object"
+    },
+    "StudyFittedAdmission": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "study-admission.v2",
+          "default": "study-admission.v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason_code": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "source_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Digest",
+          "type": "string"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "map_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Map Digest",
+          "type": "string"
+        },
+        "review_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Review Digest",
+          "type": "string"
+        },
+        "witness_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Witness Digest"
+        },
+        "method": {
+          "enum": [
+            "b1_always",
+            "b2_interface",
+            "learned_initial",
+            "learned_refined"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "lane": {
+          "enum": [
+            "guard",
+            "witness"
+          ],
+          "title": "Lane",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        },
+        "fit_review_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Fit Review Digest",
+          "type": "string"
+        },
+        "initial_fit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Initial Fit Digest",
+          "type": "string"
+        },
+        "refined_fit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Refined Fit Digest",
+          "type": "string"
+        },
+        "context_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Context Digest",
+          "type": "string"
+        },
+        "audit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Audit Digest",
+          "type": "string"
+        },
+        "scope_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Scope Digest"
+        },
+        "scope_decision": {
+          "$ref": "#/$defs/ScopeDecision"
+        }
+      },
+      "required": [
+        "decision",
+        "reason_code",
+        "source_digest",
+        "target_digest",
+        "map_digest",
+        "review_digest",
+        "witness_digest",
+        "method",
+        "lane",
+        "artifact_digest",
+        "fit_review_digest",
+        "initial_fit_digest",
+        "refined_fit_digest",
+        "context_digest",
+        "audit_digest",
+        "scope_digest",
+        "scope_decision"
+      ],
+      "title": "StudyFittedAdmission",
+      "type": "object"
+    },
+    "TargetRef": {
+      "additionalProperties": false,
+      "description": "A Python symbol and its repository-relative source file.",
+      "properties": {
+        "module": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Module",
+          "type": "string"
+        },
+        "symbol": {
+          "pattern": "^[A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module",
+        "symbol",
+        "source_ref"
+      ],
+      "title": "TargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-replay.v2",
+      "default": "study-replay.v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "plan_ref": {
+      "minLength": 1,
+      "title": "Plan Ref",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "review_anchor": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Anchor",
+      "type": "string"
+    },
+    "admission": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StudyFittedAdmission"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "integrity": {
+      "enum": [
+        "current",
+        "invalid",
+        "stale"
+      ],
+      "title": "Integrity",
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "skipped_inapplicable",
+        "skipped_unknown",
+        "passed",
+        "test_failed",
+        "infrastructure_error",
+        "integrity_error"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "run": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunRecord"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "authorization_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Authorization Ref"
+    },
+    "record_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Record Ref"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "fit_review_anchor": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Fit Review Anchor",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "plan_ref",
+    "plan_digest",
+    "review_anchor",
+    "admission",
+    "integrity",
+    "outcome",
+    "reason_code",
+    "run",
+    "authorization_ref",
+    "record_ref",
+    "artifact_digest",
+    "fit_review_anchor"
+  ],
+  "title": "StudyFittedReplay",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

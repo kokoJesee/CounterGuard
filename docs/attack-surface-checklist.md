@@ -174,3 +174,14 @@ For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立�
 无负例的可核验 refusal、20 次乱序、追加撤回、输出限制和旧 parser 拒绝均有自有 fixture 覆盖。
 人工分组/标签语义与 own-contract 确认仍是可信审核输入，不提供远程身份、原子快照或外部数据结论。
 这不是新的 Docker 攻击实测；没有扩大 C1 或生产执行权限，W01/W03/W04 状态不因此升级。
+
+学习规则通过[独立研究重放 v2](research-fitted-replay.md)接入自有 fixture；
+旧 v1/v6 的 learned 行为不变。W01/W03 的增量范围限于新版 v7 授权对拟合/查询事实的绑定、
+真实工具自有 Docker 执行及零启动分支；W04 只增加独立拟合锚与执行锚、原事件链和全来源重建。
+[来源/篡改专项](../tests/unit/test_study_fitted.py)检查两份 fit/阶段/锚/查询/审核变化拒绝、
+输出不能进入训练仓库、运行后变化保留实际 Run；[真实 Git/Docker 专项](../tests/integration/test_study_fitted.py)
+检查四方法的原最小 oracle、重复计数、refined 执行、refusal=unknown 与跳过零启动。
+范围与实际结果见[回执](results/research-fitted-replay-v1/README.md)。
+原四项隔离攻击没有重跑；未执行外部目标、未新增正式研究标签、未提升生产 Candidate 权限。
+可信人工语义、谱系、身份/签名/防回滚、原子快照、任意插件/依赖和恶意目标干扰 JUnit 仍未覆盖，
+W01/W03/W04 的整体状态仍为部分，不因此声称全面通过。

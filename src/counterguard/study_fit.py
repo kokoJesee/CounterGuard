@@ -14,7 +14,6 @@ from counterguard.project_config import reject_links, repository_path
 from counterguard.scope import FIELD_ORDER, learn_scope
 from counterguard.scope_explanations import explain_scope
 from counterguard.standalone_capture import ZERO, _model, _ref, _require, _seal
-from counterguard.static_exports import resolve_static_reexport
 from counterguard.study_data import (
     StudyNotReady,
     inspect_source,
@@ -27,7 +26,7 @@ from counterguard.study_features import (
     StudyFeatureAudit,
     StudyFeatureContext,
     study_training_example,
-    verify_study_feature_audit,
+    verify_target_feature_audit,
 )
 from counterguard.study_fit_models import (
     Phase,
@@ -249,26 +248,12 @@ class StudyFitSession:
         _require(rebuilt == target, "study_fit_target_not_rebuilt")
         context = _model(workspace, sample.context_ref, StudyFeatureContext)
         audit = _model(workspace, sample.audit_ref, StudyFeatureAudit)
-        definition = (target.source_ref, target.symbol)
-        if target.profile == "static-reexport-v2":
-            export = resolve_static_reexport(
-                files,
-                module=target.module,
-                symbol=target.symbol,
-                import_root=target.import_root,
-                algorithm="static-root-reexport.v2",
-            )
-            definition = (export["definition_ref"], export["definition_symbol"])
         _require(
             context.artifact_digest == sample.context_digest
-            and audit.artifact_digest == sample.audit_digest
-            and context.source_ref in {p.path for p in target.closure_pins}
-            and (context.source_ref, context.symbol) == definition,
+            and audit.artifact_digest == sample.audit_digest,
             "study_fit_feature_subject_changed",
         )
-        verify_study_feature_audit(
-            audit, files[context.source_ref], context, context_anchor=sample.context_digest
-        )
+        verify_target_feature_audit(target, files, context, audit)
         if not audit.matched:
             raise StudyNotReady("study_fit_feature_annotation_mismatch")
         label = _model(workspace, member.label_ref, StudyLabelReview)

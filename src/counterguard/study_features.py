@@ -15,6 +15,7 @@ from counterguard.project_config import Identifier, Symbol
 from counterguard.scope import TrainingExample
 from counterguard.standalone_capture import ZERO, _require, _seal
 from counterguard.standalone_models import ReviewReason
+from counterguard.static_exports import resolve_static_reexport
 from counterguard.study_models import FixtureInterface
 
 EXTRACTOR = "ast-features.study.v1"
@@ -465,3 +466,25 @@ def verify_study_feature_audit(audit, source, context, *, context_anchor):
     rebuilt = audit_study_features(source, context, audit.expected, context_anchor=context_anchor)
     _require(audit == rebuilt, "study_feature_audit_does_not_rebuild")
     return rebuilt
+
+
+def verify_target_feature_audit(target, files, context, audit):
+    """Target consumers share definition identity checks without reading any labels."""
+    definition = (target.source_ref, target.symbol)
+    if target.profile == "static-reexport-v2":
+        export = resolve_static_reexport(
+            files,
+            module=target.module,
+            symbol=target.symbol,
+            import_root=target.import_root,
+            algorithm="static-root-reexport.v2",
+        )
+        definition = (export["definition_ref"], export["definition_symbol"])
+    _require(
+        context.source_ref in {p.path for p in target.closure_pins}
+        and (context.source_ref, context.symbol) == definition,
+        "study_feature_subject_changed",
+    )
+    return verify_study_feature_audit(
+        audit, files[context.source_ref], context, context_anchor=context.artifact_digest
+    )
