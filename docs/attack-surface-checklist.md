@@ -47,6 +47,7 @@ W01/W03 增加[实验性研究重放](research-replay.md)：独立授权 v6 分�
 源码/重签/晚到变化专项在[慢层](../tests/unit/test_study_replay.py)，字面量与严格字段在[快层](../tests/unit/test_study_models.py)。
 W04 只增加独立研究审核事件与外部保留的摘要核对，Candidate 生产权限不提升；本机审核仍非身份认证或自动防回滚。
 这不批准 colored 等外部目标，不接入 learned fit/新标签，不扩大生产快照 Scope；原四项 Docker 隔离攻击本批未复跑。
+实测计数、真实 CLI 和保留的失败证据摘要见[验收回执](results/research-bridge-v1/README.md)。
 
 W02/W03 增加[只读 RGB 映射审计](results/colored-review-v1/README.md)：全部 8 case 的字面量类型、
 前景/背景角色、原消息 oracle 和 source-only 控制逐项核对；30 项专项拒绝删改/重签/自我批准，

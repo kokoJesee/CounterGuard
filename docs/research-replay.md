@@ -87,3 +87,4 @@ verify 的 0 不把负结果改成正结论；stale 结果不会通过当前来�
 
 常规执行快速层与专项目录；完整来源链的 transport-double 测试也标 slow，避免拖慢日常循环。
 真实进程只在标记 slow/docker 的自有专项中启动。没有运行全量时不声称全量通过。
+本批实测与保留的失败记录说明见[自有 fixture 验收](results/research-bridge-v1/README.md)。

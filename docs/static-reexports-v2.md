@@ -1,6 +1,6 @@
 # 多导出根包与有限类查找钩子
 
-本规格对应已获维护者批准的 [colored 受限提案](experiments/scope-v2/colored-minimal-support-proposal.md)。
+本规格描述已实现的受限静态导出，实测见[验收记录](results/static-reexport-v2/README.md)。
 在新增接受逻辑前冻结以下范围。它只识别可供源码审核的声明，不证明 Python 安全或授权跨项目执行。
 
 ## 版本与入口
