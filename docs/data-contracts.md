@@ -443,3 +443,25 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 单次验证内部只重建一次上游来源事实并传递运行时上下文，不把它持久化为新权威、不跨调用缓存。
 每次真正执行前后仍独立加载当前事实，之后的新验证也重新读取；不通过复用旧“已验证”标记省略来源或状态校验。
+
+## 实验性研究重放
+
+[研究重放](research-replay.md)使用独立于生产 Registry replay 的格式与审核。
+当前仅用于工具自有 fixture；它不冻结 scope_v2 的数据、标签、特征、接口分类或实验协议。
+严格模型为 [study_models.py](../src/counterguard/study_models.py)，对应 JSON Schema 位于
+[schemas/research-v1](../schemas/research-v1/)。旧 parser 不接受新授权/字段。
+
+| 层 / 版本 | 摘要依赖与独立重建 | 上游变化后的处理 |
+|---|---|---|
+| study-source.v1 | 本机仓库身份摘要、当前 Guard/Evidence/binding、真实 B/F/H、H 契约和最小失败 case；重建日志与自检 | 新来源记录；上游链过期则先用新 ID 重物化，不能重签历史 |
+| study-target.v1 | 固定提交的完整树、闭包 pins、导出/钩子/元数据评估、许可文件与导入布局 | 重新读完整 Git 树和评估，再建 target/map/见证/审核与运行 |
+| study-call-map.v1 | source/target 摘要、全部最小 case 的断言身份、关键字映射和显式来源控制 | 重建映射及下游；位置参数、值和 oracle 直接来自来源，不接受覆盖字段 |
+| study-stdout-witness.v1 | target/map 摘要、目标树内的规范依据 refs、获审子集与 stdout 字面量 | 新见证与审核；不替换来源 oracle、不自动生成合规标签 |
+| study-review.v1 | source/target/map/见证、精确 runner review、policy、全包实现、fixture 接口类别、真实 UTC 与先前事件 | 新追加事件；调用方单独更新可信审核摘要。没有自动最新 tip 或签名防回滚 |
+| study-replay-plan.v1 / study-admission.v1 | 严格引用、方法/用途/限额；从当前来源和匹配的可信审核摘要计算实际决定 | 方法/输入/代码变化需新准入；learned fit 未接入时仍 unknown |
+| Docker authorization v6 | 独立研究用途、source H/target 提交分列、逐文件来源角色、map/review/见证/准入/计划/request/test/image/policy/实现 | 每次执行前后重建，不替代旧生产授权，不能复用 run ID 或运行路径 |
+| study-replay.v1 | 实际准入、完整性、原 Run/授权/日志引用、真实时间和运行后核对 | 输出新目录；stale 保留实际 Run；verify 重建当前来源与原始 JUnit，不回写 |
+
+确定性只对规范化输入与决策数据声明；真实审核/运行时间、随机 run ID 和本机身份摘要不会伪造为跨运行相同。
+调用方提供的可信审核摘要不从可变计划自动推导；同时控制该摘要、验证器和主机的攻击不在此保证内。
+现有 `standalone-snapshot-scope.v1` 与 Candidate/Shadow/Active 的生产权限规则保持原样。

@@ -1,0 +1,95 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-admission.v1",
+      "default": "study-admission.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "applicable",
+        "inapplicable",
+        "unknown"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Witness Digest"
+    },
+    "method": {
+      "enum": [
+        "b1_always",
+        "b2_interface",
+        "learned_initial",
+        "learned_refined"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "enum": [
+        "guard",
+        "witness"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision",
+    "reason_code",
+    "source_digest",
+    "target_digest",
+    "map_digest",
+    "review_digest",
+    "witness_digest",
+    "method",
+    "lane",
+    "artifact_digest"
+  ],
+  "title": "StudyAdmission",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

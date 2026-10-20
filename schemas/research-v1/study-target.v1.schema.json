@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-target.v1",
+      "default": "study-target.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "target_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Target Id",
+      "type": "string"
+    },
+    "repository_identity_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Repository Identity Digest",
+      "type": "string"
+    },
+    "revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Revision",
+      "type": "string"
+    },
+    "module": {
+      "maxLength": 256,
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+      "title": "Module",
+      "type": "string"
+    },
+    "symbol": {
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+      "title": "Symbol",
+      "type": "string"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "profile": {
+      "enum": [
+        "direct",
+        "static-reexport-v2"
+      ],
+      "title": "Profile",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "license_ref": {
+      "minLength": 1,
+      "title": "License Ref",
+      "type": "string"
+    },
+    "tree_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "maxItems": 2048,
+      "minItems": 1,
+      "title": "Tree Pins",
+      "type": "array"
+    },
+    "closure_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Closure Pins",
+      "type": "array"
+    },
+    "assessment_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Assessment Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_id",
+    "repository_identity_digest",
+    "revision",
+    "module",
+    "symbol",
+    "import_root",
+    "profile",
+    "source_ref",
+    "license_ref",
+    "tree_pins",
+    "closure_pins",
+    "assessment_digest",
+    "artifact_digest"
+  ],
+  "title": "StudyTarget",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

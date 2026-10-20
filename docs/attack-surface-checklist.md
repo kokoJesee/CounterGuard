@@ -40,6 +40,14 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+W01/W03 增加[实验性研究重放](research-replay.md)：独立授权 v6 分列 source H 与 target 提交，
+保留原契约/oracle，按当前完整来源、映射、可信审核摘要及 runner/policy/code pins 在运行前后核验。
+[自有 Docker 专项](../tests/integration/test_study_bridge.py)覆盖两独立 Git 历史、根→src 布局、
+重复计数、独立 stdout 见证、import-time ValueError 和 Observer 故障；unknown/inapplicable 的调用数为 0。
+源码/重签/晚到变化专项在[慢层](../tests/unit/test_study_replay.py)，字面量与严格字段在[快层](../tests/unit/test_study_models.py)。
+W04 只增加独立研究审核事件与外部保留的摘要核对，Candidate 生产权限不提升；本机审核仍非身份认证或自动防回滚。
+这不批准 colored 等外部目标，不接入 learned fit/新标签，不扩大生产快照 Scope；原四项 Docker 隔离攻击本批未复跑。
+
 W02/W03 增加[只读 RGB 映射审计](results/colored-review-v1/README.md)：全部 8 case 的字面量类型、
 前景/背景角色、原消息 oracle 和 source-only 控制逐项核对；30 项专项拒绝删改/重签/自我批准，
 20 次乱序语义稳定。该工具只读取现有契约/回执，不启动目标，不认证自摘要回执的来源，不能成为执行授权。

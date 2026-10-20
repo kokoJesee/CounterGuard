@@ -18,7 +18,7 @@
 | 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证 | 外层 fit 编排仍绑定 v1 protocol/context；新数据需要独立适配 | [scope.py](../../../src/counterguard/scope.py) |
 | Feature / context | AST 自动提取与逐行对账 | 新语义能否用现有词汇表达尚未验证；不支持不能用假特征填空 | [features.py](../../../src/counterguard/features.py)、[context 政策](../../module-context-policy.md) |
 | Evidence / Guard | 受限 contract.v3–v6 → Docker evidence.v4 → 最小 guard.v3/v4、自检和独立重建 | 每个真实来源仍需完整 B/F、H 内契约、闭包与人工审核；版本按 oracle/profile 选择，不适用则停 | [standalone capture](../../standalone-capture.md)、[Guard](../../standalone-guards.md)、[v2 导出](../../static-reexports-v2.md) |
-| Scope / replay | 生产 standalone 使用精确 B/F 快照，原隔离与授权核验可复用 | learned Scope 在新研究目标上的审核桥接未实现；不能放宽生产 snapshot Scope | [standalone_replay.py](../../../src/counterguard/standalone_replay.py) |
+| Scope / replay | 生产 standalone 使用精确 B/F 快照；独立研究 fixture 通道支持获审 b1/b2 与 stdout 见证 | learned fit 尚未接入，返回 unknown；不能放宽生产 snapshot Scope 或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[研究重放](../../research-replay.md) |
 | Metrics / evaluation | 既有分子/分母、配对变化与报告逻辑 | v1 外层绑定类型与硬编码期望不能直接用于新 Guard/真实仓库 | [evaluation.py](../../../src/counterguard/evaluation.py)、[metrics](../../../src/counterguard/evaluation_metrics.py) |
 | 独立历史事实盘点 | 只读标准库脚本，核对公开预测/标签/计数/pin | 不检查旧 Docker 授权或完整运行来源，不批准 scope_v2 | [研究入口](../../../scripts/run_scope_study.py) |
 
@@ -100,8 +100,8 @@ unknown 在主混淆矩阵中是负预测，另列 coverage 和配对转移；�
 
 ## 下一道准入
 
-最新材料是[colored 源码/调用审计](../../results/colored-review-v1/README.md)及[研究桥接提案](research-bridge-proposal.md)。
-已获批的静态 profile 扩展不包含真实跨项目执行；新的执行授权和 own-contract stdout 见证仍须确认与自有 fixture 验收。
+最新材料是[colored 源码/调用审计](../../results/colored-review-v1/README.md)及[研究重放接口](../../research-replay.md)。
+静态 profile 扩展不批准外部跨项目执行；研究通道的自有 fixture 验收也不代替外部源审与语义裁决。
 字面量 8/8 不等于 8 个合法反例，也不等于有足够的独立训练/留出数据。
 
 候选采集需逐项满足：完整来源与许可、可表示契约、合法 H、受限闭包、自然跨项目可比性。记录所有未通过项、网络/工具/人工/等待耗时；不支持则停止该候选，不改标准。

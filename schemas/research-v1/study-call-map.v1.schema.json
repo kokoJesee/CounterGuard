@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "StudyCaseMap": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_assertion_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Assertion Digest",
+          "type": "string"
+        },
+        "keyword_renames": {
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "maxLength": 128,
+              "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 128
+          },
+          "title": "Keyword Renames",
+          "type": "object"
+        },
+        "source_only_keywords": {
+          "default": [],
+          "items": {
+            "const": "force_color",
+            "type": "string"
+          },
+          "title": "Source Only Keywords",
+          "type": "array"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_assertion_digest",
+        "keyword_renames"
+      ],
+      "title": "StudyCaseMap",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-call-map.v1",
+      "default": "study-call-map.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "map_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Map Id",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "cases": {
+      "items": {
+        "$ref": "#/$defs/StudyCaseMap"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "generator": {
+      "const": "study-mapped-test.v1",
+      "default": "study-mapped-test.v1",
+      "title": "Generator",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "map_id",
+    "source_digest",
+    "target_digest",
+    "cases",
+    "artifact_digest"
+  ],
+  "title": "StudyCallMap",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

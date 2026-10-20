@@ -1,0 +1,84 @@
+{
+  "$defs": {
+    "StdoutWitnessCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "stdout": {
+          "maxLength": 4096,
+          "title": "Stdout",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "stdout"
+      ],
+      "title": "StdoutWitnessCase",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-stdout-witness.v1",
+      "default": "study-stdout-witness.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "oracle": {
+      "const": "stdout_eq",
+      "default": "stdout_eq",
+      "title": "Oracle",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "basis_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 16,
+      "minItems": 1,
+      "title": "Basis Refs",
+      "type": "array"
+    },
+    "cases": {
+      "items": {
+        "$ref": "#/$defs/StdoutWitnessCase"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_digest",
+    "map_digest",
+    "basis_refs",
+    "cases",
+    "artifact_digest"
+  ],
+  "title": "StudyWitness",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

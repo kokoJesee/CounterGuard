@@ -1,0 +1,99 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-source.v1",
+      "default": "study-source.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "repository_identity_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Repository Identity Digest",
+      "type": "string"
+    },
+    "guard_ref": {
+      "minLength": 1,
+      "title": "Guard Ref",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "evidence_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Evidence Digest",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "buggy_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Buggy Commit",
+      "type": "string"
+    },
+    "fixed_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Fixed Commit",
+      "type": "string"
+    },
+    "assertion_head": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Assertion Head",
+      "type": "string"
+    },
+    "contract_ref": {
+      "minLength": 1,
+      "title": "Contract Ref",
+      "type": "string"
+    },
+    "contract_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Contract Digest",
+      "type": "string"
+    },
+    "case_ids": {
+      "items": {
+        "pattern": "^case_[a-f0-9]{24}$",
+        "type": "string"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Case Ids",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_id",
+    "repository_identity_digest",
+    "guard_ref",
+    "guard_digest",
+    "evidence_digest",
+    "binding_digest",
+    "buggy_commit",
+    "fixed_commit",
+    "assertion_head",
+    "contract_ref",
+    "contract_digest",
+    "case_ids",
+    "artifact_digest"
+  ],
+  "title": "StudySource",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

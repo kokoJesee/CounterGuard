@@ -1,4 +1,4 @@
-"""Read-only preparation for a new scope study; never authorize or run targets."""
+"""Read-only historical inventory and explicit tool-owned research fixture commands."""
 
 from __future__ import annotations
 
@@ -304,7 +304,22 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     command = sub.add_parser("inventory", help="Independently recount published scope_v1 facts.")
     command.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    for name in ("audit", "replay", "verify"):
+        research = sub.add_parser(name, help="Tool-owned fixture research only, never production.")
+        research.add_argument("--workspace", type=Path, required=True)
+        research.add_argument("--source-repo", type=Path, required=True)
+        research.add_argument("--target-repo", type=Path, required=True)
+        research.add_argument("--review-digest", required=True)
+        research.add_argument(
+            "--result" if name == "verify" else "--plan", type=Path, required=True
+        )
+        if name == "replay":
+            research.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.command != "inventory":
+        from counterguard.study_cli import execute_study_command
+
+        return execute_study_command(args)
     try:
         result = inventory(args.root)
     except (InventoryError, OSError, KeyError, TypeError, ValueError) as error:

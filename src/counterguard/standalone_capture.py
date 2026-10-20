@@ -482,16 +482,17 @@ def capture_standalone(
         return value
 
 
-def _verify_run_envelope(run, request, plan):
+def _verify_run_envelope(run, request, plan, *, import_root=None):
     policy = DockerPolicyV1()
-    contract = read_standalone_contract(_file(request.cwd, CONTRACT_REF))
+    if import_root is None:
+        import_root = read_standalone_contract(_file(request.cwd, CONTRACT_REF)).import_root
     manifest = {
         "schema_version": "docker-runner-request.v2",
         "test_ref": TEST_REF,
         "contract_ref": CONTRACT_REF,
         "target_module": request.target.module,
         "target_symbol": request.target.symbol,
-        "import_root": contract.import_root,
+        "import_root": import_root,
         "timeout_seconds": request.timeout_seconds,
         "stdout_limit_bytes": policy.stdout_limit_bytes,
         "stderr_limit_bytes": policy.stderr_limit_bytes,
