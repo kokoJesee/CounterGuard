@@ -1,6 +1,7 @@
 # 候选来源与可行性
 
-状态：开发期来源探测，尚无纳入 scope_v2 的场景。候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[首批](../../results/scope-study-feasibility-v1/README.md)和[第二批回执](../../results/scope-study-feasibility-v2/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
+状态：开发期来源探测，尚无纳入 scope_v2 的场景。最新[colored 源码/映射审核材料](../../results/colored-review-v1/README.md)已准备，维护者准入裁决与研究桥接仍待完成。
+候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[首批](../../results/scope-study-feasibility-v1/README.md)和[第二批回执](../../results/scope-study-feasibility-v2/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
 
 ## 采集原则
 
@@ -108,5 +109,25 @@ Click 准入不是一项参数展开小补丁，本轮暂停其执行接入，�
 其完整闭包 12 文件，三个类/元类钩子被保守规则记为模块钩子，根包导出仍独立 unsupported。
 8/8 仅是字面量映射工作表，不是语义裁决或运行通过；不能把夹紧政策解释为漏拒绝缺陷。
 
-停止同方向扩搜，等待维护者在[colored 受限支持提案](colored-minimal-support-proposal.md)与缩窄本轮实证主张之间选择。
-提案初估 3–6 人日，不含研究执行桥接；不做 legacy、kwargs 提取或 Click 支持，也未在本轮实施接受范围扩张。
+该批停止同方向扩搜，提交[colored 受限支持提案](colored-minimal-support-proposal.md)与缩窄实证主张的选择。
+当时初估 3–6 人日，不含研究执行桥接；不做 legacy、kwargs 提取或 Click 支持。随后选择和实测见下。
+
+## 受限支持及源码/调用审核的当前状态
+
+维护者已批准受限支持，[工程验收](../../results/static-reexport-v2/README.md)完成 contract.v6 / binding.v4、
+closure.v2 和有限类钩子识别；旧默认 grammar 保留。工具自有 Docker fixture 通过不计外部研究样本。
+colored 固定提交的 50 文件、12 文件闭包和 3 个钩子均已记录，仍为 review_required / not_run。
+
+后续[源码审读与映射审计](../../results/colored-review-v1/README.md)保留全部 8 case、ValueError 及原消息子串。
+机器只核对字面量、角色、断言身份和来源控制参数，不能替维护者批准语义或标签。
+其中 4 个越界三元组有上游夹紧测试依据，4 个长度错误缺少同等独立规范依据，明确列为待裁决。
+完整闭包的类体生成、环境读取及条件 Windows native 初始化均纳入审读，没有删分支来放行。
+
+谱系检查包括固定历史、根提交、当前/初始接口及相关 RGB 实现；可达提交没有交集，但这不证明无代码借用。
+维护者仍须裁决分组与整行可比性；没有给目标分配标签。已验证来源修复保持 1，完整研究场景保持 0。
+来源的历史 Evidence/Guard 不能冒充当前实现验收，需在代码稳定且获执行批准后用新 ID 重新物化。
+
+下一项可审阅材料是[研究桥接提案](research-bridge-proposal.md)，先限定严格输入与自有 fixture，
+不直接执行 colored，不开放最终标签。原计划中的研究 Docker 桥接属于研究编排阶段；
+来源/可比性材料准备与工程桥接验收应分别记录，不能以阶段名代替通过证据。
+新 AST/context/接口分类尚未冻结，数据也不足以独立构成 initial/refinement/holdout；不更改标准来填空。
