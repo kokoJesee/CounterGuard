@@ -16,7 +16,7 @@
 |---|---|---|---|
 | Protocol / split | 严格模型、冻结 pin、来源核验 | v1 固定 study ID、两份 Guard、接口枚举、训练期望；不能直接传 scope_v2 | [protocol.py](../../../src/counterguard/protocol.py) |
 | 纯 learner | 特征白名单、零误差搜索、并列裁决、clause 见证 | 外层 fit 编排仍绑定 v1 protocol/context；新数据需要独立适配 | [scope.py](../../../src/counterguard/scope.py) |
-| Feature / context | AST 自动提取与逐行对账 | 新语义能否用现有词汇表达尚未验证；不支持不能用假特征填空 | [features.py](../../../src/counterguard/features.py)、[context 政策](../../module-context-policy.md) |
+| Feature / context | 冻结 v1 提取与对账；独立研究 fixture 版本支持 For/GeneratorExp、行见证和精确 learner 投影 | 外部接口类别、研究 context 与正式 fit/split 尚未冻结；静态记录不提供执行权限 | [研究特征](../../study-features.md)、[context 政策](../../module-context-policy.md) |
 | Evidence / Guard | 受限 contract.v3–v6 → Docker evidence.v4 → 最小 guard.v3/v4、自检和独立重建 | 每个真实来源仍需完整 B/F、H 内契约、闭包与人工审核；版本按 oracle/profile 选择，不适用则停 | [standalone capture](../../standalone-capture.md)、[Guard](../../standalone-guards.md)、[v2 导出](../../static-reexports-v2.md) |
 | Scope / replay | 生产 standalone 使用精确 B/F 快照；独立研究 fixture 通道支持获审 b1/b2 与 stdout 见证 | learned fit 尚未接入，返回 unknown；不能放宽生产 snapshot Scope 或把 fixture 当外部实验 | [standalone_replay.py](../../../src/counterguard/standalone_replay.py)、[研究重放](../../research-replay.md) |
 | Metrics / evaluation | 既有分子/分母、配对变化与报告逻辑 | v1 外层绑定类型与硬编码期望不能直接用于新 Guard/真实仓库 | [evaluation.py](../../../src/counterguard/evaluation.py)、[metrics](../../../src/counterguard/evaluation_metrics.py) |
@@ -33,7 +33,9 @@ uv run python scripts/run_scope_study.py inventory
 uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 ```
 
-入口当前只有 `inventory`；`audit/fit/evaluate/verify/compare/report/export` 仍未实现，传入会被拒绝。它不 import 仓库目标，不调用生产 learner/evaluator，不启动 Git/Docker/pytest 子进程。测试也拦截真实子进程启动。
+`inventory` 分支只读历史事实，不 import 仓库目标，不调用生产 learner/evaluator，不启动 Git/Docker/pytest 子进程。测试也拦截真实子进程启动。
+同一脚本另有自有 fixture 的 `audit/replay/verify`，见[研究重放](../../research-replay.md)；`fit/evaluate/compare/report/export` 尚未实现，传入会被拒绝。
+独立的静态特征命令见[研究特征](../../study-features.md)，尚未接通 learned replay。
 
 该命令只读固定路径的 v1 protocol/split、9 个训练样本、6 个公开留出样本、原始 24 份预测和已发布汇总。它独立计算 B1/B2 训练计数、四方法留出混淆矩阵、false alert/bug recall 分母、执行数与配对变化，并比较原始数据和历史发布 pin。重复/缺失行、标签错配、文件篡改、重新签名的不同历史 manifest、重复 JSON key 和非有限数字会拒绝。
 

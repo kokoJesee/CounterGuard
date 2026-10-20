@@ -465,3 +465,14 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 确定性只对规范化输入与决策数据声明；真实审核/运行时间、随机 run ID 和本机身份摘要不会伪造为跨运行相同。
 调用方提供的可信审核摘要不从可变计划自动推导；同时控制该摘要、验证器和主机的攻击不在此保证内。
 现有 `standalone-snapshot-scope.v1` 与 Candidate/Shadow/Active 的生产权限规则保持原样。
+
+研究静态特征的独立 Schema 见 [study-features.md](study-features.md) 与 `schemas/study-features-v1/`。
+
+| 层 / 版本 | 摘要依赖 | 上游变化与重算 |
+|---|---|---|
+| study-feature-context.v1 | 精确 source bytes pin、所选函数、可信审核元数据/依据、真实操作者时间；独立保存的 context_anchor | 修改元数据或源码须新 context 与可信 anchor，不能只重签旧记录 |
+| study-feature-record.v1 | context/source pin、ast-features.study.v1、独立词汇、parameter-shape.study.v1、逐 token 行见证、全包实现 | 改上游或实现则重新提取与逐字段对账；旧 record 不原地覆盖 |
+| study-feature-audit.v1 | 完整 record、独立 expected 向量与其规范摘要、双方差异 | 修改任一侧须新对账；matched 不等于语义正确，不得自动修改另一侧 |
+
+上述静态记录没有 Git/来源执行事实或标签审核权限；它们不能代替 fit/Scope/研究授权。
+纯学习仍复用精确 `TrainingExample(FeatureVector, bool)` 与 `conjunction.v1`，不扩大冻结 v1 接受集合。

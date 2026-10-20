@@ -158,3 +158,11 @@ validators 固定 fork 试点已按全部检查点完成。未来接入其他仓
 历史“verify 通过”的解释见 [旧验证结论的边界](known-limitations.md#历史验证结论的边界)。
 
 MVP 冻结补充：A09 的依赖缺失预检由 [test_runner_dependency.py](../tests/unit/test_runner_dependency.py) 和[安装验收](results/mvp-freeze-v1/final-checks.json)覆盖；缺 pytest 元数据或模块时，CLI 给出 runner 安装提示、执行器不启动进程。这不关闭 W01 的未知代码隔离缺口。
+
+研究特征的补充检查见[接口说明](study-features.md)与[专项](../tests/unit/test_study_features.py)：
+For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立条件不拼范围、源码行见证、
+原始字节/独立 context anchor 与重签事实重建、AST/字节预算、外层字段不能进入纯 learner、
+无负样本拒绝和 20 次乱序稳定均有自有 fixture 覆盖。
+静态命令不执行目标代码；手工标注不一致保留双方，不自动改数据。
+这不证明可信审核元数据或标签语义、不提供 Git 来源认证、不吸收 helper、不做动态/流敏感分析，
+也没有让 learned replay 获得执行权限。W01/W03/W04 的执行、插件和远程权限状态未因此升级。

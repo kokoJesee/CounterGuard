@@ -131,3 +131,7 @@ colored 固定提交的 50 文件、12 文件闭包和 3 个钩子均已记录�
 不直接执行 colored，不开放最终标签。来源/可比性材料与工程桥接验收分别记录，
 不能以实现执行通道代替外部样本的准入裁决。开发实施方案只在本地维护。
 新 AST/context/接口分类尚未冻结，数据也不足以独立构成 initial/refinement/holdout；不更改标准来填空。
+
+工具自有 fixture 的[独立静态特征接口](../../study-features.md)现已实现 For/GeneratorExp、审核 context pin、
+行见证和人工对账，并可投影到原纯 learner；[有限验收](../../results/study-features-v1/README.md)不计外部研究样本。
+外部分类/协议仍未冻结，完整 fit/split/Scope 授权链未接通，learned replay 继续 unknown。

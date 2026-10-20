@@ -1,0 +1,113 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-feature-context.v1",
+      "default": "study-feature-context.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_research_fixture_only",
+      "default": "tool_owned_research_fixture_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "context_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Context Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "operator": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "metadata_basis": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Metadata Basis",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "symbol": {
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+      "title": "Symbol",
+      "type": "string"
+    },
+    "contract_family": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Contract Family",
+      "type": "string"
+    },
+    "contract_version": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "interface_kind": {
+      "enum": [
+        "value_return",
+        "stdout_write"
+      ],
+      "title": "Interface Kind",
+      "type": "string"
+    },
+    "module_group": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Module Group",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "context_id",
+    "created_at",
+    "operator",
+    "reason",
+    "metadata_basis",
+    "source_ref",
+    "source_digest",
+    "symbol",
+    "contract_family",
+    "contract_version",
+    "interface_kind",
+    "module_group",
+    "artifact_digest"
+  ],
+  "title": "StudyFeatureContext",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

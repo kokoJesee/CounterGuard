@@ -88,3 +88,6 @@ verify 的 0 不把负结果改成正结论；stale 结果不会通过当前来�
 常规执行快速层与专项目录；完整来源链的 transport-double 测试也标 slow，避免拖慢日常循环。
 真实进程只在标记 slow/docker 的自有专项中启动。没有运行全量时不声称全量通过。
 本批实测与保留的失败记录说明见[自有 fixture 验收](results/research-bridge-v1/README.md)。
+
+独立的[研究特征提取与对账](study-features.md)已提供 For/GeneratorExp 的静态处理和纯 learner 输入投影。
+它没有扩写本页的 v1 plan/admission 或 v6 authorization；缺少 fit/scope/协议绑定时 learned 方法仍然 unknown。

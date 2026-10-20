@@ -1,0 +1,279 @@
+{
+  "$defs": {
+    "FeatureVector": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_family": {
+          "minLength": 1,
+          "title": "Contract Family",
+          "type": "string"
+        },
+        "contract_version": {
+          "minLength": 1,
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "interface_kind": {
+          "minLength": 1,
+          "title": "Interface Kind",
+          "type": "string"
+        },
+        "symbol_signature": {
+          "minLength": 1,
+          "title": "Symbol Signature",
+          "type": "string"
+        },
+        "module_group": {
+          "minLength": 1,
+          "title": "Module Group",
+          "type": "string"
+        },
+        "ast_features": {
+          "items": {
+            "enum": [
+              "branch:is_member",
+              "branch:none",
+              "decimal:multiply",
+              "decimal:subtract",
+              "int:parse",
+              "regex:ascii_digits",
+              "range:check",
+              "round:half_up",
+              "str:isascii",
+              "str:isdecimal"
+            ],
+            "type": "string"
+          },
+          "title": "Ast Features",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contract_family",
+        "contract_version",
+        "interface_kind",
+        "symbol_signature",
+        "module_group",
+        "ast_features"
+      ],
+      "title": "FeatureVector",
+      "type": "object"
+    },
+    "StudyFeatureRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "study-feature-record.v1",
+          "default": "study-feature-record.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "tool_owned_research_fixture_only",
+          "default": "tool_owned_research_fixture_only",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "extractor": {
+          "const": "ast-features.study.v1",
+          "default": "ast-features.study.v1",
+          "title": "Extractor",
+          "type": "string"
+        },
+        "signature_algorithm": {
+          "const": "parameter-shape.study.v1",
+          "default": "parameter-shape.study.v1",
+          "title": "Signature Algorithm",
+          "type": "string"
+        },
+        "vocabulary_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Vocabulary Digest",
+          "type": "string"
+        },
+        "context_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Context Digest",
+          "type": "string"
+        },
+        "source_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Digest",
+          "type": "string"
+        },
+        "implementation_digests": {
+          "additionalProperties": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Implementation Digests",
+          "type": "object"
+        },
+        "features": {
+          "$ref": "#/$defs/FeatureVector"
+        },
+        "witnesses": {
+          "items": {
+            "$ref": "#/$defs/SyntaxWitness"
+          },
+          "title": "Witnesses",
+          "type": "array"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "vocabulary_digest",
+        "context_digest",
+        "source_digest",
+        "implementation_digests",
+        "features",
+        "witnesses",
+        "artifact_digest"
+      ],
+      "title": "StudyFeatureRecord",
+      "type": "object"
+    },
+    "SyntaxWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "token": {
+          "enum": [
+            "branch:is_member",
+            "branch:none",
+            "decimal:multiply",
+            "decimal:subtract",
+            "int:parse",
+            "regex:ascii_digits",
+            "range:check",
+            "round:half_up",
+            "str:isascii",
+            "str:isdecimal"
+          ],
+          "title": "Token",
+          "type": "string"
+        },
+        "line": {
+          "minimum": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "node_kind": {
+          "minLength": 1,
+          "title": "Node Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token",
+        "line",
+        "end_line",
+        "node_kind"
+      ],
+      "title": "SyntaxWitness",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-feature-audit.v1",
+      "default": "study-feature-audit.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "assurance": {
+      "const": "annotation_agreement_not_semantic_adjudication",
+      "default": "annotation_agreement_not_semantic_adjudication",
+      "title": "Assurance",
+      "type": "string"
+    },
+    "record": {
+      "$ref": "#/$defs/StudyFeatureRecord"
+    },
+    "expected": {
+      "$ref": "#/$defs/FeatureVector"
+    },
+    "expected_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Expected Digest",
+      "type": "string"
+    },
+    "matched": {
+      "title": "Matched",
+      "type": "boolean"
+    },
+    "missing": {
+      "items": {
+        "enum": [
+          "branch:is_member",
+          "branch:none",
+          "decimal:multiply",
+          "decimal:subtract",
+          "int:parse",
+          "regex:ascii_digits",
+          "range:check",
+          "round:half_up",
+          "str:isascii",
+          "str:isdecimal"
+        ],
+        "type": "string"
+      },
+      "title": "Missing",
+      "type": "array"
+    },
+    "unexpected": {
+      "items": {
+        "enum": [
+          "branch:is_member",
+          "branch:none",
+          "decimal:multiply",
+          "decimal:subtract",
+          "int:parse",
+          "regex:ascii_digits",
+          "range:check",
+          "round:half_up",
+          "str:isascii",
+          "str:isdecimal"
+        ],
+        "type": "string"
+      },
+      "title": "Unexpected",
+      "type": "array"
+    },
+    "metadata_mismatches": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Metadata Mismatches",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record",
+    "expected",
+    "expected_digest",
+    "matched",
+    "missing",
+    "unexpected",
+    "metadata_mismatches",
+    "artifact_digest"
+  ],
+  "title": "StudyFeatureAudit",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
