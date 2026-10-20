@@ -8,7 +8,13 @@ from tests.repository_support import git
 
 
 def standalone_history(
-    workspace: Path, *, import_root=".", import_failure=False, message_match=False, reexport=False
+    workspace: Path,
+    *,
+    import_root=".",
+    import_failure=False,
+    message_match=False,
+    reexport=False,
+    export_v2=False,
 ):
     repo = workspace / "repo"
     repo.mkdir()
@@ -21,6 +27,20 @@ def standalone_history(
     if reexport:
         assert message_match and not import_failure
         (package / "__init__.py").write_text("from .core import price\n", encoding="utf-8")
+    if export_v2:
+        assert reexport and message_match
+        (package / "__init__.py").write_text(
+            "from .hooks import Missing\nfrom .core import price\n__version__: str = '1.0'\n",
+            encoding="utf-8",
+        )
+        (package / "hooks.py").write_text(
+            "from __future__ import annotations\nfrom .errors import InvalidKey\n"
+            "class Missing(type):\n"
+            " def __getattr__(cls, name: str) -> NoReturn:\n"
+            "  raise InvalidKey(f'Invalid key: {name}')\n",
+            encoding="utf-8",
+        )
+        (package / "errors.py").write_text("class InvalidKey(Exception): pass\n", encoding="utf-8")
     guard = (
         "import os\n"
         "if os.environ.get('COUNTERGUARD_CONTRACT') != 'cg_control/contract.json':\n"
@@ -39,8 +59,9 @@ def standalone_history(
         buggy_function = buggy_function.replace(
             "def price(x):\n", "def price(x):\n" + indent(guard, " ")
         )
+    imports = "from .hooks import Missing\n" if export_v2 else ""
     (package / "core.py").write_text(
-        buggy_source + buggy_function,
+        imports + buggy_source + buggy_function,
         encoding="utf-8",
     )
     tests = repo / "tests"
@@ -63,7 +84,9 @@ def standalone_history(
         fixed_function = fixed_function.replace(
             "def price(x):\n", "def price(x):\n" + indent(guard, " ")
         )
-    (package / "core.py").write_text(("" if reexport else guard) + fixed_function, encoding="utf-8")
+    (package / "core.py").write_text(
+        imports + ("" if reexport else guard) + fixed_function, encoding="utf-8"
+    )
     regression = (
         "import pytest\ndef test_price():\n assert price(0) == 1\n"
         " with pytest.raises(ValueError, match='expected message'): price(1)\n"
@@ -90,6 +113,7 @@ def standalone_history(
         test_function="test_price",
         output=workspace / "prep",
         cwd=workspace,
+        profile="static-reexport-v2" if export_v2 else "existing",
     )
     (repo / "contracts").mkdir()
     (repo / "contracts/price.v1.json").write_bytes((workspace / "prep/contract.json").read_bytes())

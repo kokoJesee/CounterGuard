@@ -15,6 +15,18 @@ unknown/blocked 返回 4，完整性拒绝返回 5；不生成 Evidence 或执�
 `bootstrap plan` 提供[独立 Guard 输入计划](bootstrap-plans.md)：读取提交树，分别列出目标导入闭包、
 草案覆盖及全仓引导需求。计划始终不可执行并返回 4；它不是通用 verify 或契约批准入口。
 
+多项静态根导出和有限类查找钩子使用[显式 v2 profile](static-reexports-v2.md)：
+
+```powershell
+counterguard bootstrap inspect-target --repo <repo> --revision <sha> --target package:public --import-root . --profile static-reexport-v2 --output <new-inspection>
+counterguard contract prepare --repo <repo> --buggy <B> --fixed <F> --contract-id <new-id> --target package:public --import-root . --test-ref <test.py> --test-function <test_name> --profile static-reexport-v2 --output <new-preparation>
+```
+
+`inspect-target` 读取完整提交树，但不要求比较目标提供虚构的 B/F/H 或契约；它始终 not_run、退出 4。
+源码来源的 `prepare` 则继续要求真实修复/测试，生成 contract.v6，所有者 H 及另行执行审核仍不可省略。
+省略 `--profile` 时 `prepare/plan` 使用 `existing`，原 v3/v4/v5 接受范围不变；新未知 profile 不会回退成可执行格式。
+静态 `review_required` 不能解释为已授权或测试通过，不能拿检查回执替代来源 Guard。
+
 源码开发版提供 [统一 verify](verify.md)、[Guard 生命周期](guard-lifecycle.md) 和 [runner 发现](runners.md)：`runner list/show` 只读展示审核来源和本机可用性；`verify --runner-id ...` 绑定已审核镜像，仅使用 Docker。当前报告为 `verify-report.v2`，旧 v1 与 `command-report.v1` 保留原契约。`guard transition/history` 使用独立的追加式事件格式。
 
 源码开发版另有 [本地 Registry](registry.md)：`registry add/list/show/disable`；来源完整性失败退出 5，禁用是追加终态，不提升 Guard 生命周期。

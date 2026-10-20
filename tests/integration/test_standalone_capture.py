@@ -20,24 +20,52 @@ from counterguard.standalone_capture import (
     verify_standalone_evidence,
 )
 from counterguard.standalone_guard import compile_standalone_guard, verify_standalone_guard
+from counterguard.target_inspection import inspect_static_target
 from tests.standalone_support import standalone_history
 
 pytestmark = [pytest.mark.slow, pytest.mark.docker]
 
 
-@pytest.mark.parametrize("reexport", [False, True], ids=["direct", "root-reexport"])
+@pytest.mark.parametrize(
+    "reexport,export_v2",
+    [(False, False), (True, False), (True, True)],
+    ids=["direct", "root-reexport", "static-reexport-v2"],
+)
 def test_real_docker_message_only_regression_preserves_minimal_oracle_and_registry(
-    tmp_path, monkeypatch, runner_and_no_local_execution, reexport
+    tmp_path, monkeypatch, runner_and_no_local_execution, reexport, export_v2
 ):
     monkeypatch.chdir(tmp_path)
     repo = standalone_history(
-        tmp_path, import_root="src" if reexport else ".", message_match=True, reexport=reexport
+        tmp_path,
+        import_root="src" if reexport else ".",
+        message_match=True,
+        reexport=reexport,
+        export_v2=export_v2,
     )
     if reexport:
         binding = json.loads(Path("bind/binding.json").read_bytes())
-        assert binding["schema_version"] == "bootstrap-binding.v3"
-        assert binding["contract"]["schema_version"] == "contract.v5"
+        assert binding["schema_version"] == (
+            "bootstrap-binding.v4" if export_v2 else "bootstrap-binding.v3"
+        )
+        assert binding["contract"]["schema_version"] == (
+            "contract.v6" if export_v2 else "contract.v5"
+        )
         assert binding["contract"]["target_module"] == "sample"
+        if export_v2:
+            for role in ("buggy", "fixed", "head"):
+                assessment = binding["runtime_assessments"][role]
+                assert len(assessment["files"]) == 4
+                assert assessment["hook_observations"][0]["recognition"] == "finite_raise"
+            inspection = inspect_static_target(
+                repo,
+                binding["head_commit"],
+                target="sample:price",
+                import_root="src",
+                profile="static-reexport-v2",
+                output=Path("comparison-inspection"),
+            )
+            assert inspection["runtime_assessment"]["status"] == "review_required"
+            assert not inspection["execution_allowed"]
     evidence = capture_standalone(
         repo,
         Path("bind/binding.json"),

@@ -127,6 +127,14 @@ class StandaloneContractV5(StandaloneContractV4):
         return self
 
 
+class StandaloneContractV6(StandaloneContractV5):
+    schema_version: Literal["contract.v6"] = "contract.v6"
+    profile: Literal["standalone-static-reexport.v2"] = "standalone-static-reexport.v2"
+    export_algorithm: Literal["static-root-reexport.v2"] = "static-root-reexport.v2"
+    closure_algorithm: Literal["module-import-closure.v2"] = "module-import-closure.v2"
+    hook_grammar: Literal["finite-raise-hook.v1"] = "finite-raise-hook.v1"
+
+
 def _hashable_literal(value: DraftLiteral) -> bool:
     return value.kind not in {"list", "dict"} and (
         value.kind != "tuple" or all(_hashable_literal(item) for item in value.items)
@@ -160,5 +168,6 @@ def read_standalone_contract(raw: bytes) -> StandaloneContract:
     model = {
         "contract.v4": StandaloneContractV4,
         "contract.v5": StandaloneContractV5,
+        "contract.v6": StandaloneContractV6,
     }.get(value.get("schema_version"), StandaloneContract)
     return model.model_validate_json(raw)

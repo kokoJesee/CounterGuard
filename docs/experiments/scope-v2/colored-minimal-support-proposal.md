@@ -1,6 +1,7 @@
 # colored 普通元组入口的受限支持提案
 
-状态：**仅提案，未实施，等待维护者决定是否扩大现有 profile 范围**。本文件不批准执行 colored，不新增生产开关或跳过未知项的参数。
+状态：**维护者已批准受限实施**；精确版本、grammar、拒绝与重算规则见[实施规格](../../static-reexports-v2.md)。
+本批准不包含执行 colored，不新增生产开关或跳过未知项的参数。下文保留提案时的工程范围与估算。
 提出它的原因是[五项筛查](../../results/bounded-rgb-targets-v1/README.md)已用尽，仍无合格目标，但 colored 有明确的夹紧规范与较集中的工程阻塞。
 
 ## 固定对象与要回答的问题
@@ -86,16 +87,15 @@
 
 ## 重新物化与不变量
 
-本文件和本批诊断不改变任何产品摘要，不需要重算现有执行产物。
-若实施源码改动，全包 implementation_digests 会变化，旧执行/绑定可能按规则判 stale；
+提案提交本身未改变产品摘要；获批实施将改变源码的全包 implementation_digests，旧执行/绑定会按规则判 stale；
 使用新 ID/目录重新生成需要的 plan/binding、授权、Evidence、Guard、Registry，旧文件不可覆盖。
 termcolor 原 contract.v5 内容/投影不变且旧路由仍受支持时，可重新核对并复用已有所有者 H，无需伪造新提交。
 
 后续研究桥接另用新目标/映射/特征/协议与下游产物版本，不修改 scope_v1 标准、标签、实验、split/context、examples 原实现/契约或既有 artifact。
 不移动发布标签；不新增运行时依赖；不默认打开 Shadow/Active。
 
-## 本轮不做
+## 实施批准的边界
 
-不实施 A–C，不扩搜第六项；不做旧式元数据、pytest 参数展开、类方法 target、命名空间包或 Click 支持；
+实施 A–C 的受限范围，不扩搜第六项；不做旧式元数据、pytest 参数展开、类方法 target、命名空间包或 Click 支持；
 不运行 colored、不创建 fork/H、不生成新来源契约、不确定标签；不把该提案当成跨项目研究已完成。
 维护者也可以选择不扩大 profile，保留 insufficient_data 并缩窄可交付主张，两种选择都不得改写历史事实。

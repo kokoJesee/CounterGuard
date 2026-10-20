@@ -1,5 +1,8 @@
 # 受限根包重导出
 
+本页描述默认的 v1 grammar，接受范围保持原样。多个根导出和有限类钩子仅在显式选择的
+[v2 profile](static-reexports-v2.md) 中提供；不会因安装新版工具而自动放宽 contract.v5。
+
 `contract prepare` 能识别根包通过一条显式 `from ... import ...` 导出的普通函数，使用新版本
 `contract.v5` / `standalone-static-reexport.v1`。这是源码声明核验，仍须人工审核；不会导入目标 Python。
 既有 contract.v3/v4 不获得这一能力，未改写历史契约或执行产物。

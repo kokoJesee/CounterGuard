@@ -38,6 +38,21 @@ docker desktop disable model-runner
 
 不要用恢复出厂设置作为第一步。该命令见 [Docker Desktop disable 文档](https://docs.docker.com/reference/cli/docker/desktop/disable/)；官方功能字段是 `enableInference`，不是控制 Gordon 的 `enableDockerAI`。本机持久化位置未取证确认；不能把官方字段当作本机历史 diff。
 
+另一次 Windows 实测中，功能开关没有被改动；启动先后被旧的 `dockerInference` 和 Secrets Engine `engine.sock`
+阻塞。二者均为零字节 AF_UNIX 重解析点，单文件移动甚至非跟随句柄打开也报系统无法访问。
+按[官方停止入口](https://docs.docker.com/reference/cli/docker/desktop/stop/)尝试退出失败后，
+只终止了路径已核对的 Docker Desktop/backend 进程。核对 `%LOCALAPPDATA%\Docker\run`
+以及 `%LOCALAPPDATA%\docker-secrets-engine` 是普通目录，且**只含已列明的零字节 socket**后，
+将目录分别改名为同父目录下全新的 `.stale-20261020`（及 `-2`）备份，保留全部原目录，随后启动 Desktop。
+同一条有界 Engine 探测从 timeout 变为 29.4.1，两个已审核镜像均重新显示 available。
+该记录只证明这次残留 socket 的修复，不保证其他启动故障具有同一原因。
+
+没有删除文件、镜像、卷、容器或 WSL 磁盘，没有读取凭据内容，没有手工修改 Model Runner/Gordon 或其他持久配置。
+原 socket 目录留在同一位置供取证；如需恢复原状态，应先停止 Desktop，将新运行目录另行保留，
+再将相应备份改回原目录名。恢复旧 socket 也会恢复已知故障，不作为日常恢复 Engine 的方法。
+含其他文件、链接目录或身份未核对时不能套用本次操作，更不能删除整个 Docker 数据目录。
+Windows 重解析点与不跟随打开的语义见[Microsoft 文档](https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-point-operations)。
+
 ## 固定边界
 
 容器没有网络或额外挂载，不传 Docker socket、宿主环境和凭据。根文件系统与最小 `/workspace` 只读，只有 64 MiB `/tmp` 可写。进程为 65532:65532，drop ALL capabilities、no-new-privileges，限制 1 CPU、256 MiB 内存/无额外 swap、64 PID、30 秒测试时间及分层日志大小。

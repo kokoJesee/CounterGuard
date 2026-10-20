@@ -21,6 +21,8 @@ from counterguard.digests import canonical_json_bytes, digest_bytes, digest_json
 from counterguard.errors import ArtifactIntegrityError
 from counterguard.project_config import Module, RepositoryPath, Symbol, reject_links
 from counterguard.repository import read_committed_files
+from counterguard.static_exports import ExportProblem, resolve_static_reexport
+from counterguard.static_hooks import inspect_hooks
 
 MAX_MODULES = 256
 MAX_AST_NODES = 50000
@@ -95,9 +97,13 @@ def describe_bootstrap_files(files: dict[str, bytes], selected_refs: set[str]) -
     return result
 
 
-def inspect_target_closure(files: dict[str, bytes], *, module: str, import_root: str) -> dict:
+def inspect_target_closure(
+    files: dict[str, bytes], *, module: str, import_root: str, algorithm="module-import-closure.v1"
+) -> dict:
     """Build a deterministic proposed input set; unresolved inputs stay visible."""
     TypeAdapter(Module).validate_python(module)
+    if algorithm not in {"module-import-closure.v1", "module-import-closure.v2"}:
+        raise ValueError("Unsupported closure algorithm")
     if import_root not in {".", "src"}:
         raise ValueError("Use --import-root . or src")
     prefix = "" if import_root == "." else "src/"
@@ -111,6 +117,7 @@ def inspect_target_closure(files: dict[str, bytes], *, module: str, import_root:
         if parts and all(part.isidentifier() for part in parts):
             modules.setdefault(".".join(parts), []).append(ref)
     findings, edges, stdlib, selected = set(), set(), set(), {}
+    observations = []
     pending, visited, total_nodes = {module}, set(), 0
 
     def issue(code, ref, detail="", severity="unknown"):
@@ -174,6 +181,13 @@ def inspect_target_closure(files: dict[str, bytes], *, module: str, import_root:
             issue("closure_ast_budget_exceeded", ref, severity="blocked")
             break
         package = parts if ref.endswith("/__init__.py") else parts[:-1]
+        if algorithm == "module-import-closure.v2":
+            hook_findings, hooks = inspect_hooks(
+                files, tree, module=name, ref=ref, import_root=import_root
+            )
+            observations.extend(hooks)
+            for code in hook_findings:
+                issue(code, ref)
         for node in nodes:
             if isinstance(node, ast.Import):
                 for alias in node.names:
@@ -230,8 +244,10 @@ def inspect_target_closure(files: dict[str, bytes], *, module: str, import_root:
                     "PyDLL",
                 }:
                     issue("resource_or_native_access_requires_review", ref)
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == (
-                "__getattr__"
+            if (
+                algorithm == "module-import-closure.v1"
+                and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and node.name == "__getattr__"
             ):
                 issue("module_lookup_hook_requires_review", ref)
             if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.Delete)) and any(
@@ -249,7 +265,12 @@ def inspect_target_closure(files: dict[str, bytes], *, module: str, import_root:
         else "unknown"
         if findings
         else "review_required",
-        "algorithm": "module-import-closure.v1",
+        "algorithm": algorithm,
+        **(
+            {"hook_observations": sorted(observations, key=lambda x: (x["path"], x["line"]))}
+            if algorithm == "module-import-closure.v2"
+            else {}
+        ),
         "files": [
             {"path": ref, "content_digest": digest_bytes(body)}
             for ref, body in sorted(selected.items())
@@ -276,10 +297,13 @@ def plan_bootstrap(
     test_function: str,
     output: Path,
     cwd: Path | None = None,
+    profile: str = "existing",
 ) -> dict:
     """Publish a fresh review plan from one committed tree; never start a runner."""
     if target.count(":") != 1:
         raise ValueError("Use a module:symbol target")
+    if profile not in {"existing", "static-reexport-v2"}:
+        raise ValueError("Use profile existing or static-reexport-v2")
     module, symbol = target.split(":")
     TypeAdapter(Module).validate_python(module)
     TypeAdapter(Symbol).validate_python(symbol)
@@ -298,7 +322,30 @@ def plan_bootstrap(
     commit, files, pins = read_committed_files(repo, revision)
     if test_ref not in files:
         raise ValueError("Selected test must exist in the committed tree")
-    closure = inspect_target_closure(files, module=module, import_root=import_root)
+    closure = inspect_target_closure(
+        files,
+        module=module,
+        import_root=import_root,
+        algorithm="module-import-closure.v2"
+        if profile == "static-reexport-v2"
+        else "module-import-closure.v1",
+    )
+    if profile == "static-reexport-v2":
+        try:
+            closure["static_export"] = resolve_static_reexport(
+                files,
+                module=module,
+                symbol=symbol,
+                import_root=import_root,
+                algorithm="static-root-reexport.v2",
+            )
+        except ExportProblem as error:
+            closure["findings"].append(
+                {"code": str(error), "path": "", "detail": "", "severity": "unknown"}
+            )
+            closure["findings"].sort(key=lambda x: (x["code"], x["path"], x["detail"]))
+            if closure["status"] != "blocked":
+                closure["status"] = "unknown"
     projection = project_test(
         files[test_ref],
         test_function=test_function,
@@ -312,7 +359,9 @@ def plan_bootstrap(
     pinned = {pin.path: pin for pin in pins}
     bootstrap = describe_bootstrap_files(files, selected_refs)
     payload = {
-        "schema_version": "bootstrap-plan.v1",
+        "schema_version": "bootstrap-plan.v2"
+        if profile == "static-reexport-v2"
+        else "bootstrap-plan.v1",
         "status": "blocked"
         if closure["status"] == "blocked" or not projection["cases"]
         else "unknown"

@@ -24,6 +24,7 @@ from counterguard.standalone_contracts import (
     StandaloneContract,
     StandaloneContractV4,
     StandaloneContractV5,
+    StandaloneContractV6,
     StandaloneTestOrigin,
     StandaloneTestOriginV2,
     read_standalone_contract,
@@ -96,10 +97,46 @@ def _projection(files, pins, *, test_ref, test_function, module, symbol):
 
 
 def _runtime_assessment(files, contract):
-    closure = inspect_target_closure(
+    exported = isinstance(contract, StandaloneContractV5)
+    modern = isinstance(contract, StandaloneContractV6)
+    return assess_runtime_source(
         files,
         module=contract.target_module,
+        symbol=contract.target_symbol,
+        source_ref=contract.source_ref,
         import_root=contract.import_root,
+        closure_algorithm=contract.closure_algorithm if modern else "module-import-closure.v1",
+        export_algorithm=contract.export_algorithm
+        if modern
+        else "static-root-reexport.v1"
+        if exported
+        else None,
+        expected_definition={
+            field: getattr(contract, field)
+            for field in ("definition_module", "definition_symbol", "definition_ref")
+        }
+        if exported
+        else None,
+    )
+
+
+def assess_runtime_source(
+    files,
+    *,
+    module,
+    symbol,
+    source_ref,
+    import_root,
+    closure_algorithm="module-import-closure.v1",
+    export_algorithm=None,
+    expected_definition=None,
+):
+    """Shared source-only review aid; no contract identity or execution authority."""
+    closure = inspect_target_closure(
+        files,
+        module=module,
+        import_root=import_root,
+        algorithm=closure_algorithm,
     )
     findings = list(closure["findings"])
 
@@ -131,24 +168,24 @@ def _runtime_assessment(files, contract):
                 add("legacy_runtime_dependencies_require_review", "setup.cfg")
         except (configparser.Error, UnicodeError, ValueError):
             add("legacy_metadata_requires_review", "setup.cfg")
-    if isinstance(contract, StandaloneContractV5):
+    if export_algorithm is not None:
         try:
             export = resolve_static_reexport(
                 files,
-                module=contract.target_module,
-                symbol=contract.target_symbol,
-                import_root=contract.import_root,
+                module=module,
+                symbol=symbol,
+                import_root=import_root,
+                algorithm=export_algorithm,
             )
             closure["static_export"] = export
-            if any(
-                export[field] != getattr(contract, field)
-                for field in ("definition_module", "definition_symbol", "definition_ref")
+            if expected_definition is not None and any(
+                export[field] != value for field, value in expected_definition.items()
             ):
-                add("export_definition_mismatch", contract.source_ref)
+                add("export_definition_mismatch", source_ref)
         except ExportProblem as error:
-            add(str(error), contract.source_ref)
+            add(str(error), source_ref)
     else:
-        _assess_direct_function(files, contract, add)
+        _assess_direct_function(files, source_ref, symbol, add)
     closure["findings"] = sorted(
         findings,
         key=lambda item: (item["code"], item["path"], item["detail"], item["severity"]),
@@ -161,20 +198,18 @@ def _runtime_assessment(files, contract):
     return closure
 
 
-def _assess_direct_function(files, contract, add):
+def _assess_direct_function(files, source_ref, symbol, add):
     try:
-        tree = ast.parse(files[contract.source_ref])
+        tree = ast.parse(files[source_ref])
         declarations = [
-            node
-            for node in tree.body
-            if isinstance(node, ast.FunctionDef) and node.name == contract.target_symbol
+            node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == symbol
         ]
         if len(declarations) != 1:
-            add("target_binding_requires_review", contract.source_ref)
+            add("target_binding_requires_review", source_ref)
         elif declarations[0].decorator_list:
-            add("target_decorators_require_review", contract.source_ref)
+            add("target_decorators_require_review", source_ref)
     except (KeyError, SyntaxError, UnicodeError, ValueError, RecursionError):
-        add("target_binding_requires_review", contract.source_ref)
+        add("target_binding_requires_review", source_ref)
 
 
 def prepare_contract(
@@ -189,9 +224,11 @@ def prepare_contract(
     test_function: str,
     output: Path,
     cwd: Path | None = None,
+    profile: str = "existing",
 ) -> dict:
     """Prepare all supported cases; owner review/commit is a separate user action."""
     TypeAdapter(ContractId).validate_python(contract_id)
+    _require(profile in {"existing", "static-reexport-v2"}, "preparation_profile_unsupported")
     TypeAdapter(CommitId).validate_python(buggy)
     TypeAdapter(CommitId).validate_python(fixed)
     TypeAdapter(RepositoryPath).validate_python(test_ref)
@@ -208,9 +245,18 @@ def prepare_contract(
     origin, fragments = _projection(
         files, pins, test_ref=test_ref, test_function=test_function, module=module, symbol=symbol
     )
-    closure = inspect_target_closure(files, module=module, import_root=import_root)
+    closure_algorithm = (
+        "module-import-closure.v2"
+        if profile == "static-reexport-v2"
+        else "module-import-closure.v1"
+    )
+    closure = inspect_target_closure(
+        files, module=module, import_root=import_root, algorithm=closure_algorithm
+    )
     _require(closure["status"] != "blocked", "fixed_closure_is_blocked")
-    buggy_closure = inspect_target_closure(buggy_files, module=module, import_root=import_root)
+    buggy_closure = inspect_target_closure(
+        buggy_files, module=module, import_root=import_root, algorithm=closure_algorithm
+    )
     prefix = "" if import_root == "." else "src/"
     stem = prefix + module.replace(".", "/")
     candidates = [ref for ref in (stem + ".py", stem + "/__init__.py") if ref in files]
@@ -221,12 +267,22 @@ def prepare_contract(
     export_fields = {}
     try:
         export = resolve_static_reexport(
-            files, module=module, symbol=symbol, import_root=import_root
+            files,
+            module=module,
+            symbol=symbol,
+            import_root=import_root,
+            algorithm="static-root-reexport.v2"
+            if profile == "static-reexport-v2"
+            else "static-root-reexport.v1",
         )
-    except ExportProblem:
+    except ExportProblem as error:
+        if profile == "static-reexport-v2":
+            raise BindingProblem(str(error)) from error
         pass  # Unsupported declarations retain the old, non-executable assessment.
     else:
-        contract_type = StandaloneContractV5
+        contract_type = (
+            StandaloneContractV6 if profile == "static-reexport-v2" else StandaloneContractV5
+        )
         export_fields = {
             field: export[field]
             for field in ("definition_module", "definition_symbol", "definition_ref")
@@ -325,7 +381,9 @@ def rebuild_binding(repo: Path, head: str, contract_ref: str) -> dict:
         else ("unknown" if "unknown" in role_status else "review_required")
     )
     payload = {
-        "schema_version": "bootstrap-binding.v3"
+        "schema_version": "bootstrap-binding.v4"
+        if isinstance(contract, StandaloneContractV6)
+        else "bootstrap-binding.v3"
         if isinstance(contract, StandaloneContractV5)
         else "bootstrap-binding.v2",
         "binding_status": "sources_verified",
@@ -417,7 +475,12 @@ def verify_binding(repo: Path, path: Path) -> dict:
         value = strict_json(path.read_bytes(), limit=BINDING_LIMIT)
         _require(
             value.get("schema_version")
-            in {"bootstrap-binding.v1", "bootstrap-binding.v2", "bootstrap-binding.v3"},
+            in {
+                "bootstrap-binding.v1",
+                "bootstrap-binding.v2",
+                "bootstrap-binding.v3",
+                "bootstrap-binding.v4",
+            },
             "not_a_source_binding",
         )
         _require(

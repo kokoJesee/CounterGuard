@@ -42,6 +42,7 @@ from counterguard.standalone_contracts import (
     StandaloneContract,
     StandaloneContractV4,
     StandaloneContractV5,
+    StandaloneContractV6,
 )
 from counterguard.standalone_models import (
     StandaloneAuthorization,
@@ -59,6 +60,7 @@ from counterguard.verify import VerifyReport, VerifyReportV2, VerifyReportV3
 from counterguard.workspace import PipelineScenario, WorkspaceManifest
 
 MODELS = {
+    "standalone-contract-v6": StandaloneContractV6,
     "standalone-contract-v5": StandaloneContractV5,
     "contract-proposal-v2": ContractProposalV2,
     "standalone-contract-v4": StandaloneContractV4,

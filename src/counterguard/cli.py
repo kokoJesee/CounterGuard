@@ -120,6 +120,9 @@ def contract_prepare_command(
     test_ref: Annotated[str, typer.Option(help="Committed fixed regression test.")],
     test_function: Annotated[str, typer.Option(help="One top-level test_* function.")],
     output: Annotated[Path, typer.Option(help="New preparation directory outside target repo.")],
+    profile: Annotated[
+        str, typer.Option(help="existing or explicit static-reexport-v2.")
+    ] = "existing",
 ) -> None:
     """Prepare a versioned literal contract for owner review; never execute."""
     from counterguard.bootstrap_binding import prepare_contract
@@ -136,6 +139,7 @@ def contract_prepare_command(
             test_ref=test_ref,
             test_function=test_function,
             output=output,
+            profile=profile,
         )
     except RepositoryProblem as error:
         _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
@@ -332,6 +336,9 @@ def bootstrap_plan_command(
     test_ref: Annotated[str, typer.Option(help="Committed upstream test path.")],
     test_function: Annotated[str, typer.Option(help="Selected top-level test_* function.")],
     output: Annotated[Path, typer.Option(help="New review plan directory outside target repo.")],
+    profile: Annotated[
+        str, typer.Option(help="existing or explicit static-reexport-v2.")
+    ] = "existing",
 ) -> None:
     """Separate target import closure from whole-repository test bootstrap requirements."""
     from counterguard.bootstrap_plan import plan_bootstrap
@@ -346,6 +353,7 @@ def bootstrap_plan_command(
             test_ref=test_ref,
             test_function=test_function,
             output=output,
+            profile=profile,
         )
     except RepositoryProblem as error:
         _error("Committed repository data unavailable: " + error.code, 5 if error.rejected else 4)
@@ -357,6 +365,38 @@ def bootstrap_plan_command(
     # Even a complete static plan needs review and unimplemented execution
     # capabilities. Exit zero must never be mistaken for generic admission.
     raise typer.Exit(4)
+
+
+@bootstrap_app.command("inspect-target")
+def bootstrap_inspect_target_command(
+    repo: Annotated[Path, typer.Option(help="Read a complete committed tree only.")],
+    revision: Annotated[str, typer.Option(help="Fixed comparison-target commit.")],
+    target: Annotated[str, typer.Option(help="Public root module:symbol.")],
+    import_root: Annotated[str, typer.Option(help="Explicit . or src.")],
+    profile: Annotated[str, typer.Option(help="Explicit static-reexport-v2 only.")],
+    output: Annotated[Path, typer.Option(help="New read-only inspection receipt directory.")],
+) -> None:
+    """Inspect a comparison target; no fictional source contract or execution."""
+    from counterguard.repository import RepositoryProblem
+    from counterguard.target_inspection import inspect_static_target
+
+    try:
+        value = inspect_static_target(
+            repo,
+            revision,
+            target=target,
+            import_root=import_root,
+            profile=profile,
+            output=output,
+        )
+    except RepositoryProblem as error:
+        _error(error.code, 5 if error.rejected else 4)
+    except ArtifactIntegrityError as error:
+        _error(str(error), 5)
+    except (OSError, ValueError, UnicodeError, RecursionError) as error:
+        _error(str(error), 2)
+    typer.echo(canonical_json_bytes(value).decode())
+    raise typer.Exit(4)  # Review-required never means permission to execute.
 
 
 @app.command("preflight")
