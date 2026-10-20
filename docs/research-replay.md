@@ -4,6 +4,9 @@
 共同复用已审核 Docker runner，不改变生产 standalone 的精确 B/F 快照 Scope。
 它不是任意仓库接入、正式 scope_v2 实验、外部目标执行批准或生产 Registry 调度入口。
 
+另行获审的固定外部观察使用[独立 v3/v8](external-observations.md)，仅支持 B1 和必需的独立见证。
+它不扩张本页 v1/v6 或 fixture 学习重放 v2/v7 的接受范围。
+
 ## 已实现的范围
 
 | 方法／输入 | 当前行为 |

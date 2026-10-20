@@ -30,6 +30,14 @@ def execute_study_command(args):
             session = StudyFittedSession(
                 args.source_repo, args.target_repo, workspace, args.review_digest, fit_session
             )
+        elif version in {"study-replay.v3", "study-replay-plan.v3"}:
+            from counterguard.study_observation import StudyObservationSession
+
+            if getattr(args, "fit_review_digest", None) or getattr(args, "training_repository", []):
+                raise ValueError("Observation inputs cannot consume fit trust or training inputs")
+            session = StudyObservationSession(
+                args.source_repo, args.target_repo, workspace, args.review_digest
+            )
         elif version in {"study-replay.v1", "study-replay-plan.v1"}:
             if getattr(args, "fit_review_digest", None) or getattr(args, "training_repository", []):
                 raise ValueError("C1 inputs cannot consume new fit trust arguments")

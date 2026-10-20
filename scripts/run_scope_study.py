@@ -305,7 +305,10 @@ def main(argv=None) -> int:
     command = sub.add_parser("inventory", help="Independently recount published scope_v1 facts.")
     command.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     for name in ("audit", "replay", "verify"):
-        research = sub.add_parser(name, help="Tool-owned fixture research only, never production.")
+        research = sub.add_parser(
+            name,
+            help="Reviewed fixture research or external observations; never production.",
+        )
         research.add_argument("--workspace", type=Path, required=True)
         research.add_argument("--source-repo", type=Path, required=True)
         research.add_argument("--target-repo", type=Path, required=True)

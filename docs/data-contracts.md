@@ -446,8 +446,8 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 ## 实验性研究重放
 
-[研究重放](research-replay.md)使用独立于生产 Registry replay 的格式与审核。
-当前仅用于工具自有 fixture；它不冻结 scope_v2 的数据、标签、特征、接口分类或实验协议。
+[研究重放 v1/v2](research-replay.md)使用独立于生产 Registry replay 的格式与审核。
+这两个版本仅用于工具自有 fixture；它们不冻结 scope_v2 的数据、标签、特征、接口分类或实验协议。
 严格模型为 [study_models.py](../src/counterguard/study_models.py)，对应 JSON Schema 位于
 [schemas/research-v1](../schemas/research-v1/)。旧 parser 不接受新授权/字段。
 
@@ -500,3 +500,21 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 本批共享静态定义核验、纯条款 evaluator 和 Docker 重放实现，没有改变 conjunction.v1 或 scope_v1。
 全包源码变化令需要当前结论的旧来源/特征/fit/review 链过期，须使用新 ID 重建各层下游；历史字节不改。
+
+## 单独获审的外部快照观察
+
+[外部观察](external-observations.md)使用独立 v3/v8，只接受 B1 和非空独立 stdout 见证。
+旧 fixture-only v1/v2/v6/v7 不扩大接受范围；新类型不能携带 fit、训练仓库或语义标签。
+
+| 层 / 版本 | 摘要依赖与独立重建 | 上游变化后的处理 |
+|---|---|---|
+| study-replay-plan.v3 | source/target/map/非空 witness/review 引用、guard 或 witness lane、B1、限额和封闭外部用途 | 新输入新 plan/目录；不把旧计划改版或借旧审核执行 |
+| study-review.v3 | 当前来源 Guard/Evidence/B/F/H、目标全树/闭包、完整映射、独立见证、I/O 类别、runner/policy、全包实现、真实 UTC 与可选前序事件 | 可信本机审核后追加新事件，调用方独立保留返回的摘要；不能从可变计划取得信任 |
+| study-admission.v3 | 当前重建事实和独立执行审核锚；execution_policy_not_semantic_label 固定解释 | 上游变化重新准入；撤回为 unknown/run=null，损坏输入拒绝；不能生成适用性或合规标签 |
+| Docker authorization v8 | 新用途、完整原 case、source H 与 target 提交分列、逐文件 pins、见证/review/admission/request/test/image/policy/实现 | 执行前后重建；沿用原封闭 Docker 路径，旧 parser 拒绝，不增加环境或本地执行通道 |
+| study-replay.v3 | 实际 admission、原始 Run/授权/JUnit、lane、真实时间和运行后核对 | 新目录保存；独立 verify 重建来源与原始日志，运行后漂移保留 Run 并 stale |
+
+见证可以只覆盖获审子集，完整 Guard 的原输入及异常/消息 oracle 不裁剪、不替换。
+见证通过只说明该子集观察一致；不能提升为整个 Guard 适用、目标完全合规或研究标签。
+源码变化使旧来源链失效时，原获批 H 字节未变可复用 H，在新 ID/目录重新 bind/capture/compile/review/replay；
+不需要也不允许靠补签旧记录或新造 owner 提交来规避。冻结 scope_v1、生产生命周期及旧产物保持原样。

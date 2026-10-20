@@ -1,0 +1,89 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-admission.v3",
+      "default": "study-admission.v3",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "applicable",
+        "inapplicable",
+        "unknown"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Witness Digest",
+      "type": "string"
+    },
+    "method": {
+      "const": "b1_always",
+      "default": "b1_always",
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "enum": [
+        "guard",
+        "witness"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "scope_interpretation": {
+      "const": "execution_policy_not_semantic_label",
+      "default": "execution_policy_not_semantic_label",
+      "title": "Scope Interpretation",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision",
+    "reason_code",
+    "source_digest",
+    "target_digest",
+    "map_digest",
+    "review_digest",
+    "witness_digest",
+    "lane",
+    "artifact_digest"
+  ],
+  "title": "StudyObservationAdmission",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

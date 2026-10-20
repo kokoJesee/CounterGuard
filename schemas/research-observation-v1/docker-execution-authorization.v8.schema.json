@@ -1,0 +1,250 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    },
+    "StudyInputOrigin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "source_contract",
+            "target_source"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "repository_identity_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Repository Identity Digest",
+          "type": "string"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Revision",
+          "type": "string"
+        },
+        "original_ref": {
+          "minLength": 1,
+          "title": "Original Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "origin",
+        "repository_identity_digest",
+        "revision",
+        "original_ref"
+      ],
+      "title": "StudyInputOrigin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "docker-execution-authorization.v8",
+      "default": "docker-execution-authorization.v8",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "external_snapshot_observation_only",
+      "default": "external_snapshot_observation_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "role": {
+      "const": "replay",
+      "default": "replay",
+      "title": "Role",
+      "type": "string"
+    },
+    "source_head": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Source Head",
+      "type": "string"
+    },
+    "target_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Target Revision",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Witness Digest",
+      "type": "string"
+    },
+    "admission_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Admission Digest",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Image Digest",
+      "type": "string"
+    },
+    "runner_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Runner Review Digest",
+      "type": "string"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "input_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "title": "Input Pins",
+      "type": "array"
+    },
+    "input_origins": {
+      "items": {
+        "$ref": "#/$defs/StudyInputOrigin"
+      },
+      "title": "Input Origins",
+      "type": "array"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "test_ref": {
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "known_case_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Known Case Ids",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "observation_policy": {
+      "const": "original_guard_and_reviewed_stdout_subset_no_labels.v1",
+      "default": "original_guard_and_reviewed_stdout_subset_no_labels.v1",
+      "title": "Observation Policy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_head",
+    "target_revision",
+    "source_digest",
+    "target_digest",
+    "map_digest",
+    "review_digest",
+    "witness_digest",
+    "admission_digest",
+    "plan_digest",
+    "image_digest",
+    "runner_review_digest",
+    "policy_digest",
+    "implementation_digests",
+    "request_digest",
+    "input_pins",
+    "input_origins",
+    "import_root",
+    "test_ref",
+    "test_digest",
+    "known_case_ids",
+    "artifact_digest"
+  ],
+  "title": "StudyObservationAuthorization",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,86 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "study-replay-plan.v3",
+      "default": "study-replay-plan.v3",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "external_snapshot_observation_only",
+      "default": "external_snapshot_observation_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "target_ref": {
+      "minLength": 1,
+      "title": "Target Ref",
+      "type": "string"
+    },
+    "map_ref": {
+      "minLength": 1,
+      "title": "Map Ref",
+      "type": "string"
+    },
+    "review_ref": {
+      "minLength": 1,
+      "title": "Review Ref",
+      "type": "string"
+    },
+    "witness_ref": {
+      "minLength": 1,
+      "title": "Witness Ref",
+      "type": "string"
+    },
+    "method": {
+      "const": "b1_always",
+      "default": "b1_always",
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "default": "guard",
+      "enum": [
+        "guard",
+        "witness"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "default": 10.0,
+      "exclusiveMinimum": 0,
+      "maximum": 30,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "observation_policy": {
+      "const": "original_guard_and_reviewed_stdout_subset_no_labels.v1",
+      "default": "original_guard_and_reviewed_stdout_subset_no_labels.v1",
+      "title": "Observation Policy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_ref",
+    "target_ref",
+    "map_ref",
+    "review_ref",
+    "witness_ref",
+    "artifact_digest"
+  ],
+  "title": "StudyObservationPlan",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

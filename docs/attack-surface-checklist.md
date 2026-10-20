@@ -191,3 +191,16 @@ H 原始契约及旧 Evidence 的当前过期拒绝；没有新增执行能力�
 没有用外部源码伪造 fixture context 或放宽 FORCE_COLOR/conftest/TTY。
 四条可推导见证与四条缺规范的长度输入分开保留，不形成自动标签；35 项既有映射/严格版本检查通过。
 这不是新的 W01 隔离攻击实测或 W04 外部授权验收，W01/W03/W04 的整体状态不变。
+
+[单独获审的外部观察 v3/v8](external-observations.md)现增加 W01/W03/W04 的受限覆盖：
+只允许 B1、完整原 Guard 和必需的独立 stdout 子集；旧 fixture-only 版本不接受新用途，
+拒绝 fit/训练/标签输入，可信执行审核锚与可变计划分离。
+来源/映射/见证/审核的同格式重签拒绝，撤回 unknown/run=null 不发现 Docker，晚到变化保留实际 Run 并 stale，
+均有[完整来源专项](../tests/unit/test_study_observation.py)；[工具自有真实 Docker 项](../tests/integration/test_study_observation.py)
+先验证 8-case/4-witness、宿主环境不转发、本地 executor/import 哨兵、原始 JUnit 及重复独立核验。
+
+[固定 termcolor → colored 实测](results/colored-observation-v1/README.md)随后使用独立外部审核：
+来源捕获/自检 4 容器、目标完整 Guard 两次及见证两次共 4 容器，总计 8，没有额外重跑。
+它新增一个固定外部观察实例，未提升生产生命周期、未分配研究标签、未冻结正式协议。
+原四项隔离攻击本批未重跑；恶意目标干扰 pytest/JUnit、原子快照、任意原生插件/依赖、
+远程身份/签名/防回滚及可信主机整体被控制仍未覆盖，W01/W03/W04 整体继续为部分。
