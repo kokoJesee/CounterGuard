@@ -185,3 +185,9 @@ For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立�
 原四项隔离攻击没有重跑；未执行外部目标、未新增正式研究标签、未提升生产 Candidate 权限。
 可信人工语义、谱系、身份/签名/防回滚、原子快照、任意插件/依赖和恶意目标干扰 JUnit 仍未覆盖，
 W01/W03/W04 的整体状态仍为部分，不因此声称全面通过。
+
+[colored 只读准入复核](results/colored-readiness-v1/README.md)重新检查固定全树/闭包、原8case映射、
+H 原始契约及旧 Evidence 的当前过期拒绝；没有新增执行能力。现有 fixture-only purpose 保持封闭，
+没有用外部源码伪造 fixture context 或放宽 FORCE_COLOR/conftest/TTY。
+四条可推导见证与四条缺规范的长度输入分开保留，不形成自动标签；35 项既有映射/严格版本检查通过。
+这不是新的 W01 隔离攻击实测或 W04 外部授权验收，W01/W03/W04 的整体状态不变。

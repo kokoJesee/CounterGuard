@@ -1,6 +1,8 @@
 # 候选来源与可行性
 
-状态：开发期来源探测，尚无纳入 scope_v2 的场景。最新[colored 源码/映射审核材料](../../results/colored-review-v1/README.md)已准备，维护者准入裁决与研究桥接仍待完成。
+状态：开发期来源探测，尚无纳入 scope_v2 的场景。[研究重放工程](../../research-fitted-replay.md)已限工具自有 fixture 验收；
+最新[colored 只读复核](../../results/colored-readiness-v1/README.md)补充当前闭包、环境与规范边界。
+随后获批的受限外部观察仍待独立版本实现与验收，尚未执行，整行语义未裁决。
 候选登记见 [candidates.jsonl](../../../benchmarks/v2/candidates.jsonl)，实测见[首批](../../results/scope-study-feasibility-v1/README.md)和[第二批回执](../../results/scope-study-feasibility-v2/README.md)。这些材料已被开发者阅读，不会再当作独立保管的未见留出集。
 
 ## 采集原则
@@ -144,3 +146,9 @@ colored 固定提交的 50 文件、12 文件闭包和 3 个钩子均已记录�
 拟合锚与执行锚独立，四方法共用来源/查询/映射/隔离检查，refusal 为 unknown，跳过不启动。
 旧 v1 learned 仍 unknown，不修改生产快照 Scope；外部分类/协议、标签、准入和语义裁决仍未完成。
 该工程链不增加已验证真实来源或完整跨项目研究场景，计数仍分别为 1 和 0。
+
+[当前只读复核](../../results/colored-readiness-v1/README.md)确认：50 文件完整树与 12 文件闭包仍可审读，
+原8case映射保持一致，H 内契约原始字节未变，历史 Evidence 则被当前验证器明确判 stale。
+两个实际定义的语法可诊断，不等于外部特征/context/标注已冻结。
+RGB 路径无需开放颜色环境，独立 non-TTY 见证不应附加 reset；四个长度错误输入仍缺明确规范 oracle。
+本批外部执行、标签与新场景均为0。候选见证与新外部用途的实施方案留本地，不因 fixture 工程已过而自动批准。
