@@ -200,8 +200,9 @@ def test_source_and_target_keep_distinct_authority_and_minimal_cases(study):
     assert auth["source_head"] == H and auth["target_revision"] == T
     assert len({p["origin"] for p in auth["input_origins"]}) == 2
     for old in [StandaloneAuthorization, StandaloneGuardAuthorization]:
-        with pytest.raises(ValidationError):
-            old.model_validate(auth)
+        with pytest.raises(ValidationError) as error:
+            old.model_validate_json(json.dumps(auth))
+        assert any(item["loc"] == ("schema_version",) for item in error.value.errors())
     assert source.case_ids == tuple(c.case_id for c in mapping.cases)
     with pytest.raises(ArtifactIntegrityError):
         session.replay(plan, Path("r1"))

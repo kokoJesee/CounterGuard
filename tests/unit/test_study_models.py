@@ -257,3 +257,54 @@ def test_cli_missing_inputs_are_sanitized_and_do_not_launch_processes(
     with pytest.raises(SystemExit) as error:
         main([*command, "--approve"])
     assert error.value.code == 2
+
+
+def test_deep_json_is_a_finite_failure_without_traceback_or_process(tmp_path, monkeypatch, capsys):
+    import subprocess
+    import sys
+
+    from counterguard.study_replay import StudySession
+    from scripts.run_scope_study import main
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("malformed JSON launched a process")
+
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    depth = sys.getrecursionlimit() + 100
+    (tmp_path / "deep.json").write_bytes(b'{"x":' + b"[" * depth + b"0" + b"]" * depth + b"}")
+    assert (
+        main(
+            [
+                "audit",
+                "--workspace",
+                str(tmp_path),
+                "--source-repo",
+                str(tmp_path),
+                "--target-repo",
+                str(tmp_path),
+                "--review-digest",
+                ZERO,
+                "--plan",
+                "deep.json",
+            ]
+        )
+        == 5
+    )
+    output = capsys.readouterr().out
+    assert "Traceback" not in output and str(tmp_path) not in output
+    source_repo, target_repo = tmp_path / "source", tmp_path / "target"
+    source_repo.mkdir()
+    target_repo.mkdir()
+    session = StudySession(source_repo, target_repo, tmp_path, ZERO)
+    plan = _seal(
+        StudyReplayPlan(
+            source_ref="deep.json",
+            target_ref="t.json",
+            map_ref="m.json",
+            review_ref="r.json",
+            method="b1_always",
+            artifact_digest=ZERO,
+        )
+    )
+    result = session.replay(plan, Path("invalid-json"))
+    assert result.integrity == "invalid" and result.run is None
