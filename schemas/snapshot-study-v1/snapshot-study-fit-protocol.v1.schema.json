@@ -1,0 +1,106 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-fit-protocol.v1",
+      "default": "snapshot-study-fit-protocol.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "protocol_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Protocol Id",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "source_project_group": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Source Project Group",
+      "type": "string"
+    },
+    "split_ref": {
+      "minLength": 1,
+      "title": "Split Ref",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "learner": {
+      "const": "conjunction.v1",
+      "default": "conjunction.v1",
+      "title": "Learner",
+      "type": "string"
+    },
+    "extractor": {
+      "const": "ast-features.snapshot-study.v1",
+      "default": "ast-features.snapshot-study.v1",
+      "title": "Extractor",
+      "type": "string"
+    },
+    "signature_algorithm": {
+      "const": "parameter-shape.study.v1",
+      "default": "parameter-shape.study.v1",
+      "title": "Signature Algorithm",
+      "type": "string"
+    },
+    "vocabulary_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Vocabulary Digest",
+      "type": "string"
+    },
+    "max_predicates": {
+      "const": 32,
+      "default": 32,
+      "title": "Max Predicates",
+      "type": "integer"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol_id",
+    "source_ref",
+    "source_digest",
+    "guard_digest",
+    "source_project_group",
+    "split_ref",
+    "split_digest",
+    "vocabulary_digest",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyFitProtocol",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

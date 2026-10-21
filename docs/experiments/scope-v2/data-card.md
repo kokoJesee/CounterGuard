@@ -207,3 +207,13 @@ owner H 只新增原六 case 契约；B 6 failed、F 6 passed，最小 Guard 保
 分组、留出或冻结协议。**真实来源修复 2，实际外部观察 pair 2，正式跨项目研究场景 0**；
 六个参数仍属于同一来源修复，不能按六个场景计数。快照 profile 尚未绑定获审的特征/fit 桥接，
 所以这条事实不能直接进入四方法正式评测。
+
+[完整快照复筛](../../results/snapshot-candidate-rescreen-v1/README.md)随后查询十个新仓库，并复查
+Tomli-W 与 ulid-transform。Tomli-W 原负缩进断言已完整准备为1case，但四个独立 TOML 目标均无原 indent 参数；
+五个新颜色目标的实际全树检查分别因包内未安装导入、包内 conftest 或单文件布局拒绝，pansi 的固定 Git 来源不确定。
+没有改调用、删包文件或扩大 profile。新增真实来源捕获/观察/正式场景均为0，保留2/2/0计数。
+研究语法诊断另确认 webcolors 的 Try 尚不支持，没有生成外部特征或标签。
+
+独立的[快照研究训练层](../../snapshot-study-fit.md)随后仅用自有fixture接通完整来源、目标、特征和fit。
+快速层1286通过，自有Git/Docker专项1通过、实际4个自有容器；四方法快照重放尚未接通。
+这些synthetic成员不计真实样本，外部用途不因这一步获得标签、训练或生产调度许可。

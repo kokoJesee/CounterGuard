@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- 新增仅限工具自有fixture的完整快照研究训练层：独立严格Schema、真实来源/目标重建、定义绑定和逐字段特征对账、
+  分立的源执行/拟合审核锚，以及initial/refined拟合与拒绝核验。原learner和语法范围不变，holdout没有读取入口。
+  [训练层验收](docs/results/snapshot-study-fit-fixture-v1/README.md)通过；四方法快照执行、外部标签和正式数据冻结尚未提供。
+
+- [完整快照复筛](docs/results/snapshot-candidate-rescreen-v1/README.md)复查两个既有来源、查询十个新仓库；
+  Tomli-W原1case可完整准备，但新增自然比较目标0，没有修改准入、执行候选或增加研究场景计数。
+
 - 完成固定 TerminalTextEffects → webcolors 外部快照观察：真实 B/F 捕获、六 case 最小 Guard 双向自检，
   以及目标原 Guard/自身 oracle 各两次重复；恰好 8 个外部 Docker 容器。结果不生成标签、fit 或生产权限，
   详见[有限回执](docs/results/tte-webcolors-observation-v1/README.md)。

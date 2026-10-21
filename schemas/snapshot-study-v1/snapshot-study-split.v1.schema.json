@@ -1,0 +1,173 @@
+{
+  "$defs": {
+    "StudyHoldoutCommitment": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "project_group": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Project Group",
+          "type": "string"
+        },
+        "repository_identity_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Repository Identity Digest",
+          "type": "string"
+        },
+        "target_key": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "sample_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Sample Digest",
+          "type": "string"
+        },
+        "label_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Label Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "project_group",
+        "repository_identity_digest",
+        "target_key",
+        "sample_digest",
+        "label_digest"
+      ],
+      "title": "StudyHoldoutCommitment",
+      "type": "object"
+    },
+    "StudyTrainMember": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "project_group": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Project Group",
+          "type": "string"
+        },
+        "repository_identity_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Repository Identity Digest",
+          "type": "string"
+        },
+        "target_key": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "sample_ref": {
+          "minLength": 1,
+          "title": "Sample Ref",
+          "type": "string"
+        },
+        "sample_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Sample Digest",
+          "type": "string"
+        },
+        "label_ref": {
+          "minLength": 1,
+          "title": "Label Ref",
+          "type": "string"
+        },
+        "label_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Label Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "project_group",
+        "repository_identity_digest",
+        "target_key",
+        "sample_ref",
+        "sample_digest",
+        "label_ref",
+        "label_digest"
+      ],
+      "title": "StudyTrainMember",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-split.v1",
+      "default": "snapshot-study-split.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "split_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Split Id",
+      "type": "string"
+    },
+    "holdout_exposure": {
+      "const": "tool_owned_known",
+      "default": "tool_owned_known",
+      "title": "Holdout Exposure",
+      "type": "string"
+    },
+    "initial": {
+      "items": {
+        "$ref": "#/$defs/StudyTrainMember"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Initial",
+      "type": "array"
+    },
+    "refinement_additions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/StudyTrainMember"
+      },
+      "maxItems": 32,
+      "title": "Refinement Additions",
+      "type": "array"
+    },
+    "holdout": {
+      "items": {
+        "$ref": "#/$defs/StudyHoldoutCommitment"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Holdout",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "split_id",
+    "initial",
+    "holdout",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudySplit",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

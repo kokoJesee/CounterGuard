@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "ScopeClause": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "anyOf": [
+            {
+              "enum": [
+                "contract_family",
+                "contract_version",
+                "interface_kind",
+                "symbol_signature",
+                "module_group"
+              ],
+              "type": "string"
+            },
+            {
+              "const": "ast_features",
+              "type": "string"
+            }
+          ],
+          "title": "Field"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "contains"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "title": "ScopeClause",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-learned-scope.v1",
+      "default": "snapshot-study-learned-scope.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "protocol_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Protocol Digest",
+      "type": "string"
+    },
+    "split_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Split Digest",
+      "type": "string"
+    },
+    "source_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "phase": {
+      "enum": [
+        "initial",
+        "refined"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "training_binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Training Binding Digest",
+      "type": "string"
+    },
+    "learning_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Learning Digest",
+      "type": "string"
+    },
+    "explanation_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Explanation Digest",
+      "type": "string"
+    },
+    "clauses": {
+      "items": {
+        "$ref": "#/$defs/ScopeClause"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Clauses",
+      "type": "array"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol_digest",
+    "split_digest",
+    "source_digest",
+    "guard_digest",
+    "review_digest",
+    "phase",
+    "training_binding_digest",
+    "learning_digest",
+    "explanation_digest",
+    "clauses",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyLearnedScope",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

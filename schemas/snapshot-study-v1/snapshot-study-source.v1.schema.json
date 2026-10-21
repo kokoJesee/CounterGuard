@@ -1,0 +1,113 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-source.v1",
+      "default": "snapshot-study-source.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "source_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "repository_identity_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Repository Identity Digest",
+      "type": "string"
+    },
+    "evidence_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Evidence Ref",
+      "type": "string"
+    },
+    "guard_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Guard Ref",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "evidence_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Evidence Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "source_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Review Digest",
+      "type": "string"
+    },
+    "buggy_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Buggy Commit",
+      "type": "string"
+    },
+    "fixed_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Fixed Commit",
+      "type": "string"
+    },
+    "head_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Head Commit",
+      "type": "string"
+    },
+    "case_ids": {
+      "items": {
+        "pattern": "^case_[a-f0-9]{24}$",
+        "type": "string"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Case Ids",
+      "type": "array"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_id",
+    "repository_identity_digest",
+    "evidence_ref",
+    "guard_ref",
+    "binding_digest",
+    "evidence_digest",
+    "guard_digest",
+    "source_review_digest",
+    "buggy_commit",
+    "fixed_commit",
+    "head_commit",
+    "case_ids",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudySource",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
