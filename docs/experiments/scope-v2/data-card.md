@@ -181,3 +181,9 @@ RGB 路径无需开放颜色环境，独立 non-TTY 见证不应附加 reset；�
 新增可准入来源/比较目标和正式跨项目场景均为 0；已有来源保持 1，正式场景保持 0。
 TTE 原测试另有 pytest.param 投影边界，不能概括成“只补这一项就能解锁”；
 没有删 case、抬高预算、执行目标或冻结数据，当前结论仍为 insufficient_data。
+
+[后续定点续查](../../results/input-validation-search-v3/README.md)再核查 9 个新仓库：
+base32-lib 完整 Git 树与现有静态角色已实际通过，原 2 条拒绝断言完整可提取，但尚无合格来源修复配对；
+ulid-transform 新找到现代真实漏拒绝 B/F，原 fixture/分发测试和动态实现选择仍未支持。
+已有 [TTE → webcolors 六个输入](../../research/hex-validation-comparability.md)取得独立规范覆盖依据，
+导入形状补查仍 unknown，没有执行、标签或正式场景。接受范围保持原样；正式场景仍为 0。
