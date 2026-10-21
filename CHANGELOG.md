@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 新增独立外部完整快照观察 API：单独的来源/比较审核锚、许可与 URL pin、外部 Evidence/Guard/原样映射及自身 oracle；复用固定 Docker transport。旧 fixture 接口与 Schema 保持原接受范围。该用途只提供 B1 观察，不生成研究标签、四方法 fit 或生产权限，详见[边界](docs/external-snapshot-observations.md)。
+
 - 新增工具自有独立快照比较：完整目标、全最小 case 原样映射、独立自身 witness 与双审核锚，B1/B2 共用审核 Docker，跳过零启动、运行后漂移保留 Run；新快照 learned 在未绑定 fit 时明确 unknown。修正独立快照对 `__future__` 的标准库误判，未放宽旧 profile。详见[接口](docs/snapshot-comparisons.md)及[验收](docs/results/snapshot-comparison-fixture-v1/README.md)；外部执行/标签仍未新增。
 
 - 新增独立 `source-only-python-snapshot.v1`：完整提交清单、分批容量读取、有限字面量 `pytest.param(..., id=...)` 投影、B/F/H 绑定及分立审核锚。`research-snapshot` 仅在已审核 Docker 中捕获、自检和重放工具自有 fixture；不接入外部用途、研究标签或生产调度。旧 profile/冻结数据不变，详见[接口](docs/research-snapshots.md)与[验收](docs/results/research-snapshot-fixture-v1/README.md)。

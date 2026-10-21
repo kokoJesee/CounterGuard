@@ -1,0 +1,273 @@
+{
+  "$defs": {
+    "RunnerReview": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "runner-review.v1",
+          "default": "runner-review.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "runner_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+          "title": "Runner Id",
+          "type": "string"
+        },
+        "profile": {
+          "enum": [
+            "root-pytest8.v1",
+            "validators-src-pytest9.v1"
+          ],
+          "title": "Profile",
+          "type": "string"
+        },
+        "image_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Image Digest",
+          "type": "string"
+        },
+        "pytest_version": {
+          "enum": [
+            "8.4.2",
+            "9.0.3"
+          ],
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "base_registry_digests": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Base Registry Digests",
+          "type": "array"
+        },
+        "build_receipt_ref": {
+          "minLength": 1,
+          "title": "Build Receipt Ref",
+          "type": "string"
+        },
+        "build_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Build Receipt Digest",
+          "type": "string"
+        },
+        "lock_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Lock Digest",
+          "type": "string"
+        },
+        "container_source_digests": {
+          "additionalProperties": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "minLength": 1
+          },
+          "title": "Container Source Digests",
+          "type": "object"
+        },
+        "attack_receipt_ref": {
+          "minLength": 1,
+          "title": "Attack Receipt Ref",
+          "type": "string"
+        },
+        "attack_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Receipt Digest",
+          "type": "string"
+        },
+        "attack_log_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Log Digest",
+          "type": "string"
+        },
+        "attacks_passed": {
+          "const": 4,
+          "default": 4,
+          "title": "Attacks Passed",
+          "type": "integer"
+        },
+        "reviewed_at": {
+          "format": "date-time",
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runner_id",
+        "profile",
+        "image_digest",
+        "pytest_version",
+        "base_registry_digests",
+        "build_receipt_ref",
+        "build_receipt_digest",
+        "lock_digest",
+        "container_source_digests",
+        "attack_receipt_ref",
+        "attack_receipt_digest",
+        "attack_log_digest",
+        "reviewed_at",
+        "artifact_digest"
+      ],
+      "title": "RunnerReview",
+      "type": "object"
+    },
+    "SnapshotBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "blob_bytes": {
+          "default": 8388608,
+          "maximum": 8388608,
+          "minimum": 1,
+          "title": "Blob Bytes",
+          "type": "integer"
+        },
+        "tree_bytes": {
+          "default": 134217728,
+          "maximum": 134217728,
+          "minimum": 1,
+          "title": "Tree Bytes",
+          "type": "integer"
+        },
+        "file_count": {
+          "default": 2048,
+          "maximum": 2048,
+          "minimum": 1,
+          "title": "File Count",
+          "type": "integer"
+        }
+      },
+      "title": "SnapshotBudget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "external-snapshot-review.v1",
+      "default": "external-snapshot-review.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile": {
+      "const": "source-only-python-snapshot.v1",
+      "default": "source-only-python-snapshot.v1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "reviewed_external_snapshot_observation_only",
+      "default": "reviewed_external_snapshot_observation_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "review_kind": {
+      "const": "execution",
+      "default": "execution",
+      "title": "Review Kind",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "runner": {
+      "$ref": "#/$defs/RunnerReview"
+    },
+    "budget": {
+      "$ref": "#/$defs/SnapshotBudget"
+    },
+    "timeout_seconds": {
+      "exclusiveMinimum": 0,
+      "maximum": 30,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "repository_url": {
+      "maxLength": 512,
+      "minLength": 22,
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+      "title": "Repository Url",
+      "type": "string"
+    },
+    "license_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "License Ref",
+      "type": "string"
+    },
+    "license_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "License Digest",
+      "type": "string"
+    },
+    "semantic_authority": {
+      "const": "execution_review_not_semantic_labels",
+      "default": "execution_review_not_semantic_labels",
+      "title": "Semantic Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "reason",
+    "binding_digest",
+    "runner",
+    "budget",
+    "timeout_seconds",
+    "policy_digest",
+    "implementation_digests",
+    "artifact_digest",
+    "repository_url",
+    "license_ref",
+    "license_digest"
+  ],
+  "title": "ExternalSnapshotReview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

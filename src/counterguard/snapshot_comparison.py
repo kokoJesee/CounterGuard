@@ -62,6 +62,10 @@ def render_comparison_test(facts, lane):
 
 
 def decide_comparison(plan, facts, review):
+    return _decide_comparison(plan, facts, review, SnapshotComparisonAdmission)
+
+
+def _decide_comparison(plan, facts, review, admission_model):
     decision, reason = "applicable", "comparison_unscoped_method"
     if review.action != "approve":
         decision, reason = "unknown", "comparison_review_withdrawn"
@@ -75,7 +79,7 @@ def decide_comparison(plan, facts, review):
         else:
             decision, reason = "inapplicable", "comparison_interface_differs"
     return seal(
-        SnapshotComparisonAdmission(
+        admission_model(
             plan_digest=plan.artifact_digest,
             guard_digest=facts.guard.artifact_digest,
             target_digest=facts.target.artifact_digest,
@@ -103,6 +107,17 @@ class SnapshotComparisonSession:
     target_repo: Path
     review_anchor: str
 
+    _PLAN = SnapshotComparisonPlan
+    _REVIEW = SnapshotComparisonReview
+    _AUTHORIZATION = SnapshotComparisonAuthorization
+    _RESULT = SnapshotComparisonReplay
+
+    def _facts(self, plan):
+        return load_comparison_facts(self.source, self.target_repo, plan)
+
+    def _decision(self, plan, facts, review):
+        return decide_comparison(plan, facts, review)
+
     def __post_init__(self):
         reject_links(self.target_repo)
         require(
@@ -115,7 +130,8 @@ class SnapshotComparisonSession:
         TypeAdapter(Digest).validate_python(self.review_anchor)
 
     def _checked_plan(self, value):
-        value = SnapshotComparisonPlan.model_validate_json(canonical_json_bytes(value))
+        require(type(value) is self._PLAN, "comparison_plan_type_required")
+        value = self._PLAN.model_validate_json(canonical_json_bytes(value))
         require(
             value.artifact_digest == digest_json_artifact(value), "comparison_plan_digest_mismatch"
         )
@@ -125,7 +141,7 @@ class SnapshotComparisonSession:
         plan = self._checked_plan(plan)
         review = read_value(
             self.source.workspace / plan.review_ref,
-            SnapshotComparisonReview,
+            self._REVIEW,
             expected_digest=self.review_anchor,
         )
         require(
@@ -137,7 +153,7 @@ class SnapshotComparisonSession:
             and review.policy_digest == digest_json_artifact(DockerPolicyV1()),
             "comparison_implementation_or_policy_stale",
         )
-        facts = load_comparison_facts(self.source, self.target_repo, plan)
+        facts = self._facts(plan)
         require(
             (
                 review.source_guard_digest,
@@ -169,7 +185,7 @@ class SnapshotComparisonSession:
             plan.timeout_seconds <= review.timeout_seconds <= facts.source_review.timeout_seconds,
             "comparison_timeout_exceeds_reviewed_budget",
         )
-        return decide_comparison(plan, facts, review), facts, review
+        return self._decision(plan, facts, review), facts, review
 
     def audit(self, plan):
         return self._load(plan)[0]
@@ -240,7 +256,7 @@ class SnapshotComparisonSession:
                     )
                 )
         return seal(
-            SnapshotComparisonAuthorization(
+            self._AUTHORIZATION(
                 source_head=facts.binding.head_commit,
                 target_revision=facts.target.manifest.commit,
                 source_review_digest=self.source.trusted_digest,
@@ -295,7 +311,7 @@ class SnapshotComparisonSession:
             else "skipped_" + admission.decision
         )
         return seal(
-            SnapshotComparisonReplay(
+            self._RESULT(
                 created_at=datetime.now(UTC),
                 plan_ref=self.source._ref(directory / "plan.json"),
                 plan_digest=plan.artifact_digest,
@@ -379,7 +395,7 @@ class SnapshotComparisonSession:
     def verify(self, path):
         path = Path(path)
         path = path if path.is_absolute() else self.source.workspace / path
-        value = read_value(path, SnapshotComparisonReplay)
+        value = read_value(path, self._RESULT)
         directory = path.resolve().parent
         require(
             value.plan_ref == self.source._ref(directory / "plan.json")
@@ -387,7 +403,7 @@ class SnapshotComparisonSession:
             and value.comparison_review_digest == self.review_anchor,
             "comparison_result_layout_or_anchor_changed",
         )
-        plan = read_value(directory / "plan.json", SnapshotComparisonPlan)
+        plan = read_value(directory / "plan.json", self._PLAN)
         admission, facts, review = self._load(plan)
         require(
             value.plan_digest == plan.artifact_digest
@@ -413,9 +429,7 @@ class SnapshotComparisonSession:
                 "comparison_execution_layout_mismatch",
             )
             request = self._request(plan, directory / "runtime", facts)
-            authorization = read_value(
-                directory / "authorization.json", SnapshotComparisonAuthorization
-            )
+            authorization = read_value(directory / "authorization.json", self._AUTHORIZATION)
             require(
                 authorization == self._authorize(plan, request, (admission, facts, review)),
                 "comparison_authorization_not_reconstructable",

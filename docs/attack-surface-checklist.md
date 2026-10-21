@@ -149,6 +149,12 @@ W04 整体保持**部分**，不标为全面已测。
 
 随后[独立比较资格](results/snapshot-comparison-fixture-v1/README.md)增加新 target/map/own-witness/review/plan/admission/authorization/replay：W02/W03 覆盖目标完整提交、全最小 case 原样映射、独立 oracle 不改输入；W01 覆盖原 transport 上的 9 个自有实际容器、跳过真实零启动及迟到修改保留 Run；W04 覆盖来源锚与比较锚分开、错误锚和新旧类型拒绝。见[纯专项](../tests/unit/test_snapshot_comparison.py)、[Git 专项](../tests/integration/test_snapshot_comparison_data.py)与 [Docker 专项](../tests/integration/test_snapshot_comparison_docker.py)。没有重跑原六项 transport 攻击，不新增外部用途、生产权限或标签；三个整体状态仍为部分。
 
+[独立外部完整快照用途](external-snapshot-observations.md)另经[自有 fixture 资格](results/external-snapshot-fixture-v1/README.md)：
+W01 复跑网络/写入/环境/时间/内存/PID 六类实际攻击；W03 验证原配置/conftest 隔离、完整包与原最小 case；
+W04 验证外部/fixture 的 JSON 与 Python 实例类型分离、源与目标双锚、许可 pin、撤回零启动和晚到变化保留 Run。
+本批实际 30 个自有容器（新用途 21、旧用途回归 9），外部执行 0，不产生标签或生产权限。
+三个整体状态仍为部分；这份资格不关闭远程身份/签名、最新撤回、防回滚或容器内 JUnit 干扰。
+
 异常消息 oracle 的补充边界见[受限语法](literal-message-oracles.md)与[专项测试](../tests/unit/test_exception_match.py)：扫描不执行模式表达式或编译任意 regex；复杂模式明确 unsupported，旧模型不能忽略消息字段。新捕获/Guard/Registry 版本绑定原始 H 投影，消息修改后重签仍不能调度。该项不扩大 legacy、插件、依赖或 CI 权限支持，W01/W03/W04 的其余未覆盖项保持原状态。
 
 runner 与固定仓库统一入口补充：[两类镜像各四项复验](results/runner-catalog-v1/README.md)，[目录与错误镜像拒绝测试](../tests/unit/test_runner_catalog.py)，[新运行目录授权 v3 测试](../tests/unit/test_repository_verify.py)。新目录由代码 pin，发现仅 inspect、不执行镜像；跨未经审核仓库/布局仍 unknown。真实重复重放的独立来源审核由 [显式 opt-in 专项](../tests/integration/test_repository_verify_live.py) 覆盖，只有提供实际 manifest/两份报告时才运行。

@@ -1,0 +1,200 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "external-snapshot-comparison-authorization.v1",
+      "default": "external-snapshot-comparison-authorization.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "reviewed_external_snapshot_observation_only",
+      "default": "reviewed_external_snapshot_observation_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "source_head": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Source Head",
+      "type": "string"
+    },
+    "target_revision": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Target Revision",
+      "type": "string"
+    },
+    "source_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Review Digest",
+      "type": "string"
+    },
+    "comparison_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Comparison Review Digest",
+      "type": "string"
+    },
+    "source_binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Binding Digest",
+      "type": "string"
+    },
+    "source_guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Guard Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "target_manifest_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Manifest Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Witness Digest"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "admission_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Admission Digest",
+      "type": "string"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Image Digest",
+      "type": "string"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "input_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "title": "Input Pins",
+      "type": "array"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "test_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_head",
+    "target_revision",
+    "source_review_digest",
+    "comparison_review_digest",
+    "source_binding_digest",
+    "source_guard_digest",
+    "target_digest",
+    "target_manifest_digest",
+    "map_digest",
+    "witness_digest",
+    "plan_digest",
+    "admission_digest",
+    "image_digest",
+    "policy_digest",
+    "implementation_digests",
+    "request_digest",
+    "input_pins",
+    "import_root",
+    "test_ref",
+    "test_digest",
+    "artifact_digest"
+  ],
+  "title": "ExternalComparisonAuthorization",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

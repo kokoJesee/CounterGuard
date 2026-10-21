@@ -1,0 +1,271 @@
+{
+  "$defs": {
+    "FilePin": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "enum": [
+            "base",
+            "head"
+          ],
+          "title": "Revision",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "FilePin",
+      "type": "object"
+    },
+    "SnapshotBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "blob_bytes": {
+          "default": 8388608,
+          "maximum": 8388608,
+          "minimum": 1,
+          "title": "Blob Bytes",
+          "type": "integer"
+        },
+        "tree_bytes": {
+          "default": 134217728,
+          "maximum": 134217728,
+          "minimum": 1,
+          "title": "Tree Bytes",
+          "type": "integer"
+        },
+        "file_count": {
+          "default": 2048,
+          "maximum": 2048,
+          "minimum": 1,
+          "title": "File Count",
+          "type": "integer"
+        }
+      },
+      "title": "SnapshotBudget",
+      "type": "object"
+    },
+    "SnapshotManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "research-snapshot-manifest.v1",
+          "default": "research-snapshot-manifest.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Commit",
+          "type": "string"
+        },
+        "budget": {
+          "$ref": "#/$defs/SnapshotBudget"
+        },
+        "total_bytes": {
+          "maximum": 134217728,
+          "minimum": 0,
+          "title": "Total Bytes",
+          "type": "integer"
+        },
+        "files": {
+          "items": {
+            "$ref": "#/$defs/FilePin"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "sizes": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Sizes",
+          "type": "object"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "commit",
+        "budget",
+        "total_bytes",
+        "files",
+        "sizes",
+        "artifact_digest"
+      ],
+      "title": "SnapshotManifest",
+      "type": "object"
+    },
+    "SnapshotTargetEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "target_module": {
+          "maxLength": 256,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+          "title": "Target Module",
+          "type": "string"
+        },
+        "target_symbol": {
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "title": "Target Symbol",
+          "type": "string"
+        },
+        "source_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "import_root": {
+          "enum": [
+            ".",
+            "src"
+          ],
+          "title": "Import Root",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_module",
+        "target_symbol",
+        "source_ref",
+        "import_root"
+      ],
+      "title": "SnapshotTargetEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "external-snapshot-target.v1",
+      "default": "external-snapshot-target.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile": {
+      "const": "source-only-python-snapshot.v1",
+      "default": "source-only-python-snapshot.v1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "target_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Target Id",
+      "type": "string"
+    },
+    "repository_identity_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Repository Identity Digest",
+      "type": "string"
+    },
+    "entry": {
+      "$ref": "#/$defs/SnapshotTargetEntry"
+    },
+    "manifest": {
+      "$ref": "#/$defs/SnapshotManifest"
+    },
+    "package_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 2048,
+      "minItems": 1,
+      "title": "Package Refs",
+      "type": "array"
+    },
+    "license_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "License Ref",
+      "type": "string"
+    },
+    "license_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "License Digest",
+      "type": "string"
+    },
+    "interface_kind": {
+      "enum": [
+        "value_return",
+        "stdout_write"
+      ],
+      "title": "Interface Kind",
+      "type": "string"
+    },
+    "interface_basis_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Interface Basis Ref",
+      "type": "string"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "repository_url": {
+      "maxLength": 512,
+      "minLength": 22,
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+      "title": "Repository Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_id",
+    "repository_identity_digest",
+    "entry",
+    "manifest",
+    "package_refs",
+    "license_ref",
+    "license_digest",
+    "interface_kind",
+    "interface_basis_ref",
+    "implementation_digests",
+    "artifact_digest",
+    "repository_url"
+  ],
+  "title": "ExternalSnapshotTarget",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

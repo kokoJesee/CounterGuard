@@ -1,0 +1,148 @@
+{
+  "$defs": {
+    "ExecutionInputPin": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "ExecutionInputPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "external-snapshot-authorization.v1",
+      "default": "external-snapshot-authorization.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile": {
+      "const": "source-only-python-snapshot.v1",
+      "default": "source-only-python-snapshot.v1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "purpose": {
+      "enum": [
+        "external_snapshot_capture",
+        "external_snapshot_guard_check"
+      ],
+      "title": "Purpose",
+      "type": "string"
+    },
+    "backend": {
+      "const": "docker",
+      "default": "docker",
+      "title": "Backend",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "target_manifest_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Manifest Digest",
+      "type": "string"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "image_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Image Digest",
+      "type": "string"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "input_pins": {
+      "items": {
+        "$ref": "#/$defs/ExecutionInputPin"
+      },
+      "title": "Input Pins",
+      "type": "array"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "test_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Test Ref",
+      "type": "string"
+    },
+    "test_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Test Digest",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "purpose",
+    "review_digest",
+    "binding_digest",
+    "target_manifest_digest",
+    "implementation_digests",
+    "image_digest",
+    "policy_digest",
+    "request_digest",
+    "input_pins",
+    "import_root",
+    "test_ref",
+    "test_digest",
+    "artifact_digest"
+  ],
+  "title": "ExternalSnapshotAuthorization",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

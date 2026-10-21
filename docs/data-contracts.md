@@ -553,3 +553,20 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 输入/标签/项目/公式/实现变化需新投影；verify 从完整输入重算，不接受重签假计数。
 无时间、训练、文件引用授权或目标执行；相同字节输出幂等，不同字节不得覆盖。
 它不能证明输入标签语义、真实运行来源、正式协议或研究主结论，也不把外部观察转换为实验矩阵。
+
+## 完整外部快照的独立观察
+
+[独立外部用途](external-snapshot-observations.md)使用新 `external-snapshot-*.v1` 类型；
+包范围沿用 source-only-python-snapshot.v1，旧 fixture 的审核/parser/CLI 不扩大接受范围。
+中性的 contract/binding 不赋予执行权，外部源仍须重建 H blob 和完整 B/F/H。
+
+| 层 | 摘要依赖与重建 | 上游变化后的处理 |
+|---|---|---|
+| external source review | 当前 binding、B/F/H LICENSE pin、独立 URL 声明、runner/policy/预算/超时、实现、实际审核时间 | 新审核及调用方独立锚；URL 不证明所有权 |
+| authorization / evidence / guard | 新 capture/selfcheck 用途、源审核锚、原 H 契约、包与 request/test pins、原始 Run/JUnit、实际最小失败子集 | 新 ID/目录；不重签旧事实；旧 fixture parser 拒绝 |
+| target / map / own-witness | 完整固定目标与 URL/许可/接口依据，整个最小 case 原样调用，独立自身 oracle 和目标提交内依据 | 任一输入变化重建目标、映射、见证及下游；不由观察生成标签 |
+| comparison review / plan | 另一可信锚，来源审核/Guard/binding、target/map/witness、B1/lane、runner/policy/实现/超时 | 独立重新审核；withdraw 为 unknown，不能借来源锚自行批准目标 |
+| admission / authorization / replay | 两锚与全来源、原契约/目标包、实际 Run/JUnit、晚到变化检查 | 每次运行前后重建；跳过 run=null；晚到漂移保留 Run 并 stale |
+
+本版本只提供 B1 两条观察，不产生学习 Scope、标签、fit、split、正式研究协议或生产 Registry 权限。
+全包源码变化使当前使用的旧链过期，须按各层规则新物化；历史字节、冻结 scope_v1 与发布标签保持原样。

@@ -1,0 +1,99 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "external-snapshot-comparison-plan.v1",
+      "default": "external-snapshot-comparison-plan.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "reviewed_external_snapshot_observation_only",
+      "default": "reviewed_external_snapshot_observation_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "evidence_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Evidence Ref",
+      "type": "string"
+    },
+    "guard_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Guard Ref",
+      "type": "string"
+    },
+    "target_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Target Ref",
+      "type": "string"
+    },
+    "map_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Map Ref",
+      "type": "string"
+    },
+    "review_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Review Ref",
+      "type": "string"
+    },
+    "witness_ref": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Witness Ref"
+    },
+    "method": {
+      "const": "b1_always",
+      "default": "b1_always",
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "default": "guard",
+      "enum": [
+        "guard",
+        "own_contract"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "default": 10.0,
+      "exclusiveMinimum": 0,
+      "maximum": 30,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_ref",
+    "guard_ref",
+    "target_ref",
+    "map_ref",
+    "review_ref",
+    "artifact_digest"
+  ],
+  "title": "ExternalComparisonPlan",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

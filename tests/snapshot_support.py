@@ -32,7 +32,9 @@ def assert_snapshot_attack_observed(run, behavior):
         assert marker in messages
 
 
-def snapshot_history(workspace, *, large_media=False, behavior="normal", fixture_marker=True):
+def snapshot_history(
+    workspace, *, large_media=False, behavior="normal", fixture_marker=True, license_text=None
+):
     repo = workspace / "repo"
     repo.mkdir()
     git(repo, "init", "-b", "main")
@@ -40,6 +42,8 @@ def snapshot_history(workspace, *, large_media=False, behavior="normal", fixture
     git(repo, "config", "user.email", "fixture@example.invalid")
     if fixture_marker:
         (repo / FIXTURE_REF).write_bytes(FIXTURE_MARKER)
+    if license_text is not None:
+        (repo / "LICENSE").write_text(license_text, encoding="utf-8")
     package = repo / "src/snapshot_sample"
     package.mkdir(parents=True)
     (package / "__init__.py").write_text(

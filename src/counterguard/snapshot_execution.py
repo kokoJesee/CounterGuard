@@ -91,6 +91,18 @@ class SnapshotSession:
     review_path: Path
     trusted_digest: str
 
+    # Closed concrete session classes select their own artifact namespace. No
+    # artifact, CLI flag or constructor parameter can change these authorities.
+    _AUTHORIZATION = SnapshotAuthorization
+    _EVIDENCE = SnapshotEvidence
+    _GUARD = SnapshotGuard
+    _REPLAY_RESULT = SnapshotReplay
+    _CAPTURE = "fixture_capture"
+    _GUARD_CHECK = "fixture_guard_check"
+    _REPLAY = "fixture_replay"
+    _PURPOSES = frozenset({_CAPTURE, _GUARD_CHECK, _REPLAY})
+    _FAILURE_SCHEMA = "research-snapshot-failure.v1"
+
     def __post_init__(self):
         for path in (self.repo, self.workspace, self.binding_path, self.review_path):
             reject_links(path)
@@ -151,7 +163,7 @@ class SnapshotSession:
         return PytestRunRequest(
             role=(
                 RunRole.REPLAY
-                if purpose == "fixture_replay"
+                if purpose == self._REPLAY
                 else {"buggy": RunRole.BUGGY, "fixed": RunRole.FIXED}[role]
             ),
             contract_id=contract.contract_id,
@@ -173,7 +185,7 @@ class SnapshotSession:
 
     def _authorize(self, request, binding, review, role, case_ids, purpose):
         require(
-            purpose in {"fixture_capture", "fixture_guard_check", "fixture_replay"},
+            purpose in self._PURPOSES,
             "snapshot_purpose_forbidden",
         )
         payload = self._payload(binding, role, case_ids)
@@ -214,7 +226,7 @@ class SnapshotSession:
                 )
             )
         return seal(
-            SnapshotAuthorization(
+            self._AUTHORIZATION(
                 purpose=purpose,
                 review_digest=review.artifact_digest,
                 binding_digest=binding.artifact_digest,
@@ -262,7 +274,7 @@ class SnapshotSession:
         request = self._request(
             runtime, binding, review, role, case_ids, run_id="run_snapshot", purpose=purpose
         )
-        authorization = read_value(self.workspace / item.authorization_ref, SnapshotAuthorization)
+        authorization = read_value(self.workspace / item.authorization_ref, self._AUTHORIZATION)
         require(
             authorization == self._authorize(request, binding, review, role, case_ids, purpose),
             "snapshot_run_authorization_mismatch",
@@ -313,14 +325,14 @@ class SnapshotSession:
         ids = tuple(c.case_id for c in binding.contract.cases)
         try:
             buggy = self._execute(
-                directory / "b", role="buggy", case_ids=ids, purpose="fixture_capture"
+                directory / "b", role="buggy", case_ids=ids, purpose=self._CAPTURE
             )
             fixed = self._execute(
-                directory / "f", role="fixed", case_ids=ids, purpose="fixture_capture"
+                directory / "f", role="fixed", case_ids=ids, purpose=self._CAPTURE
             )
             failed, reasons = _reproduction(buggy.run, fixed.run, binding.contract)
             value = seal(
-                SnapshotEvidence(
+                self._EVIDENCE(
                     evidence_id=evidence_id,
                     created_at=datetime.now(UTC),
                     binding_digest=binding.artifact_digest,
@@ -343,7 +355,7 @@ class SnapshotSession:
     def _failure(self, directory, operation, error):
         # Preserve every completed raw run. Do not re-sign it as a successful result.
         value = {
-            "schema_version": "research-snapshot-failure.v1",
+            "schema_version": self._FAILURE_SCHEMA,
             "operation": operation,
             "execution_status": "incomplete_or_rejected",
             "error_type": type(error).__name__,
@@ -355,7 +367,7 @@ class SnapshotSession:
 
     def verify_evidence(self, path):
         binding, review = self.context()
-        value = read_value(path, SnapshotEvidence)
+        value = read_value(path, self._EVIDENCE)
         require(
             value.binding_digest == binding.artifact_digest
             and value.review_digest == review.artifact_digest
@@ -369,7 +381,7 @@ class SnapshotSession:
                 item.workspace_ref == directory + ("/b" if role == "buggy" else "/f"),
                 "snapshot_evidence_run_layout",
             )
-            self._verify_execution(item, binding, review, role, ids, "fixture_capture")
+            self._verify_execution(item, binding, review, role, ids, self._CAPTURE)
         failed, reasons = _reproduction(value.buggy.run, value.fixed.run, binding.contract)
         require(
             (value.failing_case_ids, value.rejection_reasons, value.reproduced)
@@ -387,10 +399,10 @@ class SnapshotSession:
             binding, review = self.context()
             ids = evidence.failing_case_ids
             buggy = self._execute(
-                directory / "b", role="buggy", case_ids=ids, purpose="fixture_guard_check"
+                directory / "b", role="buggy", case_ids=ids, purpose=self._GUARD_CHECK
             )
             fixed = self._execute(
-                directory / "f", role="fixed", case_ids=ids, purpose="fixture_guard_check"
+                directory / "f", role="fixed", case_ids=ids, purpose=self._GUARD_CHECK
             )
             selected = binding.contract.model_copy(
                 update={"cases": tuple(c for c in binding.contract.cases if c.case_id in ids)}
@@ -398,7 +410,7 @@ class SnapshotSession:
             failed, reasons = _reproduction(buggy.run, fixed.run, selected)
             require(not reasons and failed == ids, "snapshot_minimal_guard_self_check_failed")
             guard = seal(
-                SnapshotGuard(
+                self._GUARD(
                     guard_id=guard_id,
                     created_at=datetime.now(UTC),
                     evidence_digest=evidence.artifact_digest,
@@ -420,7 +432,7 @@ class SnapshotSession:
     def verify_guard(self, path, *, evidence_path):
         evidence = self.verify_evidence(evidence_path)
         binding, review = self.context()
-        guard = read_value(path, SnapshotGuard)
+        guard = read_value(path, self._GUARD)
         require(
             evidence.reproduced
             and guard.evidence_digest == evidence.artifact_digest
@@ -437,9 +449,7 @@ class SnapshotSession:
                 item.workspace_ref == directory + ("/b" if role == "buggy" else "/f"),
                 "snapshot_guard_run_layout",
             )
-            self._verify_execution(
-                item, binding, review, role, guard.case_ids, "fixture_guard_check"
-            )
+            self._verify_execution(item, binding, review, role, guard.case_ids, self._GUARD_CHECK)
         selected = binding.contract.model_copy(
             update={
                 "cases": tuple(c for c in binding.contract.cases if c.case_id in guard.case_ids)
@@ -458,10 +468,10 @@ class SnapshotSession:
         try:
             binding, review = self.context()
             item = self._execute(
-                directory / "run", role=role, case_ids=guard.case_ids, purpose="fixture_replay"
+                directory / "run", role=role, case_ids=guard.case_ids, purpose=self._REPLAY
             )
             value = seal(
-                SnapshotReplay(
+                self._REPLAY_RESULT(
                     guard_digest=guard.artifact_digest,
                     evidence_digest=guard.evidence_digest,
                     review_digest=review.artifact_digest,
@@ -483,7 +493,7 @@ class SnapshotSession:
     def verify_replay(self, path, *, guard_path, evidence_path):
         guard = self.verify_guard(guard_path, evidence_path=evidence_path)
         binding, review = self.context()
-        value = read_value(path, SnapshotReplay)
+        value = read_value(path, self._REPLAY_RESULT)
         require(
             value.guard_digest == guard.artifact_digest
             and value.evidence_digest == guard.evidence_digest
@@ -494,7 +504,7 @@ class SnapshotSession:
             "snapshot_replay_source_or_layout_mismatch",
         )
         self._verify_execution(
-            value.execution, binding, review, value.source_role, guard.case_ids, "fixture_replay"
+            value.execution, binding, review, value.source_role, guard.case_ids, self._REPLAY
         )
         return value
 

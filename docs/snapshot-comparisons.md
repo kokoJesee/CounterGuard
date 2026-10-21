@@ -2,7 +2,9 @@
 
 `research-snapshot comparison` 将[独立研究快照](research-snapshots.md)的最小 Guard 重放到另一个固定提交的工具自有目标上。来源的原输入、异常和消息不变；目标自身的 oracle 独立观察，不替换原 Guard。
 
-用途固定为 `tool_owned_snapshot_comparison_only`。这不是外部项目授权、生产 Scope 或正式研究数据；旧快照/研究/Registry parser 不接受这些新格式。外部用途仍须另行实现和批准，不能给真实仓库添加 fixture 标记以绕过边界。
+用途固定为 `tool_owned_snapshot_comparison_only`。这不是外部项目授权、生产 Scope 或正式研究数据；旧快照/研究/Registry parser 不接受这些新格式。外部用途须采用独立类型、实现和批准，不能给真实仓库添加 fixture 标记以绕过边界。
+
+另有[独立外部观察 API](external-snapshot-observations.md)，不改变本页命令的 fixture 限制。
 
 ## 两条观察分开
 

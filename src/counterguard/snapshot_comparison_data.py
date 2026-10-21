@@ -45,6 +45,34 @@ def inspect_snapshot_target(
     output=None,
     budget=SNAPSHOT_BUDGET,
 ):
+    return _inspect_snapshot_target(
+        repo,
+        revision,
+        target_id=target_id,
+        entry=entry,
+        license_ref=license_ref,
+        interface_kind=interface_kind,
+        interface_basis_ref=interface_basis_ref,
+        output=output,
+        budget=budget,
+        target_model=SnapshotComparisonTarget,
+    )
+
+
+def _inspect_snapshot_target(
+    repo,
+    revision,
+    *,
+    target_id,
+    entry,
+    license_ref,
+    interface_kind,
+    interface_basis_ref,
+    output,
+    budget,
+    target_model,
+    **declarations,
+):
     entry = SnapshotTargetEntry.model_validate_json(canonical_json_bytes(entry))
     TypeAdapter(CommitId).validate_python(revision)
     require(
@@ -67,7 +95,7 @@ def inspect_snapshot_target(
     )
     reject_links(repo)
     target = seal(
-        SnapshotComparisonTarget(
+        target_model(
             target_id=target_id,
             repository_identity_digest=digest_bytes(str(Path(repo).resolve()).encode()),
             entry=entry,
@@ -79,6 +107,7 @@ def inspect_snapshot_target(
             interface_basis_ref=interface_basis_ref,
             implementation_digests=inspection_implementation_digests(),
             artifact_digest=ZERO,
+            **declarations,
         )
     )
     if output is not None:
@@ -100,12 +129,16 @@ class ComparisonFacts:
 
 
 def create_comparison_map(guard, contract, target):
+    return _create_comparison_map(guard, contract, target, SnapshotComparisonMap)
+
+
+def _create_comparison_map(guard, contract, target, map_model):
     cases = tuple(c for c in contract.cases if c.case_id in guard.case_ids)
     require(
         tuple(c.case_id for c in cases) == guard.case_ids, "comparison_guard_case_order_mismatch"
     )
     return seal(
-        SnapshotComparisonMap(
+        map_model(
             guard_digest=guard.artifact_digest,
             target_digest=target.artifact_digest,
             cases=tuple(

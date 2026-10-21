@@ -4,6 +4,9 @@
 
 来源链当前执行用途仅为 **tool_owned_fixture**；[独立比较子命名空间](snapshot-comparisons.md)仅允许 **tool_owned_snapshot_comparison_only**。二者均限工具自有 fixture，没有批准 TTE、webcolors 或其他外部仓库执行，没有生成真实研究标签，也没有提供生产 Shadow/Active 的入口。工具自有 fixture 跑通不能计入跨项目场景数。
 
+独立的[外部观察 API](external-snapshot-observations.md)使用另一组严格类型和审核锚；
+本页的 fixture 命令、用途和 parser 不因该 API 而扩大范围。
+
 ## 两种快照边界
 
 | 边界 | 内容 | 作用 |
