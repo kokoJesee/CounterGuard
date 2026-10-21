@@ -1,0 +1,101 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-comparison-admission.v1",
+      "default": "snapshot-comparison-admission.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Witness Digest"
+    },
+    "method": {
+      "enum": [
+        "b1_always",
+        "b2_interface",
+        "learned_initial",
+        "learned_refined"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "enum": [
+        "guard",
+        "own_contract"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "applicable",
+        "inapplicable",
+        "unknown"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "plan_digest",
+    "guard_digest",
+    "target_digest",
+    "map_digest",
+    "review_digest",
+    "witness_digest",
+    "method",
+    "lane",
+    "decision",
+    "reason_code",
+    "artifact_digest"
+  ],
+  "title": "SnapshotComparisonAdmission",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

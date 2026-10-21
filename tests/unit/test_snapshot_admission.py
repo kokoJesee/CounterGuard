@@ -39,6 +39,28 @@ def test_full_package_refs_are_stable_for_twenty_input_shuffles():
         assert _package(dict(items), contract) == expected
 
 
+def test_future_directive_is_stdlib_but_may_not_be_shadowed_by_target_package():
+    contract = SimpleNamespace(
+        import_root="src", target_module="sample.core", source_ref="src/sample/core.py"
+    )
+    files = package_files()
+    files["src/sample/core.py"] = (
+        b"from __future__ import annotations\nimport __future__\n"
+        b"def check(value: MissingAtRuntime) -> MissingAtRuntime: return value\n"
+    )
+    assert "src/sample/core.py" in _package(files, contract)
+    shadow = {"src/__future__/__init__.py": b"", "pyproject.toml": files["pyproject.toml"]}
+    with pytest.raises(ArtifactIntegrityError, match="snapshot_reserved_package"):
+        _package(
+            shadow,
+            SimpleNamespace(
+                import_root="src",
+                target_module="__future__",
+                source_ref="src/__future__/__init__.py",
+            ),
+        )
+
+
 @pytest.mark.parametrize(
     "ref,body",
     [

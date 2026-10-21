@@ -534,6 +534,17 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 源码更新使全包 implementation digest 变化。旧链保留历史事实，不能只改摘要或重签旧审核。
 
+独立比较的[专用类型](snapshot-comparisons.md)另在 `schemas/snapshot-comparison-v1/`：
+
+| 层 | 摘要依赖与重建 | 变化处理 |
+|---|---|---|
+| target / map | 固定提交完整 manifest/包 refs/入口/许可与接口依据；原 Guard、目标及全部最小 case 的完整摘要 | 重新检查目标和完整映射，不能删/改输入或混用来源 |
+| own-witness | 固定目标/map、提交内依据、与原 case 同一输入/身份的独立 oracle | 新 witness 与比较审核；不替换来源 oracle，不生成标签 |
+| comparison-review / plan / admission | 独立来源锚、完整来源 Guard/绑定、目标/map/witness、两侧接口依据、runner/policy/超时/实现；计划方法/lane；真实三态决定和原因 | 新审核与调用方独立保存的比较锚；无 fit 的 learned 明确 unknown |
+| comparison-authorization / replay | 前述全链、原 H 契约和目标包 pins、规范测试/request/argv、原始日志/JUnit、运行后完整性 | 每次运行前后重建；晚到漂移保留 Run 并 stale，旧 parser 不接受新用途 |
+
+本组不为旧研究 fit 或生产 Registry 增加兼容分支；外部执行与新快照拟合适配仍需独立版本和验收。
+
 ## 研究 fixture 的纯指标投影
 
 [纯汇总](study-metrics.md)的新 study-metric-input.v1 / study-metric-summary.v1 复用既有指标公式与预测类型，

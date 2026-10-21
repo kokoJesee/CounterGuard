@@ -44,12 +44,14 @@ from counterguard.report import OutputFormat, command_report, render_report
 from counterguard.runner_cli import app as runner_app
 from counterguard.scope import fit_scopes
 from counterguard.snapshot_cli import app as snapshot_app
+from counterguard.snapshot_comparison_cli import app as snapshot_comparison_app
 from counterguard.verification_gate import capture_candidate, gate_exit_code, verify_gate
 
 app = typer.Typer(no_args_is_help=True, help="Scope-aware regression guard tooling.")
 app.add_typer(registry_app, name="registry")
 app.add_typer(runner_app, name="runner")
 app.add_typer(snapshot_app, name="research-snapshot")
+snapshot_app.add_typer(snapshot_comparison_app, name="comparison")
 contract_app = typer.Typer(no_args_is_help=True, help="Prepare review-only contract proposals.")
 app.add_typer(contract_app, name="contract")
 bootstrap_app = typer.Typer(

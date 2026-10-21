@@ -115,7 +115,10 @@ def _package(files, contract):
     refs = tuple(sorted(ref for ref in files if ref.startswith(package + "/")))
     require(contract.source_ref in refs, "snapshot_entry_missing")
     reserved = {"cg_control", "pytest", "sitecustomize", "usercustomize", "conftest"}
-    require(root not in reserved | STDLIB, "snapshot_reserved_package")
+    # __future__ is Python's compiler-directive/stdlib module, not an installed
+    # project dependency. Keep this correction local to the snapshot profile.
+    stdlib = STDLIB | {"__future__"}
+    require(root not in reserved | stdlib, "snapshot_reserved_package")
     for ref in refs:
         parts = Path(ref).parts
         require(
@@ -146,7 +149,7 @@ def _package(files, contract):
                 )
                 for name in imports:
                     require(
-                        name.split(".")[0] in STDLIB | {root},
+                        name.split(".")[0] in stdlib | {root},
                         "snapshot_uninstalled_static_import:" + name,
                     )
     try:

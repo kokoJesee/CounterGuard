@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "SnapshotMappedCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_case_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Case Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_case_digest"
+      ],
+      "title": "SnapshotMappedCase",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-comparison-map.v1",
+      "default": "snapshot-comparison-map.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "mapping": {
+      "const": "identity_call_all_minimal_cases",
+      "default": "identity_call_all_minimal_cases",
+      "title": "Mapping",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "cases": {
+      "items": {
+        "$ref": "#/$defs/SnapshotMappedCase"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "guard_digest",
+    "target_digest",
+    "cases",
+    "artifact_digest"
+  ],
+  "title": "SnapshotComparisonMap",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

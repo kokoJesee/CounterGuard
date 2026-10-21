@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 新增工具自有独立快照比较：完整目标、全最小 case 原样映射、独立自身 witness 与双审核锚，B1/B2 共用审核 Docker，跳过零启动、运行后漂移保留 Run；新快照 learned 在未绑定 fit 时明确 unknown。修正独立快照对 `__future__` 的标准库误判，未放宽旧 profile。详见[接口](docs/snapshot-comparisons.md)及[验收](docs/results/snapshot-comparison-fixture-v1/README.md)；外部执行/标签仍未新增。
+
 - 新增独立 `source-only-python-snapshot.v1`：完整提交清单、分批容量读取、有限字面量 `pytest.param(..., id=...)` 投影、B/F/H 绑定及分立审核锚。`research-snapshot` 仅在已审核 Docker 中捕获、自检和重放工具自有 fixture；不接入外部用途、研究标签或生产调度。旧 profile/冻结数据不变，详见[接口](docs/research-snapshots.md)与[验收](docs/results/research-snapshot-fixture-v1/README.md)。
 
 - 新增工具自有 fixture 的四方法纯指标汇总与算术重算 CLI：复用冻结公式，按项目、Guard 和总体报告，保留 unknown、零分母和配对变化；不执行目标、审核标签或代替正式 evaluate。详见[接口与边界](docs/study-metrics.md)。

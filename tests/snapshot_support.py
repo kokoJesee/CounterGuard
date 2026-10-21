@@ -49,6 +49,7 @@ def snapshot_history(workspace, *, large_media=False, behavior="normal", fixture
         encoding="utf-8",
     )
     protection = (
+        "from __future__ import annotations\n"
         "import os\n"
         "if os.environ.get('COUNTERGUARD_CONTRACT') != 'cg_control/contract.json':\n"
         " raise RuntimeError('Docker only')\n"

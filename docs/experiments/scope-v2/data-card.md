@@ -187,3 +187,11 @@ base32-lib 完整 Git 树与现有静态角色已实际通过，原 2 条拒绝�
 ulid-transform 新找到现代真实漏拒绝 B/F，原 fixture/分发测试和动态实现选择仍未支持。
 已有 [TTE → webcolors 六个输入](../../research/hex-validation-comparability.md)取得独立规范覆盖依据，
 导入形状补查仍 unknown，没有执行、标签或正式场景。接受范围保持原样；正式场景仍为 0。
+
+维护者随后批准独立研究快照 profile 的工具自有 fixture 阶段；[来源链](../../research-snapshots.md)及
+[独立比较](../../snapshot-comparisons.md)的用途均封闭，不借该批准执行外部项目。
+新的[完整快照只读准备](../../results/snapshot-readiness-v1/README.md)取得 TTE 实际 B/F 全树，
+机械生成原六个输入/消息的契约提案；webcolors 的 39 文件完整目标也可检查。
+本轮还发现并修正标准库 `__future__` 的依赖误判，保留原拒绝和新准备记录。
+没有创建 fork/H、外部执行或标签；新快照 profile 未绑定研究 fit，learned 仍 unknown。
+这使“材料能否完整表示”更具体，但来源复现、独立外部用途及语义/数据门槛仍待通过，正式场景数未增加。

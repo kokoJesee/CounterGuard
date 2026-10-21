@@ -155,3 +155,5 @@ unknown / disabled 只表示跳过，不能算 pass。完整规则、来源分�
 `counterguard research-snapshot --help` 提供独立 prepare/bind/review/capture/compile/replay/audit。
 完整契约、容量、独立审核锚和用途限制见[研究快照](research-snapshots.md)。
 此入口只验证工具自有 fixture；不是任意项目的 `verify` 或生产 Shadow 接入，也不批准外部数据执行。
+
+另有 `counterguard research-snapshot comparison --help`，提供完整目标检查、全最小 case 的原样映射、独立比较审核、Docker run/audit-only 和只读 verify。目标自身 oracle 独立，learned 在此新 profile 尚无 fit 时为 unknown。用途及退出语义见[独立比较](snapshot-comparisons.md)。

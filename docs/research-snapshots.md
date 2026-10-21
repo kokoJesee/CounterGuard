@@ -2,7 +2,7 @@
 
 `source-only-python-snapshot.v1` 使用完整 Git 快照清单和独立执行审核，接受获审包源码中的正常 Python 动态操作。它与原有词法闭包 profile 分开：旧 profile 的 `unknown` 不会被一个理由字段清除，旧契约、Scope、Registry 和 `verify` 不接受这里的新类型。
 
-当前执行用途仅为 **tool_owned_fixture**。本接口没有批准 TTE、webcolors 或其他外部仓库执行，没有生成真实研究标签，也没有提供生产 Shadow/Active 的入口。工具自有 fixture 跑通不能计入跨项目场景数。
+来源链当前执行用途仅为 **tool_owned_fixture**；[独立比较子命名空间](snapshot-comparisons.md)仅允许 **tool_owned_snapshot_comparison_only**。二者均限工具自有 fixture，没有批准 TTE、webcolors 或其他外部仓库执行，没有生成真实研究标签，也没有提供生产 Shadow/Active 的入口。工具自有 fixture 跑通不能计入跨项目场景数。
 
 ## 两种快照边界
 
@@ -14,6 +14,8 @@
 包根支持 `.` / `src`，要求顶层包存在 `__init__.py`。原测试、根配置、根 conftest、安装脚本和包外媒体不进入容器挂载；它们仍在完整提交清单中。包内 conftest、启动定制文件、原生二进制和 Python 字节码拒绝，不通过删除这些文件换取准入。
 
 PEP 621 必须给出静态零运行时依赖、可检查的 Python 版本要求；不执行 `setup.py`，不安装依赖。包内显式第三方导入拒绝。静态扫描不证明所有动态导入可用、无副作用或语义安全；这些是快照审核和 Docker 隔离的责任。运行时导入失败仍是执行问题，不是缺陷证据。
+
+`__future__` 是 Python 标准库的编译指令模块，不是需安装的项目依赖；本 profile 接受它，也禁止目标包遮蔽它。该修正不扩大旧预检、插件或依赖安装范围。
 
 ## 容量和 Git 约束
 

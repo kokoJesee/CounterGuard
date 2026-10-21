@@ -1,0 +1,264 @@
+{
+  "$defs": {
+    "RunnerReview": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "runner-review.v1",
+          "default": "runner-review.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "runner_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+          "title": "Runner Id",
+          "type": "string"
+        },
+        "profile": {
+          "enum": [
+            "root-pytest8.v1",
+            "validators-src-pytest9.v1"
+          ],
+          "title": "Profile",
+          "type": "string"
+        },
+        "image_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Image Digest",
+          "type": "string"
+        },
+        "pytest_version": {
+          "enum": [
+            "8.4.2",
+            "9.0.3"
+          ],
+          "title": "Pytest Version",
+          "type": "string"
+        },
+        "base_registry_digests": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Base Registry Digests",
+          "type": "array"
+        },
+        "build_receipt_ref": {
+          "minLength": 1,
+          "title": "Build Receipt Ref",
+          "type": "string"
+        },
+        "build_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Build Receipt Digest",
+          "type": "string"
+        },
+        "lock_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Lock Digest",
+          "type": "string"
+        },
+        "container_source_digests": {
+          "additionalProperties": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "minLength": 1
+          },
+          "title": "Container Source Digests",
+          "type": "object"
+        },
+        "attack_receipt_ref": {
+          "minLength": 1,
+          "title": "Attack Receipt Ref",
+          "type": "string"
+        },
+        "attack_receipt_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Receipt Digest",
+          "type": "string"
+        },
+        "attack_log_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Attack Log Digest",
+          "type": "string"
+        },
+        "attacks_passed": {
+          "const": 4,
+          "default": 4,
+          "title": "Attacks Passed",
+          "type": "integer"
+        },
+        "reviewed_at": {
+          "format": "date-time",
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runner_id",
+        "profile",
+        "image_digest",
+        "pytest_version",
+        "base_registry_digests",
+        "build_receipt_ref",
+        "build_receipt_digest",
+        "lock_digest",
+        "container_source_digests",
+        "attack_receipt_ref",
+        "attack_receipt_digest",
+        "attack_log_digest",
+        "reviewed_at",
+        "artifact_digest"
+      ],
+      "title": "RunnerReview",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-comparison-review.v1",
+      "default": "snapshot-comparison-review.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_comparison_only",
+      "default": "tool_owned_snapshot_comparison_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "action": {
+      "default": "approve",
+      "enum": [
+        "approve",
+        "withdraw"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "source_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Review Digest",
+      "type": "string"
+    },
+    "source_guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Guard Digest",
+      "type": "string"
+    },
+    "source_binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Binding Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Witness Digest"
+    },
+    "source_interface": {
+      "enum": [
+        "value_return",
+        "stdout_write"
+      ],
+      "title": "Source Interface",
+      "type": "string"
+    },
+    "source_interface_basis_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Source Interface Basis Ref",
+      "type": "string"
+    },
+    "runner": {
+      "$ref": "#/$defs/RunnerReview"
+    },
+    "policy_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "exclusiveMinimum": 0,
+      "maximum": 30,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "reason",
+    "source_review_digest",
+    "source_guard_digest",
+    "source_binding_digest",
+    "target_digest",
+    "map_digest",
+    "witness_digest",
+    "source_interface",
+    "source_interface_basis_ref",
+    "runner",
+    "policy_digest",
+    "timeout_seconds",
+    "implementation_digests",
+    "artifact_digest"
+  ],
+  "title": "SnapshotComparisonReview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

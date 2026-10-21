@@ -1,0 +1,348 @@
+{
+  "$defs": {
+    "DraftCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_line": {
+          "minimum": 1,
+          "title": "Source Line",
+          "type": "integer"
+        },
+        "assertion_index": {
+          "minimum": 1,
+          "title": "Assertion Index",
+          "type": "integer"
+        },
+        "parameter_index": {
+          "minimum": 1,
+          "title": "Parameter Index",
+          "type": "integer"
+        },
+        "assertion_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Assertion Digest",
+          "type": "string"
+        },
+        "positional_args": {
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Positional Args",
+          "type": "array"
+        },
+        "keyword_args": {
+          "items": {
+            "$ref": "#/$defs/DraftKeyword"
+          },
+          "title": "Keyword Args",
+          "type": "array"
+        },
+        "oracle": {
+          "enum": [
+            "eq",
+            "ne",
+            "is",
+            "is_not",
+            "truthy",
+            "falsey",
+            "raises"
+          ],
+          "title": "Oracle",
+          "type": "string"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DraftLiteral"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exception": {
+          "anyOf": [
+            {
+              "enum": [
+                "ValueError",
+                "TypeError",
+                "OverflowError"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exception"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_line",
+        "assertion_index",
+        "parameter_index",
+        "assertion_digest",
+        "positional_args",
+        "keyword_args",
+        "oracle"
+      ],
+      "title": "DraftCase",
+      "type": "object"
+    },
+    "DraftKeyword": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "literal": {
+          "$ref": "#/$defs/DraftLiteral"
+        }
+      },
+      "required": [
+        "name",
+        "literal"
+      ],
+      "title": "DraftKeyword",
+      "type": "object"
+    },
+    "DraftLiteral": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "boolean",
+            "integer",
+            "float",
+            "string",
+            "bytes",
+            "list",
+            "tuple",
+            "dict"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "items": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "entries": {
+          "default": [],
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "$ref": "#/$defs/DraftLiteral"
+              },
+              {
+                "$ref": "#/$defs/DraftLiteral"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Entries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "DraftLiteral",
+      "type": "object"
+    },
+    "DraftMatchCase": {
+      "additionalProperties": false,
+      "description": "New case shape; old DraftCase continues to reject this extra field.",
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_line": {
+          "minimum": 1,
+          "title": "Source Line",
+          "type": "integer"
+        },
+        "assertion_index": {
+          "minimum": 1,
+          "title": "Assertion Index",
+          "type": "integer"
+        },
+        "parameter_index": {
+          "minimum": 1,
+          "title": "Parameter Index",
+          "type": "integer"
+        },
+        "assertion_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Assertion Digest",
+          "type": "string"
+        },
+        "positional_args": {
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Positional Args",
+          "type": "array"
+        },
+        "keyword_args": {
+          "items": {
+            "$ref": "#/$defs/DraftKeyword"
+          },
+          "title": "Keyword Args",
+          "type": "array"
+        },
+        "oracle": {
+          "enum": [
+            "eq",
+            "ne",
+            "is",
+            "is_not",
+            "truthy",
+            "falsey",
+            "raises"
+          ],
+          "title": "Oracle",
+          "type": "string"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DraftLiteral"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exception": {
+          "anyOf": [
+            {
+              "enum": [
+                "ValueError",
+                "TypeError",
+                "OverflowError"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exception"
+        },
+        "exception_match": {
+          "maxLength": 4096,
+          "title": "Exception Match",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_line",
+        "assertion_index",
+        "parameter_index",
+        "assertion_digest",
+        "positional_args",
+        "keyword_args",
+        "oracle",
+        "exception_match"
+      ],
+      "title": "DraftMatchCase",
+      "type": "object"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-comparison-own-witness.v1",
+      "default": "snapshot-comparison-own-witness.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "basis_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 16,
+      "minItems": 1,
+      "title": "Basis Refs",
+      "type": "array"
+    },
+    "cases": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/DraftMatchCase"
+          },
+          {
+            "$ref": "#/$defs/DraftCase"
+          }
+        ]
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "role": {
+      "const": "target_own_observation_not_source_oracle_or_label",
+      "default": "target_own_observation_not_source_oracle_or_label",
+      "title": "Role",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_digest",
+    "map_digest",
+    "basis_refs",
+    "cases",
+    "artifact_digest"
+  ],
+  "title": "SnapshotOwnWitness",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
