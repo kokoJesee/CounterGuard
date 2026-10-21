@@ -1,0 +1,423 @@
+{
+  "$defs": {
+    "DraftCase": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_line": {
+          "minimum": 1,
+          "title": "Source Line",
+          "type": "integer"
+        },
+        "assertion_index": {
+          "minimum": 1,
+          "title": "Assertion Index",
+          "type": "integer"
+        },
+        "parameter_index": {
+          "minimum": 1,
+          "title": "Parameter Index",
+          "type": "integer"
+        },
+        "assertion_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Assertion Digest",
+          "type": "string"
+        },
+        "positional_args": {
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Positional Args",
+          "type": "array"
+        },
+        "keyword_args": {
+          "items": {
+            "$ref": "#/$defs/DraftKeyword"
+          },
+          "title": "Keyword Args",
+          "type": "array"
+        },
+        "oracle": {
+          "enum": [
+            "eq",
+            "ne",
+            "is",
+            "is_not",
+            "truthy",
+            "falsey",
+            "raises"
+          ],
+          "title": "Oracle",
+          "type": "string"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DraftLiteral"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exception": {
+          "anyOf": [
+            {
+              "enum": [
+                "ValueError",
+                "TypeError",
+                "OverflowError"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exception"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_line",
+        "assertion_index",
+        "parameter_index",
+        "assertion_digest",
+        "positional_args",
+        "keyword_args",
+        "oracle"
+      ],
+      "title": "DraftCase",
+      "type": "object"
+    },
+    "DraftKeyword": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "literal": {
+          "$ref": "#/$defs/DraftLiteral"
+        }
+      },
+      "required": [
+        "name",
+        "literal"
+      ],
+      "title": "DraftKeyword",
+      "type": "object"
+    },
+    "DraftLiteral": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "boolean",
+            "integer",
+            "float",
+            "string",
+            "bytes",
+            "list",
+            "tuple",
+            "dict"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "items": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "entries": {
+          "default": [],
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "$ref": "#/$defs/DraftLiteral"
+              },
+              {
+                "$ref": "#/$defs/DraftLiteral"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Entries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "DraftLiteral",
+      "type": "object"
+    },
+    "DraftMatchCase": {
+      "additionalProperties": false,
+      "description": "New case shape; old DraftCase continues to reject this extra field.",
+      "properties": {
+        "case_id": {
+          "pattern": "^case_[a-f0-9]{24}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "source_line": {
+          "minimum": 1,
+          "title": "Source Line",
+          "type": "integer"
+        },
+        "assertion_index": {
+          "minimum": 1,
+          "title": "Assertion Index",
+          "type": "integer"
+        },
+        "parameter_index": {
+          "minimum": 1,
+          "title": "Parameter Index",
+          "type": "integer"
+        },
+        "assertion_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Assertion Digest",
+          "type": "string"
+        },
+        "positional_args": {
+          "items": {
+            "$ref": "#/$defs/DraftLiteral"
+          },
+          "title": "Positional Args",
+          "type": "array"
+        },
+        "keyword_args": {
+          "items": {
+            "$ref": "#/$defs/DraftKeyword"
+          },
+          "title": "Keyword Args",
+          "type": "array"
+        },
+        "oracle": {
+          "enum": [
+            "eq",
+            "ne",
+            "is",
+            "is_not",
+            "truthy",
+            "falsey",
+            "raises"
+          ],
+          "title": "Oracle",
+          "type": "string"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DraftLiteral"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exception": {
+          "anyOf": [
+            {
+              "enum": [
+                "ValueError",
+                "TypeError",
+                "OverflowError"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exception"
+        },
+        "exception_match": {
+          "maxLength": 4096,
+          "title": "Exception Match",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "source_line",
+        "assertion_index",
+        "parameter_index",
+        "assertion_digest",
+        "positional_args",
+        "keyword_args",
+        "oracle",
+        "exception_match"
+      ],
+      "title": "DraftMatchCase",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "SnapshotOrigin": {
+      "additionalProperties": false,
+      "properties": {
+        "test_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Test Ref",
+          "type": "string"
+        },
+        "test_function": {
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "title": "Test Function",
+          "type": "string"
+        },
+        "test_object_id": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Test Object Id",
+          "type": "string"
+        },
+        "test_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Test Digest",
+          "type": "string"
+        },
+        "extractor_version": {
+          "const": "snapshot-test-projection.v1",
+          "default": "snapshot-test-projection.v1",
+          "title": "Extractor Version",
+          "type": "string"
+        },
+        "projection_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Projection Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "test_ref",
+        "test_function",
+        "test_object_id",
+        "test_digest",
+        "projection_digest"
+      ],
+      "title": "SnapshotOrigin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "research-snapshot-contract.v1",
+      "default": "research-snapshot-contract.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile": {
+      "const": "source-only-python-snapshot.v1",
+      "default": "source-only-python-snapshot.v1",
+      "title": "Profile",
+      "type": "string"
+    },
+    "contract_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$",
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "buggy_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Buggy Commit",
+      "type": "string"
+    },
+    "fixed_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Fixed Commit",
+      "type": "string"
+    },
+    "target_module": {
+      "maxLength": 256,
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+      "title": "Target Module",
+      "type": "string"
+    },
+    "target_symbol": {
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+      "title": "Target Symbol",
+      "type": "string"
+    },
+    "source_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "import_root": {
+      "enum": [
+        ".",
+        "src"
+      ],
+      "title": "Import Root",
+      "type": "string"
+    },
+    "test_origin": {
+      "$ref": "#/$defs/SnapshotOrigin"
+    },
+    "cases": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/DraftMatchCase"
+          },
+          {
+            "$ref": "#/$defs/DraftCase"
+          }
+        ]
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "authority": {
+      "const": "repository_declaration_not_execution_authorization",
+      "default": "repository_declaration_not_execution_authorization",
+      "title": "Authority",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_id",
+    "buggy_commit",
+    "fixed_commit",
+    "target_module",
+    "target_symbol",
+    "source_ref",
+    "import_root",
+    "test_origin",
+    "cases"
+  ],
+  "title": "SnapshotContract",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -228,6 +228,25 @@ def project_test(
     test_bytes: bytes, *, test_function: str, target_module: str, target_symbol: str
 ) -> dict:
     """Return proposal fragments; import bindings are syntax, not runtime identity proof."""
+    return _project_test(
+        test_bytes,
+        test_function=test_function,
+        target_module=target_module,
+        target_symbol=target_symbol,
+        parameter_reader=_parameters,
+    )
+
+
+def _project_test(
+    test_bytes,
+    *,
+    test_function,
+    target_module,
+    target_symbol,
+    parameter_reader,
+    identity_namespace=None,
+):
+    """Shared syntax walker; only explicitly versioned callers select another grammar."""
     if len(test_bytes) > 1024 * 1024:
         raise ValueError("Test file exceeds byte budget")
     try:
@@ -293,7 +312,7 @@ def project_test(
     if not source_count:
         return refuse("no_assertion_syntax")
     try:
-        parameters = _parameters(function, bindings)
+        parameters = parameter_reader(function, bindings)
         local_names = {
             node.id
             for node in ast.walk(function)
@@ -337,16 +356,17 @@ def project_test(
             try:
                 for parameter_index, values in enumerate(parameters, 1):
                     fragment = _assertion(statement, local, values, target)
-                    identity = digest_json_artifact(
-                        {
-                            "test_function": test_function,
-                            "target": target,
-                            "assertion_index": ordinal,
-                            "parameter_index": parameter_index,
-                            "assertion_digest": ast_digest,
-                            "fragment": fragment,
-                        }
-                    )
+                    identity_data = {
+                        "test_function": test_function,
+                        "target": target,
+                        "assertion_index": ordinal,
+                        "parameter_index": parameter_index,
+                        "assertion_digest": ast_digest,
+                        "fragment": fragment,
+                    }
+                    if identity_namespace is not None:
+                        identity_data["projection_namespace"] = identity_namespace
+                    identity = digest_json_artifact(identity_data)
                     candidates.append(
                         (DraftMatchCase if "exception_match" in fragment else DraftCase)(
                             case_id="case_" + identity[7:31],

@@ -519,6 +519,21 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 源码变化使旧来源链失效时，原获批 H 字节未变可复用 H，在新 ID/目录重新 bind/capture/compile/review/replay；
 不需要也不允许靠补签旧记录或新造 owner 提交来规避。冻结 scope_v1、生产生命周期及旧产物保持原样。
 
+## 独立研究快照
+
+[研究快照](research-snapshots.md)采用独立 `research-snapshot-*.v1` Schema，当前用途仅为工具自有 fixture。
+
+| 层 | 摘要依赖与重建 | 上游变化后的处理 |
+|---|---|---|
+| manifest | 完整 Git commit、所有文件的路径/object ID/内容摘要/大小、收紧后的容量 | 重新读取完整提交；不能删媒体规避限额 |
+| contract / binding | B/F 直接父子、H 仅新增工具文件、H 原始契约、F 原测试完整投影、原参数顺序/ID、三角色 manifest/完整包 refs、实现 | 新绑定/审核及全部下游；旧 parser 不接受新类型 |
+| review | 独立 execution 或 semantics 类别、固定 fixture 用途、绑定、runner 收据、policy、容量/超时、真实 UTC 和实现 | 新记录和调用方独立保存的新锚；自签记录不能替换可信锚 |
+| authorization | 实际绑定/审核锚、目标角色 manifest、完整包与 H 契约 pins、规范生成测试、用途/request/runner/policy/实现 | 每次运行前后重建；不能借给生产/外部用途 |
+| evidence | 双向实际 Run、授权、日志、完整原 case 与真实失败子集、绑定/审核/契约 | 重新捕获；异常不当成真实缺陷，旧记录不覆盖 |
+| guard / replay | 原 Evidence、恰好失败 case、双向自检、精确 B/F manifest 和原始运行 | 新 ID/目录重新物化；不生成跨项目标签、学习 Scope 或生产调度权 |
+
+源码更新使全包 implementation digest 变化。旧链保留历史事实，不能只改摘要或重签旧审核。
+
 ## 研究 fixture 的纯指标投影
 
 [纯汇总](study-metrics.md)的新 study-metric-input.v1 / study-metric-summary.v1 复用既有指标公式与预测类型，

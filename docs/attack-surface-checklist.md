@@ -139,6 +139,14 @@ W04 整体保持**部分**，不标为全面已测。
 
 ## W3 开工与准入
 
+独立[研究快照](research-snapshots.md)增加工具自有 fixture 范围的检查，原 W01/W03/W04 总体状态均保持**部分**：
+
+- W02/W03：完整 B/F/H 清单和分批容量读取；H 只新增工具文件、原断言/参数完整投影、完整包输入；原 profile 和容量不变。
+- W01/W03：执行仅使用原已审核 Docker transport；新增 fixture 检查列于 [Git 专项](../tests/integration/test_snapshot_admission.py)和 [Docker 专项](../tests/integration/test_snapshot_docker.py)。原 pytest 配置/conftest 不加载，不安装依赖，不允许本地 fallback。
+- W04：新 Schema 及 fixture-only purpose、执行/语义审核分列、调用方独立可信锚、逐次来源与授权重建；重签记录不能代替锚。没有生产 Registry、Shadow/Active 或外部用途路由。
+
+本轮结果见[自有 fixture 回执](results/research-snapshot-fixture-v1/README.md)。容量/审核通过不证明动态依赖完整、oracle 独立性、仓库所有权或恶意目标未干扰容器内 JUnit；远程认证/签名/撤销、防回滚和原子快照也未因此关闭。未执行 TTE/webcolors，不增加真实研究场景数。
+
 异常消息 oracle 的补充边界见[受限语法](literal-message-oracles.md)与[专项测试](../tests/unit/test_exception_match.py)：扫描不执行模式表达式或编译任意 regex；复杂模式明确 unsupported，旧模型不能忽略消息字段。新捕获/Guard/Registry 版本绑定原始 H 投影，消息修改后重签仍不能调度。该项不扩大 legacy、插件、依赖或 CI 权限支持，W01/W03/W04 的其余未覆盖项保持原状态。
 
 runner 与固定仓库统一入口补充：[两类镜像各四项复验](results/runner-catalog-v1/README.md)，[目录与错误镜像拒绝测试](../tests/unit/test_runner_catalog.py)，[新运行目录授权 v3 测试](../tests/unit/test_repository_verify.py)。新目录由代码 pin，发现仅 inspect、不执行镜像；跨未经审核仓库/布局仍 unknown。真实重复重放的独立来源审核由 [显式 opt-in 专项](../tests/integration/test_repository_verify_live.py) 覆盖，只有提供实际 manifest/两份报告时才运行。

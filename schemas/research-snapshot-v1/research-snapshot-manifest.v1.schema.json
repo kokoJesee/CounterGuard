@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "FilePin": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "enum": [
+            "base",
+            "head"
+          ],
+          "title": "Revision",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "object_id": {
+          "title": "Object Id",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "path",
+        "object_id",
+        "content_digest"
+      ],
+      "title": "FilePin",
+      "type": "object"
+    },
+    "SnapshotBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "blob_bytes": {
+          "default": 8388608,
+          "maximum": 8388608,
+          "minimum": 1,
+          "title": "Blob Bytes",
+          "type": "integer"
+        },
+        "tree_bytes": {
+          "default": 134217728,
+          "maximum": 134217728,
+          "minimum": 1,
+          "title": "Tree Bytes",
+          "type": "integer"
+        },
+        "file_count": {
+          "default": 2048,
+          "maximum": 2048,
+          "minimum": 1,
+          "title": "File Count",
+          "type": "integer"
+        }
+      },
+      "title": "SnapshotBudget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "research-snapshot-manifest.v1",
+      "default": "research-snapshot-manifest.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Commit",
+      "type": "string"
+    },
+    "budget": {
+      "$ref": "#/$defs/SnapshotBudget"
+    },
+    "total_bytes": {
+      "maximum": 134217728,
+      "minimum": 0,
+      "title": "Total Bytes",
+      "type": "integer"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/FilePin"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "sizes": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Sizes",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "commit",
+    "budget",
+    "total_bytes",
+    "files",
+    "sizes",
+    "artifact_digest"
+  ],
+  "title": "SnapshotManifest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

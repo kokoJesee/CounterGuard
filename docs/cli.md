@@ -149,3 +149,9 @@ uv run python scripts/run_pilot.py --manifest integrations/pilot/manifest-v5.yam
 本入口的失败退出 4，保存具体错误和 next_stage_allowed=false；没有本地回退。
 unknown / disabled 只表示跳过，不能算 pass。完整规则、来源分类和恢复本地 owner 提交见
 [试点设计](../integrations/pilot/design-fork-v1.md)。该入口不声明已经支持任意仓库、插件或作用域学习。
+
+## 工具自有研究快照
+
+`counterguard research-snapshot --help` 提供独立 prepare/bind/review/capture/compile/replay/audit。
+完整契约、容量、独立审核锚和用途限制见[研究快照](research-snapshots.md)。
+此入口只验证工具自有 fixture；不是任意项目的 `verify` 或生产 Shadow 接入，也不批准外部数据执行。

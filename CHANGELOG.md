@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 新增独立 `source-only-python-snapshot.v1`：完整提交清单、分批容量读取、有限字面量 `pytest.param(..., id=...)` 投影、B/F/H 绑定及分立审核锚。`research-snapshot` 仅在已审核 Docker 中捕获、自检和重放工具自有 fixture；不接入外部用途、研究标签或生产调度。旧 profile/冻结数据不变，详见[接口](docs/research-snapshots.md)与[验收](docs/results/research-snapshot-fixture-v1/README.md)。
+
 - 新增工具自有 fixture 的四方法纯指标汇总与算术重算 CLI：复用冻结公式，按项目、Guard 和总体报告，保留 unknown、零分母和配对变化；不执行目标、审核标签或代替正式 evaluate。详见[接口与边界](docs/study-metrics.md)。
 - colored 的受限真实观察后补查独立固定文档与历史；错误长度的异常/消息规范仍未确定，该 pair 保留探索用途，不进入正式 refinement。详见[一手依据](docs/research/colored-arity-policy.md)。
 
