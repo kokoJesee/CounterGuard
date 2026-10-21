@@ -221,6 +221,13 @@ H 原始契约及旧 Evidence 的当前过期拒绝；没有新增执行能力�
 原四项隔离攻击本批未重跑；恶意目标干扰 pytest/JUnit、原子快照、任意原生插件/依赖、
 远程身份/签名/防回滚及可信主机整体被控制仍未覆盖，W01/W03/W04 整体继续为部分。
 
+[固定 TerminalTextEffects → webcolors 实测](results/tte-webcolors-observation-v1/README.md)使用另一组独立外部快照类型：
+H 只增加原六 case 契约，fork Actions 在发布前显式关闭；来源完整树/许可、双审核锚、精确 runner、
+全最小 case identity map 和独立自身 oracle 均重建。实际外部容器为来源捕获/自检 4、目标两 lane 重复 4，
+共 8；宿主 import 和本地 executor 为 0。两次零容器的编排/网络失败另行保留，没有退额度或改 oracle。
+这增加固定外部用途的实测覆盖，但不关闭远程签名、防回滚、最新撤回、并发原子快照或恶意目标干扰 JUnit；
+W01/W03/W04 整体仍为部分，也不授予生产 Shadow/Active 权限。
+
 [研究纯指标投影](study-metrics.md)只增加完整四方法成员、固定项目分组、unknown/执行故障/空分母、
 20 次乱序和合法 Schema 重签后完整重算的算术覆盖；没有新增执行或标签授权。
 输入只声明可信人工 fixture 标签，不能证明真实 Run/JUnit 或语义来源。

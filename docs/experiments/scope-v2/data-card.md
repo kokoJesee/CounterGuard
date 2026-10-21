@@ -195,3 +195,15 @@ ulid-transform 新找到现代真实漏拒绝 B/F，原 fixture/分发测试和�
 本轮还发现并修正标准库 `__future__` 的依赖误判，保留原拒绝和新准备记录。
 没有创建 fork/H、外部执行或标签；新快照 profile 未绑定研究 fit，learned 仍 unknown。
 这使“材料能否完整表示”更具体，但来源复现、独立外部用途及语义/数据门槛仍待通过，正式场景数未增加。
+
+## 完整快照的首个真实外部观察
+
+[TTE → webcolors 固定观察](../../results/tte-webcolors-observation-v1/README.md)随后在独立外部用途下完成：
+owner H 只新增原六 case 契约；B 6 failed、F 6 passed，最小 Guard 保留全部六项并通过双向自检。
+固定 webcolors 上，来源 Guard 两次均 6 failed，目标自身 oracle 两次均 6 passed；逐 case 签名各自一致。
+真实外部容器恰好 8 次，没有本地执行、删 case、改消息或额外重跑。
+
+该结果新增一个独立真实来源和一个实际观察 pair，但没有分配适用性/合规性标签，也没有训练、
+分组、留出或冻结协议。**真实来源修复 2，实际外部观察 pair 2，正式跨项目研究场景 0**；
+六个参数仍属于同一来源修复，不能按六个场景计数。快照 profile 尚未绑定获审的特征/fit 桥接，
+所以这条事实不能直接进入四方法正式评测。

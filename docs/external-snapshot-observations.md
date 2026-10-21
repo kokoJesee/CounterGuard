@@ -93,3 +93,7 @@ integration 全部标 slow，Docker 项另标 docker。缺镜像变量的 skip �
 此接口不提供远程签名身份、自动发现最新撤回、防回滚、跨会话容器总配额，
 也不能防止恶意目标在容器内干扰测试结果。独立审核、实际容器账本及规范裁决仍需操作者负责。
 新模型、独立审核锚和 Docker 隔离不证明目标业务语义，也不证明项目之间没有代码借用。
+
+固定 [TerminalTextEffects → webcolors 实测](results/tte-webcolors-observation-v1/README.md)
+在该边界下完成 8 个真实外部容器：来源捕获/自检各 2，目标原 Guard/自身 oracle 各 2。
+结果只增加一条行为观察，不产生标签、fit、holdout 或正式研究结论。

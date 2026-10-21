@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 完成固定 TerminalTextEffects → webcolors 外部快照观察：真实 B/F 捕获、六 case 最小 Guard 双向自检，
+  以及目标原 Guard/自身 oracle 各两次重复；恰好 8 个外部 Docker 容器。结果不生成标签、fit 或生产权限，
+  详见[有限回执](docs/results/tte-webcolors-observation-v1/README.md)。
+
 - 新增独立外部完整快照观察 API：单独的来源/比较审核锚、许可与 URL pin、外部 Evidence/Guard/原样映射及自身 oracle；复用固定 Docker transport。旧 fixture 接口与 Schema 保持原接受范围。该用途只提供 B1 观察，不生成研究标签、四方法 fit 或生产权限，详见[边界](docs/external-snapshot-observations.md)。
 
 - 新增工具自有独立快照比较：完整目标、全最小 case 原样映射、独立自身 witness 与双审核锚，B1/B2 共用审核 Docker，跳过零启动、运行后漂移保留 Run；新快照 learned 在未绑定 fit 时明确 unknown。修正独立快照对 `__future__` 的标准库误判，未放宽旧 profile。详见[接口](docs/snapshot-comparisons.md)及[验收](docs/results/snapshot-comparison-fixture-v1/README.md)；外部执行/标签仍未新增。

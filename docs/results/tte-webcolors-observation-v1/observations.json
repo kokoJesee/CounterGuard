@@ -1,0 +1,44 @@
+{
+  "schema_version": "tte-webcolors-observation-summary.v1",
+  "artifact_digest": "sha256:46db568befd39f3193e1e7303446073faaa489d2faa0d92d77b224914a73733b",
+  "implementation_commit": "4d3347894f0d9f69c49e124ea14066d7d499e1cd",
+  "runner_image": "sha256:561d706ee4938783c17e92efda0058ce4ebcc04e021981292a16b0a12ecd0d16",
+  "source": {
+    "repository": "https://github.com/kokoJesee/terminaltexteffects",
+    "upstream": "https://github.com/ChrisBuilds/terminaltexteffects",
+    "buggy_commit": "bb541505aa05d12e6f43d62d803b05836a5db09a",
+    "fixed_commit": "b360e0723d2c8e88e7db4f98c162b99b87442bd9",
+    "head": "068dc27c61e8f6fc1cf25f500fdeccd0fddcd009",
+    "contract_digest": "sha256:9a622bb453d527ee289c9e5f110e34bc977aa182667ca1fd2db8005d2a547f2a",
+    "evidence_digest": "sha256:28ced088b30701b11fc45fa1e25aba61f0e732f6dd38a4ef9698b999c6bd728b",
+    "guard_digest": "sha256:86ab0eecf58e441cdb13466bb388f9037af06d05b96c92c82b03ac87ae016810",
+    "contract_cases": 6,
+    "minimal_guard_cases": 6,
+    "buggy": {"outcome": "test_failed", "failed": 6},
+    "fixed": {"outcome": "passed", "passed": 6},
+    "guard_buggy": {"outcome": "test_failed", "failed": 6},
+    "guard_fixed": {"outcome": "passed", "passed": 6}
+  },
+  "target": {
+    "repository": "https://github.com/ubernostrum/webcolors",
+    "revision": "6c8da6832eb4ae2591a1883a0d1371263d6cd4db",
+    "entry": "webcolors:normalize_hex"
+  },
+  "observations": {
+    "source_guard": [
+      {"outcome": "test_failed", "failed": 6, "passed": 0},
+      {"outcome": "test_failed", "failed": 6, "passed": 0}
+    ],
+    "target_own_oracle": [
+      {"outcome": "passed", "failed": 0, "passed": 6},
+      {"outcome": "passed", "failed": 0, "passed": 6}
+    ],
+    "per_case_signatures_repeat": true
+  },
+  "external_container_starts": 8,
+  "candidate_host_imports": 0,
+  "local_executor_calls": 0,
+  "labels_assigned": 0,
+  "fit_or_protocol_frozen": false,
+  "raw_observation_digest": "sha256:c87c5fe065a7e5cf68c3fbdd02e56c24b071b69075c151526288fd050a90e02b"
+}

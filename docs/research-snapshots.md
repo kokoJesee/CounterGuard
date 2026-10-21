@@ -2,10 +2,12 @@
 
 `source-only-python-snapshot.v1` 使用完整 Git 快照清单和独立执行审核，接受获审包源码中的正常 Python 动态操作。它与原有词法闭包 profile 分开：旧 profile 的 `unknown` 不会被一个理由字段清除，旧契约、Scope、Registry 和 `verify` 不接受这里的新类型。
 
-来源链当前执行用途仅为 **tool_owned_fixture**；[独立比较子命名空间](snapshot-comparisons.md)仅允许 **tool_owned_snapshot_comparison_only**。二者均限工具自有 fixture，没有批准 TTE、webcolors 或其他外部仓库执行，没有生成真实研究标签，也没有提供生产 Shadow/Active 的入口。工具自有 fixture 跑通不能计入跨项目场景数。
+本页来源链的执行用途仅为 **tool_owned_fixture**；[独立比较子命名空间](snapshot-comparisons.md)仅允许 **tool_owned_snapshot_comparison_only**。二者均限工具自有 fixture，不能执行 TTE、webcolors 或其他外部仓库，也没有提供生产 Shadow/Active 的入口。工具自有 fixture 跑通不能计入跨项目场景数。
 
 独立的[外部观察 API](external-snapshot-observations.md)使用另一组严格类型和审核锚；
 本页的 fixture 命令、用途和 parser 不因该 API 而扩大范围。
+[TTE → webcolors 实测](results/tte-webcolors-observation-v1/README.md)只经该外部用途运行，
+没有给本页接口增加外部权限或生成研究标签。
 
 ## 两种快照边界
 

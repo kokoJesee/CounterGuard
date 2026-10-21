@@ -45,7 +45,7 @@ webcolors 的[固定格式文档](https://github.com/ubernostrum/webcolors/blob/
 前者使用不含媒体 blob 的过滤 clone，仅用于提交历史与逐文件只读诊断；它不通过完整对象准入。
 不同历史不证明没有代码借用。完整谱系、接口 cohort、适用性与自身契约合规审核仍未批准。
 
-## 当前明确不能运行的原因
+## 只读调查阶段的阻塞
 
 - 来源完整固定树仍为 108,610,617 bytes，违反现有 8 MiB 全树与 1 MiB 单 blob 限额；没有删除媒体。
 - 原 `pytest.param` 字面量表在现有提取器中为 unsupported，不能改写原测试后冒充机械提取。
@@ -54,5 +54,9 @@ webcolors 的[固定格式文档](https://github.com/ubernostrum/webcolors/blob/
   以及 `terminal_input.py` 的 `re.compile`。这是三份文件的语法 finding，不是三个已证实漏洞；`re.compile` 也不是内置 Python compile。
 - webcolors 现有角色检查仍因保守 `re.compile` 名称匹配与 evaluated annotation 为 unknown。
 
-因此，增加容量、补 `pytest.param` 或识别标准库 regex 中的任何单项，都不足以解锁完整来源链。
-本轮没有修改默认 profile、创建 H、签执行授权或运行外部 Docker。实现范围的讨论材料仅留本地。
+因此，在该次只读调查所用的旧 profile 下，增加容量、补 `pytest.param` 或识别标准库 regex 中的任何单项，
+都不足以解锁完整来源链。该轮没有修改默认 profile、创建 H、签执行授权或运行外部 Docker。
+
+后续建立了独立、版本化的完整快照外部观察用途，并先通过工具自有 fixture 资格；
+[固定 TTE → webcolors 观察](../results/tte-webcolors-observation-v1/README.md)随后保留全部六个输入完成双向捕获、
+最小 Guard 自检和两类目标重复观察。旧 profile 的阻塞和结论没有被改写为通过。
