@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "SnapshotStudyEvaluationPin": {
+      "additionalProperties": false,
+      "properties": {
+        "row_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Row Id",
+          "type": "string"
+        },
+        "plan_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Plan Digest",
+          "type": "string"
+        },
+        "label_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Label Digest",
+          "type": "string"
+        },
+        "guard_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Guard Digest",
+          "type": "string"
+        },
+        "target_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Digest",
+          "type": "string"
+        },
+        "execution_review_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Execution Review Digest",
+          "type": "string"
+        },
+        "fit_review_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Fit Review Digest",
+          "type": "string"
+        },
+        "initial_fit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Initial Fit Digest",
+          "type": "string"
+        },
+        "refined_fit_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Refined Fit Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "row_id",
+        "plan_digest",
+        "label_digest",
+        "guard_digest",
+        "target_digest",
+        "execution_review_digest",
+        "fit_review_digest",
+        "initial_fit_digest",
+        "refined_fit_digest"
+      ],
+      "title": "SnapshotStudyEvaluationPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-evaluation-review.v1",
+      "default": "snapshot-study-evaluation-review.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_local_operator_not_authenticated_identity",
+      "default": "trusted_local_operator_not_authenticated_identity",
+      "title": "Authority",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "operator": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "action": {
+      "default": "approve",
+      "enum": [
+        "approve",
+        "withdraw"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "members": {
+      "items": {
+        "$ref": "#/$defs/SnapshotStudyEvaluationPin"
+      },
+      "title": "Members",
+      "type": "array"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "operator",
+    "reason",
+    "plan_digest",
+    "members",
+    "implementation_digests",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyEvaluationReview",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

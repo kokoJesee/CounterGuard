@@ -570,3 +570,21 @@ Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完
 
 本版本只提供 B1 两条观察，不产生学习 Scope、标签、fit、split、正式研究协议或生产 Registry 权限。
 全包源码变化使当前使用的旧链过期，须按各层规则新物化；历史字节、冻结 scope_v1 与发布标签保持原样。
+
+## 完整快照的 fixture 训练与评测
+
+[训练接口](snapshot-study-fit.md)和[四方法评测](snapshot-study-evaluation.md)使用独立
+`tool_owned_snapshot_study_only` 类型，不扩大旧 fixture 或外部观察 parser。
+
+| 层 | 摘要依赖与独立重建 | 上游变化后的处理 |
+|---|---|---|
+| source/context/feature/audit | 原 B/F/H、Evidence/Guard/JUnit、完整固定目标、实际定义字节、人工 context 锚与 expected、现有语法 | 来源变化重建 source 及全部下游；目标/context/提取变化重建特征与对账及相应 fit/查询链 |
+| split/protocol/label/fit-review | 明确成员/组/仓库与逻辑目标、来源、人工标签及提交内依据、词汇表、实现、独立拟合锚 | 新版本/新审核，不从预测反推标签；holdout 没有可读取路径 |
+| fit/scope | 只读取相应训练阶段，全来源/目标/特征/标签重建，原 learner/explanation、条款见证和实现 | 新拟合；refusal 明文保留而非全适用；学习摘要不伪造时间 |
+| replay-plan/execution-review/admission | 原 source/target/map 与执行锚、相同两份 fit 及拟合锚、实际查询 context/audit、B2 类别、方法/runner/policy/实现 | 重新审核及准入；查询标签不参与决策；同 Guard 不得逐查询更换 fit/B2 |
+| authorization/replay | 全链及实际 request/test/输入 pins、所选 Scope、原始 Run/JUnit 与真实时间 | 执行前后重建；跳过 run=null；变化保留实际运行并 stale；新目录重放 |
+| evaluation-plan/query-label/review | 完整四方法与成员、来源/目标身份、人工 fixture 查询标签及原始依据、逐行 fit/执行 pins、独立评测锚和实现 | 全矩阵运行前后核对；任一输入变化另建计划/审核与新输出，不能补签旧矩阵 |
+| evaluation/report/export | 原始逐项重放、全矩阵重建、固定公式/分组/配对、独立 unscoped 源自检表和实现 | 从原事实全部重算；损坏/缺行拒绝，部分运行保留 failure；报告导出先 verify |
+
+源自检表不证明 learned Scope 的来源检出率；已知 fixture 查询不是正式留出实验。
+该组没有外部标签、训练、生产 Registry 或科学结论授权。

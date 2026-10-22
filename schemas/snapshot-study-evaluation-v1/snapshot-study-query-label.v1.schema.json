@@ -1,0 +1,158 @@
+{
+  "$defs": {
+    "SampleLabels": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_applicable": {
+          "title": "Guard Applicable",
+          "type": "boolean"
+        },
+        "guard_violation": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Guard Violation"
+        },
+        "contract_compliant": {
+          "title": "Contract Compliant",
+          "type": "boolean"
+        },
+        "basis": {
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_applicable",
+        "guard_violation",
+        "contract_compliant",
+        "basis"
+      ],
+      "title": "SampleLabels",
+      "type": "object"
+    },
+    "StudyBasisPin": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "content_digest"
+      ],
+      "title": "StudyBasisPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-query-label.v1",
+      "default": "snapshot-study-query-label.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "authority": {
+      "const": "trusted_manual_fixture_labels_not_semantic_proof",
+      "default": "trusted_manual_fixture_labels_not_semantic_proof",
+      "title": "Authority",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "operator": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "sample_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Sample Id",
+      "type": "string"
+    },
+    "project_group": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Project Group",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "labels": {
+      "$ref": "#/$defs/SampleLabels"
+    },
+    "basis_pins": {
+      "items": {
+        "$ref": "#/$defs/StudyBasisPin"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Basis Pins",
+      "type": "array"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "operator",
+    "reason",
+    "sample_id",
+    "project_group",
+    "guard_digest",
+    "target_digest",
+    "labels",
+    "basis_pins",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyQueryLabel",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -2,7 +2,7 @@
 
 工具自有的完整快照来源现在可以接入独立训练接口。它从真实 Git B/F/H、Evidence、最小 Guard
 和原始 JUnit 重建来源，重新读取固定目标全树，再核对特征和人工 fixture 标签。
-这一步实现训练层；四方法执行与评测编排尚未接通。
+训练层通过[四方法研究重放](snapshot-study-evaluation.md)接入独立评测编排；用途仍限工具自有 fixture。
 
 用途固定为 `tool_owned_snapshot_study_only`。旧研究 fixture、完整快照比较和外部 observation-only
 parser 不接受这些新记录，训练结果也不提供生产 Registry 或 Docker 调度权限。

@@ -1,7 +1,8 @@
 # 完整快照研究训练层验收
 
 工具自有的完整快照来源已接入独立的特征与拟合接口，严格类型、CLI 和11份新 Schema 已实现。
-本阶段关闭训练层的工程缺口；**完整快照的四方法重放和评测编排仍待接入**。
+本回执记录 `386593b` 的训练层验收；该版本尚无完整快照四方法重放和评测编排。
+后续接口与独立验收见[四方法研究重放](../../snapshot-study-evaluation.md)，本回执及其 JSON 保留原版本事实。
 没有真实项目标签、外部训练数据或正式 scope_v2 冻结。
 
 接口见[完整快照研究拟合](../../snapshot-study-fit.md)，有限机器回执见[qualification.json](qualification.json)。
@@ -38,7 +39,9 @@ initial不读取refinement内容；holdout阶段在读取协议前拒绝，holdo
 
 外部快照、外部语义标签、快照学习规则的Docker重放、N×4评测、正式protocol/split/context与留出消费
 不在本阶段实现或实测范围。外部observation-only与生产snapshot用途未扩大。
-webcolors的Try仍不在当前研究语法子集内，不能用空特征代替拒绝。
+更正：先前将webcolors的拒绝节点写为Try不准确。固定`normalize_hex`函数实际含NamedExpr，
+静态根导出另因`export_evaluated_annotation`拒绝；两者都没有支持，不能用空特征代替拒绝。
+原固定定义的文件摘要和行依据见[后续复核](../snapshot-study-replay-fixture-v1/README.md#候选诊断更正)。
 远程审核身份、防回滚、自动最新撤回、恶意目标干扰容器内pytest/JUnit等既有限制保持。
 
 新增包源码改变实现指纹，历史观察保留为原实现下的事实；需要当前结论时使用新ID/目录重建，

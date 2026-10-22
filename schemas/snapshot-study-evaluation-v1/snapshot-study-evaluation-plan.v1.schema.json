@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "SnapshotStudyEvaluationMember": {
+      "additionalProperties": false,
+      "properties": {
+        "row_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Row Id",
+          "type": "string"
+        },
+        "sample_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "project_group": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Project Group",
+          "type": "string"
+        },
+        "guard_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Guard Digest",
+          "type": "string"
+        },
+        "target_key": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Target Key",
+          "type": "string"
+        },
+        "plan_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Plan Ref",
+          "type": "string"
+        },
+        "label_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Label Ref",
+          "type": "string"
+        },
+        "label_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Label Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "row_id",
+        "sample_id",
+        "project_group",
+        "guard_digest",
+        "target_key",
+        "plan_ref",
+        "label_ref",
+        "label_digest"
+      ],
+      "title": "SnapshotStudyEvaluationMember",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-evaluation-plan.v1",
+      "default": "snapshot-study-evaluation-plan.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "evaluation_id": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Evaluation Id",
+      "type": "string"
+    },
+    "dataset_role": {
+      "const": "known_tool_owned_fixture_queries_not_formal_holdout",
+      "default": "known_tool_owned_fixture_queries_not_formal_holdout",
+      "title": "Dataset Role",
+      "type": "string"
+    },
+    "methods": {
+      "default": [
+        "b1_always",
+        "b2_interface",
+        "learned_initial",
+        "learned_refined"
+      ],
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "const": "b1_always",
+          "type": "string"
+        },
+        {
+          "const": "b2_interface",
+          "type": "string"
+        },
+        {
+          "const": "learned_initial",
+          "type": "string"
+        },
+        {
+          "const": "learned_refined",
+          "type": "string"
+        }
+      ],
+      "title": "Methods",
+      "type": "array"
+    },
+    "members": {
+      "items": {
+        "$ref": "#/$defs/SnapshotStudyEvaluationMember"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Members",
+      "type": "array"
+    },
+    "execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Execution Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "members",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyEvaluationPlan",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

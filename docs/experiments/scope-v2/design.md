@@ -41,7 +41,8 @@ uv run pytest tests/unit/test_study_inventory.py -m "not slow" -q
 独立的静态特征命令见[研究特征](../../study-features.md)，自有 fixture 的 learned replay
 另见[研究重放 v2](../../research-fitted-replay.md)；正式外部评测未接通。
 完整快照另有独立的[特征/训练接口](../../snapshot-study-fit.md)，已用真实自有Git/Docker来源验收，
-尚未接通该快照类型的四方法重放。旧词法闭包fit不因此接受快照或外部观察记录。
+并以工具自有fixture接通[四方法重放与N×4评测](../../snapshot-study-evaluation.md)。
+这项工程桥接不增加真实样本、外部标签或正式留出；旧词法闭包fit仍不接受快照或外部观察记录。
 
 该命令只读固定路径的 v1 protocol/split、9 个训练样本、6 个公开留出样本、原始 24 份预测和已发布汇总。它独立计算 B1/B2 训练计数、四方法留出混淆矩阵、false alert/bug recall 分母、执行数与配对变化，并比较原始数据和历史发布 pin。重复/缺失行、标签错配、文件篡改、重新签名的不同历史 manifest、重复 JSON key 和非有限数字会拒绝。
 

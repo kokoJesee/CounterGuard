@@ -1,0 +1,240 @@
+{
+  "$defs": {
+    "ClauseTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "op": {
+          "title": "Op",
+          "type": "string"
+        },
+        "expected": {
+          "title": "Expected",
+          "type": "string"
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actual"
+        },
+        "matched": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Matched"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "expected",
+        "actual",
+        "matched"
+      ],
+      "title": "ClauseTrace",
+      "type": "object"
+    },
+    "ScopeDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "trace": {
+          "items": {
+            "$ref": "#/$defs/ClauseTrace"
+          },
+          "title": "Trace",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision",
+        "trace"
+      ],
+      "title": "ScopeDecision",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-admission.v1",
+      "default": "snapshot-study-admission.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "guard_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Guard Digest",
+      "type": "string"
+    },
+    "target_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Digest",
+      "type": "string"
+    },
+    "map_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Map Digest",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "witness_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Witness Digest"
+    },
+    "method": {
+      "enum": [
+        "b1_always",
+        "b2_interface",
+        "learned_initial",
+        "learned_refined"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "lane": {
+      "const": "guard",
+      "default": "guard",
+      "title": "Lane",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "applicable",
+        "inapplicable",
+        "unknown"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "fit_review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Fit Review Digest",
+      "type": "string"
+    },
+    "initial_fit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Initial Fit Digest",
+      "type": "string"
+    },
+    "refined_fit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Refined Fit Digest",
+      "type": "string"
+    },
+    "context_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Context Digest",
+      "type": "string"
+    },
+    "audit_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Audit Digest",
+      "type": "string"
+    },
+    "scope_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Scope Digest"
+    },
+    "scope_decision": {
+      "$ref": "#/$defs/ScopeDecision"
+    }
+  },
+  "required": [
+    "plan_digest",
+    "guard_digest",
+    "target_digest",
+    "map_digest",
+    "review_digest",
+    "witness_digest",
+    "method",
+    "decision",
+    "reason_code",
+    "artifact_digest",
+    "fit_review_digest",
+    "initial_fit_digest",
+    "refined_fit_digest",
+    "context_digest",
+    "audit_digest",
+    "scope_digest",
+    "scope_decision"
+  ],
+  "title": "SnapshotStudyAdmission",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

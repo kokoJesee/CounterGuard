@@ -212,8 +212,15 @@ owner H 只新增原六 case 契约；B 6 failed、F 6 passed，最小 Guard 保
 Tomli-W 与 ulid-transform。Tomli-W 原负缩进断言已完整准备为1case，但四个独立 TOML 目标均无原 indent 参数；
 五个新颜色目标的实际全树检查分别因包内未安装导入、包内 conftest 或单文件布局拒绝，pansi 的固定 Git 来源不确定。
 没有改调用、删包文件或扩大 profile。新增真实来源捕获/观察/正式场景均为0，保留2/2/0计数。
-研究语法诊断另确认 webcolors 的 Try 尚不支持，没有生成外部特征或标签。
+研究语法诊断确认 webcolors 尚不支持，没有生成外部特征或标签。
+2026-10-22 更正具体原因：此前写为Try不准确，固定`normalize_hex`实际含NamedExpr；
+静态根导出另以`export_evaluated_annotation`拒绝。
+见[固定定义复核](../../results/snapshot-study-replay-fixture-v1/README.md#候选诊断更正)，接受范围未改。
 
 独立的[快照研究训练层](../../snapshot-study-fit.md)随后仅用自有fixture接通完整来源、目标、特征和fit。
-快速层1286通过，自有Git/Docker专项1通过、实际4个自有容器；四方法快照重放尚未接通。
+训练层快速层1286通过，自有Git/Docker专项1通过、实际4个自有容器。
+[四方法工程桥接](../../snapshot-study-evaluation.md)又以工具自有fixture接通B1、B2、initial、refined的
+N×4重放、核验和报告；专项27项及两查询补测1项、快速层1313项、Docker专项1项通过。
+该桥接累计10个成功复跑容器并保留首轮4个失败容器，只证明工程链路；没有增加真实来源、真实观察或正式场景，
+当前计数仍为2/2/0，也没有外部标签、外部训练或scope_v2冻结。
 这些synthetic成员不计真实样本，外部用途不因这一步获得标签、训练或生产调度许可。

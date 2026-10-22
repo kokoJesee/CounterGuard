@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+- 新增工具自有完整快照的四方法重放与N×4评测：独立执行/评测审核锚、固定每个Guard的fit与B2、
+  原始Run/JUnit和全矩阵重建、unknown与执行故障分列，以及核验后报告/配对/导出。
+  源Bug表明确为未加作用域自检，不代替学习后的来源检出证明；没有外部标签或正式冻结。
+  详见[接口与验收](docs/snapshot-study-evaluation.md)。
+
 - 新增仅限工具自有fixture的完整快照研究训练层：独立严格Schema、真实来源/目标重建、定义绑定和逐字段特征对账、
   分立的源执行/拟合审核锚，以及initial/refined拟合与拒绝核验。原learner和语法范围不变，holdout没有读取入口。
-  [训练层验收](docs/results/snapshot-study-fit-fixture-v1/README.md)通过；四方法快照执行、外部标签和正式数据冻结尚未提供。
+  [训练层验收](docs/results/snapshot-study-fit-fixture-v1/README.md)通过；外部标签和正式数据冻结尚未提供。
 
 - [完整快照复筛](docs/results/snapshot-candidate-rescreen-v1/README.md)复查两个既有来源、查询十个新仓库；
   Tomli-W原1case可完整准备，但新增自然比较目标0，没有修改准入、执行候选或增加研究场景计数。

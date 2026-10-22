@@ -238,3 +238,10 @@ W01/W03/W04 整体仍为部分，也不授予生产 Shadow/Active 权限。
 20 次乱序和合法 Schema 重签后完整重算的算术覆盖；没有新增执行或标签授权。
 输入只声明可信人工 fixture 标签，不能证明真实 Run/JUnit 或语义来源。
 无 Docker/fit/holdout 读取入口，W01/W03/W04 的执行及远程权限状态不因此升级。
+
+[完整快照四方法桥接](snapshot-study-evaluation.md)增加独立 fixture 用途的执行/拟合/评测锚，
+完整N×4成员、逐Guard固定fit/B2、查询标签依据与逐项Run/JUnit重建、三态结果和部分失败留痕。
+[单元专项](../tests/unit/test_snapshot_study_evaluation.py)覆盖先审全部标签、变更/撤回拒绝、
+重签假计数拒绝和运行后变化保留记录；[实际资格状态](results/snapshot-study-replay-fixture-v1/README.md)
+分别记录Docker与快层结果。来源Bug表明确只是unscoped自检，不声称学习后的来源检出保持。
+本批不运行外部仓库，不增加真实标签或生产权限，不重跑隔离攻击矩阵；W01/W03/W04整体仍为部分。

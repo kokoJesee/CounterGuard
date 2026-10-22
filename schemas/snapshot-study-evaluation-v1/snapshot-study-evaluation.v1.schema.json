@@ -1,0 +1,933 @@
+{
+  "$defs": {
+    "ClauseTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "op": {
+          "title": "Op",
+          "type": "string"
+        },
+        "expected": {
+          "title": "Expected",
+          "type": "string"
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actual"
+        },
+        "matched": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Matched"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "expected",
+        "actual",
+        "matched"
+      ],
+      "title": "ClauseTrace",
+      "type": "object"
+    },
+    "ConfusionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "integer"
+        },
+        "fp": {
+          "minimum": 0,
+          "title": "Fp",
+          "type": "integer"
+        },
+        "tn": {
+          "minimum": 0,
+          "title": "Tn",
+          "type": "integer"
+        },
+        "fn": {
+          "minimum": 0,
+          "title": "Fn",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tp",
+        "fp",
+        "tn",
+        "fn"
+      ],
+      "title": "ConfusionCounts",
+      "type": "object"
+    },
+    "EvaluationMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "evaluation-metrics.v1",
+          "default": "evaluation-metrics.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "metric_version": {
+          "const": "scope-v1-metrics.v1",
+          "default": "scope-v1-metrics.v1",
+          "title": "Metric Version",
+          "type": "string"
+        },
+        "unknown_policy": {
+          "const": "negative_prediction_with_separate_coverage",
+          "default": "negative_prediction_with_separate_coverage",
+          "title": "Unknown Policy",
+          "type": "string"
+        },
+        "methods": {
+          "additionalProperties": {
+            "$ref": "#/$defs/MethodMetrics"
+          },
+          "propertyNames": {
+            "enum": [
+              "b1_always",
+              "b2_interface",
+              "learned_initial",
+              "learned_refined"
+            ]
+          },
+          "title": "Methods",
+          "type": "object"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "methods",
+        "artifact_digest"
+      ],
+      "title": "EvaluationMetrics",
+      "type": "object"
+    },
+    "MethodMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "micro": {
+          "$ref": "#/$defs/SliceMetrics"
+        },
+        "per_guard": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SliceMetrics"
+          },
+          "title": "Per Guard",
+          "type": "object"
+        },
+        "macro_scope": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Macro Scope",
+          "type": "object"
+        },
+        "macro_end_to_end": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Macro End To End",
+          "type": "object"
+        }
+      },
+      "required": [
+        "micro",
+        "per_guard",
+        "macro_scope",
+        "macro_end_to_end"
+      ],
+      "title": "MethodMetrics",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "numerator": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Numerator"
+        },
+        "denominator": {
+          "minimum": 0,
+          "title": "Denominator",
+          "type": "number"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "included_guards": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Included Guards",
+          "type": "array"
+        },
+        "components": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "default": {},
+          "title": "Components",
+          "type": "object"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator",
+        "value",
+        "reason"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "Prediction": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "b1_always",
+            "b2_interface",
+            "learned_initial",
+            "learned_refined"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "sample_id": {
+          "minLength": 1,
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/$defs/SampleLabels"
+        },
+        "scope_decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Scope Decision",
+          "type": "string"
+        },
+        "decision_trace": {
+          "items": {
+            "$ref": "#/$defs/ClauseTrace"
+          },
+          "title": "Decision Trace",
+          "type": "array"
+        },
+        "verdict": {
+          "minLength": 1,
+          "title": "Verdict",
+          "type": "string"
+        },
+        "violated_case_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Violated Case Ids",
+          "type": "array"
+        },
+        "run_outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "guard_id",
+        "sample_id",
+        "labels",
+        "scope_decision",
+        "decision_trace",
+        "verdict",
+        "violated_case_ids",
+        "run_outcome"
+      ],
+      "title": "Prediction",
+      "type": "object"
+    },
+    "RunOutcome": {
+      "description": "Normalized outcome of a pytest process.",
+      "enum": [
+        "passed",
+        "test_failed",
+        "interrupted",
+        "pytest_internal_error",
+        "pytest_usage_error",
+        "no_tests_collected",
+        "timeout",
+        "launch_error",
+        "process_error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "SampleLabels": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "minLength": 1,
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_applicable": {
+          "title": "Guard Applicable",
+          "type": "boolean"
+        },
+        "guard_violation": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Guard Violation"
+        },
+        "contract_compliant": {
+          "title": "Contract Compliant",
+          "type": "boolean"
+        },
+        "basis": {
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_applicable",
+        "guard_violation",
+        "contract_compliant",
+        "basis"
+      ],
+      "title": "SampleLabels",
+      "type": "object"
+    },
+    "SliceMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_count": {
+          "minimum": 0,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "confusion": {
+          "$ref": "#/$defs/ConfusionCounts"
+        },
+        "unknown_count": {
+          "minimum": 0,
+          "title": "Unknown Count",
+          "type": "integer"
+        },
+        "execution_count": {
+          "minimum": 0,
+          "title": "Execution Count",
+          "type": "integer"
+        },
+        "verdict_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Verdict Counts",
+          "type": "object"
+        },
+        "scope": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Scope",
+          "type": "object"
+        },
+        "end_to_end": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "End To End",
+          "type": "object"
+        }
+      },
+      "required": [
+        "sample_count",
+        "confusion",
+        "unknown_count",
+        "execution_count",
+        "verdict_counts",
+        "scope",
+        "end_to_end"
+      ],
+      "title": "SliceMetrics",
+      "type": "object"
+    },
+    "SnapshotStudyEvaluationSlot": {
+      "additionalProperties": false,
+      "properties": {
+        "row_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Row Id",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "b1_always",
+            "b2_interface",
+            "learned_initial",
+            "learned_refined"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "replay_ref": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Replay Ref",
+          "type": "string"
+        },
+        "replay_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Replay Digest",
+          "type": "string"
+        },
+        "prediction": {
+          "$ref": "#/$defs/Prediction"
+        }
+      },
+      "required": [
+        "row_id",
+        "method",
+        "replay_ref",
+        "replay_digest",
+        "prediction"
+      ],
+      "title": "SnapshotStudyEvaluationSlot",
+      "type": "object"
+    },
+    "SnapshotStudySourceBug": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "const": "unscoped_guard_self_check_not_learned_scope_replay",
+          "default": "unscoped_guard_self_check_not_learned_scope_replay",
+          "title": "Role",
+          "type": "string"
+        },
+        "guard_id": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "guard_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Guard Digest",
+          "type": "string"
+        },
+        "buggy_run_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Buggy Run Digest",
+          "type": "string"
+        },
+        "fixed_run_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Fixed Run Digest",
+          "type": "string"
+        },
+        "detected": {
+          "title": "Detected",
+          "type": "boolean"
+        },
+        "fixed_passed": {
+          "title": "Fixed Passed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "guard_id",
+        "guard_digest",
+        "buggy_run_digest",
+        "fixed_run_digest",
+        "detected",
+        "fixed_passed"
+      ],
+      "title": "SnapshotStudySourceBug",
+      "type": "object"
+    },
+    "StudyMetricDeltas": {
+      "additionalProperties": false,
+      "properties": {
+        "bug_recall": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bug Recall"
+        },
+        "false_alert_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "False Alert Rate"
+        },
+        "unknown_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unknown Rate"
+        },
+        "decision_coverage": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decision Coverage"
+        }
+      },
+      "required": [
+        "bug_recall",
+        "false_alert_rate",
+        "unknown_rate",
+        "decision_coverage"
+      ],
+      "title": "StudyMetricDeltas",
+      "type": "object"
+    },
+    "StudyMetricSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "study-metric-summary.v1",
+          "default": "study-metric-summary.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "tool_owned_research_fixture_only",
+          "default": "tool_owned_research_fixture_only",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "assurance": {
+          "const": "pure_metrics_not_provenance_verification_or_scientific_support",
+          "default": "pure_metrics_not_provenance_verification_or_scientific_support",
+          "title": "Assurance",
+          "type": "string"
+        },
+        "execution_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Execution Allowed",
+          "type": "boolean"
+        },
+        "formal_protocol_frozen": {
+          "const": false,
+          "default": false,
+          "title": "Formal Protocol Frozen",
+          "type": "boolean"
+        },
+        "normalized_rows_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Normalized Rows Digest",
+          "type": "string"
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "evaluation_pair_count": {
+          "minimum": 0,
+          "title": "Evaluation Pair Count",
+          "type": "integer"
+        },
+        "metrics": {
+          "$ref": "#/$defs/EvaluationMetrics"
+        },
+        "per_project": {
+          "patternProperties": {
+            "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$": {
+              "$ref": "#/$defs/EvaluationMetrics"
+            }
+          },
+          "title": "Per Project",
+          "type": "object"
+        },
+        "paired": {
+          "$ref": "#/$defs/StudyPairComparison"
+        },
+        "deltas": {
+          "$ref": "#/$defs/StudyMetricDeltas"
+        },
+        "implementation_digests": {
+          "additionalProperties": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Implementation Digests",
+          "type": "object"
+        },
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "normalized_rows_digest",
+        "row_count",
+        "evaluation_pair_count",
+        "metrics",
+        "per_project",
+        "paired",
+        "deltas",
+        "implementation_digests",
+        "artifact_digest"
+      ],
+      "title": "StudyMetricSummary",
+      "type": "object"
+    },
+    "StudyPairComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "paired-refinement.v1",
+          "default": "paired-refinement.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "totals": {
+          "$ref": "#/$defs/StudyPairTotals"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/StudyPairRow"
+          },
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "totals",
+        "rows"
+      ],
+      "title": "StudyPairComparison",
+      "type": "object"
+    },
+    "StudyPairRow": {
+      "additionalProperties": false,
+      "properties": {
+        "guard_id": {
+          "title": "Guard Id",
+          "type": "string"
+        },
+        "sample_id": {
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "initial_decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Initial Decision",
+          "type": "string"
+        },
+        "refined_decision": {
+          "enum": [
+            "applicable",
+            "inapplicable",
+            "unknown"
+          ],
+          "title": "Refined Decision",
+          "type": "string"
+        },
+        "corrected_false_application": {
+          "title": "Corrected False Application",
+          "type": "boolean"
+        },
+        "retained_applicable_case": {
+          "title": "Retained Applicable Case",
+          "type": "boolean"
+        },
+        "new_false_rejection": {
+          "title": "New False Rejection",
+          "type": "boolean"
+        },
+        "new_false_application": {
+          "title": "New False Application",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "guard_id",
+        "sample_id",
+        "initial_decision",
+        "refined_decision",
+        "corrected_false_application",
+        "retained_applicable_case",
+        "new_false_rejection",
+        "new_false_application"
+      ],
+      "title": "StudyPairRow",
+      "type": "object"
+    },
+    "StudyPairTotals": {
+      "additionalProperties": false,
+      "properties": {
+        "corrected_false_applications": {
+          "minimum": 0,
+          "title": "Corrected False Applications",
+          "type": "integer"
+        },
+        "retained_applicable_cases": {
+          "minimum": 0,
+          "title": "Retained Applicable Cases",
+          "type": "integer"
+        },
+        "new_false_rejections": {
+          "minimum": 0,
+          "title": "New False Rejections",
+          "type": "integer"
+        },
+        "new_false_applications": {
+          "minimum": 0,
+          "title": "New False Applications",
+          "type": "integer"
+        },
+        "delta_false_application_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta False Application Rate"
+        },
+        "delta_recall": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta Recall"
+        }
+      },
+      "required": [
+        "corrected_false_applications",
+        "retained_applicable_cases",
+        "new_false_rejections",
+        "new_false_applications",
+        "delta_false_application_rate",
+        "delta_recall"
+      ],
+      "title": "StudyPairTotals",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "snapshot-study-evaluation.v1",
+      "default": "snapshot-study-evaluation.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "purpose": {
+      "const": "tool_owned_snapshot_study_only",
+      "default": "tool_owned_snapshot_study_only",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "research_support": {
+      "const": "fixture_engineering_only_not_scientific_evidence",
+      "default": "fixture_engineering_only_not_scientific_evidence",
+      "title": "Research Support",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "plan_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Plan Ref",
+      "type": "string"
+    },
+    "plan_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Digest",
+      "type": "string"
+    },
+    "review_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "Review Ref",
+      "type": "string"
+    },
+    "review_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Digest",
+      "type": "string"
+    },
+    "slots": {
+      "items": {
+        "$ref": "#/$defs/SnapshotStudyEvaluationSlot"
+      },
+      "maxItems": 128,
+      "minItems": 4,
+      "title": "Slots",
+      "type": "array"
+    },
+    "source_bugs": {
+      "items": {
+        "$ref": "#/$defs/SnapshotStudySourceBug"
+      },
+      "title": "Source Bugs",
+      "type": "array"
+    },
+    "metrics": {
+      "$ref": "#/$defs/StudyMetricSummary"
+    },
+    "integrity": {
+      "const": "complete",
+      "default": "complete",
+      "title": "Integrity",
+      "type": "string"
+    },
+    "execution_failures": {
+      "maximum": 128,
+      "minimum": 0,
+      "title": "Execution Failures",
+      "type": "integer"
+    },
+    "implementation_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Implementation Digests",
+      "type": "object"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "plan_ref",
+    "plan_digest",
+    "review_ref",
+    "review_digest",
+    "slots",
+    "source_bugs",
+    "metrics",
+    "execution_failures",
+    "implementation_digests",
+    "artifact_digest"
+  ],
+  "title": "SnapshotStudyEvaluation",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
