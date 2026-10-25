@@ -1,7 +1,7 @@
 # 研究 fixture 的训练拟合与来源核验
 
-工具自有 fixture 可以通过独立的 `study-fit-protocol.v1`，从获审训练成员拟合研究 Scope，
-再从原始来源独立重建结果。这是训练专用接口，不生成 Docker 或生产调度许可。
+工具自有 fixture 可以通过独立的 `study-fit-protocol.v1`，从获审训练成员拟合研究 Scope，再从原始来源独立重建结果。这是训练专用接口，不生成 Docker 或生产调度许可。
+
 真实外部数据的 `scope_v2` 协议、标签和分组尚未冻结。
 
 实现见 [study_fit.py](../src/counterguard/study_fit.py)，
@@ -20,15 +20,13 @@
 | `study-fit.v1` | 实际消费成员的 pins、阶段、学习/解释/研究 Scope，或明确的拒绝原因 |
 | `study-learned-scope.v1` | 精确 source/Guard/protocol/split/review/训练绑定、learning/explanation 摘要与规范化条件 |
 
-审核函数 `issue_fit_review` 不调用 learner，也不打开 holdout 文件。
-调用者单独保存返回的可信审核摘要，Session 通过该摘要核对审核事件，不能从可变协议自行取得批准。
-审核是可信本机操作记录，不提供身份签名、远程角色或自动发现最新撤回的能力；使用撤回事件时须显式换用新摘要。
-同时控制可信摘要、代码和主机的攻击不在保证内。
+审核函数 `issue_fit_review` 不调用 learner，也不打开 holdout 文件。调用者要单独保存返回的可信审核摘要，Session 通过这个摘要核对审核事件，不能从可变协议里自行取得批准。
 
-标签的语义由人审。当前 `own_contract_confirmation=trusted_manual_fixture_review` 表示人工确认自有 fixture 的规范，
-不冒充一次已执行的契约检查，不自动分配外部标签。
-工具核对规范依据确实来自固定目标提交及其字节，但不能证明这份文本的语义或人工结论正确。
-合法反例声明与适用性必须一致，refinement additions 全部必须是获审负例。
+审核是可信本机操作记录，不提供身份签名、远程角色，也不能自动发现最新撤回；使用撤回事件时要显式换用新摘要。同时控制可信摘要、代码和主机的攻击不在保证内。
+
+标签的语义由人审。`own_contract_confirmation=trusted_manual_fixture_review` 表示人工确认了自有 fixture 的规范，不代表已经执行过一次契约检查，也不会自动分配外部标签。
+
+工具会核对规范依据确实来自固定目标提交及其字节，但证明不了这份文本的语义或人工结论正确。合法反例声明必须和适用性一致，refinement additions 必须全部是获审负例。
 
 ## 实际重建的事实
 
