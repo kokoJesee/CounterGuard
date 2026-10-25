@@ -137,7 +137,7 @@ Shadow/Active/unknown/异常退出策略、JSON/Markdown 计数同源、公开�
 本地安装驱动不能替代实际 GitHub job；公开材料是否已发布以 [Beta 交付说明](beta-release.md)及同版验收记录为准。
 W04 整体保持**部分**，不标为全面已测。
 
-## W3 开工与准入
+## 开工与准入
 
 独立[研究快照](research-snapshots.md)增加工具自有 fixture 范围的检查，原 W01/W03/W04 总体状态均保持**部分**：
 

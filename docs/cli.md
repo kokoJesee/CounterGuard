@@ -35,7 +35,7 @@ Q1 的可执行只读入口为 `uv run counterguard preflight --repo <repo> --re
 
 日期：2026-10-15。格式版本为 `command-report.v1` / `demo-report.v1`。命令格式化不修改冻结 scope_v1 的标签、标准、公式或已发布记录。
 
-## W3-A inspect
+## 仓库检查 `inspect`
 
 源码开发版新增 `inspect --repo ... --base ... --head ... --config ... --format json|text|markdown`，使用独立 `repository-inspection.v1`，不扩展旧 command-report.v1 或把候选影响当作 Replay verdict。完整可运行示例见 [只读仓库检查](repository-inspection.md)，安全准入见 [security-model.md](security-model.md)。
 

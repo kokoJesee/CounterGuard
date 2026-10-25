@@ -1,4 +1,4 @@
-# W3 安全模型与准入记录
+# 安全模型与准入记录
 
 更新：2026-10-16。W3-A 只读检查、W3-B 独立授权与受限执行、W3-C 本地 Registry 均有记录；validators 固定 manifest-v5 pilot 已完成。正式 runner 的镜像字节锁定和四项攻击结果见[验收记录](results/w3b-formal-v1/runner-receipt.json)及[攻击面清单](attack-surface-checklist.md)。本页不是通用沙箱或全面安全认证。
 
@@ -12,7 +12,7 @@ W3-B 使用另一份 `docker-execution-authorization.v1`。只有可信宿主控
 
 这里的“可信宿主控制面”是进程内信任假设：当前库函数没有身份角色或签名认证。W3-C 保存本机登记/禁用事实并重验来源，不认证操作者身份。W4 仍须限制授权调用者并完善身份/签名/CI 权限，不能把任意拥有宿主 Python 执行权的调用者视为已鉴权。
 
-## W3-A 的具体控制
+## 只读仓库检查的控制
 
 1. 校验根路径与配置的既有组成部分，拒绝 symlink/Windows reparse point。只读普通 .git 目录；gitfile、worktree/commondir、reftable 等布局返回 unknown，不跟随外部 gitdir。
 2. 受限读取 HEAD、heads/tags、packed-refs、shallow。对象目录预查链接/特殊文件、alternates 和体积；不读取原仓库 config、hooks、index 或 reflog。
@@ -38,7 +38,7 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 一个 PR 同时修改源码和 `.github/workflows/ci.yml` 时，只有配置把这个**精确路径**放入 `ignored_paths` 才得到 affected/ready；没有声明则 unknown。允许声明的是直接位于 `.github/workflows/` 的 yml/yaml、`.github/dependabot.yml|yaml`、`.circleci/config.yml`、根级 `.gitignore`/CI 元数据，以及文档/许可证/变更日志等有限集合。`.github/actions/`、图片、requirements、构建脚本仍是 unknown，不能用宽泛 glob 隐藏。这里的 ignore 表示“本次文件影响映射不参与目标语义”，不表示文件可信。
 
-## fsck 实测与 W3-D 仓库规模
+## fsck 实测与仓库规模
 
 [原始 JSON](results/w3b-v1/fsck-benchmark.json) 使用与 W3-A 相同的 `fsck --full --strict --no-reflogs --no-dangling <base> <head>`，在 Windows 11、Git 2.53.0.windows.2 上各跑 5 次：
 
@@ -51,7 +51,7 @@ ready 只代表指定提交可读且声明映射覆盖当前改动，不证明�
 
 当前仓库为 838 个 loose 对象，最大 391.21 ms。**本机没有测到“多少对象必然接近 5 秒”的阈值**；同样对象数在 loose/packed 下相差一个数量级，缓存、对象大小和文件系统也会改变结果，不能把对象数拟合成通用承诺。W3-D 不选 pandas 量级仓库；首个试点限定为存储不超过 64 MiB、loose 元数据不超过 10,000 项，并要求在实际机器按同命令预跑 5 次、最大值不超过 2.5 秒。packed 仓库也必须预跑，不能因目录项少就跳过。超出该准入返回 unknown 或更换更小试点，不提高 5 秒标准。
 
-## W3-B Docker 固定策略
+## Docker 固定策略
 
 `docker-policy.v1` 的字段均为 Literal 常量，不接收项目配置覆盖：network/ipc none、只读根文件系统与工作区 bind、UID/GID 65532、drop ALL capabilities、no-new-privileges、64 PID、256 MiB 内存且不使用额外 swap、1 CPU、64 MiB `/tmp` tmpfs、30 秒测试上限，以及 stdout/stderr/JUnit/传输上限。镜像必须按本地 `sha256:` image ID 存在，运行使用 `--pull=never`；未传宿主环境、凭据、Docker socket或其他宿主目录。
 
