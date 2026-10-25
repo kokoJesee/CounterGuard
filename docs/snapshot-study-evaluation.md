@@ -21,10 +21,9 @@
 报告分别显示通过、Guard 失败、明确跳过、未知和执行故障；跳过不计通过。
 pytest 真失败、收集错误、超时和执行错误保持不同结果，执行故障不计检出。
 
-新 `snapshot-study-*.v1` [执行 Schema](../schemas/snapshot-study-replay-v1/)和
-[评测 Schema](../schemas/snapshot-study-evaluation-v1/)独立于旧比较和外部观察类型。
-来源事实复用旧只读读取器时，先生成只含原始事实引用的内部视图；这个视图不落盘、不调度执行。
-旧 parser 仍拒绝新研究计划。实际调度只使用新计划、新审核和新授权，绑定两份 fit 及查询 context/audit。
+新 `snapshot-study-*.v1` 的[执行 Schema](../schemas/snapshot-study-replay-v1/)和[评测 Schema](../schemas/snapshot-study-evaluation-v1/)独立于旧的比较和外部观察类型。
+
+来源事实会复用旧的只读读取器，但先生成一个只含原始事实引用的内部视图；这个视图不落盘、不调度执行。旧的 parser 仍然拒绝新研究计划。实际调度只使用新计划、新审核和新授权，并绑定两份 fit 与查询 context/audit。
 
 ## 审核与评测
 
@@ -47,10 +46,9 @@ CLI roster 还需要原始字节摘要，避免更换 roster 就替换全部可�
 指标沿用[纯汇总口径](study-metrics.md)：micro / per-Guard / macro、逐项目、initial→refined 配对及四项差值。
 零分母保持 null；unknown 不算通过或明确纠正。评测包含已知人工 fixture 查询，不能声明为正式封存留出。
 
-源 Bug 表单列 Guard 原始 buggy/fixed 自检，不进入查询指标分母，角色固定为
-`unscoped_guard_self_check_not_learned_scope_replay`。
-它证明原最小 Guard 的双向自检，**不证明学习后的 Scope 仍会适用于来源缺陷**。
-后者仍须正式实验单独提供按学习阶段的来源重放。
+源 Bug 表单独列出 Guard 原始的 buggy/fixed 自检，不进入查询指标分母，角色固定为 `unscoped_guard_self_check_not_learned_scope_replay`。
+
+它证明的是原最小 Guard 的双向自检，不证明学习后的 Scope 仍会适用于来源缺陷。后者要由正式实验单独提供按学习阶段的来源重放。
 结果的 `research_support` 固定为 `fixture_engineering_only_not_scientific_evidence`，不输出研究通过结论。
 
 ## 命令
