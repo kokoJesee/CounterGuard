@@ -1,246 +1,155 @@
 # CounterGuard
 
-CounterGuard turns verified bug evidence into reusable regression guards with explicit
-applicability boundaries.
+Fixed bugs should stay fixed.
+
+A while back you patched a boundary case. Today an AI assistant edits the same file. It has no idea that patch ever happened, so the same check goes missing again.
+
+CounterGuard takes a different approach: every confirmed fix is compiled into a small check that can be replayed later. The check also knows which code it belongs to, so it stays out of unrelated modules.
 
 > [中文](README.md) · English
 
-The public release is **[v0.5.0 Beta](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0)**.
-Its GitHub Release includes release notes, a wheel, an sdist, hashed tool dependency lists,
-the reviewed runner archive and SHA256SUMS. See the [Beta installation guide](docs/beta-release.md).
-This project has not published to PyPI.
-
-## The problem
-
-AI-generated and AI-edited code has a structural gap: **it does not know what you fixed three
-months ago.** The same defect can therefore be reintroduced repeatedly, and "someone remembers"
-was never a reliable mechanism.
-
-CounterGuard makes every fix a permanent check — and the check **knows when it should apply**.
-Rules are not global; each guard's applicability boundary is learned from confirmed
-counterexamples.
-
-The learning results below apply to the frozen benchmark. A new project can complete the
-restricted Docker Evidence → minimal Guard → manual review path; its first Scope uses complete
-reviewed B/F source snapshots, without automatic generalization to new code. See the
-[admission boundary and boltons retrial](docs/standalone-guards.md#非固定项目的支持边界).
+The public release is [v0.5.0 Beta](https://github.com/kokoJesee/CounterGuard/releases/tag/v0.5.0). It ships a wheel, an sdist, two hashed dependency lists, the reviewed runner archive and a SHA256SUMS file. Installation details are in the [Beta guide](docs/beta-release.md). Nothing has been published to PyPI.
 
 ## Install
 
 ```powershell
 uv sync
 uv run counterguard --help
+```
 
+Or install from a build:
+
+```powershell
 uv build
 python -m pip install "dist/counterguard-0.5.0-py3-none-any.whl[runner]"
 ```
 
-The wheel provides the CLI and library. Executing tests requires the `runner` extra, which
-declares the pytest dependency. Without pytest, execution fails **before creating any output**
-with exit `3` and a `counterguard[runner]` installation hint.
+The wheel gives you the CLI and the library. Running tests needs the `runner` extra, which pulls in pytest. Without pytest the command exits `3` before writing anything and tells you to install `counterguard[runner]`.
 
-The offline Demo additionally needs the source distribution's `examples/`, `benchmarks/`,
-`experiments/` and contract tests — these are not bundled in the library wheel.
+The offline demo also needs `examples/`, `benchmarks/`, `experiments/` and the contract tests from the source tree. Those are not part of the wheel.
 
-## Quick start
+## Run the demo
 
 ```powershell
 uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts/quickstart-v1
 ```
 
-One command runs the full pipeline from clean inputs and writes `report.json` and `report.md`.
-Repeating it performs a read-only audit and re-renders existing records.
+That single command goes through capture, compile, scope learning and replay, then writes `report.json` and `report.md`. Run it again against the same workspace and it only audits the records and re-renders the report.
 
-```powershell
-uv run counterguard demo --workspace artifacts/quickstart-v1 --format markdown
-uv run counterguard demo --workspace artifacts/quickstart-v1 --verify-only
-```
+The scenario file is called `mvp.yaml`, but the parser only accepts a JSON subset. Indentation, comments and anchors are not supported. The [quickstart](docs/quickstart.md) has valid input plus a real missing-contract case that ends in `unknown`.
 
-**Note**: although the scenario is named `mvp.yaml`, it currently requires **JSON syntax**.
-YAML indentation, comments and anchors are unsupported. The
-[quickstart](docs/quickstart.md) includes valid input plus a real missing-contract `unknown`
-replay.
+The demo uses recorded proposals and local fixtures. No network, no model calls. It is a demo, not a sandbox for arbitrary Python.
 
-The default Demo uses recorded proposals and trusted local fixtures — no network, no live
-model. **It is not a sandbox for arbitrary Python.**
+## Three states, kept apart
 
-## Three states are kept separate
+Running a guard can produce three different answers, and CounterGuard records them separately:
 
-This is the core design: **applicability, execution outcome and final verdict are three
-independent quantities.**
+| Field | Values | What it means |
+|---|---|---|
+| `scope_decision` | `applicable` / `inapplicable` / `unknown` | whether this guard is meant for this target |
+| `execution_outcome` | `not_run` / `pass` / `fail` / `error` / `timeout` | whether pytest ran, and what it did |
+| `final_verdict` | `pass` / `violation` / `skipped` / `inconclusive` | the conclusion a person reads |
 
-| Dimension | Values |
-|---|---|
-| `scope_decision` | `applicable` / `inapplicable` / `unknown` |
-| `execution_outcome` | `not_run` / `pass` / `fail` / `error` / `timeout` |
-| `final_verdict` | `pass` / `violation` / `skipped` / `inconclusive` |
+Inapplicable and unknown targets never start pytest; they are recorded as `not_run` plus `skipped`. Infrastructure problems become `inconclusive`. A skipped row is never turned into a pass.
 
-**Inapplicable and unknown never start pytest** — they produce `not_run` + `skipped`.
-Infrastructure failures produce `inconclusive`. A skipped target never becomes a pass.
-
-Reports also show the minimal failed cases, the initial/refined rules, per-clause comparison
-results, and source links. See [the CLI contract](docs/cli.md).
+Reports also carry the minimal failed cases, the initial and refined rules, clause-by-clause comparisons and source links. Field definitions live in the [CLI contract](docs/cli.md).
 
 ## How it works
 
-Four steps, each of which produces a versioned, digest-bound artifact:
+1. **Capture.** The same cases run against the buggy and the fixed revision. Only a real failure followed by a real pass counts as reproducible evidence. Raw logs, case results and source digests are kept.
+2. **Compile.** The failing cases become a Guard that contains nothing else, and that Guard has to pass on the fixed target before it is published.
+3. **Learn the boundary.** Which targets a guard should apply to is fitted from confirmed counterexamples. The learner only sees a `FeatureVector` and an applicability boolean. Paths, names, expected values and anything else that would leak the answer stay out of training.
+4. **Replay.** Applicability is decided first. Only then does pytest run, and skipped rows keep `run = null`.
 
-1. **Capture** — only a real buggy failure followed by a fixed pass counts as reproducible
-   Evidence. Contract, test and target digests, structured case results and raw logs are all
-   recorded.
-2. **Compile** — the failed cases become an independent minimal Guard, self-checked against the
-   fixed target before publication.
-3. **Learn the boundary** — the guard's applicability is fitted from confirmed counterexamples.
-   The solver receives only a `FeatureVector` plus a strict applicability bool; provenance,
-   identity fields and leaking subclasses are rejected.
-4. **Replay** — applicability is decided **before** pytest starts. Skipped rows keep `run=null`.
+## The frozen 15 samples
 
-## Frozen benchmark
+`benchmarks/` holds 15 labeled targets: 9 for training, 6 held out. Two guards cover them:
 
-15 labeled scenarios: **9 training + 6 holdout**. Each guard has applicable and inapplicable
-examples in both splits, and the holdout implementations use code shapes absent from training.
+- **Membership discount** (`membership_discount` v1 final-price). Members pay 80% of the original amount, two decimal places, half-up rounding, negative amounts rejected. The compiled guard keeps only the two member-price cases that failed on the source bug.
+- **Query limit** (`input-limit` v1). Default 20, accepting only ASCII decimal strings from 1 to 100. Signed, zero-padded, Unicode-digit, malformed and out-of-range input is rejected. The guard keeps a single assertion: reject zero.
 
-Scope features deliberately exclude contract IDs, paths, module names, target names, expected
-outputs and oracle values — a rule cannot work by memorizing answers. One target is
-**inapplicable while violating its own contract**, proving applicability cannot be inferred
-from target correctness.
+Scope features deliberately exclude contract IDs, paths, module names, target names and expected output. The holdout set also contains a target that is inapplicable while violating its own contract, which is there to keep "should this run" separate from "is this correct".
 
-### Membership discount guard
+### What the learner found
 
-Source contract: `membership_discount` final-price at version `v1`.
+In the initial phase both rules learn `contract_version == v1`. Add the two frozen legal counterexamples and refit, and the rules become version plus interface: `final_price` for discount, `query_parameter` for query limit.
 
-- members pay 80% of the original amount; non-members pay the original amount
-- two decimal places, **half-up rounding**; negative amounts rejected
+On the 9 training rows:
 
-The compiled Guard retains **only the two member-price cases that failed on the source bug**.
+| Phase | TP | FP | TN | FN |
+|---|---:|---:|---:|---:|
+| initial | 4 | 2 | 3 | 0 |
+| refined | 4 | 0 | 5 | 0 |
 
-### Query-limit validation guard
-
-Source contract: default 20, accepting only ASCII decimal digit strings from 1 through 100.
-Signed, padded, Unicode-digit, malformed and out-of-range input is rejected.
-
-The compiled Guard retains **only the zero-rejection assertion**.
-
-## Scope learning
+The search space is reported as 8/92 and 10/175 candidate combinations. Twenty input shuffles produce the same rule and digest. Holdout never enters fitting.
 
 ```powershell
 uv run counterguard scope learn --protocol experiments/scope_v1.json --phase initial --output artifacts/.../initial
 uv run counterguard scope learn --protocol experiments/scope_v1.json --phase refined --output artifacts/.../refined
 ```
 
-Both **initial** rules learn `contract_version == v1`. Adding the two frozen legal
-counterexamples and refitting produces **version AND interface** rules:
-`final_price` for discount, `query_parameter` for input-limit.
-
-On all nine training rows:
-
-| Phase | TP | FP | TN | FN |
-|---|---:|---:|---:|---:|
-| initial | 4 | 2 | 3 | 0 |
-| **refined** | **4** | **0** | **5** | **0** |
-
-Search space is recorded as `predicate_count` / `combination_count` — 8/92 for discount,
-10/175 for input-limit. Twenty input permutations preserve the learned rule and digest.
-**Holdout never enters fitting.**
-
-## Replay and evaluation
+## Four methods on the holdout set
 
 ```powershell
 uv run counterguard benchmark replay --protocol experiments/scope_v1.json --phase refined --split train
 uv run counterguard experiment evaluate --protocol experiments/scope_v1.json --split holdout --fitted artifacts/experiments/scope-v1/fitted --output artifacts/experiments/scope-v1/final
 ```
 
-Training replay expects exit `1` because two applicable targets really violate their guards:
-**2 pass, 2 violation, 5 skipped**, with exactly **4 pytest processes started**. Every skipped
-row has `run=null`.
+Training replay is expected to exit `1`: two applicable targets really do violate their guards. That run gives 2 passes, 2 violations and 5 skips, with exactly 4 pytest processes started.
 
-Four methods on the frozen holdout:
+On the 6 held-out targets:
 
 | Method | TP / FP / TN / FN | False-application rate | Bug recall |
 |---|---|---:|---:|
 | always | 2 / 4 / 0 / 0 | 1.0 | 1/1 |
 | fixed interface | 2 / 2 / 2 / 0 | 0.5 | 1/1 |
 | learned initial | 2 / 2 / 2 / 0 | 0.5 | 1/1 |
-| **learned refined** | **2 / 0 / 4 / 0** | **0.0** | **1/1** |
+| learned refined | 2 / 0 / 4 / 0 | 0.0 | 1/1 |
 
-**Refined corrected 2 false applications, retained 2 applicable cases, and added no FP/FN.**
-The query guard has no held-out bug, so its Bug recall is reported as `null` rather than 100%.
+Refined removed both false applications, kept both applicable targets and added no FP or FN. The query guard has no held-out bug, so its bug recall is reported as `null` rather than 100%.
 
-The frozen confusion policy counts unknown as a negative prediction while also reporting its
-rate and decision coverage. Raw results retain unknown.
+Under the frozen policy, unknown counts as a negative prediction, but its rate and decision coverage are reported separately, and raw results keep `unknown`.
 
-> `evaluate` exiting 0 means **the experiment met its frozen acceptance**, not that every guard
-> passed. These six labels are already public, so this is engineering validation rather than a
-> blind benchmark.
+An `evaluate` exit code of 0 means the experiment met its frozen acceptance criteria, not that every guard passed. These six labels are public, so this is engineering validation, not a blind benchmark.
 
-`replay verify` audits current inputs **without executing pytest**. A successful audit means the
-record is complete — **not that the recorded verdict was pass**.
+`replay verify` audits the current inputs without executing pytest. A clean audit means the record is complete. It does not mean the recorded verdict was `pass`.
 
-## CLI and exit codes
+## Exit codes
 
-`capture`, `compile`, `learn`, `replay run` and `evaluate` accept
-`--format text|json|markdown`. Explicit formats wrap the original payload in
-`command-report.v1`; without `--format` the original JSON shape is preserved. Formatting does
-not change exit codes.
+`capture`, `compile`, `learn`, `replay run` and `evaluate` all accept `--format text|json|markdown`. An explicit format wraps the original payload in `command-report.v1`; without it, the original JSON shape is kept. Formatting never changes the exit code.
 
 | Code | Meaning |
 |---|---|
-| `0` | reproduced Evidence / acceptance met |
+| `0` | reproduced evidence, or acceptance met |
 | `1` | completed but not reproduced; or an applicable guard confirmed a violation |
 | `2` | invalid input |
-| `3` | execution failure (including missing pytest metadata) |
-| `4` | insufficient information (`unknown`); or learning refused to generalize |
+| `3` | execution failure, including missing pytest metadata |
+| `4` | not enough information (`unknown`); or learning refused to generalize |
 | `5` | artifact integrity failure |
 
-Pytest exit codes 2–5, missing or ambiguous case results, and timeouts **cannot count as a
-reproduced bug**.
+Pytest's own exit codes 2–5, missing or ambiguous case results, and timeouts never count as a reproduced bug.
+
+## More docs
+
+- [Repository verification (`verify`)](docs/verify.md) and [guard lifecycle](docs/guard-lifecycle.md)
+- [Read-only console](console/README.md): export the local Registry and run artifacts, then browse guards, replay records and scope decisions in a browser
+- [Admission conditions](docs/project-admission.md), [onboarding checklist](docs/onboarding.md) and [roadmap](docs/roadmap.md)
+- [Contract drafts](docs/contract-drafts.md) and [CI example with Summary export](docs/github-actions.md)
+- The boltons trial: [a real attempt that stopped at admission](docs/results/onboarding-boltons-v1/README.md)
+
+Where the project stands: reviewed local snapshots and the fixed validators profile can run the whole chain end to end. A brand-new project can take the restricted onboarding path, but its Scope stays an exact snapshot and does not generalize to later source changes. Details are in [the admission boundary](docs/standalone-guards.md).
 
 ## Development
 
-The source checkout also provides [repository verification](docs/verify.md) and an
-[append-only Guard lifecycle](docs/guard-lifecycle.md). `verify` replays reviewed
-Shadow/Active Guards in Docker, with separate unknown, skipped, and execution-error
-results. Supported paths include known root-import snapshots, the fixed validators src/pytest9
-profile, and restricted standalone packages under root/src imports.
-Use `counterguard runner list` to discover reviewed image IDs and their sources,
-then select a stable `--runner-id`. Other projects must meet the explicit
-[admission conditions](docs/project-admission.md).
-
-The [onboarding checklist](docs/onboarding.md) assigns responsibility for contracts,
-bug/fix sources and initial Scope. `preflight --profile minimal-python --import-root src`
-classifies static no-install/no-plugin candidates without authorizing execution.
-The [CI example and Summary export](docs/github-actions.md) currently cover trusted tool
-fixtures; generic project onboarding and live GitHub platform acceptance remain open.
-
-Use [contract draft](docs/contract-drafts.md) to prepare review-only proposals from a
-restricted grammar of existing tests. Unsupported assertions remain explicit; proposals
-cannot execute or enter the Registry. The [onboarding trial](docs/results/onboarding-boltons-v1/README.md)
-records a real blocked attempt, while the [roadmap](docs/roadmap.md) identifies remaining support.
-
-[bootstrap plan](docs/bootstrap-plans.md) separates proposed target imports from upstream
-test bootstrap requirements, retaining the full committed-tree provenance. It does not
-authorize execution. Zero runtime dependencies do not imply plugin-free tests.
-
-[contract prepare / bootstrap bind](docs/standalone-contracts.md) prepare literal contracts
-for an owner assertion-head commit and independently reconstruct B/F/H provenance.
-Binding itself does not execute code. After explicit local review,
-[bootstrap capture / verify-evidence](docs/standalone-capture.md) run both revisions
-in the reviewed Docker runner and independently reconstruct literal-contract Evidence.
-[Minimal Guard compilation, exact-snapshot Scope and explicit Shadow onboarding](docs/standalone-guards.md)
-complete this restricted path. New source snapshots remain unknown; native test bootstrap,
-dependency installation and learned cross-revision generalization are outside this profile.
-
 ```powershell
-uv run pytest -m "not slow" -q      # fast tier: seconds
+uv run pytest -m "not slow" -q      # fast tier, no real subprocesses
 uv run ruff check .
-uv run pytest -q --durations=20      # complete suite, once before delivery
+uv run pytest -q --durations=20      # full suite, once before shipping
 ```
 
-Integration/e2e tests, heavy fixtures and real child processes are marked `slow`. **The fast
-tier rejects unmarked real process launches during fixture setup, execution and teardown** — so
-any new test that spawns a process must declare itself `slow`. See [testing.md](docs/testing.md).
+Integration tests, e2e flows, heavy fixtures and real child processes are marked `slow`. The fast tier rejects unmarked real processes during setup, execution and teardown, so any new test that starts a process has to declare itself `slow`. The rules are in [testing.md](docs/testing.md).
 
-## Project layout
+## Layout
 
 ```text
 src/counterguard/     implementation and CLI
@@ -250,25 +159,21 @@ benchmarks/           frozen labeled samples, splits and module context
 examples/             demo scenario, contracts and implementations
 experiments/          frozen experiment protocol
 containers/           restricted Docker runner
+console/              read-only console for guards, replays and scope
 docs/                 architecture, data contracts, CLI, security model, known limits
 ```
 
-Runtime artifacts under `artifacts/` and distributions under `dist/` are excluded from Git.
+Runtime artifacts under `artifacts/` and distributions under `dist/` stay out of Git.
 
-## Security and limitations
+## Security
 
-Because CounterGuard executes code and reads repositories, its own security posture matters:
+CounterGuard reads repositories and executes code, so its own boundaries are documented separately:
 
-- **[docs/security-model.md](docs/security-model.md)** — assets, trust assumptions, and the
-  concrete controls for repository inspection and container execution
-- **[docs/attack-surface-checklist.md](docs/attack-surface-checklist.md)** — per-item status of
-  what is tested, partially covered, and **not covered at all**
-- **[docs/known-limitations.md](docs/known-limitations.md)** — the current scope statement and
-  the historical verification boundary
+- [security-model.md](docs/security-model.md): assets, trust assumptions, repository inspection and container controls
+- [attack-surface-checklist.md](docs/attack-surface-checklist.md): tested, partially covered and not covered at all, item by item
+- [known-limitations.md](docs/known-limitations.md): the current scope and the historical verification boundary
 
-Current releases are validated on local Python environments only. No claim is made about
-cross-platform behavior, malicious-repository isolation, signature-based authentication or
-program equivalence.
+Verification so far ran on local Python tooling and a pinned Linux Docker image. None of it is a cross-platform guarantee, malicious-repository isolation, signature-based authentication or a proof of program equivalence.
 
 ## License
 
