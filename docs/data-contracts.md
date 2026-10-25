@@ -4,16 +4,15 @@
 
 ## 静态接入、runner 收据与 CI 投影
 
-`repository-admission.v2` 保留 v1 的静态 profile/条件及内部 engineering_prerequisites，
-新增 user_guidance（当前产品支持、用户动作、维护者工作、eta=null、跟踪落点），next_step 同文提供用户动作。
-读取失败时明确尚未分类兼容性；静态候选仍 user_can_enable_verify=false。旧 v1 报告不补签。
+`repository-admission.v2` 保留 v1 的静态 profile、条件和内部的 engineering_prerequisites，新增 `user_guidance`（当前产品支持、用户动作、维护者工作、`eta=null`、跟踪落点），`next_step` 用同样内容提供用户动作。
 
-新增 `contract-proposal.v1` / `literal-test-projection.v1`：强制未审核/不可执行，绑定 commit、
-测试 blob/字节、选定函数、目标声明、断言 AST/原行号、带类型的字面量与工具源码。
-case ID 来自确定性语法/参数身份，不含时间、输出路径或 UUID；原断言的已表达与未表达数量必须一致。
-这是一种数据提案，不能被当作 contract.v1/v2、Evidence 或 Guard 调度。
-上游测试/选定提交/提取语义/工具实现变化→新提案目录及摘要；最终契约仍须真实出现在 owner head，
-并在受支持的 Docker 捕获/验证链中产生新 Evidence/Guard。没有对旧 artifact 增加授权。
+读取失败时会明确说明尚未分类兼容性；静态候选仍然是 `user_can_enable_verify=false`。旧 v1 报告不补签。
+
+新增 `contract-proposal.v1` 和 `literal-test-projection.v1`：强制未审核、不可执行，绑定 commit、测试 blob/字节、选定函数、目标声明、断言 AST/原行号、带类型的字面量和工具源码。
+
+case ID 来自确定性的语法和参数身份，不含时间、输出路径或 UUID；原断言里已表达和未表达的数量必须一致。这是一种数据提案，不能被当作 contract.v1/v2、Evidence 或 Guard 调度。
+
+上游测试、选定提交、提取语义或工具实现发生变化，就开新的提案目录和摘要。最终契约仍然必须真实出现在 owner head 里，并在受支持的 Docker 捕获/验证链中产生新的 Evidence/Guard。没有给旧 artifact 增加授权。
 
 | 格式 | 新增语义 | 上游变化与重算 |
 |---|---|---|
@@ -30,7 +29,9 @@ runner 的四份收据以原字节进入包，review 仍固定原规范化摘要
 
 ## 只读准入报告
 
-`repository-preflight.v1` 是工具生成的静态完整提交树报告，包含 exact commit、逐文件 pins、固定执行 profile、findings/warnings、依赖声明和实际源码摘要；无执行时间，execution_allowed=false/not_run。eligible_candidate 不等于 Inspection.ready 或执行许可。原始 Git/配置不确定性不能转换成 applicable/inapplicable。
+`repository-preflight.v1` 是工具生成的静态完整提交树报告，包含 exact commit、逐文件 pins、固定执行 profile、findings/warnings、依赖声明和实际源码摘要；没有执行时间，`execution_allowed=false` / not_run。
+
+`eligible_candidate` 不等于 Inspection.ready，也不等于执行许可。原始 Git 或配置上的不确定性，不能被转换成 applicable 或 inapplicable。
 
 `pilot-manifest.v1` 固定 URL/许可/base/head、完整树、契约提案、配置、阶段收据和准入标准。提案 admitted=false 不是可执行 Guard 契约，也不生成伪 Evidence。`pilot-admission-report.v1` 保存真实生成时间、实际实现版本/摘要、各层检查、逐 Registry Guard 的未判断原因/run=null 和计数；可重复比较的是去时间的 projection_digest。报告 accepted=false 时，两次拒绝一致也不表示 Docker 执行试点通过。源码、冻结输入或 Registry 状态变化需新目录/版本，不重签旧记录。
 
