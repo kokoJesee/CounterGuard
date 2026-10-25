@@ -441,10 +441,11 @@ capture_entry_point/capture_authority 指向单独的当前来源授权；绑定
 | RunRecord v1 与原始日志 | 实际 argv、角色/目标/契约、版本、时间、退出码、case 结果、原始 stdout/stderr/JUnit 及摘要 | 源码不重新执行就不能重新制造；独立重建 JUnit 分类并核对封闭 Docker argv，错配即拒绝 |
 | evidence.v4 | Evidence ID/真实 UTC、capture/binding/contract、两份运行/授权引用、实际失败集、双向复现/拒绝原因 | 发布前独立重建双方；任何上游变化新建 capture，不重签历史 |
 
-契约 case_<hex> 到运行 case-<hex> 是单射传输映射，授权保存原始 ID→运行 ID；Evidence 使用原始契约 ID。
-完整 case 集合必须一致，导入/收集错误不属于 raises oracle，pytest 2/3/4/5、skip/timeout 不能冒充真实失败。
-有效执行但未复现仍是 reproduced=false 的事实记录；完整性/前置失败保存 standalone-capture-failure.v1，
-保留已完成记录，不留下成功 Evidence。仅最终 Evidence 文件是发布标记，独立核验不能省略。
+契约的 `case_<hex>` 到运行的 `case-<hex>` 是单射传输映射，授权保存原始 ID 到运行 ID 的对应关系，Evidence 使用原始契约 ID。
+
+完整 case 集合必须一致。导入或收集错误不属于 raises oracle，pytest 2/3/4/5、skip、timeout 都不能冒充真实失败。
+
+有效执行但没复现，仍然是一条 `reproduced=false` 的事实记录；完整性或前置失败会保存 `standalone-capture-failure.v1`，保留已完成的记录，但不会留下成功 Evidence。只有最终的 Evidence 文件是发布标记，独立核验不能省。
 
 全包 .py 摘要本轮发生变化，当前执行链需要在新命名空间重做 bind/capture；contract.v3 字节、B/F/H、
 Docker policy/入口/审核镜像与 catalog 收据不变时不需改写它们。旧 binding v1 和执行证据保持原样并可能过期。
@@ -461,9 +462,9 @@ Docker policy/入口/审核镜像与 catalog 收据不变时不需改写它们�
 | registry-entry.v3 | 原工作区/仓库、guard 原始字节、完整 Guard/Evidence 值 | 旧 entry v1/v2 形状不变；v3 重新登记，JSON 为权威、SQLite 仅镜像 |
 | verify-report.v3 | Inspection、Registry 状态快照、逐 Guard 来源/Scope/真实运行/原因、review、实现、汇总策略 | 仅含新 profile 时使用 v3；JSON/Markdown/公开 Summary 同源，决策摘要排除运行时间/ID等，保留原码优先级 |
 
-Scope 绑定 Guard ID 与 Evidence；Guard 反向绑定 Scope 摘要，避免循环摘要。Candidate/Retired/disabled 不执行，
-Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完整性失败分别保留 4/3/5。
-新 schema 不升级旧对象；工具版本 0.5.0 改变全包源码绑定，应在新目录重新物化需要当前结论的执行链。
+Scope 绑定 Guard ID 和 Evidence，Guard 反向绑定 Scope 摘要，避免出现循环摘要。Candidate、Retired、disabled 不执行，Shadow 只告警，Active 的适用违规返回 1；unknown、执行故障和完整性失败分别保留 4 / 3 / 5。
+
+新 Schema 不会升级旧对象。工具版本 0.5.0 改变了全包源码绑定，需要当前结论的执行链应该在新目录重新物化。
 
 单次验证内部只重建一次上游来源事实并传递运行时上下文，不把它持久化为新权威、不跨调用缓存。
 每次真正执行前后仍独立加载当前事实，之后的新验证也重新读取；不通过复用旧“已验证”标记省略来源或状态校验。
