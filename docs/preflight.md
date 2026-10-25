@@ -7,9 +7,9 @@ counterguard preflight --repo <repo> --revision <full-commit-sha> --profile mini
 # 根布局显式使用 --import-root .
 ```
 
-当前输出 `repository-admission.v2` / `minimal-python.v1`，默认 legacy 预检保留。
-它读取完整已提交树，复用 Git 对象完整性、文件/总量/时间预算；不 checkout、import、运行测试或安装依赖。
-工作树里删除 conftest 或更改依赖声明不能隐藏提交中的事实。
+当前输出 `repository-admission.v2` / `minimal-python.v1`，默认的 legacy 预检仍然保留。它读取完整的已提交树，复用 Git 对象完整性、文件/总量/时间预算，不 checkout、不 import、不运行测试、不安装依赖。
+
+工作树里删掉 conftest 或改依赖声明，藏不住提交中的事实。
 
 | 可机器检查的条件 | 不满足时对应前置 |
 |---|---|
@@ -24,10 +24,9 @@ counterguard preflight --repo <repo> --revision <full-commit-sha> --profile mini
 检查器是保守的候选分类器，不是完备的 Python 依赖/fixture 证明器；固定词汇之外的标准库模块也可能 unknown。
 它不读取或执行 build backend，build-system 的存在不意味着目标需要安装。
 
-返回 0/eligible_candidate 表示上述**可见条件**未发现阻塞，工程上可以优先只做①+④；
-这不是“只做两项就一定能运行”的语义证明。输出仍为 execution_allowed=false、verify_supported=false，
-④还包括真实契约、B/F、Docker 捕获、Guard、初始精确快照 Scope 和人工审核，尚未通用实现。
-在受限 Docker 中实际执行生成的契约并验证依赖闭包仍是后续硬门槛。
+返回 0 / eligible_candidate，只表示上面这些可见条件里没发现阻塞，工程上可以优先只做①+④。这不是「只做两项就一定能跑」的语义证明：输出仍然是 `execution_allowed=false`、`verify_supported=false`。
+
+④还包括真实契约、B/F、Docker 捕获、Guard、初始精确快照 Scope 和人工审核，尚未通用实现。在受限 Docker 里真正执行生成的契约、验证依赖闭包，仍是后续的硬门槛。
 
 `engineering_prerequisites` 只给工具维护者描述内部开发工作，用户不需要实现这些模块。
 v2 的 `user_guidance` 和同文 `next_step` 明确当前支持、用户动作、维护者责任、空的 ETA 和[跟踪落点](roadmap.md)：
