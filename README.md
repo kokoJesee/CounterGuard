@@ -143,6 +143,7 @@ pytest 自己的 2–5、缺失或歧义的 case、超时——**都不能算"�
 ## 更多文档
 
 - [统一仓库验证 `verify`](docs/verify.md) · [Guard 生命周期](docs/guard-lifecycle.md)
+- [只读控制台](console/README.md)——本地导出 Registry 与运行产物后，可在浏览器里查看守卫、验证记录和适用范围
 - [新项目接入条件](docs/project-admission.md) · [首次接入清单](docs/onboarding.md) · [接入路线](docs/roadmap.md)
 - [契约草案提取 `contract draft`](docs/contract-drafts.md) · [CI 示例与 Summary](docs/github-actions.md)
 - 实际试走数据见 [boltons 复跑记录](docs/results/onboarding-boltons-v1/README.md)
@@ -169,6 +170,7 @@ benchmarks/           冻结的标注样本、拆分、模块上下文
 examples/             Demo 场景、契约、实现
 experiments/          冻结的实验协议
 containers/           受限 Docker 执行器
+console/              只读控制台（守卫、验证记录、适用范围）
 docs/                 架构、数据契约、CLI、安全模型、已知限制
 ```
 

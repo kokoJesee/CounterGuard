@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CounterGuard 控制台</title>
+  <meta name="description" content="CounterGuard 控制台：守卫、验证记录与适用范围">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 44'%3E%3Cpath d='M20 2 36 8v12c0 10-7.4 18.4-16 22C11.4 38.4 4 30 4 20V8Z' fill='%230f9f6e'/%3E%3Cpath d='m13.5 21.5 5 5 9-10' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/console.css">
+</head>
+<body>
+  <!-- 图标精灵 -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.6 9.2-8 11-4.4-1.8-8-6-8-11V6Z"/><path d="m8.6 12.2 2.4 2.4 4.4-4.9"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 17.6A1.9 1.9 0 0 0 4.3 20.5h15.4a1.9 1.9 0 0 0 1.7-2.9L13.7 4.3a1.9 1.9 0 0 0-3.4 0Z"/><path d="M12 9v4.5M12 17h.01"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.2 12.4 2.6 2.6 5-5.4"/></symbol>
+    <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9.2 9.2 5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.6 2.3c-.8.4-1.2 1-1.2 1.9"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2.4"/><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="7" r="2.4"/><path d="M6 7.4v9.2M18 9.4c0 3.4-3 4.6-6 5.2"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10.2 8.6 5.4 3.4-5.4 3.4Z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 1.8"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4"/></symbol>
+    <symbol id="i-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m6.5 17.5 11-11"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="#/overview" aria-label="CounterGuard 控制台首页">
+      <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true">
+        <defs>
+          <linearGradient id="brandGrad" x1="6" y1="4" x2="34" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#45d9a2"/><stop offset=".55" stop-color="#13a875"/><stop offset="1" stop-color="#07714e"/>
+          </linearGradient>
+        </defs>
+        <path d="M20 2 36 8v12c0 10-7.4 18.4-16 22C11.4 38.4 4 30 4 20V8Z" fill="url(#brandGrad)"/>
+        <path d="m13.2 21.6 5 5 9.2-10.2" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">CounterGuard</span>
+    </a>
+
+    <div class="topbar-search">
+      <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="global-search" type="search" placeholder="搜索守卫、样本或提交…" autocomplete="off" aria-label="搜索">
+      <span class="search-hint">/</span>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="source-toggle" id="source-toggle" type="button" title="切换数据来源">
+        <span class="dot" id="source-dot"></span>
+        <span id="source-label">真实记录</span>
+      </button>
+      <button class="icon-btn" type="button" title="通知" aria-label="通知">
+        <svg class="icon"><use href="#i-bell"/></svg>
+        <span class="badge-dot" id="bell-dot"></span>
+      </button>
+      <span class="divider" aria-hidden="true"></span>
+      <button class="user-chip" type="button">
+        <span class="avatar" aria-hidden="true">CG</span>
+        <span class="user-name">开发团队</span>
+        <svg class="icon chevron"><use href="#i-chevron-down"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <nav class="nav" aria-label="主导航">
+        <a class="nav-item" href="#/overview" data-route="overview"><svg class="icon"><use href="#i-grid"/></svg><span>项目</span></a>
+        <a class="nav-item" href="#/guards" data-route="guards"><svg class="icon"><use href="#i-shield"/></svg><span>守卫库</span><span class="nav-count" id="nav-guards"></span></a>
+        <a class="nav-item" href="#/records" data-route="records"><svg class="icon"><use href="#i-file"/></svg><span>验证记录</span></a>
+        <a class="nav-item" href="#/scope" data-route="scope"><svg class="icon"><use href="#i-target"/></svg><span>适用范围</span></a>
+        <a class="nav-item" href="#/alerts" data-route="alerts"><svg class="icon"><use href="#i-alert"/></svg><span>告警</span><span class="nav-count danger" id="nav-alerts"></span></a>
+      </nav>
+
+      <div class="side-foot">
+        <svg class="side-art" viewBox="0 0 208 208" aria-hidden="true">
+          <defs>
+            <linearGradient id="artGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#46d4a4"/><stop offset="1" stop-color="#0b8a61"/>
+            </linearGradient>
+            <linearGradient id="artFill" x1="0" y1="0" x2="0" y2="1">
+              <stop stop-color="#d9f7ea"/><stop offset="1" stop-color="#f4fdf9" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <circle cx="104" cy="100" r="76" fill="#f0faf5"/>
+          <path d="M104 26 166 49v32c0 27-26 46-62 60-36-14-62-33-62-60V49Z" fill="url(#artFill)" stroke="url(#artGrad)" stroke-width="1.8"/>
+          <path d="M104 46 148 63v22c0 18-18 31-44 41-26-10-44-23-44-41V63Z" fill="#ffffff" stroke="#c8f0df" stroke-width="1.4"/>
+          <path d="m89 86 11 11 20-23" fill="none" stroke="url(#artGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <g stroke="#22ad7d" stroke-width="1.4" stroke-linecap="round" opacity=".35">
+            <path d="M24 150h32M24 160h19"/>
+            <path d="M152 122h32M160 132h20"/>
+          </g>
+          <g fill="#1aa678" opacity=".26">
+            <circle cx="26" cy="110" r="2.2"/><circle cx="182" cy="88" r="1.8"/>
+            <circle cx="48" cy="186" r="1.6"/><circle cx="164" cy="172" r="2"/>
+          </g>
+        </svg>
+        <span class="chip chip-a" aria-hidden="true">{&nbsp;}</span>
+        <span class="chip chip-b" aria-hidden="true">✓</span>
+        <span class="chip chip-c" aria-hidden="true">&lt;/&gt;</span>
+        <p class="slogan">修过一次，<br>守护每一次。</p>
+        <p class="side-meta" id="side-meta">v0.5.0 Beta · main</p>
+      </div>
+    </aside>
+
+    <main class="view" id="view" tabindex="-1"></main>
+  </div>
+
+  <div class="drawer-root" id="drawer-root" aria-live="polite"></div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/console.js"></script>
+</body>
+</html>
