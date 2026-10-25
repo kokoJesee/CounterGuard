@@ -8,8 +8,8 @@
 
 用户可以先自行运行[免安装/免插件候选检查](preflight.md#免安装免插件候选检查)，得到可检查的缺项和对应前置。这里不估算能覆盖多少项目；缺少代表性项目样本，比例既无依据，也不能决定单个项目是否可用。
 
-预检中的 engineering_prerequisites 是工具维护者的工程工作，不是让用户写实现。用户应读取 v2 的 next_step/user_guidance；
-可以通过 [contract draft](contract-drafts.md)准备未审核的测试投影；旧全仓预检本身不授予执行权。
+预检中的 engineering_prerequisites 是工具维护者的工程工作，不是让用户写实现。用户应读取 v2 的 next_step/user_guidance；可以通过 [contract draft](contract-drafts.md)准备未审核的测试投影。旧的全仓预检本身不授予执行权。
+
 当前已交付非固定项目的受限 standalone 路线，不能把旧 profile 的工程提示理解成所有新项目都只能等待。
 现可进一步用 [contract prepare / bootstrap bind](standalone-contracts.md)准备 H 内的受限通用契约并重建 B/F 来源；
 绑定本身不产生 Evidence 或可执行 Guard；单独审核并执行新捕获后才有双向 Evidence，之后还须编译、自检、审核快照边界并进入 Shadow。

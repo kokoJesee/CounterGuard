@@ -28,10 +28,13 @@ validators 固定仓库使用 `--runner-id validators-pytest9`。两者属于不
 
 目录是安装包中的 `data/runner-catalog.v1.json`，其完整内容摘要固定在可信宿主代码中；各 review 另有自摘要。只改目录并重算自摘要不能批准新镜像。`verify-report.v2` 记录选中的 runner ID、image ID 和 review digest，各行也绑定同一审核记录。目录只信任当前安装的 CounterGuard；它不是签名服务或用户身份系统。
 
-`runner-discovery.v2` 在探测任何本地镜像**之前**，逐项读取安装包内 `data/runner-receipts.v1/` 的四份 build/attacks 收据。
-先比较各收据的规范化摘要与已固定 review，再交叉核对 image ID、lock digest、基础 registry digest、runner 源码、pytest 版本和四项攻击 accepted/exit/passed/log digest。
-收据缺失、篡改、重算自摘要或超出预算均导致整体退出 5；不输出部分 available。
-`resolve_runner` 走同一核验，`--image` 也不能绕过。轮包内带收据，不依赖源码仓库的 docs 路径或网络获取。
+`runner-discovery.v2` 在探测任何本地镜像之前，会逐项读取安装包内 `data/runner-receipts.v1/` 的四份 build/attacks 收据：
+
+1. 比较各收据的规范化摘要与已固定的 review；
+2. 交叉核对 image ID、lock digest、基础 registry digest、runner 源码和 pytest 版本；
+3. 核对四项攻击的 accepted / exit / passed / log digest。
+
+收据缺失、被篡改、重算自摘要或超出预算，都会让整体退出 5，不输出部分 available。`resolve_runner` 走同一核验，`--image` 也不能绕过。安装包内自带收据，不依赖源码仓库的 docs 路径或网络获取。
 输出的 docs 引用是公开来源地址，实际核验的是包内对应副本；两者发布时应逐字节一致。
 
 因此，available 的准确含义是：**安装包固定审核链/收据完整，而且本机 image inspect 的精确 ID 相同**。
