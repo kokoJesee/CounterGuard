@@ -287,9 +287,13 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 ## EvaluationReport 与指标投影（evaluation）
 
-`evaluation-report.v1` 的 manifest 保存 eval_ 身份、真实开始/完成时间和耗时、protocol/split 引用与摘要、两阶段 fit、四方法 Scope 的实际绑定、运行实现的逐文件及集合摘要、Python/pytest/Pydantic/Typer/平台/超时环境、样本/预测/执行计数、文件摘要、验收结果及失败原因。代码摘要来自当前导入的实现，不对临时目标工作区中的空 src 目录签名。
+`evaluation-report.v1` 的 manifest 保存 eval_ 身份、真实开始/完成时间和耗时、protocol/split 引用与摘要、两阶段 fit，以及四方法 Scope 的实际绑定。
 
-四方法在相同六个 `(guard_id, sample_id)` 留出行上产生 24 个 Prediction 和 Replay。Prediction 是没有随机 ID/时间/耗时的确定性投影，包含方法、身份、冻结标签、原始作用域决策/trace、verdict、失败 case 和实际 RunOutcome。`replays.jsonl` 保留完整 ReplayResult、引用和真实身份/时间。新增源码缺陷复检保存在 `source-checks.jsonl`，两个学习阶段各两个来源 buggy，共四行，明确不进入留出指标分母。
+它还记录运行实现的逐文件与集合摘要、Python/pytest/Pydantic/Typer/平台/超时环境、样本/预测/执行计数、文件摘要、验收结果和失败原因。代码摘要来自当前导入的实现，不对临时目标工作区里的空 `src` 目录签名。
+
+四方法在相同的六个 `(guard_id, sample_id)` 留出行上产生 24 个 Prediction 和 Replay。Prediction 是不带随机 ID、时间或耗时的确定性投影，包含方法、身份、冻结标签、原始作用域决策/trace、verdict、失败 case 和实际 RunOutcome。
+
+`replays.jsonl` 保留完整的 ReplayResult、引用以及真实身份和时间。源码缺陷复检保存在 `source-checks.jsonl`：两个学习阶段各有两个来源 buggy，共四行，明确不进入留出指标分母。
 
 `evaluation-metrics.v1` 保存 scope-v1-metrics.v1 的公式版本、显式 unknown 政策、每方法的 micro、per_guard、macro_scope 和 macro_end_to_end、自摘要。Ratio 保存 numerator、denominator、value 和 reason；零分母为 null/zero_denominator。Balanced accuracy 的任一项未定义则整体 null，保留两项的 components。macro 对有定义的逐 Guard 指标等权，显式保存 included_guards 和全部 components，不能用 micro 值冒充 macro。input-limit 的留出 Bug recall 分母为 0，macro Bug recall 只纳入 discount。
 
