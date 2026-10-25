@@ -1,5 +1,7 @@
 # 数据契约与摘要边界
 
+这一页按格式逐个记录字段语义、摘要边界和重算规则。Schema 是字段定义的最终来源；每个小节解释的是「为什么这样设计」以及「什么时候必须新建产物」。
+
 ## 静态接入、runner 收据与 CI 投影
 
 `repository-admission.v2` 保留 v1 的静态 profile/条件及内部 engineering_prerequisites，
@@ -26,13 +28,13 @@ runner 的四份收据以原字节进入包，review 仍固定原规范化摘要
 不修改历史记录。本轮真实 CI 验证使用全新可信 fixture 捕获，不把旧 validators 产物补签为当前有效。
 冻结 scope_v1 的标注、实现、协议与期望值不变。
 
-## W3-D 只读准入报告
+## 只读准入报告
 
 `repository-preflight.v1` 是工具生成的静态完整提交树报告，包含 exact commit、逐文件 pins、固定执行 profile、findings/warnings、依赖声明和实际源码摘要；无执行时间，execution_allowed=false/not_run。eligible_candidate 不等于 Inspection.ready 或执行许可。原始 Git/配置不确定性不能转换成 applicable/inapplicable。
 
 `pilot-manifest.v1` 固定 URL/许可/base/head、完整树、契约提案、配置、阶段收据和准入标准。提案 admitted=false 不是可执行 Guard 契约，也不生成伪 Evidence。`pilot-admission-report.v1` 保存真实生成时间、实际实现版本/摘要、各层检查、逐 Registry Guard 的未判断原因/run=null 和计数；可重复比较的是去时间的 projection_digest。报告 accepted=false 时，两次拒绝一致也不表示 Docker 执行试点通过。源码、冻结输入或 Registry 状态变化需新目录/版本，不重签旧记录。
 
-## W3-C Registry 事实与状态
+## Registry 事实与状态
 
 `registry.v1` 是不可变本地身份；`registry-entry.v1` 保存实际登记时间、原工作区与 Guard ref/原始文件 digest、完整 Guard/Evidence 快照及自身摘要。`registry-event.v1` 保存全局 sequence、前驱 digest、Registry/Guard 身份与摘要、registered/disabled、实际 UTC 时间、操作者和原因。首事件无前驱，后续严格连续；disabled 不能复活。
 
@@ -280,7 +282,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 `experiment verify --run` 逐层审核文件摘要、冻结成员/标签、scope/fit、每份真实 Replay、运行时实现及环境、原始预测和指标重建、配对及验收摘要、Markdown 重建；不执行 pytest。返回 0 表示记录完整，不表示 accepted=true，也不表示每个 Guard 通过。`experiment evaluate` 返回 0 表示冻结实验验收通过，原始报告仍可有真实违规和错误应用；验收未通过返回 1，完整性错误返回 5。
 
-## W3-A 配置、Git 快照和检查报告
+## 只读检查的配置、Git 快照和报告
 
 三份新 Schema 为 project-config.v1、repository-snapshot.v1、repository-inspection.v1；旧 Schema/冻结 scope_v1 未改。均继承严格 FrozenModel，配置不得加入命令、插件、环境或任意扩展字段。
 
@@ -303,7 +305,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 W3-B 未关闭项见 [安全模型](security-model.md)。
 
-## W3-B Docker 执行授权
+## Docker 执行授权
 
 W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有修改 `repository-inspection.v1`、RunRecord v1 或任何冻结 scope_v1 文件。
 
@@ -318,7 +320,7 @@ W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有�
 
 任一上游变化都要求重新物化授权：Inspection/工具源码、配置字节、head 输入、Guard 测试、请求字段、policy 或 image ID。执行时只把 input_pins 与 test_ref 的已核对字节物化到新目录并只读挂载，未声明仓库文件不进入容器。RunRecord 保留 v1 形状，Docker 约束和 image ID 进入归一化 argv；授权本身由后续调度/Registry 作为独立来源保存。历史 W3-A 报告没有当前递归源码清单，不能被 W3-B 补签成授权，必须在新 ID/目录重跑 inspect。
 
-## W3-D fork 版本（独立于冻结 scope_v1）
+## fork 版本（独立于冻结 scope_v1）
 
 设计与范围见 [fork 设计](../integrations/pilot/design-fork-v1.md)。以下是受限 MAC 试点接口，
 不是对旧版的隐式字段扩展。旧 Evidence/Guard/Registry JSON 继续按原形状序列化。
