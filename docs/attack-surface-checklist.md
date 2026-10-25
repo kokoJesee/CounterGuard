@@ -187,6 +187,8 @@ validators 固定 fork 试点已按全部检查点完成。未来接入其他仓
 
 MVP 冻结补充：A09 的依赖缺失预检由 [test_runner_dependency.py](../tests/unit/test_runner_dependency.py) 和[安装验收](results/mvp-freeze-v1/final-checks.json)覆盖；缺 pytest 元数据或模块时，CLI 给出 runner 安装提示、执行器不启动进程。这不关闭 W01 的未知代码隔离缺口。
 
+### 研究链的补充检查
+
 研究特征的补充检查见[接口说明](study-features.md)与[专项](../tests/unit/test_study_features.py)：
 For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立条件不拼范围、源码行见证、
 原始字节/独立 context anchor 与重签事实重建、AST/字节预算、外层字段不能进入纯 learner、
@@ -214,6 +216,8 @@ For/GeneratorExp 的词法遮蔽、第一个 iterable 的外层解析、独立�
 可信人工语义、谱系、身份/签名/防回滚、原子快照、任意插件/依赖和恶意目标干扰 JUnit 仍未覆盖，
 W01/W03/W04 的整体状态仍为部分，不因此声称全面通过。
 
+### 外部观察与真实来源
+
 [colored 只读准入复核](results/colored-readiness-v1/README.md)重新检查固定全树/闭包、原8case映射、
 H 原始契约及旧 Evidence 的当前过期拒绝；没有新增执行能力。现有 fixture-only purpose 保持封闭，
 没有用外部源码伪造 fixture context 或放宽 FORCE_COLOR/conftest/TTY。
@@ -240,7 +244,9 @@ H 只增加原六 case 契约，fork Actions 在发布前显式关闭；来源�
 这增加固定外部用途的实测覆盖，但不关闭远程签名、防回滚、最新撤回、并发原子快照或恶意目标干扰 JUnit；
 W01/W03/W04 整体仍为部分，也不授予生产 Shadow/Active 权限。
 
-[独立快照训练层](snapshot-study-fit.md)增加W04的局部覆盖：完整fixture来源重建、源执行/拟合双锚、
+### 训练与评测层
+
+[独立快照训练层](snapshot-study-fit.md)增加 W04 的局部覆盖：完整 fixture 来源重建、源执行/拟合双锚、
 严格新用途、固定Git目标、定义绑定/特征对账、训练成员与标签pins、holdout早拒绝及无文件读取入口。
 重签/旧类型/子类/撤回/分组交叉/输出逃逸有单元覆盖；[真实来源专项](results/snapshot-study-fit-fixture-v1/README.md)
 另完成4个自有Docker容器和原始来源核验，拟合未启动目标。
