@@ -1,6 +1,8 @@
 # 攻击面排查清单
 
-独立验证、正式 Docker runner 和本地 Registry 均有记录；validators 的固定 manifest-v5 MAC 试点也已完成。本清单记录已检查范围和剩余缺口，不是穷尽性安全认证。
+独立验证、正式 Docker runner 和本地 Registry 都有记录，validators 的固定 manifest-v5 MAC 试点也已完成。这份清单记录已检查的范围和剩余缺口，不是穷尽性的安全认证。
+
+全文分四节：四类缺口是怎么发现的、状态与信任假设、接入检查与 CI 展示的补充边界、开工与准入。
 
 ## 四类缺口是怎样发现的
 
