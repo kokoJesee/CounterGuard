@@ -44,6 +44,8 @@
 
 下面按功能列边界，每段对应一次新增能力和它的实测。段首的 `W01/W03` 这类编号只标明这次改动碰到哪条攻击面，不代表当前状态，也不构成新的保证。
 
+### 研究接口
+
 W01/W03 增加[实验性研究重放](research-replay.md)：独立授权 v6 分列 source H 与 target 提交，
 保留原契约/oracle，按当前完整来源、映射、可信审核摘要及 runner/policy/code pins 在运行前后核验。
 [自有 Docker 专项](../tests/integration/test_study_bridge.py)覆盖两独立 Git 历史、根→src 布局、
@@ -58,6 +60,8 @@ W02/W03 增加[只读 RGB 映射审计](results/colored-review-v1/README.md)：�
 20 次乱序语义稳定。该工具只读取现有契约/回执，不启动目标，不认证自摘要回执的来源，不能成为执行授权。
 12 文件源码审读和有限谱系观察已记录，维护者裁决仍待完成；4 个越界三元组与 4 个长度错误不合并为合法反例。
 W01 没有本批 Docker/隔离实测，W04 没有新增权限或跨仓库调度覆盖；研究桥接仍待单独设计确认与验收。
+
+### 静态导出与来源绑定
 
 W02/W03 增加[显式 static-reexport-v2](static-reexports-v2.md)：contract.v6 / binding.v4 与 closure.v2，
 默认 v1 接受范围保留。多个根导出和有限 raise 类钩子必须逐角色独立重建；观察项绑定类与异常定义源码，
@@ -78,6 +82,8 @@ B/F/H 分角色重建根包/定义摘要。静态专项拒绝条件/动态/重�
 随后[termcolor 真实来源验收](results/termcolor-source-v1/README.md)以明确获批契约和真实 owner H 通过三角色绑定、
 两轮独立 Docker 捕获、最小 B/F 自检及 Registry 幂等来源核验；外部目标共 6 次 Docker 执行，Candidate 不调度。
 它补充 W02/W03/W04 的一个受限外部实例，不扩大原生 pytest、通用导出/依赖、身份或远程 CI 的覆盖声明。
+
+### 最小 Guard、Docker 捕获与运行器
 
 W01/W03/W04 增加[独立最小 Guard 到 Shadow/verify](standalone-guards.md)：新 Guard v3、快照 Scope、
 Registry entry v3 与执行授权 v5。每次最小自检/重放均重新核对来源，完整闭包不能混合 B/F；
@@ -129,6 +135,8 @@ W03 增加[免安装/免插件静态候选检查](preflight.md#免安装免插�
 W01/W03 增加[包内收据逐项核验](../tests/unit/test_runner_catalog.py)：catalog 仍由可信代码 pin，
 build/attacks 缺失、改写、重签或超预算都在 image inspect 前拒绝；未知镜像不能借同名目录获准。
 这不是重新执行四项攻击、校验远程签名或防止整个安装包/主机失陷；Docker policy/容器源码未改变。
+
+### CI 投影
 
 W04 的 CI 展示与上传范围已有[有限字段投影测试](../tests/unit/test_github_report.py)、
 [workflow 权限/触发/固定上传路径检查](../tests/unit/test_github_workflow.py)及
