@@ -1,8 +1,8 @@
 # 独立 Guard 的输入计划
 
-`bootstrap plan` 是通用 Docker bootstrap 的第一个只读准备环节，本命令不批准捕获或执行。
-它把目标模块的候选输入集与上游测试环境分开记录。仓库里存在 conftest，不等于所选断言使用了 fixture；
-反过来，目标只用标准库也不证明可以忽略其包初始化、动态导入或资源文件。
+`bootstrap plan` 是通用 Docker bootstrap 的第一个只读准备环节，不批准捕获或执行。它把目标模块的候选输入集和上游测试环境分开记录。
+
+仓库里有 conftest，不等于所选断言用了 fixture；反过来，目标只用标准库，也不证明可以忽略包初始化、动态导入或资源文件。
 
 ```powershell
 counterguard bootstrap plan --repo <repo> --revision <full-commit-sha> --target package.module:function --import-root src --test-ref tests/test_module.py --test-function test_regression --output <new-plan-directory>
@@ -31,8 +31,8 @@ Git/路径完整性拒绝返回 5；参数/不可读取的草案内容等错误�
 任何现有执行入口都不消费它。静态闭包不能穷尽 Python 动态行为；别名反射、条件资源、模块重绑等仍需人工审核。
 即使没有 finding，也须审核调用绑定、包副作用、资源、oracle 和 case 独立性。
 
-用户下一步是审核计划及未支持项，准备真实 B/F 和由所有者提交到 H 的最终契约。
-现在可继续使用[contract prepare 与 bootstrap bind](standalone-contracts.md)准备并重建 H 内契约和 B/F 来源；
-这不提供自动审批；审核后可单独运行 [Docker 双向捕获](standalone-capture.md)及[最小 Guard/Scope](standalone-guards.md)，
-不能用本地 capture、删 conftest/配置、重签计划或任意布尔开关代替。
-运行上游原生测试套件是另一条路线，先完成配置、conftest/hooks、fixture、插件及其依赖的受控引导。
+用户下一步是审核计划里的未支持项，准备真实 B/F，以及由所有者提交到 H 的最终契约。
+
+之后可以用 [contract prepare 与 bootstrap bind](standalone-contracts.md)准备并重建 H 内契约和 B/F 来源。这不提供自动审批；审核完可以单独运行 [Docker 双向捕获](standalone-capture.md)和[最小 Guard/Scope](standalone-guards.md)。不能用本地 capture、删 conftest 或配置、重签计划或任意布尔开关代替。
+
+运行上游原生测试套件是另一条路线，要先完成配置、conftest/hooks、fixture、插件和依赖的受控引导。
