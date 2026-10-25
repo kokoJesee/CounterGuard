@@ -1,12 +1,8 @@
 # 获审外部快照的独立观察
 
-此接口允许可信本机操作者审核完整源码快照后，在已审核 Docker 中捕获真实 B/F、编译最小 Guard，
-并观察另一个固定目标。它使用独立的 `external-snapshot-*.v1` 类型，
-用途固定为 `reviewed_external_snapshot_observation_only`。
+这个接口让可信的本机操作者先审核完整源码快照，再在已审核的 Docker 里捕获真实 B/F、编译最小 Guard，并观察另一个固定目标。它使用独立的 `external-snapshot-*.v1` 类型，用途固定为 `reviewed_external_snapshot_observation_only`。
 
-原 [fixture 接口](research-snapshots.md)与[自有比较](snapshot-comparisons.md)保留原类型和标记要求，
-不接受外部审核、Evidence、Guard 或比较计划。没有新增 `allow_external` 开关，
-也不通过给真实仓库添加 fixture 标记取得执行权限。
+原来的 [fixture 接口](research-snapshots.md)和[自有比较](snapshot-comparisons.md)保留原类型和标记要求，不接受外部审核、Evidence、Guard 或比较计划。没有新增 `allow_external` 开关，也不能靠给真实仓库加 fixture 标记来取得执行权限。
 
 ## 接受范围和材料
 
@@ -22,10 +18,9 @@ conftest 或插件。Git、容量、路径和已有 Docker policy 的限制不�
 URL 是可信操作者的声明，不证明远端所有权；许可是否合法、契约是否符合规范仍需人工审阅。
 URL 不接受凭据、查询参数、其他协议或其他主机。
 
-执行审核绑定完整 binding、runner、policy、预算、超时和当前全包源码指纹。
-调用方单独保留审核摘要，不能从候选文件或可变计划自行读取批准。
-`ExternalSnapshotSession` 只允许 `external_snapshot_capture` 和 `external_snapshot_guard_check`；
-没有精确源重放、Registry、Shadow/Active 或本地 fallback 路径。
+执行审核会绑定完整 binding、runner、policy、预算、超时和当前全包源码指纹。调用方要单独保存审核摘要，不能从候选文件或可变计划里自行读取批准。
+
+`ExternalSnapshotSession` 只允许 `external_snapshot_capture` 和 `external_snapshot_guard_check`，没有精确源重放、Registry、Shadow/Active 或本地 fallback 路径。
 
 ## Python 接口
 
