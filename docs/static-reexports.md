@@ -29,9 +29,14 @@ F 不能按该语法解析时 prepare 保留原格式及待审结果；不会伪
 
 ## 声明、重建和执行
 
-v5 新增 `definition_module`、`definition_symbol`、`definition_ref`；原 `target_module` / `target_symbol` /
-`source_ref` 始终指向公开入口。定义路径必须在完整 `runtime_refs` 中，不以定义文件替换父包初始化。
-见 [Schema](../schemas/standalone-contract-v5.schema.json)。纯字面量 case 保留 projection.v1；消息 case 要求 projection.v2。
+契约里新增的字段是这样用的：
+
+- v5 新增 `definition_module`、`definition_symbol`、`definition_ref`；
+- 原来的 `target_module` / `target_symbol` / `source_ref` 始终指向公开入口；
+- 定义路径必须在完整的 `runtime_refs` 里，不能用定义文件替换父包初始化；
+- 纯字面量 case 保留 projection.v1，消息 case 要求 projection.v2。
+
+字段定义见 [Schema](../schemas/standalone-contract-v5.schema.json)。
 
 新 `bootstrap-binding.v3` 从 B、F、H 分别重建导出声明，每个角色记录根包/定义文件的内容摘要和定义位置，
 逐项比对契约中的定义，不用 F 的结论代替 B。H 仍必须是 F 的直接子提交，且只新增该契约文件。
