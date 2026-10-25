@@ -219,13 +219,17 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 外层的身份和来源不会传进学习器。记录没有生成时间字段，相同输入得到相同字节；同一提取器、context 和 sample ID 下的不同输入，不能原地覆盖。
 
-`feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于对账，不进入 Scope learning 拟合。历史报告与快照追加保留，分歧仲裁见 `feature-adjudication.md`。
+`feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行会单独保留原因，不会伪造 actual。
+
+审计不会读取适用性、违规或 compliance 标签来提取特征；已经公开的 holdout 源码和手工 AST 可以用于对账，但不进入 Scope learning 拟合。历史报告和快照追加保留，分歧仲裁见 [feature-adjudication](feature-adjudication.md)。
 
 退出 0 要求所有行 matched；差异返回 1，配置或词汇错误返回 2，提取失败返回 3，不可变资产冲突返回 5。混合失败时优先级为 5、3、2、1。错误和差异都会先写出报告。
 
 ## Learner 类型边界与确定性
 
-`learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult` 是纯规则搜索入口；它不接收 Guard、FeatureRecord、样本 ID 或路径。TrainingExample 只有精确的 FeatureVector 和严格 bool 适用性标签。严格模型拒绝额外字段，运行时入口拒绝其他模型、dict、FeatureRecord 和带额外属性的 FeatureVector 子类，并重新校验输入。正例角色、标签来源、合法反例、协议、来源和成员资格由外层 `fit_scopes` 审核后再投影。
+`learn_scope(examples: tuple[TrainingExample, ...]) -> ScopeLearningResult` 是纯规则搜索入口，不接收 Guard、FeatureRecord、样本 ID 或路径。`TrainingExample` 只有精确的 FeatureVector 和严格的 bool 适用性标签。
+
+严格模型会拒绝额外字段；运行时入口会拒绝其他模型、dict、FeatureRecord 和带额外属性的 FeatureVector 子类，并重新校验输入。正例角色、标签来源、合法反例、协议、来源和成员资格，由外层 `fit_scopes` 审核后再投影。
 
 这是类型注解、严格模型和运行时校验共同执行的输入边界；不把 Python 动态运行时描述成任意代码无法绕过的安全沙箱。测试覆盖整份 FeatureRecord、外层 JSON、混入身份/Oracle 字段、子类和伪造模型输入；正常 API 都会拒绝。
 
