@@ -1,8 +1,8 @@
 # 完整快照的研究特征与训练拟合
 
-工具自有的完整快照来源现在可以接入独立训练接口。它从真实 Git B/F/H、Evidence、最小 Guard
-和原始 JUnit 重建来源，重新读取固定目标全树，再核对特征和人工 fixture 标签。
-训练层通过[四方法研究重放](snapshot-study-evaluation.md)接入独立评测编排；用途仍限工具自有 fixture。
+工具自有的完整快照来源可以接入独立训练接口。它从真实 Git B/F/H、Evidence、最小 Guard 和原始 JUnit 重建来源，重新读取固定目标全树，再核对特征和人工 fixture 标签。
+
+训练层通过[四方法研究重放](snapshot-study-evaluation.md)接入独立评测编排；用途仍限于工具自有 fixture。
 
 用途固定为 `tool_owned_snapshot_study_only`。旧研究 fixture、完整快照比较和外部 observation-only
 parser 不接受这些新记录，训练结果也不提供生产 Registry 或 Docker 调度权限。
@@ -14,10 +14,9 @@ parser 不接受这些新记录，训练结果也不提供生产 Registry 或 Do
 外部 Session 和子类都拒绝。来源声明绑定 B/F/H、源审核、Evidence、Guard 和实际最小 case 集。
 目标沿用完整快照读取器、容量、包内 bootstrap/原生文件和未安装依赖检查。
 
-`SnapshotStudyContext` 绑定目标摘要、定义文件/符号/字节、元数据依据、真实审核时间和操作者。
-定义只能精确匹配直接入口或现有 `static-root-reexport.v2` 的解析结果，不能借闭包中的同名 helper。
-`ast-features.snapshot-study.v1` 复用现有[研究语法和十个 token](study-features.md)，不加入新语法。
-Try、类方法、fixture 和动态分发仍明确不支持；不生成一份空特征来代替拒绝。
+`SnapshotStudyContext` 绑定目标摘要、定义文件/符号/字节、元数据依据、真实审核时间和操作者。定义只能精确匹配直接入口，或现有 `static-root-reexport.v2` 的解析结果，不能借闭包里的同名 helper。
+
+`ast-features.snapshot-study.v1` 复用现有[研究语法和十个 token](study-features.md)，不加入新语法。Try、类方法、fixture 和动态分发仍然明确不支持，也不会生成一份空特征来代替拒绝。
 
 特征 record 绑定完整目标和 context，对账保存人工 expected 与实际结果、逐行见证和全部差异。
 核验会重新提取，正确的自摘要不能代替源码/定义/元数据一致。
