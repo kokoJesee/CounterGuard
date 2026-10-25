@@ -378,12 +378,9 @@ RunRecord v1 的 `cwd="."` 是相对于该记录的授权 `workspace_ref`，不�
 | Registry 禁用或来源损坏 | 立即拒绝调度；历史报告不覆盖当前状态，不通过索引重建恢复 enabled |
 | 只修复工具验证器且上游未变 | 保留原工具方 H，在新 manifest/产物命名空间重新验收；不用再造一个 owner 提交 |
 
-本次 manifest-v3 / validators-fork-v1 是首轮历史；相对 cwd 解释修正后，正式复验使用
-manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，该轮因重复来源遍历开销显式中断。
-批读取 Git 专项通过后，最终版本为 manifest-v5 / validators-fork-v3 / evd_validators_mac_complete_v3。
-前驱 manifest 摘要和重捕获原因逐次显式保存，owner H 始终未变。
-实现以递归源码摘要识别；源码 zip 归档同时保存实际 Git 基点和 dirty 状态，
-不把未提交源码伪称为某个历史 commit，也不伪造执行时间。
+manifest-v3 / validators-fork-v1 是首轮历史。相对 cwd 的解释修正后，正式复验使用 manifest-v4 / validators-fork-v2 / evd_validators_mac_complete_v2，那一轮因为重复的来源遍历开销被显式中断。批读取 Git 专项通过后，最终版本是 manifest-v5 / validators-fork-v3 / evd_validators_mac_complete_v3。
+
+前驱 manifest 的摘要和重捕获原因逐次显式保存，owner H 始终没有变。实现用递归源码摘要识别；源码 zip 归档同时保存实际 Git 基点和 dirty 状态，不把未提交源码伪称成某个历史 commit，也不伪造执行时间。
 
 批输出不是无上限的 stdout：先 batch-check 每个大小与原 8 MiB 总预算，
 再按预检总字节 + 每条受限头部设定输出上限；每条 body 按长度解析并重算 Git SHA-1，
@@ -418,9 +415,9 @@ v5 复用 capture.v2 / Guard v4 的完整契约摘要、生成器 v2 和当前�
 
 Docker policy、runner review、RunRecord、Evidence 的来源摘要字段和精确 Scope 算法未扩张；新语义由完整上游契约摘要及新版生成器绑定。源码摘要变化使旧通用链不能借历史“已验证”状态调度，按新 ID 重建所需下游。
 
-`contract.v3` / `standalone-literals.v1` 的[字段与流程](standalone-contracts.md)与固定 validators 的
-contract.v2 分开。契约 pin B/F、显式导入映射、闭包 refs、F 内测试 blob/字节/完整投影以及受支持 case；
-H SHA 不放入其自身 blob，避免提交内容自引用。H 的新增契约与未改写的 F 文件由绑定器从对象库独立核对。
+`contract.v3` / `standalone-literals.v1` 的[字段与流程](standalone-contracts.md)和固定 validators 的 contract.v2 是分开的。契约会 pin B/F、显式导入映射、闭包 refs、F 内测试的 blob/字节/完整投影，以及受支持的 case。
+
+H 的 SHA 不放进它自己的 blob，避免提交内容自引用。H 新增的契约和未改写的 F 文件，由绑定器从对象库独立核对。
 
 `contract-preparation.v1` 保存契约字节摘要、B/F 评估、完整 case/unsupported 覆盖和当前实现，固定需人审/不执行。
 当前 `bootstrap-binding.v2` 摘要覆盖除自身外所有字段：B/F/H 全树 pins、契约原始摘要与解析值、线性父子规则、
