@@ -18,7 +18,9 @@ with pytest.raises(ValueError, match=r"invalid\[value\]"):
 
 未转义的 `. ^ $ * + ? { } [ ] | ( )`、字符类、分组、重复、交替、锚点、flags、反向引用、`\d` 等转义和悬空反斜杠均返回 `exception_match_regex_unsupported`。本版宁可拒绝简单的锚点，也不把任意 regex 当纯文本解释。
 
-变量（包括参数名）、f-string、函数调用、`re.compile`/`re.escape` 调用和非字符串返回 `exception_match_literal_required`。即使调用结果可能是字面量，扫描阶段也不执行它。`as exc`、多异常元组、check 回调、关键字展开和用户异常类继续 unsupported。部分断言不支持时保持逐条覆盖计数，不丢弃该条记录。
+变量（包括参数名）、f-string、函数调用、`re.compile` / `re.escape` 调用和非字符串返回，都会得到 `exception_match_literal_required`。即使调用结果可能是字面量，扫描阶段也不会执行它。
+
+`as exc`、多异常元组、check 回调、关键字展开和用户异常类仍然 unsupported。部分断言不支持时，逐条覆盖计数会保留，不会丢掉那条记录。
 
 pytest 的 match 使用 `re.search`，会搜索异常字符串及 PEP 678 notes，允许匹配其中的一段。[pytest 官方语义](https://docs.pytest.org/en/stable/reference/reference.html#pytest.raises)是这里的依据。生成测试把已验证的模式原样交给已审核 runner 内的 `pytest.raises(..., match=...)`，由 pytest 执行类型和文本检查；宿主扫描器只做有界字符检查，不编译模式、不 import 目标。
 
@@ -32,7 +34,9 @@ pytest 的 match 使用 `re.search`，会搜索异常字符串及 PEP 678 notes�
 | 最小 Guard 与生成器 | guard.v3 / standalone-guard-test.v1 | [guard.v4](../schemas/standalone-guard-v4.schema.json) / standalone-guard-test.v2 |
 | Registry 条目 | registry-entry.v3 | [registry-entry.v4](../schemas/standalone-registry-entry-v4.schema.json) |
 
-新 case 在原 raises 字段之外增加必需的 `exception_match`。新契约可以混合原 case 与消息 case。旧 Schema/模型保持原样，读取新字段或新版本会拒绝；新读取器按显式版本分派，不能降级为“只检查异常类型”。捕获/Guard 生成器版本与契约版本必须一致。
+新 case 在原 raises 字段之外增加必需的 `exception_match`，新契约可以混合原 case 和消息 case。旧 Schema 和模型保持原样，读到新字段或新版本会拒绝；新读取器按显式版本分派，不能降级成「只检查异常类型」。
+
+捕获和 Guard 生成器的版本必须与契约版本一致。
 
 case ID 继续绑定原断言 AST 和完整片段，match 改动会改变 ID 与投影摘要；相同输入重复结果稳定，注释/行号变化不改变 case ID。原来已支持且不带 match 的 case 字段、ID、契约和规范测试字节保持兼容。
 
