@@ -487,9 +487,9 @@ Scope 绑定 Guard ID 和 Evidence，Guard 反向绑定 Scope 摘要，避免出
 | Docker authorization v6 | 独立研究用途、source H/target 提交分列、逐文件来源角色、map/review/见证/准入/计划/request/test/image/policy/实现 | 每次执行前后重建，不替代旧生产授权，不能复用 run ID 或运行路径 |
 | study-replay.v1 | 实际准入、完整性、原 Run/授权/日志引用、真实时间和运行后核对 | 输出新目录；stale 保留实际 Run；verify 重建当前来源与原始 JUnit，不回写 |
 
-确定性只对规范化输入与决策数据声明；真实审核/运行时间、随机 run ID 和本机身份摘要不会伪造为跨运行相同。
-调用方提供的可信审核摘要不从可变计划自动推导；同时控制该摘要、验证器和主机的攻击不在此保证内。
-现有 `standalone-snapshot-scope.v1` 与 Candidate/Shadow/Active 的生产权限规则保持原样。
+确定性只对规范化的输入和决策数据成立；真实的审核/运行时间、随机 run ID 和本机身份摘要，不会被伪造成跨运行相同。
+
+调用方提供的可信审核摘要，不会从可变计划自动推导；同时控制这个摘要、验证器和主机的攻击，不在保证范围内。现有的 `standalone-snapshot-scope.v1` 以及 Candidate/Shadow/Active 的生产权限规则保持原样。
 
 研究静态特征的独立 Schema 见 [study-features.md](study-features.md) 与 `schemas/study-features-v1/`。
 
@@ -539,10 +539,9 @@ Scope 绑定 Guard ID 和 Evidence，Guard 反向绑定 Scope 摘要，避免出
 | Docker authorization v8 | 新用途、完整原 case、source H 与 target 提交分列、逐文件 pins、见证/review/admission/request/test/image/policy/实现 | 执行前后重建；沿用原封闭 Docker 路径，旧 parser 拒绝，不增加环境或本地执行通道 |
 | study-replay.v3 | 实际 admission、原始 Run/授权/JUnit、lane、真实时间和运行后核对 | 新目录保存；独立 verify 重建来源与原始日志，运行后漂移保留 Run 并 stale |
 
-见证可以只覆盖获审子集，完整 Guard 的原输入及异常/消息 oracle 不裁剪、不替换。
-见证通过只说明该子集观察一致；不能提升为整个 Guard 适用、目标完全合规或研究标签。
-源码变化使旧来源链失效时，原获批 H 字节未变可复用 H，在新 ID/目录重新 bind/capture/compile/review/replay；
-不需要也不允许靠补签旧记录或新造 owner 提交来规避。冻结 scope_v1、生产生命周期及旧产物保持原样。
+见证可以只覆盖获审的那部分子集，完整 Guard 的原输入以及异常/消息 oracle 不会被裁剪或替换。见证通过只说明这个子集的观察一致，不能提升成整个 Guard 适用、目标完全合规或研究标签。
+
+源码变化让旧来源链失效时，如果原获批的 H 字节没变，可以复用 H，在新 ID/目录里重新 bind/capture/compile/review/replay；不需要也不允许靠补签旧记录或新造 owner 提交来规避。冻结 scope_v1、生产生命周期和旧产物保持原样。
 
 ## 独立研究快照
 
