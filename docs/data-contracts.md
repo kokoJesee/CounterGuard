@@ -182,7 +182,9 @@ Registry / CI 的使用顺序：
 
 ## FeatureVector 与 AST token
 
-FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得；`module_group` 从独立、固定摘要的 `benchmarks/context/scope_v1.json` 架构包清单取得；只有 AST 集合从源码生成。目标名称、路径、case、Oracle 和标签均在模型之外。上下文来源及 feature audit 更正见 `module-context-policy.md`。
+FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信契约元数据取得，`module_group` 从独立、固定摘要的 `benchmarks/context/scope_v1.json` 架构包清单取得，只有 AST 集合是直接从源码生成的。
+
+目标名称、路径、case、Oracle 和标签都在模型之外。上下文来源和 feature audit 的更正见 [module-context-policy](module-context-policy.md)。
 
 `branch:none` 的历史名称表示 **Python None 身份检查**：`ast.If` 或 `ast.IfExp` 的 test 内，一个正式参数与 `None` 通过 `is` / `is not` 比较，允许左右交换。它不表示缺少分支。
 
@@ -213,7 +215,9 @@ FeatureVector 只包含五个标量字段和 `ast_features`。前四项从可信
 
 ## FeatureRecord 与对账报告
 
-新记录为 `feature-extraction.v2`，外层保存 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、module_context_ref/digest、FeatureVector 和自身摘要。旧 v1 形状与摘要兼容读取，但不能用于 Scope learning fit。外层身份/来源不传入学习器。没有生成时间字段，相同输入可得到相同字节；同提取器/context/sample ID 的不同输入不能原地覆盖。
+新记录为 `feature-extraction.v2`，外层保存 extractor/vocabulary 版本与摘要、TargetRef、目标原始字节摘要、契约引用与原始字节摘要、`module_context_ref` / digest、FeatureVector 和自身摘要。旧 v1 的形状和摘要可以兼容读取，但不能用于 Scope learning fit。
+
+外层的身份和来源不会传进学习器。记录没有生成时间字段，相同输入得到相同字节；同一提取器、context 和 sample ID 下的不同输入，不能原地覆盖。
 
 `feature-audit.v2` 报告记录数据文件摘要、独立 module context、每个样本的 expected/actual、AST `missing/unexpected`、标量 `metadata_diff`、来源 feature 引用、快照和摘要。错误行单独保留原因，不伪造 actual。审计不读取适用性、违规或 compliance 标签来提取特征；已公开 holdout 的源码与手工 AST 可以用于对账，不进入 Scope learning 拟合。历史报告与快照追加保留，分歧仲裁见 `feature-adjudication.md`。
 
