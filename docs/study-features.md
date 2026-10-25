@@ -1,9 +1,8 @@
 # 研究 fixture 的静态特征
 
-`ast-features.study.v1` 可静态读取一个源码文件中的单个顶层同步函数，支持普通 `for` 和生成器表达式。
-当前用途严格限定为 `tool_owned_research_fixture_only`，没有外部项目的学习或执行授权。
-实现位于 [study_features.py](../src/counterguard/study_features.py)，
-逐字段人工 golden 和拒绝案例见 [专项](../tests/unit/test_study_features.py)。
+`ast-features.study.v1` 可以静态读取一个源码文件里的单个顶层同步函数，支持普通 `for` 和生成器表达式。用途严格限定为 `tool_owned_research_fixture_only`，没有外部项目的学习或执行授权。
+
+实现位于 [study_features.py](../src/counterguard/study_features.py)，逐字段人工 golden 和拒绝案例见[专项](../tests/unit/test_study_features.py)。
 
 ## 输入与审核
 
@@ -12,10 +11,9 @@
 接口目前只有 `value_return` 与 `stdout_write` 两项 fixture 类别；它们不同，B2 应按不同接口处理。
 这些类别尚未成为外部项目的冻结分类标准。
 
-提取调用必须另传 `context_anchor`，并同时检查 context 自摘要与源文件原始字节。
-调用者在可变 context 之外保存可信摘要；重新签一份 context 不会匹配原摘要。
-若主机、验证器和可信摘要都被控制，这种机制不能提供保护；操作者文本也不是身份认证。
-审核本身是人工信任输入，当前不声称依据文本的语义已被自动证明。
+提取调用必须另传 `context_anchor`，并同时检查 context 自摘要和源文件原始字节。调用者要在可变 context 之外保存可信摘要；重新签一份 context 不会匹配原摘要。
+
+如果主机、验证器和可信摘要都被控制，这套机制提供不了保护；操作者文本也不是身份认证。审核本身是人工信任输入，当前不声称依据文本的语义已经被自动证明。
 
 `source_ref` 只标识本次读取的文件，不构成 Git 来源链或 B/F/H 核验。
 这份记录不能代替研究 replay 的 source/target/review，也不能直接注册为生产 Scope。
@@ -40,9 +38,9 @@
 | `round:half_up` | 有限解析的 decimal.ROUND_HALF_UP 读取 |
 | `str:isascii` / `str:isdecimal` | 对相应同名属性的调用，不推断接收者类型 |
 
-范围 token 只证明语法出现，不证明运行时会拒绝、夹紧、遍历所有值或满足契约。
-不跨独立条件、filter 或生成器作用域拼接上下界。不做控制流、类型、任意别名或动态模块变更的语义分析。
-模块条件分支中的 import/定义会保守遮蔽同名库绑定，不能冒充确定的 builtin 或标准库调用；模块 star import 明确拒绝。
+范围 token 只证明语法出现过，不证明运行时真的会拒绝、夹紧、遍历所有值或满足契约。不跨独立条件、filter 或生成器作用域拼接上下界，也不做控制流、类型、任意别名或动态模块变更的语义分析。
+
+模块条件分支里的 import 或定义会保守地遮蔽同名库绑定，不能冒充确定的 builtin 或标准库调用；模块 star import 明确拒绝。
 
 For 的普通 name/tuple/list 绑定属于函数局部；生成器的绑定只属于生成器作用域，不向外泄漏。
 生成器第一个 iterable 按外层名字解析，后续 iterable、filter 和产出式使用生成器局部名字。
