@@ -1,8 +1,8 @@
 # 从已有测试起草契约
 
-`contract draft` 已提供通用的**静态草案提取**。此前只有 validators 的专用 `extract_mac_contract`，
-没有面向任意测试的命令；两种能力不能混称。当前命令不运行测试、不 import 项目、
-不安装依赖、不加载 conftest，也不生成可执行授权。
+`contract draft` 提供通用的静态草案提取。以前只有 validators 的专用 `extract_mac_contract`，没有面向任意测试的命令，这两种能力不要混着叫。
+
+当前命令不运行测试、不 import 项目、不安装依赖、不加载 conftest，也不生成可执行授权。
 
 ```powershell
 counterguard contract draft --repo <repo> --revision <full-sha> --test-ref tests/test_price.py --test-function test_price --target package.pricing:price --output artifacts/proposals/new-id
@@ -37,10 +37,11 @@ fixture、任意 setup/赋值、控制流、异步、间接参数化、未知装
 | unsupported / 4 | 没有可表达的 case，保留原因，不制造空的可执行契约 |
 | 2 / 4 / 5 | 输入/解析错误、Git 信息不足或安全/不可变输出冲突；不覆盖历史输出 |
 
-草案绑定 commit、测试路径、Git blob ID、原字节摘要、原行号、断言 AST 摘要和实际工具源码摘要。
-同输入同实现不使用时间/UUID，结果可逐字节复现；case ID 不依赖原行号，增加注释只改变来源记录。
-`source_assertions` 统计 assert 及 pytest.raises 上下文；表示数与未表示数必须对账。
-无 match 时 Schema 仍为独立 [contract-proposal.v1](../schemas/contract-proposal.schema.json)；有受支持 match 时使用 [contract-proposal.v2](../schemas/contract-proposal-v2.schema.json)，保留完整消息 oracle，不冒充已有 contract.v1/v2。
+草案绑定 commit、测试路径、Git blob ID、原字节摘要、原行号、断言 AST 摘要和实际工具源码摘要。同样的输入和实现不使用时间或 UUID，结果可以逐字节复现；case ID 不依赖原行号，加注释只会改变来源记录。
+
+`source_assertions` 统计 assert 和 pytest.raises 上下文，表示数与未表示数必须对账。
+
+无 match 时 Schema 仍是 [contract-proposal.v1](../schemas/contract-proposal.schema.json)；有受支持 match 时用 [contract-proposal.v2](../schemas/contract-proposal-v2.schema.json)，保留完整消息 oracle，不冒充已有的 contract.v1/v2。
 
 `human_review_required=true`、`execution_allowed=false` 均为强制字段。
 Registry、compile 和 verify 不消费这种草案；没有“改一个 approved=true 就执行”的通道。
