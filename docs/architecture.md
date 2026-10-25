@@ -1,6 +1,6 @@
 # 架构与信任边界
 
-CounterGuard 只对可信的本地 Python / pytest 代码执行。它把一次已复现的缺陷编译成最小 Guard，再用已确认的合法反例约束这个 Guard 的适用范围。
+CounterGuard 只执行审核过的代码：本地可信的 Python / pytest 代码，或在审核过的 Docker 镜像里运行的固定仓库快照。它把一次已复现的缺陷编译成最小 Guard，再用已确认的合法反例约束这个 Guard 的适用范围。
 
 ```mermaid
 flowchart LR
