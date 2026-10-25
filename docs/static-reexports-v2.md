@@ -5,13 +5,11 @@
 
 ## 版本与入口
 
-显式 `contract prepare --profile static-reexport-v2` 生成 `contract.v6`，profile 为
-`standalone-static-reexport.v2`；契约字段 `export_algorithm=static-root-reexport.v2`、
-`closure_algorithm=module-import-closure.v2`、`hook_grammar=finite-raise-hook.v1` 均为封闭 Literal。
-`bootstrap plan --profile static-reexport-v2` 生成 `bootstrap-plan.v2`，仅作静态材料。
-新契约生成 `bootstrap-binding.v4`；B/F/H 分别重建算法、闭包、导出、钩子和所有源码 pin。
-默认 profile 为 `existing`，仍使用原有算法和 contract.v3/v4/v5；不自动尝试 v2。
-未知 profile、算法或字段均拒绝，不能降级后忽略。
+显式 `contract prepare --profile static-reexport-v2` 会生成 `contract.v6`，profile 是 `standalone-static-reexport.v2`。契约里 `export_algorithm=static-root-reexport.v2`、`closure_algorithm=module-import-closure.v2`、`hook_grammar=finite-raise-hook.v1` 都是封闭 Literal。
+
+`bootstrap plan --profile static-reexport-v2` 生成 `bootstrap-plan.v2`，只作静态材料。新契约生成 `bootstrap-binding.v4`，B/F/H 分别重建算法、闭包、导出、钩子和所有源码 pin。
+
+默认 profile 是 `existing`，仍然使用原有算法和 contract.v3/v4/v5，不会自动尝试 v2。未知 profile、算法或字段都拒绝，不能降级后忽略。
 
 比较目标无需虚构自己的 B/F/H。以下只读命令生成独立的 `static-target-inspection.v1`：
 
