@@ -18,7 +18,9 @@ Registry 的来源损坏、索引与 JSON 不一致，即使发生在 Candidate 
 
 ## 当前支持的适用性
 
-本版使用 `verified-evidence-source-snapshot.v1`：只接受经独立 Evidence/Guard 审核的原 buggy 或 fixed 源码字节、同一契约字节和已审核符号。仅支持 `guard.v1`、`project-config.v1` 的根导入布局、无项目依赖映射且只含标准库静态导入的目标。完整 head 树先经过 no-install profile 的静态预检；conftest、插件、依赖安装需求和需要人工复核的动态代码均不自动执行。只有声明的提交输入与经核验的 Guard 测试进入 Docker 挂载。
+本版使用 `verified-evidence-source-snapshot.v1`：只接受经独立 Evidence/Guard 审核的原 buggy 或 fixed 源码字节、同一契约字节和已审核符号。仅支持 `guard.v1`、`project-config.v1` 的根导入布局、无项目依赖映射且只含标准库静态导入的目标。
+
+完整 head 树先经过 no-install profile 的静态预检；conftest、插件、依赖安装需求和需要人工复核的动态代码均不自动执行。只有声明的提交输入与经核验的 Guard 测试进入 Docker 挂载。
 
 该规则是有限的已审核快照绑定，不是程序等价性证明，也不是 Scope 学习或跨提交泛化。其他源码字节、依赖闭包、导入布局或仓库 Guard 格式均为 unknown。文件影响范围的 unaffected 仅用于筛选，不会被改写为 Scope 的 inapplicable。
 
@@ -26,10 +28,16 @@ Registry 的来源损坏、索引与 JSON 不一致，即使发生在 Candidate 
 
 新的 `pilot-manifest.v3` 明确使用现有 owner head 中的历史文件名 `evidenceguard.yaml`；不修改该提交、文件或契约，也不建立新的 owner 提交。旧 manifest、Evidence、Guard 和授权保留原字节；当前实现的来源在新目录重捕获。其他 `src` 项目不因此自动获准，接入前置与估算见 [新项目条件](project-admission.md)。
 
-Beta 新增[独立字面量 Guard](standalone-guards.md)：guard.v3、Registry entry v3 和精确 B/F 完整闭包 Scope。
-它支持受审核普通模块/包的根/src 布局，使用 root-pytest8 runner；映射必须精确、契约必须来自 head、依赖闭包不能混合两个快照。
-仅来源核验通过的 Shadow/Active 可调度，执行前后重验 Registry/提交/授权。其他快照保持 unknown/4、run=null。
-含此 profile 的 Registry 产生 verify-report.v3，旧报告 v1/v2 的结构和判定语义保留。
+## 独立字面量 Guard（Beta）
+
+Beta 新增[独立字面量 Guard](standalone-guards.md)：`guard.v3`、Registry entry v3，以及精确 B/F 完整闭包的 Scope。
+
+- 支持受审核的普通模块/包根布局和 `src/` 布局，使用 root-pytest8 runner；
+- 映射必须精确，契约必须来自 head，依赖闭包不能混合两个快照；
+- 只有来源核验通过的 Shadow / Active 可调度，执行前后都要重验 Registry、提交和授权；
+- 其他快照保持 unknown / 4、`run=null`。
+
+含这个 profile 的 Registry 会产生 `verify-report.v3`；旧的 v1 / v2 报告结构和判定语义保留。
 
 ## 报告与退出码
 
