@@ -224,3 +224,16 @@ N×4重放、核验和报告；专项27项及两查询补测1项、快速层1313
 该桥接累计10个成功复跑容器并保留首轮4个失败容器，只证明工程链路；没有增加真实来源、真实观察或正式场景，
 当前计数仍为2/2/0，也没有外部标签、外部训练或scope_v2冻结。
 这些synthetic成员不计真实样本，外部用途不因这一步获得标签、训练或生产调度许可。
+
+## 最新正式准入状态
+
+[候选续查 v4](../../results/scope-v2-candidate-search-v4/README.md)又固定核查 7 个真实仓库/修复线索。
+其中 `parse#261` 已实际运行 preflight 与契约准备；它先因依赖声明进入 unknown，原测试又因动态字符串拼接
+被契约提取器拒绝。其余候选分别受 lambda、unittest/subTest、宿主 Git、依赖、缺少配套回归测试或
+提交不够独立阻塞。没有删 case、改 oracle、运行候选代码或放宽 profile。
+
+因此累计事实仍为：**候选记录 20、已验证来源修复 2、外部观察 pair 2、正式准入场景 0**。
+候选记录包括原 `candidates.jsonl` 的 13 条结构化记录和 v4 回执的 7 条只读 desk screen；两者用途不同，
+不得把 desk screen 误写成已捕获 Evidence。机器可核验的准入状态见
+[scope_v2 readiness](../../results/scope-v2-readiness-v1/README.md)；在正式来源、标签、冻结 split 和训练 fit
+全部出现前，它必须以非零退出码阻止进入下一阶段。

@@ -1,0 +1,230 @@
+{
+  "$defs": {
+    "ReadinessCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_records": {
+          "minimum": 0,
+          "title": "Candidate Records",
+          "type": "integer"
+        },
+        "verified_source_repairs": {
+          "minimum": 0,
+          "title": "Verified Source Repairs",
+          "type": "integer"
+        },
+        "external_observation_pairs": {
+          "minimum": 0,
+          "title": "External Observation Pairs",
+          "type": "integer"
+        },
+        "formally_admitted_scenarios": {
+          "minimum": 0,
+          "title": "Formally Admitted Scenarios",
+          "type": "integer"
+        },
+        "frozen_train_rows": {
+          "minimum": 0,
+          "title": "Frozen Train Rows",
+          "type": "integer"
+        },
+        "frozen_holdout_rows": {
+          "minimum": 0,
+          "title": "Frozen Holdout Rows",
+          "type": "integer"
+        },
+        "fitted_guard_slots": {
+          "minimum": 0,
+          "title": "Fitted Guard Slots",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "candidate_records",
+        "verified_source_repairs",
+        "external_observation_pairs",
+        "formally_admitted_scenarios",
+        "frozen_train_rows",
+        "frozen_holdout_rows",
+        "fitted_guard_slots"
+      ],
+      "title": "ReadinessCounts",
+      "type": "object"
+    },
+    "ReadinessInput": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "content_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Content Digest",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "research_specification",
+            "data_card",
+            "candidate_ledger",
+            "source_observation",
+            "engineering_qualification"
+          ],
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "content_digest",
+        "role"
+      ],
+      "title": "ReadinessInput",
+      "type": "object"
+    },
+    "ReadinessStage": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "specification",
+            "feasibility",
+            "formal_contracts",
+            "real_data",
+            "freeze",
+            "train_fit"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "partial",
+            "blocked",
+            "not_started"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "title": "Reason Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "status"
+      ],
+      "title": "ReadinessStage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "scope-v2-readiness.v1",
+      "default": "scope-v2-readiness.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "study_id": {
+      "const": "scope_v2",
+      "default": "scope_v2",
+      "title": "Study Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "source_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Source Commit",
+      "type": "string"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "#/$defs/ReadinessInput"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Inputs",
+      "type": "array"
+    },
+    "stages": {
+      "items": {
+        "$ref": "#/$defs/ReadinessStage"
+      },
+      "maxItems": 6,
+      "minItems": 6,
+      "title": "Stages",
+      "type": "array"
+    },
+    "counts": {
+      "$ref": "#/$defs/ReadinessCounts"
+    },
+    "outcome": {
+      "enum": [
+        "insufficient_data",
+        "ready_for_freeze",
+        "study_fit_complete"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "holdout_exposure": {
+      "enum": [
+        "not_created",
+        "sealed",
+        "known"
+      ],
+      "title": "Holdout Exposure",
+      "type": "string"
+    },
+    "standards_relaxed": {
+      "const": false,
+      "default": false,
+      "title": "Standards Relaxed",
+      "type": "boolean"
+    },
+    "external_execution_allowed": {
+      "const": false,
+      "default": false,
+      "title": "External Execution Allowed",
+      "type": "boolean"
+    },
+    "next_phase_allowed": {
+      "title": "Next Phase Allowed",
+      "type": "boolean"
+    },
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "source_commit",
+    "inputs",
+    "stages",
+    "counts",
+    "outcome",
+    "holdout_exposure",
+    "next_phase_allowed",
+    "artifact_digest"
+  ],
+  "title": "ScopeV2Readiness",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
