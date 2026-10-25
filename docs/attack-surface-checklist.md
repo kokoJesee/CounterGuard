@@ -42,6 +42,8 @@
 
 ## 接入检查与 CI 展示的补充边界
 
+下面按功能列边界，每段对应一次新增能力和它的实测。段首的 `W01/W03` 这类编号只标明这次改动碰到哪条攻击面，不代表当前状态，也不构成新的保证。
+
 W01/W03 增加[实验性研究重放](research-replay.md)：独立授权 v6 分列 source H 与 target 提交，
 保留原契约/oracle，按当前完整来源、映射、可信审核摘要及 runner/policy/code pins 在运行前后核验。
 [自有 Docker 专项](../tests/integration/test_study_bridge.py)覆盖两独立 Git 历史、根→src 布局、
