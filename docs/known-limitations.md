@@ -53,7 +53,7 @@ CLI 自己生成的错误摘要会移除显式凭据赋值和绝对路径；启�
 
 默认不会把 API key 环境变量传给子 pytest，录制 AgentContext 也不包含环境、fixed 实现或 benchmark 标签。但这个边界不阻止可信目标主动读取本机文件或自行访问网络。
 
-## 仓库接入试点（validators / fork）
+## 仓库接入试点
 
 试点限定为 validators 的固定 B/F/H 和 MAC 全部 10 个回归 case。`pilot-scope.v1` 是已审核的精确快照绑定，不是学习作用域，没有验证跨提交或跨仓库的泛化。
 

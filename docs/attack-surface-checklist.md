@@ -171,7 +171,7 @@ W3-A/B 固定 profile、正式镜像同组四项复验和 W3-C 本地 Registry �
 
 validators 固定 fork 试点已按全部检查点完成。未来接入其他仓库时仍需各自通过这些前置检查；失败时保留诊断并停止执行，不用可信本地模式绕过。Registry/CI 的身份与权限仍是 W4 的未关闭事项。此流程不改变 scope_v1 的标签、指标或历史验收。
 
-历史“verify 通过”的解释见 [旧验证结论的边界](known-limitations.md#历史验证结论的边界)。
+历史“verify 通过”的解释见 [旧验证结论的边界](known-limitations.md#历史结论的边界)。
 
 MVP 冻结补充：A09 的依赖缺失预检由 [test_runner_dependency.py](../tests/unit/test_runner_dependency.py) 和[安装验收](results/mvp-freeze-v1/final-checks.json)覆盖；缺 pytest 元数据或模块时，CLI 给出 runner 安装提示、执行器不启动进程。这不关闭 W01 的未知代码隔离缺口。
 

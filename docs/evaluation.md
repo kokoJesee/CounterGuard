@@ -26,7 +26,7 @@ true_bug = guard_applicable and guard_violation
 
 从 initial 到 refined，修正了 2 个错误应用，保留 2 个真实适用样本，没有新增 FP/FN。四方法实际执行 16 次，来源缺陷另外复检 4 次，这 4 次不进入 holdout 分母。标准六行 Demo 得到的是 2 pass / 2 violation / 2 skipped_inapplicable、实际 Replay 4 次，它和留出评测是两条不同的数据路径。
 
-发布汇总见 [Markdown](results/mvp-evaluation.md)，引用的都是冻结的原始数据和摘要，并附带历史版本的只读复验说明。发布冻结不会重跑留出集去生成「当前版本的新结果」；现行代码拒绝旧 manifest 的源码绑定是预期行为，切回原提交复验也只继承旧版本的检查范围，见[历史验证结论的边界](known-limitations.md#历史验证结论的边界)。
+发布汇总见 [Markdown](results/mvp-evaluation.md)，引用的都是冻结的原始数据和摘要，并附带历史版本的只读复验说明。发布冻结不会重跑留出集去生成「当前版本的新结果」；现行代码拒绝旧 manifest 的源码绑定是预期行为，切回原提交复验也只继承旧版本的检查范围，见[历史结论的边界](known-limitations.md#历史结论的边界)。
 
 这 15 行全部公开，只有两个契约族，元数据是手工确认的，执行也在受控本地环境里。它能支持的是机制和工程一致性的结论，不能用来主张任意仓库、程序等价、安全执行未知代码或真实模型稳定性。
 
