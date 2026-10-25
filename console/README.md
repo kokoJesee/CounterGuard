@@ -22,6 +22,29 @@ python console/tools/export_console_data.py --root .
 
 没有数据时页面只显示提示，不会伪造记录。
 
+## 第一次使用（3 分钟）
+
+在仓库根目录导出一次数据：
+
+```powershell
+python console/tools/export_console_data.py --root .
+```
+
+看到下面两行，说明数据已经生成（数字来自当前仓库）：
+
+```text
+Guard 2 个 · 验证记录 7 条 · 回归 3 条
+适用范围实验：训练 9 / 留出 6 · 方法 4
+```
+
+然后打开 `console/index.html`，按顺序看五个地方：
+
+1. **总览**：顶部四个数是 2 / 7 / 3 / 100%。右侧是最近一次 Docker verify 的失败断言和来源缺陷。
+2. **守卫库**：点第一行 `limit=0 必须拒绝`。抽屉里是契约、接口、initial / refined 条件，以及唯一一条 case（`raw=0` 必须抛 `ValueError`）。
+3. **验证记录**：先看「适用范围」这一列。`适用` 才有执行结果，`不适用` 是 `未执行`，不会被算成通过。
+4. **适用范围**：对比 initial 和 refined，refined 多了 `interface_kind`；四方法表里 refined 的错误应用率是 0%。
+5. **告警**：只收「确认适用 + 执行失败」的记录，当前 3 条，其中 1 条标了阻断。
+
 ## 五个页面
 
 | 页面 | 内容 |
@@ -43,6 +66,18 @@ index.html#/guards/grd_discount_member_rate_regression_v2
 index.html#/records/vfy_001
 index.html?demo=1#/overview          # 直接进入演示数据
 ```
+
+## 常见操作
+
+**查某条守卫最近怎么样。** 守卫库点行，抽屉顶部是状态和最近结果；表格的「最近结果」列同时给了时间。
+
+**核对一次重放为什么跳过。** 验证记录点那一行，抽屉里的判定链路按 `scope_decision → execution_outcome → final_verdict` 展开。`not_run` 就是没启动 pytest。
+
+**看某个目标为什么不适用。** 适用范围页的 refined 条件，和记录抽屉里的 clause 比对，两边能对上。
+
+**截图或录屏。** 右上角切到「演示数据」，页面会挂横幅。录完切回真实记录，别把 128 条演示守卫当项目数据发出去。
+
+**把某一页发给别人。** 直接用深链，比如 `index.html#/records/vfy_001`；对方用同一份导出数据就能看到同一条记录。
 
 ## 真实记录 vs 演示数据
 
@@ -92,7 +127,6 @@ shots/                      真实记录模式的界面截图
 ## 交互冒烟测试（可选）
 
 ```powershell
-# 1) 用调试端口启动 Chrome
 # 1) 用调试端口启动 Chrome（chrome.exe 在 PATH 中）
 chrome --headless=new --remote-debugging-port=9333 --user-data-dir="$env:TEMP\cg-cdp" about:blank
 
@@ -109,6 +143,16 @@ node tools/smoke_console.mjs
 
 如果要把它变成产品入口，建议单独开一个阶段：新增 `counterguard console --export <dir>` 复用现有字段映射；
 用 `python -m http.server` 或 Typer 挂只读静态服务以避免 `file://`；再给导出器补单元测试并纳入验收记录。
+
+## 排错
+
+| 现象 | 原因 / 处理 |
+|---|---|
+| 页面显示「缺少数据文件」 | 还没导出，或导出到了别的目录。回到仓库根目录重跑导出。 |
+| 数字对不上 | 数据是旧的。重新导出后按 `Ctrl+F5` 强刷。 |
+| 双击没反应，或用记事本打开了 | 右键 → 打开方式 → 选 Edge 或 Chrome。 |
+| 页面白屏 | 打开浏览器控制台看报错；多数是 `data.js` 没生成或被清空。 |
+| 分不清当前是哪套数据 | 看顶部有没有橙色横幅、页脚有没有「当前为演示数据」。 |
 
 ## 已知边界
 
