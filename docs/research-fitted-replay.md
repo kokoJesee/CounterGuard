@@ -1,8 +1,8 @@
 # 学习规则的研究重放（实验接口）
 
-工具自有 fixture 的训练结果现在可以接入研究重放。新入口是
-`StudyFittedSession.audit / replay / verify`，复用原研究重放器的物化、Docker 运输、
-运行前后审核和原始 JUnit 核验。它不接入生产 Registry，也不批准外部目标或正式 scope_v2 评测。
+工具自有 fixture 的训练结果可以接入研究重放。新入口是 `StudyFittedSession.audit / replay / verify`，复用原研究重放器的物化、Docker 运输、运行前后审核和原始 JUnit 核验。
+
+它不接入生产 Registry，也不批准外部目标或正式 scope_v2 评测。
 
 ## 版本与共同准入
 
@@ -11,10 +11,9 @@ Docker authorization 为 v7。旧 v1/v6 模型和 Schema 保持原样，旧 pars
 旧 v1 learned 方法仍返回 unknown。训练侧的 fit/Scope 保持 `execution_allowed=false`，
 不能凭裸规则或自摘要取得执行权限。
 
-所有方法先重建同一 source/Guard、固定 target、原 oracle 映射、runner/policy、两份 fit 与特征对账。
-两份 fit 必须分别是 initial/refined，绑定同一 source、Guard、protocol、split 和拟合审核。
-重放核验两份 fit 会读其各自训练成员；initial 规则仍只由 initial 成员拟合，holdout 没有读取入口。
-查询目标只提供 context/audit，不接受查询适用性标签。
+所有方法先重建同一 source/Guard、固定 target、原 oracle 映射、runner/policy、两份 fit 和特征对账。两份 fit 必须分别是 initial 和 refined，绑定同一 source、Guard、protocol、split 和拟合审核。
+
+重放核验两份 fit 时会读各自的训练成员；initial 规则仍然只由 initial 成员拟合，holdout 没有读取入口。查询目标只提供 context/audit，不接受查询适用性标签。
 
 训练与查询共用实际定义核验：direct 绑定文件与符号，static-reexport-v2 绑定静态解析到的真实定义，
 闭包中同名 helper 不能代替目标。context 的接口类别也必须与执行审核一致。
