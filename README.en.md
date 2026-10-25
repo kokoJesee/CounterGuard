@@ -40,6 +40,23 @@ The scenario file is called `mvp.yaml`, but the parser only accepts a JSON subse
 
 The demo uses recorded proposals and local fixtures. No network, no model calls. It is a demo, not a sandbox for arbitrary Python.
 
+## Console
+
+The repository also ships a static console. No server, no build step:
+
+```powershell
+python console/tools/export_console_data.py --root .
+start console/index.html
+```
+
+The first command reads `.counterguard/`, `artifacts/` and `docs/results/` and writes `console/assets/data.js`. The second opens `console/index.html` in your default browser. Exported data contains local paths and is excluded by `console/.gitignore`, so a fresh clone needs one export first.
+
+It has five views: overview, guards, replay records, scope decisions and alerts. Guards and records open into a detail panel with the contract, applicability rule, cases, fixed self-check, digests and the decision trail of each replay: applicability first, execution second.
+
+![Console overview](console/shots/01-overview-real.png)
+
+Data comes from local artifacts by default. The toggle in the top-right switches to synthetic demo data; a banner says so, and the 128 demo guards are never presented as real records.
+
 ## Three states, kept apart
 
 Running a guard can produce three different answers, and CounterGuard records them separately:

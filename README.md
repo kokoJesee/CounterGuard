@@ -40,6 +40,23 @@ uv run counterguard demo --scenario examples/demo/mvp.yaml --workspace artifacts
 
 Demo 用提前录好的候选和本地 fixture，不联网，也不调用模型。它是演示，不是给任意 Python 代码用的沙箱。
 
+## 控制台
+
+仓库里带了一个静态控制台，不用起服务，也不用构建：
+
+```powershell
+python console/tools/export_console_data.py --root .
+start console/index.html
+```
+
+第一条命令从 `.counterguard/`、`artifacts/` 和 `docs/results/` 读数据，写出 `console/assets/data.js`；第二条用默认浏览器打开 `console/index.html`。导出文件里带着本机路径，已经被 `console/.gitignore` 排除，新克隆的仓库要先跑一次导出。
+
+里面有五个页面：项目总览、守卫库、验证记录、适用范围和告警。守卫和记录都能点开看详情，包括契约、适用条件、case、fixed 自检、摘要，以及每次重放先判适用性、再决定跑不跑的执行链路。
+
+![控制台总览](console/shots/01-overview-real.png)
+
+数据默认来自本机真实产物。右上角可以切到演示数据，页面会挂横幅说明这是合成样本，不会拿 128 条演示守卫冒充真实记录。
+
 ## 三个结论，别混在一起
 
 跑一条守卫，可能同时发生三件不同的事，CounterGuard 把它们分开记：
