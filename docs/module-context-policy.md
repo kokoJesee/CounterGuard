@@ -16,9 +16,13 @@ context_id: scope_v1_module_context
 artifact_digest: sha256:8f55d8564259edb5b03bcfd82c4055eaf5e31f3025adbd00ed2dfa6f475b0691
 ```
 
-规则使用点分包边界匹配，禁止重复或重叠前缀；未匹配或歧义时失败。`examples.discounted` 不属于 `examples.discount`。当前固定两条架构包规则；Scope learning 同时核对 context 自摘要和固定摘要，因此修改值后重新计算自摘要也不能悄悄改变 scope_v1。
+规则按点分包边界匹配，禁止重复或重叠前缀；未匹配或有歧义就失败。`examples.discounted` 不属于 `examples.discount`。
 
-新增模块组时，项目维护者先记录已有架构职责或独立项目配置来源，再由数据审核者检查映射是否含目标状态/标签信息，并冻结新 context 与实验协议版本。禁止为提高拟合结果，把一个 buggy/fixed 文件或一类已知标签单独划成模块组。现有 scope_v1 不原地扩充。
+当前固定两条架构包规则。Scope learning 会同时核对 context 自摘要和固定摘要，所以改完值再重算自摘要，也不能悄悄改变 scope_v1。
+
+新增模块组时，项目维护者先记录已有的架构职责或独立项目配置来源，再由数据审核者检查映射里是否含目标状态或标签信息，然后冻结新的 context 和实验协议版本。
+
+禁止为了提高拟合结果，把一个 buggy/fixed 文件或一类已知标签单独划成模块组。现有的 scope_v1 不原地扩充。
 
 如果同族出现另一个有独立架构依据的模块组，`module_group` 可以成为有信息量的特征；类型契约不禁止它参与学习。可信度来自独立来源、固定版本和审计，而不是“当前正好是常量”。
 
