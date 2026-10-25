@@ -12,11 +12,14 @@ plan/review/admission/result 为 v3，Docker authorization 为 v8，Schema 位�
 purpose 固定 `external_snapshot_observation_only`；旧 fixture-only v1/v2/v6/v7 不修改，旧 parser 拒绝新记录。
 plan 的 method 只能为 b1_always，必须引用非空的获审见证；不能传入 fit、训练仓库、标签、批准布尔或环境变量。
 
-调用方用 `issue_observation_review` 进行可信本机审核，单独保存返回的 review anchor。
-新审核绑定当前 source/Guard/Evidence/B/F/H、固定 target 全树/闭包、全部最小 case 映射、
-独立见证、简单 I/O 类别、runner/policy、全包源码和可选前序审核事件。
-该事件不认证远程身份，不自动发现最新撤回，也不提供密码学防回滚。
-同时控制可信 anchor、代码与主机的攻击不在保证内。
+调用方用 `issue_observation_review` 做可信本机审核，单独保存返回的 review anchor。新审核会绑定：
+
+- 当前 source / Guard / Evidence / B/F/H；
+- 固定 target 的整棵树和闭包，以及全部最小 case 映射；
+- 独立见证、简单的 I/O 类别；
+- runner / policy、全包源码，以及可选的前序审核事件。
+
+这个事件不认证远程身份，不自动发现最新撤回，也不提供密码学防回滚。同时控制可信 anchor、代码和主机的攻击不在保证范围内。
 
 原 source 契约仍必须是 H 的真实 blob。目标只提供自己的固定提交，不伪造目标 B/F/H。
 全部来源最小失败 case、位置参数、字面量与异常/消息 oracle 保留；仅允许原映射 grammar 的关键字改名，
