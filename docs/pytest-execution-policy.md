@@ -1,6 +1,6 @@
 # pytest 执行策略
 
-日期：2026-10-15。可信本地样本继续使用 LocalTrustedExecutor；W3-B 为未知仓库增加 Docker 受控模式。
+可信本地样本继续使用 LocalTrustedExecutor；未知仓库走 Docker 受控模式。
 
 ## 三个追问的处理
 
@@ -19,7 +19,9 @@
 | conftest / fixture 引导模块 | 明确选择允许的目录或模块，记录摘要，并在 Docker 内执行 |
 | 其他隐式依赖 | 不自动补齐；缺失时产生执行错误及说明 |
 
-独立 Guard 位于 artifacts 下，不会天然继承 `tests/conftest.py` 中的 fixtures。W3-B v1 选择更窄的安全边界：只提供受控模式，仍使用空配置、`--noconftest`、`-p no:cacheprovider` 和禁自动插件；不在宿主或容器中安装项目。会依赖项目 conftest、插件、build hook 或安装步骤的仓库不进入 W3-D 首个试点，而不是自动补齐后继续执行。
+独立 Guard 位于 artifacts 下，不会天然继承 `tests/conftest.py` 里的 fixtures。这一版选择更窄的安全边界：只提供受控模式，使用空配置、`--noconftest`、`-p no:cacheprovider` 和禁自动插件，不在宿主或容器里安装项目。
+
+会依赖项目 conftest、插件、build hook 或安装步骤的仓库，不进入首个试点，而不是自动补齐后继续执行。
 
 显式插件模式尚未实现。以后实现时，配置/插件包/fixture 引导模块必须进入授权摘要与 runner 镜像构建记录，并用新的 policy/配置协议版本；不能扩大 docker-policy.v1 的含义。
 
