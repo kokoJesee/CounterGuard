@@ -8,11 +8,20 @@
 | `supersedes` | 前驱的 `evidence_id`、工作区相对 `evidence_ref` 和 `artifact_digest` |
 | `recapture_reason` | 非空的重新捕获原因，与 `supersedes` 同时提供 |
 
-如果 ID 使用 `_vN` 后缀，N 必须与实际修订一致。旧 `evidence.v1` 在替代链内按修订 1 处理，但不向旧 JSON 注入新字段。同 ID 请求只能验证后复用；改变输入、替代关系或原因必须创建新修订。允许从测试源码已变更的前驱重新捕获，但前驱 JSON 和整条替代链必须完整，且 contract ID 保持一致。
+如果 ID 用了 `_vN` 后缀，N 必须和实际修订一致。旧 `evidence.v1` 在替代链里按修订 1 处理，但不会向旧 JSON 注入新字段。
+
+同一个 ID 的请求只能在验证后复用；改了输入、替代关系或原因，就必须创建新修订。允许从测试源码已经变化的前驱重新捕获，但前驱 JSON 和整条替代链必须完整，contract ID 也要保持一致。
 
 ## 唯一有效性标准
 
-**Evidence 能用于新的编译工作的唯一标准是 `evidence verify` 返回 0。** 这要求 Schema、自身摘要、契约、测试、两个目标、运行日志及替代链校验通过，并且双向运行确实满足 `reproduced=true`。文件存在、名称更新、Git SHA 或 JSON 中单独的 `reproduced=true` 都不能代替验证。
+一份 Evidence 能不能用于新的编译，只看 `evidence verify` 是否返回 0。这要求下面几项都通过：
+
+- Schema 和自身摘要；
+- 契约、测试、两个目标和运行日志；
+- 替代链；
+- 双向运行确实满足 `reproduced=true`。
+
+文件存在、名称更新、Git SHA 或 JSON 里单独一个 `reproduced=true`，都不能代替验证。
 
 - `verified` / `usable=true`：验证返回 0。
 - `diagnostic` / `usable=false`：内容完整，但没有复现，或存在运行基础设施错误。
