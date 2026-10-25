@@ -49,13 +49,17 @@ SQLite 逐字节索引规范 JSON，并追加镜像同一事件；每次访问�
 
 ## 依赖与重算规则
 
-后续统一入口使用 `verify-report.v2`，逐行及顶层绑定 runner review；`runner-catalog.v1` 由安装代码中的完整摘要固定，各 `runner-review.v1` 关联实际构建/隔离复验。修改配置文件并重算自摘要不能自行批准新镜像。新 image/profile 使用新审核记录、目录和代码 pin，不能改写旧收据。
+后续统一入口使用 `verify-report.v2`，逐行和顶层都绑定 runner review。`runner-catalog.v1` 由安装代码里的完整摘要固定，各 `runner-review.v1` 关联实际构建和隔离复验。
+
+改配置文件再重算自摘要，不能自行批准一个新镜像。新 image 或 profile 要用新的审核记录、目录和代码 pin，不能改写旧收据。
 
 固定仓库重放使用 `docker-execution-authorization.v3`，绑定 review、manifest、Inspection、Guard/Evidence、Scope、Registry 登记/状态事件 tip、请求与最小提交输入 pins。`pilot-manifest.v3` 只增加现有 owner head 历史配置名的显式兼容，不放宽契约来自 head。旧 v1/v2 授权与 v1 报告不改字段；新源码绑定要求新目录重新捕获/物化，不重签历史产物。
 
 统一验证新增 `verify-report.v1` 和 `guard-lifecycle-event.v1`，不改变旧 Registry 事件、Guard、Scope 或冻结协议的字节。生命周期事件依赖登记身份、Guard/Evidence 摘要与前驱事件；状态变更只追加事件，不重新捕获 Evidence。未来持久 Scope 绑定需另开事件版本。
 
-verify 报告依赖 inspection、Registry 登记与事件链快照、逐行 Scope 绑定、执行授权、RunRecord/日志及当前实现摘要。上述任一来源变化都需新输出目录；旧报告不重签。`decision_digest` 绑定规范排序的逐行来源/状态/Scope/执行类别和汇总，排除 RunRecord、运行工作目录、时间与运行 ID；完整 `artifact_digest` 仍绑定所有报告字段。两个摘要用途不同，不把重复运行的完整摘要伪造为相同。详见 [verify](verify.md)。
+verify 报告依赖 inspection、Registry 登记与事件链快照、逐行 Scope 绑定、执行授权、RunRecord/日志和当前实现摘要。上面任一来源变化，都要用新的输出目录；旧报告不重签。
+
+`decision_digest` 绑定规范排序后的逐行来源、状态、Scope、执行类别和汇总，排除 RunRecord、运行工作目录、时间和运行 ID；完整的 `artifact_digest` 仍然绑定所有报告字段。两个摘要用途不同，也不把重复运行的完整摘要伪造成相同。详见 [verify](verify.md)。
 
 当前 Evidence 只有 `artifact_digest`，没有 semantic_digest；Guard 才提供语义投影摘要。Feature 也不由 Guard 派生，而是由目标源码、声明契约和独立 module context 派生。纯 learning 依赖训练特征与适用性标签；物化 Scope/fit manifest 再绑定 Guard 和协议来源。这些分支在 Replay 汇合。
 
@@ -159,7 +163,9 @@ Gate 从已经严格验证的契约生成 `guard-test.v2` 模板测试，调用�
 | `generator_version` | 确定性测试生成器版本 |
 | `test_digest` | 生成的 `test_guard.py` 原始字节摘要 |
 
-算法：取上述字段的实际值，将嵌套模型转为 JSON 值，使用 UTF-8、键排序、紧凑分隔符、禁止 NaN 的规范 JSON，计算 SHA-256，输出 `sha256:<64 位小写十六进制>`。字段值与 case 数组顺序均参与摘要；`test_ref` 路径不参与。`guard-semantic.v1` 是这套规则的名称，**不是额外加入摘要载荷的第十个字段**。
+算法是：取上述字段的实际值，把嵌套模型转成 JSON，用 UTF-8、键排序、紧凑分隔符、禁止 NaN 的规范 JSON 计算 SHA-256，输出 `sha256:<64 位小写十六进制>`。
+
+字段值和 case 数组顺序都参与摘要，`test_ref` 路径不参与。`guard-semantic.v1` 是这套规则的名称，不是额外加进摘要载荷的第十个字段。
 
 明确排除：`schema_version`、`created_at`、`source_evidence_id/ref/digest`、`contract_digest`、`source_buggy_digest`、`source_fixed_digest`、`validation_run`（含 run ID、日志和时间）、`test_ref`、`state` 和 `artifact_digest`。完整 source contract 内容仍由协议的 source pin 和来源审核检查；最小执行内容则在 cases、接口、类型与测试摘要中固定。
 
