@@ -341,7 +341,9 @@ W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有�
 | image_digest / policy_digest | 本机实际 Docker image ID 与固定 policy 的规范化摘要；Docker 运行 `--pull=never` |
 | artifact_digest | 去自身摘要后的规范化 JSON SHA-256；执行前后仍须从 Inspection、配置、请求和工作区重建，不能只验自摘要 |
 
-任一上游变化都要求重新物化授权：Inspection/工具源码、配置字节、head 输入、Guard 测试、请求字段、policy 或 image ID。执行时只把 input_pins 与 test_ref 的已核对字节物化到新目录并只读挂载，未声明仓库文件不进入容器。RunRecord 保留 v1 形状，Docker 约束和 image ID 进入归一化 argv；授权本身由后续调度/Registry 作为独立来源保存。历史 W3-A 报告没有当前递归源码清单，不能被 W3-B 补签成授权，必须在新 ID/目录重跑 inspect。
+任一上游变化都要求重新物化授权：Inspection 或工具源码、配置字节、head 输入、Guard 测试、请求字段、policy、image ID。
+
+执行时只把 `input_pins` 和 `test_ref` 的已核对字节物化到新目录并只读挂载，未声明的仓库文件不会进入容器。RunRecord 保留 v1 形状，Docker 约束和 image ID 进入归一化的 argv；授权本身由后续调度或 Registry 作为独立来源保存。历史只读检查报告没有当前的递归源码清单，不能被 Docker 补签成授权，必须在新 ID 和目录里重跑 inspect。
 
 ## fork 版本（独立于冻结 scope_v1）
 
@@ -361,9 +363,9 @@ W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有�
 | pilot-execution-report.v2 | 逐 Guard 决策/来源/未判断原因及实际 run；其他业务 unknown/disabled 的 run=null。独立审核重建授权、原始 JUnit、Scope 与计数，不能只验自摘要 |
 | pilot-repeatability.v2 | 两份执行报告分别独立验证，要求独立 run ID，比较固定 H 的决策/计数投影；真实时间、UUID 和原始日志不改写 |
 
-RunRecord v1 的 cwd="." 相对于**该记录的授权 workspace_ref**，不是验证器进程的 cwd。
-新验证器重建请求时以工作区引用提供上下文；不把 cwd 偷换成宿主绝对路径。
-授权请求本身绑定本机路径，不能把归档授权冒充另一台机器的新执行授权。
+RunRecord v1 的 `cwd="."` 是相对于该记录的授权 `workspace_ref`，不是验证器进程的 cwd。新验证器重建请求时，用工作区引用提供上下文，不会把 cwd 偷换成宿主绝对路径。
+
+授权请求本身绑定本机路径，不能把归档的授权冒充成另一台机器上的新执行授权。
 
 新派生链的重算规则：
 
