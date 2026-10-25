@@ -1,10 +1,8 @@
 # GitHub Actions 与脱敏 Summary
 
-提供[可复制 workflow](../examples/github-actions/counterguard.yml)、
-[可信 fixture 驱动](../scripts/run_ci_fixture.py)和只读 `ci-report`。
-workflow 是 JSON 形式的合法 YAML，便于无额外 YAML 依赖地检查权限和上传路径。
-它只支持人工 workflow_dispatch 的**工具自带受控示例**，没有在本仓库启用，也没有真实 GitHub Actions 运行记录。
-本地 Git/Docker 专项验证不等于 GitHub 平台已验收。
+这里提供[可复制 workflow](../examples/github-actions/counterguard.yml)、[可信 fixture 驱动](../scripts/run_ci_fixture.py)和只读的 `ci-report`。workflow 用 JSON 形式的合法 YAML，方便在不引入 YAML 依赖的情况下检查权限和上传路径。
+
+它只支持人工 `workflow_dispatch` 的工具自带受控示例，没有在本仓库启用，也没有真实的 GitHub Actions 运行记录。本地 Git/Docker 专项验证不等于 GitHub 平台已经验收。
 
 ## Beta 的固定交付模板
 
@@ -30,10 +28,9 @@ counterguard ci-report --report <verify-output>/report.json --output <new-public
 缺失/截断/篡改报告产生明确失败 Summary，返回 5；已有输出目录不得覆盖。
 `ci-report` 不重新执行或审核来源链，也不把能重签整份 JSON 的攻击者认证为可信运行者。
 
-公开投影只保留计数、行序号、枚举状态和有限原因码、输入摘要；不含 Guard/target 名称、
-源码/契约/原日志、actor、路径、argv、异常文本或环境。未在词汇内的原因显示 other_reason_redacted。
-逐 Guard 的真实身份及完整原因留在私有原 report；公开 Summary 的行号用于本地对应。
-这不是任意文件的通用脱敏工具；不能把 raw `report.json`、Registry 或整个输出树上传替代投影。
+公开投影只保留计数、行序号、枚举状态、有限原因码和输入摘要，不含 Guard/target 名称、源码/契约/原日志、actor、路径、argv、异常文本或环境。不在词汇内的原因显示 `other_reason_redacted`。
+
+逐 Guard 的真实身份和完整原因留在私有原 report 里；公开 Summary 的行号只用于本地对应。这不是通用脱敏工具，不能拿 raw `report.json`、Registry 或整棵输出树代替投影上传。
 
 ## 受控示例如何运行
 
