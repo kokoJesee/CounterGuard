@@ -31,10 +31,9 @@ false_alert_rate = count(alert and not true_bug) / count(not true_bug)
 bug_recall = count(alert and true_bug) / count(true_bug)
 ```
 
-unknown 是混淆矩阵中的负预测，同时保留 unknown 计数、coverage、skipped_unknown；它不是 inapplicable 或通过。
-配对的 corrected_false_application 只计 initial=applicable → refined=inapplicable，不把转为 unknown 算明确纠正。
-执行故障不算检出；零分母指标与不能定义的差值为 null。macro 列出实际非 null 的 Guard，不能把 null 当 0。
-每个项目单独保留同样四方法指标，不能用总体收益掩盖某个项目的退化。
+unknown 在混淆矩阵里算负预测，同时保留 unknown 计数、coverage 和 skipped_unknown；它不是 inapplicable，也不是通过。
+
+配对的 `corrected_false_application` 只统计 initial=applicable → refined=inapplicable，不把转成 unknown 算作明确纠正。执行故障不算检出；零分母指标和无法定义的差值是 null。macro 只列实际非 null 的 Guard，不能把 null 当 0。每个项目单独保留同样的四方法指标，不能用总体收益掩盖某个项目的退化。
 
 本接口不提供 research_supported 字段：来源 Bug 保持检出、分组独立性、标签审核、正式协议、
 留出访问和原始重放来源尚须完整评测编排核对。算术改善本身不能代替这些条件。
