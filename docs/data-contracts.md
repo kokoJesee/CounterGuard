@@ -311,7 +311,7 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 | 契约/字段 | 类型与语义 |
 |---|---|
-| ProjectConfig | project_id、唯一 target_id 映射；每项 guard_id/source_ref/symbol/contract_ref，dependency_refs 可空；`module` 对 W3-A 兼容可空，声明时必须由 source_ref 唯一推导，W3-B 授权要求非空；ignored_paths 仅接受逐路径文档、根级仓库元数据和少量 CI 控制文件 |
+| ProjectConfig | project_id、唯一 target_id 映射；每项 guard_id/source_ref/symbol/contract_ref，dependency_refs 可空；`module` 在只读检查里可空，声明时必须由 source_ref 唯一推导，Docker 授权要求非空；ignored_paths 仅接受逐路径文档、根级仓库元数据和少量 CI 控制文件 |
 | config_digest | Digest；实际读取配置原字节 SHA-256，不等于作者/审核者认证 |
 | Snapshot.base_commit/head_commit | str 或 null；resolver 仅接受 40 位 SHA-1 commit ID，失败保留能解析的部分 |
 | Snapshot.changes | 已验证相对路径、A/M/D/T 和原/新 mode；关闭 rename 猜测，rename 表示 D+A |
@@ -324,13 +324,13 @@ v2 learning 的记录格式改变 artifact_digest，因此新 fit bundle 使用 
 
 读取/影响分析没有时间字段，不虚构时间换确定性。请求修订字符串、选定提交、配置字节、Git/源码版本均相同时，重读逐字节相同；不同 ref 别名即使解析到同一提交，也作为不同请求进入摘要。dirty tree、原 config 或无关新 refs 不作为代码来源。引用在检查期间变化则 unknown；不声称这是 OS 原子快照或防恶意并发恢复。
 
-输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。W3-A 新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 evaluation/MVP freeze/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
+输入变化时重算：配置字节/声明变化 → 新 Inspection；base/head 解析变化 → 新 Snapshot/Inspection；对象字节/路径边界变化 → 重新审核，损坏/链接拒绝；工具源码/Git 变化 → 新报告及摘要。只读检查的新模块被 CLI 导入，因此已纳入 Evaluation 的运行源码清单，当前版本不能重签旧 evaluation/MVP freeze/MVP manifest 来兼容新代码；历史按原提交保留，新运行另开目录。没有重新执行正式 holdout 或刷新历史评测。
 
-JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 W3-B 未关闭项见 [安全模型](security-model.md)。
+JSON Schema 不能完整表达所有路径/大小限制，运行时校验仍权威。限额、支持布局、已测攻击和 Docker 授权未关闭项见 [安全模型](security-model.md)。
 
 ## Docker 执行授权
 
-W3-B 新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有修改 `repository-inspection.v1`、RunRecord v1 或任何冻结 scope_v1 文件。
+Docker 授权新增 `docker-policy.v1` 与 `docker-execution-authorization.v1`；没有修改 `repository-inspection.v1`、RunRecord v1 或任何冻结 scope_v1 文件。
 
 | 契约/字段 | 类型与语义 |
 |---|---|

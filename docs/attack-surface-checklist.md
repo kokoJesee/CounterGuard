@@ -177,7 +177,7 @@ runner 与固定仓库统一入口补充：[两类镜像各四项复验](results
 
 W01–W04 是未关闭事项，每项 W3 安全边界都必须单独审核，即使 MVP 验收已通过。接入新仓库时，把每项拆成 `docs/security-model.md` 中的可信资产、攻击者能力、实现责任模块、攻击 fixture、预期拒绝和实测记录；新发现的边界追加 ID，不把“未测”改成空白。
 
-W3-A/B 固定 profile、正式镜像同组四项复验和 W3-C 本地 Registry 已有准入记录；这不替代候选仓库/契约/Guard/Scope 的审核。早期 validators 尝试因准入不足而停止，相关拒绝记录仍以历史结果保存，不计为执行通过。
+固定 profile 的只读检查、正式镜像的同组四项复验和本地 Registry 已有准入记录；这不替代候选仓库/契约/Guard/Scope 的审核。早期 validators 尝试因准入不足而停止，相关拒绝记录仍以历史结果保存，不计为执行通过。
 
 最终 [manifest-v5 验收记录](results/w3d-fork-v1/final-acceptance.json)显示：契约和配置位于 H 的真实提交 blob，上游文件与固定 fork 基线逐字节一致；只读准入、双向 Evidence、最小 Guard 和 Registry 核验通过后，才执行 Docker replay。Inspection.execution_allowed 仍恒为 false；执行能力由独立且逐次重建的 authorization.v2 授予，没有配置布尔开关或本地回退。该结论限于固定快照 MAC 集成，不扩大旧轮次或 scope_v1 的结论。
 
