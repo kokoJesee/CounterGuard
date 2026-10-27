@@ -43,7 +43,7 @@ Guard 2 个 · 验证记录 7 条 · 回归 3 条
 2. **守卫库**：点第一行 `limit=0 必须拒绝`。抽屉里是契约、接口、initial / refined 条件，以及唯一一条 case（`raw=0` 必须抛 `ValueError`）。
 3. **验证记录**：先看「适用范围」这一列。`适用` 才有执行结果，`不适用` 是 `未执行`，不会被算成通过。
 4. **适用范围**：对比 initial 和 refined，refined 多了 `interface_kind`；四方法表里 refined 的错误应用率是 0%。
-5. **告警**：只收「确认适用 + 执行失败」的记录，当前 3 条，其中 1 条标了阻断。
+5. **警告**：只收「确认适用 + 执行失败」的记录，当前 3 条，其中 1 条标了阻断。
 
 ## 五个页面
 
@@ -53,7 +53,7 @@ Guard 2 个 · 验证记录 7 条 · 回归 3 条
 | 守卫库 | Registry 里的全部守卫，按契约 / 状态 / 最近结果筛选；点行看详情抽屉 |
 | 验证记录 | 每条 replay / verify 的 `scope_decision`、`execution_outcome`、`final_verdict` |
 | 适用范围 | 三态计数、initial / refined 规则、留出集四方法对比 |
-| 告警 | 只收录「确认适用 + 执行失败」的违规；Shadow 阶段只记录不阻断 |
+| 警告 | 只收录「确认适用 + 执行失败」的违规；Shadow 阶段只记录不阻断 |
 
 ![验证记录](shots/04-records.png)
 
@@ -134,7 +134,7 @@ chrome --headless=new --remote-debugging-port=9333 --user-data-dir="$env:TEMP\cg
 node tools/smoke_console.mjs
 ```
 
-覆盖：列表渲染、行点击抽屉、Esc 关闭、搜索过滤、记录筛选、范围页数据、告警抽屉、真实/演示切换。当前 16/16 通过。
+覆盖：列表渲染、行点击抽屉、Esc 关闭、搜索过滤、记录筛选、范围页数据、警告抽屉、真实/演示切换。当前 16/16 通过。
 
 ## 在仓库内的位置
 

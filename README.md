@@ -60,7 +60,7 @@ python console/tools/export_console_data.py --root .
 start console/index.html
 ```
 
-静态页面，展示守卫、重放记录、适用范围和告警。导出数据含本机路径，已被 `.gitignore` 排除。说明见[控制台文档](console/README.md)。
+静态页面，展示守卫、重放记录、适用范围和警告。导出数据含本机路径，已被 `.gitignore` 排除。说明见[控制台文档](console/README.md)。
 
 ![控制台总览](console/shots/01-overview-real.png)
 

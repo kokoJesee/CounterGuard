@@ -397,13 +397,13 @@
     </div>` + pager(rows.length, page, PAGE_SIZE.records, 'records');
   }
 
-  /* ------------------------------------------------------------ 告警列表 */
+  /* ------------------------------------------------------------ 警告列表 */
   function alertListMarkup() {
     const rows = alertList();
     const page = Math.min(state.alertsPage, Math.max(1, Math.ceil(rows.length / PAGE_SIZE.alerts)));
     const slice = rows.slice((page - 1) * PAGE_SIZE.alerts, page * PAGE_SIZE.alerts);
     if (!slice.length) {
-      return `<div class="empty">${icon('check-circle')}<h3>没有匹配的告警</h3><p>只有「确认适用 + 执行失败」的守卫才会出现在这里；跳过与信息不足不算告警。</p></div>`;
+      return `<div class="empty">${icon('check-circle')}<h3>没有匹配的警告</h3><p>只有「确认适用 + 执行失败」的守卫才会出现在这里；跳过与信息不足不算警告。</p></div>`;
     }
     const cards = slice
       .map((alert) => {
@@ -487,7 +487,7 @@
       ? `${guard.source_defect} ${guard.source_defect_id || ''}`
       : `固定 CI fixture · ${record.contract || '—'}`;
     return `<div class="alert-box">
-      <div class="alert-title">${icon('alert')}检测到历史边界缺陷可能回归<span class="tag warn">告警</span></div>
+      <div class="alert-title">${icon('alert')}检测到历史边界缺陷可能回归<span class="tag warn">警告</span></div>
       <dl class="kv">
         <dt>匹配的守卫</dt><dd><strong>${esc(record.guard_name)}</strong></dd>
         <dt>来源缺陷</dt><dd>${esc(source)}</dd>
@@ -532,7 +532,7 @@
             <div class="verify-title">检查候选代码变更</div>
             <div class="verify-meta">${icon('branch')}<span>${esc(meta)}</span></div>
           </div>
-          <span class="tag ${bad ? 'bad' : 'ok'}">${bad ? '告警' : '通过'}</span>
+          <span class="tag ${bad ? 'bad' : 'ok'}">${bad ? '警告' : '通过'}</span>
         </div>
         ${record.trace?.length || (record.expect && record.actual) ? codePanel(record) : flowPanel(record)}
         ${bad ? alertBoxFor(record) : passBox(record)}
@@ -809,20 +809,20 @@
       </section>`;
   }
 
-  /* ------------------------------------------------------------ 页面：告警 */
+  /* ------------------------------------------------------------ 页面：警告 */
   function renderAlerts() {
     const data = ds();
     const violations = data.verifications.filter((record) => record.final_verdict === 'violation');
     return `<div class="page-head">
         <div>
-          <h1>告警</h1>
+          <h1>警告</h1>
           <p class="page-sub">只有「确认适用 + 执行失败」才会触发；Shadow 阶段的违规只记录，不阻断。</p>
         </div>
         <div class="page-actions"><span class="tag bad">${num(violations.length)} 条确认违规</span></div>
       </div>
       ${demoBanner()}
       <section class="card">
-        <div class="card-head">${icon('alert')}<h2 class="card-title">回归告警</h2>
+        <div class="card-head">${icon('alert')}<h2 class="card-title">回归警告</h2>
           <span class="count-pill">${num(data.alerts.length)}</span>
           <span class="card-link" style="pointer-events:none">${state.source === 'demo' ? '演示数据' : '本机记录'}</span>
         </div>
