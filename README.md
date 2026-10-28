@@ -4,7 +4,7 @@
 
 CounterGuard 是一个 Python 回归守卫工具。它把一次已确认的修复（旧版失败、新版通过）编译成只包含失败 case 的最小检查，再从已确认的合法反例里学出这条检查该作用在哪些代码上。
 
-> v0.5.0 Beta · Apache-2.0 · [English](README.en.md) · 未上 PyPI
+> v0.5.0 Beta · Apache-2.0 · [English](README.en.md)
 
 ## 安装
 
